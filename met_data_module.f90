@@ -27,6 +27,7 @@ END TYPE table_entry_struct
 TYPE table_bc_struct
 	CHARACTER (LEN=100) :: file_name
 	CHARACTER (LEN=10) :: table_type
+    DOUBLE PRECISION :: coeff(2) ! coefficients: currently just wind function
 	INTEGER :: max_entries
         INTEGER :: start_entry
 
@@ -88,6 +89,11 @@ SUBROUTINE read_met_data(met_files, max_times, status_iounit, error_iounit)
   END IF
 
   DO i = 1, max_zones
+                                ! default wind function coefficients
+
+     met_data(i)%coeff(1) = 0.46
+     met_data(i)%coeff(2) = 9.2
+
      ALLOCATE(met_data(i)%table_entry(max_times), STAT = alloc_stat)
      IF (alloc_stat /= 0) THEN
         WRITE (error_iounit,*) 'allocation failed for met zone table ', i
@@ -98,7 +104,7 @@ SUBROUTINE read_met_data(met_files, max_times, status_iounit, error_iounit)
   END DO
 	
   DO WHILE(.TRUE.)
-     READ(iounit2,*,END=200)met_zone, weather_filename
+     READ(iounit2,*,END=200)met_zone, weather_filename, met_data(met_zone)%coeff
      met_data(met_zone)%start_entry = 0
      met_data(met_zone)%max_entries = 0
      

@@ -11,7 +11,7 @@ DOUBLE PRECISION :: stephan_boltz = 5.67e-8 !stephan-boltzmann constant in W/m2-
 
 CONTAINS
 !######################################################################
-DOUBLE PRECISION FUNCTION net_heat_flux(net_solar, t_water, t_air, t_dew, wind_speed)
+DOUBLE PRECISION FUNCTION net_heat_flux(coeff, net_solar, t_water, t_air, t_dew, wind_speed)
 !
 ! Hnet - (watts/m^2)
 !
@@ -19,11 +19,15 @@ DOUBLE PRECISION FUNCTION net_heat_flux(net_solar, t_water, t_air, t_dew, wind_s
 ! equations in the report
 !
 IMPLICIT NONE
+DOUBLE PRECISION :: coeff(*)
 DOUBLE PRECISION :: net_solar,t_water, t_air, t_dew, wind_speed
 
 
-net_heat_flux = net_solar + net_longwave(t_air, t_dew) + back_radiation(t_water)&
-     & + evaporation(t_water, t_dew, wind_speed) + conduction(t_water, t_air, wind_speed) 
+net_heat_flux = net_solar + &
+     &net_longwave(t_air, t_dew) + &
+     &back_radiation(t_water) + &
+     &evaporation(coeff, t_water, t_dew, wind_speed) + &
+     &conduction(coeff, t_water, t_air, wind_speed) 
 
 END FUNCTION net_heat_flux
 !######################################################################
@@ -72,48 +76,51 @@ back_radiation = -emiss*stephan_boltz*(t_water + 273.15)**4
 END FUNCTION back_radiation
 
 !#########################################################################
-DOUBLE PRECISION FUNCTION evaporation(t_water, t_dew, wind_speed)
+DOUBLE PRECISION FUNCTION evaporation(coeff, t_water, t_dew, wind_speed)
 !
 ! He - (Watts/m^2)
 !
 ! heat flux OUT due to water evaporation
 ! formula 2.1.5 in Edinger, Brady, Geyer (1974)
 IMPLICIT NONE
+DOUBLE PRECISION :: coeff(*)
 DOUBLE PRECISION :: t_water	! water surface temperature in degrees C
 DOUBLE PRECISION :: t_dew 	! air temperature in degrees C
 DOUBLE PRECISION :: wind_speed	! wind speed in m/s at a height 7 m above water surface
 
-evaporation = -windspeed(wind_speed)*( sat_vapor_press(t_water) - sat_vapor_press(t_dew) )
+evaporation = -windspeed(coeff, wind_speed)*( sat_vapor_press(t_water) - sat_vapor_press(t_dew) )
 
 END FUNCTION evaporation
 
 !#########################################################################
-DOUBLE PRECISION FUNCTION conduction(t_water, t_air, wind_speed)
+DOUBLE PRECISION FUNCTION conduction(coeff, t_water, t_air, wind_speed)
 !
 ! Hc - (Watts/m^2)
 !
 ! heat flux OUT due to conduction
 ! formula 2.1.11 in Edinger, Brady, Geyer (1974)
 IMPLICIT NONE
+DOUBLE PRECISION :: coeff(*)
 DOUBLE PRECISION :: t_water	! water surface temperature in degrees C
 DOUBLE PRECISION :: t_air		! air temperature in degrees C
 DOUBLE PRECISION :: wind_speed	! wind speed in m/s at a height 7 m above water surface
 
-conduction = -0.47*windspeed(wind_speed)*(t_water - t_air)
+conduction = -0.47*windspeed(coeff, wind_speed)*(t_water - t_air)
 
 END FUNCTION conduction
 
 !#########################################################################
-DOUBLE PRECISION FUNCTION windspeed(wind_speed)
+DOUBLE PRECISION FUNCTION windspeed(coeff, wind_speed)
 !
 ! wind speed function required by conduction and evaporative heat fluxes
 ! has units of Watts/(m^2 mmHg)
 !
 ! formula 2.4.6 of in Edinger, Brady, Geyer (1974)
 IMPLICIT NONE
+DOUBLE PRECISION :: coeff(*)
 DOUBLE PRECISION :: wind_speed	! wind speed in m/s at a height 7 m above water surface
 
-windspeed = 9.2 + 0.46*wind_speed**2
+windspeed = coeff(2) + coeff(1)*wind_speed**2
 
 END FUNCTION windspeed
 
