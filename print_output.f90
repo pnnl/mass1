@@ -24,7 +24,7 @@
 !***************************************************************
 !
 
-SUBROUTINE print_output
+SUBROUTINE print_output(option)
 
 USE link_vars
 USE general_vars
@@ -47,8 +47,11 @@ REAL :: depth
 REAL :: tdg_press, tdg_sat
 DOUBLE PRECISION :: salinity = 0.0
 INTEGER :: link,point, iounit1
-        
-IF(time == time_begin )THEN
+CHARACTER (LEN=6) :: option
+
+SELECT CASE(option)
+
+CASE("HEADER")        
   
 	iounit1 = fileunit(7)
 	OPEN(fileunit(7),file=filename(7))
@@ -76,6 +79,10 @@ IF(time == time_begin )THEN
 1090 FORMAT(5x,'509-372-6241')
      WRITE(iounit1,1100)
 1100 FORMAT(5x,'marshall.richmond@pnl.gov'///)
+
+
+CASE("CONFIG")
+
 	 WRITE(iounit1,1120)date_run_begins,time_run_begins
 1120 FORMAT('Simulation Starts on Date: ',a10,'  Time: ',a8/)
 	 WRITE(iounit1,1130)date_run_ends,time_run_ends
@@ -117,13 +124,18 @@ WRITE(iounit1,'("gage control file - ",a80)') filename(14)
 WRITE(iounit1,'("profile control file - ",a80)') filename(15)
 
 
-WRITE(iounit1,'(//,"end of input specifications",//)')
+WRITE(fileunit(7),'(//,"end of input specifications",//)')
 
+CASE("LINKS ")
+   WRITE(fileunit(7),'(//,"--- Link Data ----------------",/)')
 
-ENDIF
+CASE("POINTS")
+   WRITE(fileunit(7),'(//,"--- Point Data ---------------",/)')
 
+CASE("SECTIO")
+   WRITE(fileunit(7),'(//,"--- Section Data -------------",/)')
 
-
+CASE("RESULT")
 !-----------------------------------------------------------------------------
 ! dumps all links and points at the simulation start and
 ! thereafter at the printout frequency
@@ -171,5 +183,8 @@ END DO
 IF(time >= time_end)THEN
 	CLOSE(fileunit(7))
 ENDIF
+
+END SELECT
+
 
 END SUBROUTINE print_output

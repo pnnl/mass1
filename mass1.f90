@@ -48,11 +48,13 @@ INTEGER :: error_iounit = 11,status_iounit = 99, species_num, i
 INTEGER :: link
 LOGICAL run
 
-version = 'MASS1 Version 0.83 Date: 06-15-1999'
+version = 'MASS1 Version 0.84 Date: 08-15-1999'
 WRITE(*,*)'Modular Aquatic Simulation System 1D (MASS1)'
 WRITE(*,*)'Pacific Northwest National Laboratory'
 WRITE(*,*)' '
 WRITE(*,*)version
+
+
 
 ! open the status file - this file records progress through the
 ! input stream and errors
@@ -62,6 +64,10 @@ OPEN(unit=99,file='status.out')
 
 ! read in configuration file
 CALL read_config
+
+CALL print_output("HEADER")
+CALL print_output("CONFIG")
+
 
 IF(debug_print == 1) WRITE(11,*)'done reading configuration file'
 
@@ -107,8 +113,10 @@ CALL section_data
 CALL link_bc
 	IF(debug_print == 1)WRITE(11,*)'link BC data done'
 
-CALL latflow_bc
-	IF(debug_print == 1)WRITE(11,*)'lateral inflow BC data done'
+IF(do_latflow)THEN
+   CALL latflow_bc
+   IF(debug_print == 1)WRITE(11,*)'lateral inflow BC data done'
+ENDIF
     
 IF(do_hotstart)THEN
 	CALL read_hotstart
@@ -141,6 +149,19 @@ IF(do_gas)THEN
 			EXIT
 		END SELECT
 	END DO
+    IF(gas_exchange)THEN
+       INQUIRE(FILE='gas_exchange_coeff.dat', EXIST=file_exist)
+       IF(file_exist)THEN
+          OPEN(88,file='gas_exchange_coeff.dat')
+          WRITE(99,*)'gas exchange coefficient file opened: '
+          READ(88,*)gasx_a,gasx_b,gasx_c, gasx_d
+          CLOSE(88)
+       ELSE
+          WRITE(*,*)'gas exchange coefficient file does not exist - ABORT'
+          WRITE(99,*)'gas exchange coefficient file does not exist - ABORT: '
+          CALL EXIT
+       ENDIF
+    ENDIF
 ENDIF
 
 IF(do_temp)THEN
@@ -173,7 +194,7 @@ DO WHILE(run)
                                 ! print out initial conditions
 
     IF (time == time_begin) THEN
-       IF (do_printout) CALL print_output
+       IF (do_printout) CALL print_output("RESULT")
        IF (do_profileout) CALL profile_output
        IF (do_gageout) CALL gage_output
     END IF
@@ -234,7 +255,7 @@ DO WHILE(run)
                                 ! do output as specified
 
     IF (MOD(time_step_count,print_freq) == 0) THEN
-       IF (do_printout)CALL print_output
+       IF (do_printout)CALL print_output("RESULT")
        IF (do_gageout) CALL gage_output	
        IF (do_profileout) CALL profile_output
 	ENDIF

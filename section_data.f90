@@ -38,7 +38,7 @@ SUBROUTINE section_data
 
         IMPLICIT NONE
 
-        INTEGER :: i,j,num_pairs
+        INTEGER :: i,j,num_pairs,io_unit
 		REAL :: xy(2*maxpairs)
         
         INQUIRE(FILE=filename(4),EXIST=file_exist)
@@ -51,15 +51,21 @@ SUBROUTINE section_data
            CALL EXIT
         ENDIF
 
+        io_unit = fileunit(7)
+        CALL print_output("SECTIO")
+        WRITE(io_unit,*)'Total number of section to be read = ',total_sections
+        WRITE(io_unit,'("Count",2x,"Section ID",2x,"Section Type",2x,"Delta Y",2x,"Num of (x,y) Pairs")')
+
         DO i=1,total_sections
 
         READ(fileunit(4),*)section_id(i),section_type(i)
+        WRITE(io_unit,'(i5,3x,i6,5x,i5)',ADVANCE='NO')i,section_id(i),section_type(i)
 
         SELECT CASE(section_type(i))
 
           CASE(1)    !rectangular section
             READ(fileunit(4),*)bottom_width(i)
-
+            WRITE(io_unit,'(5x,f8.2)',ADVANCE='YES')bottom_width(i)
 			SELECT CASE(units)
 			CASE(2)
 			  bottom_width(i) = bottom_width(i)*3.2808
@@ -85,7 +91,10 @@ SUBROUTINE section_data
 		  ! num_pairs = number of x,y paris for this section
 		  ! delta_y = depth increment to build table levels in, eg. 1 ft.
 
-			READ(fileunit(4),*)delta_y(i),num_pairs 
+			READ(fileunit(4),*)delta_y(i),num_pairs
+ 
+            WRITE(io_unit,'(8x,f6.2,5x,i5)',ADVANCE='YES')delta_y(i),num_pairs
+
 			READ(fileunit(4),*)xy(1:2*num_pairs)
 
 		  ! go to routine to compute section data on a grid

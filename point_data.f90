@@ -42,7 +42,7 @@ SUBROUTINE point_data
 
         IMPLICIT NONE
 
-        INTEGER :: i,link, junk, point,sec_num
+        INTEGER :: i,link, junk, point,sec_num,io_unit
         REAL :: delta_x, slope, start_el,end_el,manning_n,length,diffusion
 		REAL :: surface_mass_trans
         
@@ -55,12 +55,17 @@ SUBROUTINE point_data
            WRITE(99,*)'point data file does not exist - ABORT: ',filename(3)
            CALL EXIT
         ENDIF
+        
+        io_unit = fileunit(7)
+        CALL print_output("POINTS")
 
 
         DO WHILE(.TRUE.)
 
         READ(fileunit(3),*,END=100)link
         BACKSPACE(fileunit(3))
+
+        WRITE(io_unit,'("Link = ",i10," input option = ",i10)')link,input_option(link)
 
 		SELECT CASE(input_option(link))
 
@@ -70,6 +75,9 @@ SUBROUTINE point_data
         DO i=1,maxpoints(link)
 
           READ(fileunit(3),*)junk,point,x(link,i),section_number(link,i),thalweg(link,i), &
+                    manning(link,i),k_diff(link,i),k_surf(link,i)
+         
+          WRITE(io_unit,*)link,point,x(link,i),section_number(link,i),thalweg(link,i), &
                     manning(link,i),k_diff(link,i),k_surf(link,i)
 
 		kstrick(link,i) = 1.0/manning(link,i)
@@ -93,6 +101,8 @@ SUBROUTINE point_data
 
 
         READ(fileunit(3),*)junk,length,start_el,end_el,sec_num,manning_n,diffusion,surface_mass_trans
+       
+        WRITE(io_unit,*)link,length,start_el,end_el,sec_num,manning_n,diffusion,surface_mass_trans
     
 		SELECT CASE(channel_length_units)
 		CASE(1) ! length is in feet

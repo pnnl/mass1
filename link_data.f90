@@ -41,7 +41,9 @@ USE logicals, ONLY : file_exist
 
 IMPLICIT NONE
 
-INTEGER :: i,link,junk
+INTEGER :: i,link,junk,io_unit
+
+io_unit = fileunit(7)
 
 INQUIRE(FILE=filename(2),EXIST=file_exist)
 IF(file_exist)THEN
@@ -53,6 +55,7 @@ ELSE
    CALL EXIT
 ENDIF
 
+CALL print_output("LINKS ")
 
 DO i=1,maxlinks
 
@@ -61,10 +64,18 @@ DO i=1,maxlinks
 
    linkname(link) = link   
 
+  
+   WRITE(io_unit,*)'link number -',link
+
    READ(fileunit(2),*)junk,input_option(link),maxpoints(link),linkorder(link),&
         & linktype(link),num_con_links(link),linkbc_table(link),dsbc_table(link), &
         & transbc_table(link),tempbc_table(link),met_zone(link),latflowbc_table(link)
    READ(fileunit(2),*)ds_conlink(link),con_links(link,:)
+
+   WRITE(io_unit,*)link,input_option(link),maxpoints(link),linkorder(link),&
+        & linktype(link),num_con_links(link),linkbc_table(link),dsbc_table(link), &
+        & transbc_table(link),tempbc_table(link),met_zone(link),latflowbc_table(link)
+   WRITE(io_unit,*)ds_conlink(link),con_links(link,:)
         
 END DO
 

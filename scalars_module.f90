@@ -4,7 +4,7 @@
 !
 ! NAME:  MASS1 scalars module file
 !
-! VERSION and DATE: 0.80 10-5-98
+! VERSION and DATE: 0.84 08-15-99
 !
 ! PURPOSE:  header file for MASS2 model
 !
@@ -19,7 +19,7 @@
 ! MOD HISTORY: 10-5-98 added to MASS1 from MASS2
 !							fixed delta x bug in diffusion calc if you reverse distance
 !							reference frame; mcr 10-10-98
-!
+!              august 99 - added direct internal bc input, overides upstream C if active
 !
 !***************************************************************
 !
@@ -40,8 +40,10 @@ TYPE(scalar_struct), ALLOCATABLE :: species(:)
                                 ! sub-time-stepping
 
 DOUBLE PRECISION :: scalar_time, scalar_delta_t
-REAL, DIMENSION(:,:),ALLOCATABLE, SAVE, PRIVATE :: vel, area, area_old, q, q_old, y, y_old
+REAL, DIMENSION(:,:),ALLOCATABLE, SAVE, PRIVATE :: vel, area, width, area_old, q, q_old, y, y_old
 
+! air-water gas exchange coefficient parameters
+REAL :: gasx_a = 0.0, gasx_b = 0.0 , gasx_c = 0.0, gasx_d = 0.0
 
 CONTAINS
 !#####################################################################################################
@@ -96,7 +98,7 @@ SUBROUTINE allocate_species(error_iounit,status_iounit)
                                 ! allocate module PRIVATE hydrodynamic
                                 ! variables
 
-  ALLOCATE(vel(maxlinks,maxpoint), &
+  ALLOCATE(vel(maxlinks,maxpoint), width(maxlinks,maxpoint), &
        &area(maxlinks,maxpoint), area_old(maxlinks,maxpoint),&
        &q(maxlinks,maxpoint), q_old(maxlinks,maxpoint), &
        &y(maxlinks,maxpoint), y_old(maxlinks,maxpoint), STAT = alloc_stat)
@@ -158,7 +160,7 @@ SUBROUTINE tvd_interp(time, htime0, htime1)
            y(link,point) = SNGL(val)
 
            val = y(link,point) - thalweg(link,point)
-           CALL section(link, point, val, area(link,point), val0, val0, val0, val0)
+           CALL section(link, point, val, area(link,point), width(link,point), val0, val0, val0)
 
            ! val0 = DBLE(harea_old(link, point))
            ! val1 = DBLE(harea(link, point))
@@ -206,9 +208,9 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
   REAL :: f(maxpoint),table_interp
   REAL :: k_e,k_w,area_e,area_w,flux_e,flux_w
   REAL :: qspill,qgen 
-  REAL :: energy_source, depth
+  REAL :: energy_source, depth, transfer_coeff
   REAL :: tdg_saturation = 100.0, upstream_c
-  DOUBLE PRECISION :: salinity = 0.0
+  DOUBLE PRECISION :: salinity = 0.0, ccstar
 
   LOGICAL :: diffusion, fluvial, nonfluvial
 
@@ -342,22 +344,26 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                     
                     !			equations are for %Sat and effective Spill Q in Kcfs
                     !			Qspill is in effective KCFS = Qspill + qgen_frac*Qgen
-                    !			gas_eqn_type = 1 general quadratic function
+                    !			gas_eqn_type = 2 general quadratic function
                     !			tdg = a_gas + b_gas*Qspill + c_gas*Qspill**2
                     !			OR 
-                    !			gas_eqn_type = 2 exponetial equation
+                    !			gas_eqn_type = 3 exponetial equation
                     !			tdg = a_gas + b_gas*EXP(c_gas*Qspill)
                     
                     qspill = qspill + qgen_frac(link)*qgen
                     qgen   = qgen - qgen_frac(link)*qgen
                     
                     SELECT CASE(gas_eqn_type(link))
-                    CASE(1)
+                    CASE(2)
                        tdg_saturation = a_gas(link) + b_gas(link)*qspill/1000.0 + c_gas(link)*(qspill/1000.0)**2 
                        c(link,point) = SNGL(TDGasConcfromSat( DBLE(tdg_saturation), t_water, salinity, baro_press))
-                    CASE(2)
+                    CASE(3)
                        tdg_saturation = a_gas(link) + b_gas(link)*EXP(c_gas(link)*qspill/1000.0)
                        c(link,point) = SNGL(TDGasConcfromSat( DBLE(tdg_saturation), t_water, salinity, baro_press))
+                    CASE DEFAULT
+                       WRITE(*,*)'ABORT - no eqn error in type 21 link BCs at link = ',link
+                       WRITE(99,*)'ABORT - no eqn error in type 21 link BCs at link = ',link
+                       CALL EXIT
                     END SELECT
                  ENDIF
                  table_type = 2
@@ -369,25 +375,104 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                  !-----hydro inflow end
                  
               END SELECT
-              
-           ELSE ! internal link
+           !
+           ! pure internal connection between fluvial links - just mix and pass through
+           ELSE IF((num_con_links(link) /= 0) .AND. (transbc_table(link) == 0)) THEN
               sum = 0.0
               DO j=1,num_con_links(link)
                  sum = sum + q(con_links(link,j),maxpoints(con_links(link,j)))*c(con_links(link,j),maxpoints(con_links(link,j)))
                  c(link,point) = sum/q(link,point)
               END DO
+           
+           ! internal fluvial link that has an active table BC
+           ELSE IF((num_con_links(link) /= 0) .AND. (transbc_table(link) /= 0)) THEN ! internal link with table spec
+              
+              SELECT CASE(linktype(link))
+              CASE(1) ! % internal C (mg/L) specified
+                 table_type = 2
+                 c(link,point) = table_interp(time,table_type,transbc_table(link),time_mult)
+                 
+              CASE(20) ! internal %TDG Saturation is specified
+                 table_type = 2
+                 upstream_c = table_interp(time,table_type,transbc_table(link),time_mult)
+                 c(link,point) = SNGL(TDGasConcfromSat( DBLE(upstream_c), t_water, salinity, baro_press))
+                              
+              CASE(21) ! Hydro project inflow for an internal link
+                 table_type = 3 !generation flow
+                 qgen = table_interp(time,table_type,linkbc_table(link),time_mult)
+                 
+                 table_type = 4 !spill flow
+                 qspill = table_interp(time,table_type,linkbc_table(link),time_mult)
+                 
+                 IF(qspill > 0.0)THEN
+                    
+                    !			equations are for %Sat and effective Spill Q in Kcfs
+                    !			Qspill is in effective KCFS = Qspill + qgen_frac*Qgen
+                    !           gas_eqn_type = 0 No eqn given - read specified gas Conc (mg/L)
+                    !           gas_eqn_type = 1 No eqn given - read specified gas %Saturation
+                    !			gas_eqn_type = 2 general quadratic function
+                    !			tdg = a_gas + b_gas*Qspill + c_gas*Qspill**2
+                    !			OR 
+                    !			gas_eqn_type = 3 exponetial equation
+                    !			tdg = a_gas + b_gas*EXP(c_gas*Qspill)
+                    
+                    qspill = qspill + qgen_frac(link)*qgen
+                    qgen   = qgen - qgen_frac(link)*qgen
+                    
+                    SELECT CASE(gas_eqn_type(link))
+                    CASE(0)
+                       table_type = 2
+                       c(link,point) = table_interp(time,table_type,transbc_table(link),time_mult)
+                    CASE(1)
+                       table_type = 2
+                       tdg_saturation = table_interp(time,table_type,transbc_table(link),time_mult)
+                       c(link,point) = SNGL(TDGasConcfromSat( DBLE(tdg_saturation), t_water, salinity, baro_press))
+                    CASE(2)
+                       tdg_saturation = a_gas(link) + b_gas(link)*qspill/1000.0 + c_gas(link)*(qspill/1000.0)**2 
+                       c(link,point) = SNGL(TDGasConcfromSat( DBLE(tdg_saturation), t_water, salinity, baro_press))
+                    CASE(3)
+                       tdg_saturation = a_gas(link) + b_gas(link)*EXP(c_gas(link)*qspill/1000.0)
+                       c(link,point) = SNGL(TDGasConcfromSat( DBLE(tdg_saturation), t_water, salinity, baro_press))
+                    CASE DEFAULT
+                       WRITE(*,*)'ABORT - no eqn error in type 21 link BCs at link = ',link
+                       WRITE(99,*)'ABORT - no eqn error in type 21 link BCs at link = ',link
+                       CALL EXIT
+                    END SELECT
+                 ENDIF
+                 
+                 sum = 0.0
+                 DO j=1,num_con_links(link)
+                  sum = sum + q(con_links(link,j),maxpoints(con_links(link,j)))*c(con_links(link,j),maxpoints(con_links(link,j)))
+                  upstream_c = sum/q(link,point)
+                 END DO
+                 ! full mixing of spill and generation waters
+                 c(link,point) = (c(link,point)*qspill + upstream_c*qgen)/(qspill+qgen)
+                 !-----hydro inflow end
+                 
+              END SELECT
+           ELSE 
+              WRITE(*,*)'no trans BC specification for link',link,' -- ABORT'
+              WRITE(99,*)'no trans BC specification for link',link,' -- ABORT'
+              CALL EXIT
            ENDIF
            
-        CASE(2) ! temerature species
+        CASE(2) ! temperature species
            IF((num_con_links(link) == 0) .AND. (tempbc_table(link) /= 0))THEN
               table_type = 6
               c(link,point) = table_interp(time,table_type,tempbc_table(link),time_mult)
-           ELSE ! internal link
+           ELSE IF((num_con_links(link) /= 0) .AND. (tempbc_table(link) == 0)) THEN! internal link
               sum = 0.0
               DO j=1,num_con_links(link)
                  sum = sum + q(con_links(link,j),maxpoints(con_links(link,j)))*c(con_links(link,j),maxpoints(con_links(link,j)))
                  c(link,point) = sum/q(link,point)
               END DO
+           ELSE IF((num_con_links(link) /= 0) .AND. (tempbc_table(link) /= 0)) THEN! internal link with table spec
+              table_type = 6
+              c(link,point) = table_interp(time,table_type,tempbc_table(link),time_mult)
+           ELSE 
+              WRITE(*,*)'no temp BC specification for link',link,' -- ABORT'
+              WRITE(99,*)'no temp BC specification for link',link,' -- ABORT'
+              CALL EXIT
            ENDIF
         END SELECT
         
@@ -506,8 +591,15 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
         !
         IF((species_num == 1) .AND. (gas_exchange) )THEN
            DO point=2,maxpoints(link)-1
-              c(link,point) = c(link,point) + k_surf(link,point)*(100.0 - c(link,point))*delta_t
-              IF(c(link,point) < 100.0) c(link,point) = 100.0
+              CALL update_met_data(time, met_zone(link))
+              t_water = species(2)%conc(link,point)
+              ccstar  = TDGasConc(baro_press, t_water, salinity) !c* will be conc at baro press
+              transfer_coeff = gasx_a + gasx_b*windspeed + gasx_c*windspeed**2 + gasx_d*windspeed**3
+              transfer_coeff = transfer_coeff*3.2808/86400.0
+              !c(link,point) = c(link,point) + k_surf(link,point)*(100.0 - c(link,point))*delta_t
+              c(link,point) = c(link,point) + &
+                   transfer_coeff*(ccstar - c(link,point))*width(link,point)*delta_t/area(link,point)
+              IF(c(link,point) < 0.0) c(link,point) = 0.0
            END DO
            c(link,maxpoints(link)) = c(link,maxpoints(link)-1)
         ENDIF !degass if
@@ -521,7 +613,9 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
               energy_source = net_heat_flux(net_solar, t_water, t_air, t_dew, windspeed) &
                    /(1000.0*4186.0/3.2808) ! rho*specifc heat*depth in feet
               
-              c(link,point) = c(link,point) + energy_source*delta_t/depth
+              !c(link,point) = c(link,point) + energy_source*delta_t/depth
+              c(link,point) = c(link,point) + energy_source*delta_t*width(link,point)/area(link,point)
+
               IF(c(link,point) <   0.0) c(link,point) =   0.0 ! frozen - should add warning printout
               IF(c(link,point) > 100.0) c(link,point) = 100.0 ! boiling - should add warning printout
            END DO

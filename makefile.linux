@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created November 11, 1998 by William A. Perkins
-# Last Change: Fri Jul  2 15:00:54 1999 by William A. Perkins <perk@hughie.pnl.gov>
+# Last Change: Mon Aug 16 19:03:47 1999 by William A. Perkins <marshall@mack.pnl.gov>
 # -------------------------------------------------------------
 # RCS ID: $Id$
 
@@ -25,7 +25,7 @@ LIBLOC =
 LDFLAGS = ${LIBLOC} $(FLAGS)
 LIBS = -lU77
 
-TARGET = mass1_v083
+TARGET = mass1_v084
 SRCS = \
     array_alloc.f90				\
     array_dealloc.f90				\
