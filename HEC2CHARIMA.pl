@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December  2, 1996 by William A. Perkins
-# Last Change: Mon Dec  2 15:05:39 1996 by William A. Perkins <perk@doofus.pnl.gov>
+# Last Change: Wed Nov 11 10:16:59 1998 by William A. Perkins <perk@erebus.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -66,8 +66,10 @@ while (scalar(@ARGV) > 0) {
   }
   while (($hec2sect = HEC2Section::read_section(\*XSECT, $river)) != 0) {
     $charimasect = CHARIMASection::fromHEC2($hec2sect, $start);
-    $charimasect->write_section(\*OUTPUT);
-    $start += $step;
+    if (scalar($charimasect->points()) > 0) {
+      $charimasect->write_section(\*OUTPUT);
+      $start += $step;
+    }
   }
   close(XSECT);
 }
