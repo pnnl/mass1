@@ -1,3 +1,13 @@
+2000-12-04  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* makefile: added accumulator and profile output modules
+
+	* makefile.dec: made Linux compiler default and added the
+	accumulator module 
+
+	* profile_output.f90: initialization of `profile_max' in
+	profile_read. 
+
 2000-03-15  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* test/flow/slopebreak2: Created new test case

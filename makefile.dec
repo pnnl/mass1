@@ -8,11 +8,11 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created November 11, 1998 by William A. Perkins
-# Last Change: Fri Dec 10 12:19:49 1999 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Mon Nov 27 09:25:16 2000 by William A. Perkins <perk@gehenna.pnl.gov>
 # -------------------------------------------------------------
 # RCS ID: $Id$
 
-F90 = f95
+F90 = fort
 COMPILE.f90 = $(F90) $(F90FLAGS) -c $(DEBUG)
 LINK.f90 = $(F90) $(LDFLAGS)
 MOD=.mod
@@ -68,7 +68,8 @@ SRCS =											\
     trans_bc.f90								\
     date_to_decimal.f90							\
     decimal_to_date.f90							\
-    write_restart.f90
+    write_restart.f90							\
+	accumulator.f90
 
 MODULES =										\
     energy_flux$(MOD)							\
@@ -89,7 +90,8 @@ MODULES =										\
     transport_vars$(MOD)						\
     scalars$(MOD)								\
     julian$(MOD)								\
-    tdg_equation_coeff$(MOD)
+    tdg_equation_coeff$(MOD)					\
+	accumulator$(MOD)
 
 OBJS = $(SRCS:%.f90=%$(OBJ))
 
@@ -106,6 +108,13 @@ clean::
 	rm -f svgrp-test
 
 # dependancies for individual object files
+
+accumulator$(OBJ) : accumulator.f90					\
+    general_vars$(MOD)								\
+	link_vars$(MOD)									\
+    point_vars$(MOD)								\
+    scalars$(MOD)	
+accumulator$(MOD): accumulator$(OBJ)							
 
 array_alloc$(OBJ): array_alloc.f90				\
     general_vars$(MOD) 							\
@@ -150,7 +159,8 @@ gage_output$(OBJ): gage_output.f90				\
     scalars$(MOD)								\
     met_data_module$(MOD)						\
     gas_functions$(MOD)							\
-	hydro_output_module$(MOD)
+	hydro_output_module$(MOD)					\
+	accumulator$(MOD)
 
 gas_coeffs_module$(OBJ): gas_coeffs_module.f90
 
@@ -199,14 +209,16 @@ link_data$(OBJ): link_data.f90			\
     general_vars$(MOD)				\
     file_vars$(MOD)
 
-mass1$(OBJ): mass1.f90				\
-    general_vars$(MOD)				\
-    date_vars$(MOD)				\
-    file_vars$(MOD)				\
-    logicals$(MOD)				\
-    section_vars$(MOD)				\
-    scalars$(MOD)				\
-    met_data_module$(MOD)
+mass1$(OBJ): mass1.f90							\
+    general_vars$(MOD)							\
+    date_vars$(MOD)								\
+    file_vars$(MOD)								\
+    logicals$(MOD)								\
+    section_vars$(MOD)							\
+    scalars$(MOD)								\
+    met_data_module$(MOD)						\
+	profile_output_module$(MOD)					\
+	accumulator$(MOD)
 
 met_data_module$(OBJ): met_data_module.f90 date_vars$(MOD)
 
@@ -231,16 +243,18 @@ print_output$(OBJ): print_output.f90		\
     gas_functions$(MOD)				\
     met_data_module$(MOD)
 
-profile_output$(OBJ): profile_output.f90	\
-    link_vars$(MOD)					\
-    general_vars$(MOD)				\
-    point_vars$(MOD)					\
-    file_vars$(MOD)					\
-    transport_vars$(MOD)				\
-    date_vars$(MOD)					\
-    scalars$(MOD)					\
-    gas_functions$(MOD)				\
-    met_data_module$(MOD)
+profile_output$(OBJ): profile_output.f90		\
+    link_vars$(MOD)								\
+    general_vars$(MOD)							\
+    point_vars$(MOD)							\
+    file_vars$(MOD)								\
+    transport_vars$(MOD)						\
+    date_vars$(MOD)								\
+    scalars$(MOD)								\
+    gas_functions$(MOD)							\
+    met_data_module$(MOD)						\
+	accumulator$(MOD)
+profile_output_module$(MOD): profile_output$(OBJ)
 
 read_config$(OBJ): read_config.f90		\
     file_vars$(MOD)					\

@@ -71,6 +71,7 @@ CONTAINS
     INTEGER :: len1, spot1, spot2
    
 	count = 0
+    profile_max = 0
 
     INQUIRE(FILE=filename(15),EXIST=file_exist)
     IF(file_exist)THEN
