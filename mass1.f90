@@ -41,10 +41,11 @@ USE met_data_module, ONLY : read_met_data
 USE tdg_equation_coeff
 USE profile_output_module
 USE accumulator
+USE pidlink
 
 IMPLICIT NONE
 
-DOUBLE PRECISION  model_time, time_step, date_to_decimal
+DOUBLE PRECISION  model_time, date_to_decimal
 INTEGER, SAVE :: time_step_count = 0
 INTEGER :: error_iounit = 11,status_iounit = 99, species_num, i
 INTEGER :: link
@@ -284,6 +285,8 @@ DO WHILE(run)
 	ENDIF
 
     IF (do_accumulate) CALL accumulate()
+
+    CALL pidlink_assemble_lagged_flow()
 
 END DO ! end main time loop
 

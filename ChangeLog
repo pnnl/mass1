@@ -1,14 +1,33 @@
+2001-10-17  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* scalars_module.f90: Added nonfluvial link types 7 and 13
+
+	* nonfluvial_coeff.f90: Added link type 7, a sharp-crested weir
+	with movable crest -- DO NOT USE. Added link type 13, the PID dam
+	link.
+
+	* mass1.f90: move time into general_vars module, added call to
+	pidlink_assemble_lagged_flow 
+	
+	* modules.f90: moved time into general_vars module
+
+	* flow_sim.f90: included nonfluvial link 13
+
+	* makefile.sun:  updated to new f90 that makes a separate module
+	file for each module, and added pidlink
+
+	* makefile.linux (pidlink$(OBJ)): added
+
+2001-10-12  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* kick_off.f90: Call to pidhlink_initialize required.
+
+	* pidhlink.f90: Created.
+
 2001-06-12  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* energy_flux_module.f90: the coefficient for conduction is now
 	settable like the wind function coefficients
-
-2001-04-25  William A. Perkins  <wa_perkins@pnl.gov>
-
-	* flow_sim.f90: Added a downstream boundary condition (3) that was
-	supposed to allow waves to cross a held head boundary.  It does
-	not work, but might if the total energy, instead of stage, is
-	used. 
 
 2000-12-04  William A. Perkins  <wa_perkins@pnl.gov>
 

@@ -33,6 +33,7 @@ SUBROUTINE kick_off
 USE general_vars
 USE link_vars
 USE date_vars
+USE pidlink
 
 IMPLICIT NONE
 
@@ -95,5 +96,7 @@ CASE(2)
 
 END SELECT
 
+CALL read_pidlink_info()
+CALL pidlink_initialize()
 
 END SUBROUTINE kick_off

@@ -58,7 +58,7 @@ link = comporder(i)
 SELECT CASE(linktype(link))
 	CASE(1,20,21)
 		fluvial = .TRUE.
-	CASE(2,3,4,5,6)
+	CASE(2,3,4,5,6,7,13)
 		fluvial = .FALSE.
 END SELECT
 
@@ -166,7 +166,6 @@ ELSE
                                 ! nonfluvial links also need q_old for
                                 ! transport
 
-   q_old(link, :) = q(link, :)
    
 	IF(linktype(link) == 6)THEN	  ! hydropower plant
 	table_type = 3 !generation flow
@@ -183,6 +182,8 @@ ELSE
 	ENDIF
 
 	CALL nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
+
+   q_old(link, :) = q(link, :)
 
 END IF
 

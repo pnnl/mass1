@@ -27,13 +27,13 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Tue May  1 13:13:33 2001 by William A. Perkins <perk@gehenna.pnl.gov>
+! Last Change: Fri Oct 12 10:11:21 2001 by William A. Perkins <perk@gehenna.pnl.gov>
 !----------------------------------------------------------
 MODULE general_vars
 
 
 
-	DOUBLE PRECISION, SAVE :: time,time_begin,time_end,delta_t,time_mult
+	DOUBLE PRECISION, SAVE :: time,time_begin,time_end,delta_t,time_mult,time_step
 	INTEGER, SAVE :: units, channel_length_units
 	INTEGER, SAVE :: time_units,mass_check,debug_print
 	INTEGER, SAVE :: lateral_inflow_flag, sediment_flag, contaminant_flag
