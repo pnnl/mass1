@@ -1,3 +1,14 @@
+1999-11-03  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* profile_output.f90: changed the range of I/O units to from 81-90
+		  to 41-50
+
+	* hydro_output.f90: changed iobase to 100, all output files stay
+		  open now, and hydro_output_done is used to close them
+		  all 
+
+	* gage_output.f90: added call to hydro_output_done()
+
 1999-11-02  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* makefile (SRCS): added hydro_output.f90

@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created November  2, 1999 by William A. Perkins
-! Last Change: Tue Nov  2 16:09:44 1999 by William A. Perkins <perk@gehenna.pnl.gov>
+! Last Change: Wed Nov  3 15:37:37 1999 by William A. Perkins <perk@mack.pnl.gov>
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -17,9 +17,9 @@
 ! ----------------------------------------------------------------
 MODULE hydro_output_module
 
-  CHARACTER(LEN=256), PARAMETER, PRIVATE :: RCS_ID = "$Id$"
+  CHARACTER(LEN=80), PRIVATE, SAVE :: RCS_ID = "$Id$"
 
-  INTEGER, PARAMETER, PRIVATE :: iobase = 47
+  INTEGER, PARAMETER, PRIVATE :: iobase = 100
   INTEGER, PRIVATE :: hydro_links
 
   TYPE hydro_specs_struct
@@ -105,9 +105,8 @@ CONTAINS
           i = i + 1
           hydro_specs(i)%link = link
           CALL hydro_output_filename(hydro_specs(i))
-          OPEN(iobase, file=hydro_specs(i)%filename)
-          WRITE(iobase, 100) 
-          CLOSE(iobase)
+          OPEN(iobase + i, file=hydro_specs(i)%filename)
+          WRITE(iobase + i, 100) 
        END SELECT
     END DO
 100 FORMAT("#Date      Time       Discharge      Spill   ",&
@@ -131,15 +130,24 @@ CONTAINS
 
     DO i = 1, hydro_links
        link = hydro_specs(i)%link
-       OPEN(iobase, file=hydro_specs(i)%filename, POSITION='APPEND')
-       WRITE(iobase, 100) date, time, hydro_disch(link), hydro_spill(link),&
+       WRITE(iobase + i, 100) date, time, hydro_disch(link), hydro_spill(link),&
             &hydro_gen(link), hydro_temp(link), hydro_conc(link), hydro_sat(link)
-       CLOSE(iobase)
     END DO
 
 100 FORMAT(A10,1X,A8,1X,6(1X, F10.1))
   END SUBROUTINE hydro_output
 
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE hydro_output_done
+  ! ----------------------------------------------------------------
+  SUBROUTINE hydro_output_done()
 
+    INTEGER :: i
+
+    DO i = 1, hydro_links
+       CLOSE(iobase + i)
+    END DO
+
+  END SUBROUTINE hydro_output_done
 
 END MODULE hydro_output_module

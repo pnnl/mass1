@@ -8,7 +8,7 @@ Pacific Northwest Laboratory
 -------------------------------------------------------------
 -------------------------------------------------------------
 Created November  1, 1999 by William A. Perkins
-Last Change: Mon Nov  1 16:07:29 1999 by William A. Perkins <perk@mack.pnl.gov>
+Last Change: Wed Nov  3 15:03:55 1999 by William A. Perkins <perk@mack.pnl.gov>
 -------------------------------------------------------------
 
 $Id$
@@ -19,10 +19,6 @@ High Priority:
       ending dates are within the simulation, and crash if not, or (2)
       just use the first/last values before/after table start/end.
 
-    * There is some bug where profile output is written to time series
-      output, perhaps when there is a large number of time series
-      output locations.
-
 Low Priority:
 
     * use an formatted hotstart as with MASS2
@@ -30,7 +26,7 @@ Low Priority:
     * recode the transport so all calculations are DOUBLE PRECISION.
 
     * eliminate the use of link id's as array indices -- be able to
-      give links nonconsequetive, but unique id's, and generate array
+      give links nonconsecutive, but unique id's, and generate array
       indices internally
 
     * implement some kind of automatic scheme to determine link

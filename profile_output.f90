@@ -48,7 +48,9 @@ USE logicals, ONLY : file_exist
 
 IMPLICIT NONE
 
-INTEGER, PARAMETER :: maxpro=10
+CHARACTER(LEN=80), SAVE :: RCS_ID = "$Id$"
+
+INTEGER, PARAMETER :: maxpro=10, iobase=40
 
 REAL :: depth,x_pro_start(maxpro)
 REAL :: tdg_press, tdg_sat
@@ -94,7 +96,7 @@ IF(time == time_begin )THEN
 ! open the files for each profile
 
 	DO i=1,num_profiles
-	count = 80 + i
+	count = iobase + i
         fname = ''
 	fname(1:7) = 'profile'
 	WRITE(string1,*)i
@@ -168,7 +170,7 @@ ENDIF
 
 DO i=1,num_profiles
 
-count = 80 + i
+count = iobase + i
 WRITE(count,1110)
 1110 FORMAT('#',160('-'))
 CALL decimal_to_date
@@ -217,7 +219,7 @@ END DO
 IF(time >= time_end)THEN
 
 	DO i=1,num_profiles
-	count = 80 + i
+	count = iobase + i
 	CLOSE(count)
 	END DO
 

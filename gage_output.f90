@@ -42,6 +42,8 @@ USE hydro_output_module
 
 IMPLICIT NONE
 
+CHARACTER(LEN=80), SAVE :: RCS_ID = "$Id$"
+
 
 REAL :: depth, tdg_sat, tdg_press
 DOUBLE PRECISION :: salinity = 0.0
@@ -144,6 +146,7 @@ IF(time >= time_end)THEN
 	CLOSE(count)
 	END DO
 
+    CALL hydro_output_done()
 ENDIF
 
 END SUBROUTINE gage_output
