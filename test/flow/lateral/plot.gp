@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created July  2, 1999 by William A. Perkins
-# Last Change: Fri Jul  2 10:36:38 1999 by William A. Perkins <perk@hughie.pnl.gov>
+# Last Change: Tue Jul 13 08:04:44 1999 by William A. Perkins <perk@hazel.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -17,7 +17,7 @@ set nokey
 
 set xlabel "Distince Along Channel, feet"
 set ylabel "Simulated Discharge, cfs"
-set title "Lateral Inflow"
+set yrange [0:2000]
 
 set pointsize 0.5
 plot 'profile1.out' using (10656 - $4):6 with linespoints
