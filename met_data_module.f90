@@ -110,6 +110,12 @@ SUBROUTINE read_met_data(met_files, max_times, status_iounit, error_iounit)
      met_data(met_zone)%start_entry = 0
      met_data(met_zone)%max_entries = 0
      
+     WRITE (status_iounit, *) 'Coefficients for weather zone ', met_zone
+     WRITE (status_iounit, *) '        Wind a = ' , met_data(met_zone)%coeff(1)
+     WRITE (status_iounit, *) '        Wind b = ' , met_data(met_zone)%coeff(2)
+     WRITE (status_iounit, *) '    Conduction = ' , met_data(met_zone)%coeff(3)
+     WRITE (status_iounit, *) '         Brunt = ' , met_data(met_zone)%coeff(4)
+		
      INQUIRE(FILE=weather_filename,EXIST=file_exist)
      IF(file_exist)THEN
         OPEN(iounit1, file = weather_filename)
@@ -129,7 +135,7 @@ SUBROUTINE read_met_data(met_files, max_times, status_iounit, error_iounit)
 			 date_string = met_data(met_zone)%table_entry(j)%datetime%date_string
 			 time_string = met_data(met_zone)%table_entry(j)%datetime%time_string
        met_data(met_zone)%table_entry(j)%datetime%time = date_to_decimal()
-		
+
 		END DO
 100		CLOSE(iounit1)
 		END DO
@@ -140,6 +146,7 @@ END SUBROUTINE read_met_data
 
 !#####################################################################################################
 SUBROUTINE update_met_data(time, met_zone)
+  USE logicals, ONLY: do_gas
 	IMPLICIT NONE
 	DOUBLE PRECISION :: interp(5)
 	DOUBLE PRECISION :: time
@@ -165,7 +172,14 @@ SUBROUTINE update_met_data(time, met_zone)
 	t_air = interp(1)
 	t_dew = interp(2)
 	windspeed = interp(3)
-	baro_press = interp(4)
+
+                                ! let's ignore the barometric pressure
+                                ! if we are not doing gas
+
+    IF (do_gas) THEN
+       baro_press = interp(4)
+    END IF
+
 	net_solar = interp(5)
 
 

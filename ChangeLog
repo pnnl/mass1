@@ -1,3 +1,8 @@
+2001-11-19  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* met_data_module.f90: Print final met coefficients to status
+	file; ignore pressure unless gas is being simulated
+
 2001-11-12  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* pidlink.f90: Oops, forgot to initialize usebc
