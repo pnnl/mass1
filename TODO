@@ -1,3 +1,4 @@
+-*- text -*-
 -------------------------------------------------------------
 file: TODO
 List of things to do to MASS1, time permitting
@@ -8,7 +9,7 @@ Pacific Northwest Laboratory
 -------------------------------------------------------------
 -------------------------------------------------------------
 Created November  1, 1999 by William A. Perkins
-Last Change: Wed Nov  3 15:03:55 1999 by William A. Perkins <perk@mack.pnl.gov>
+Last Change: Fri Mar  3 08:10:47 2000 by William A. Perkins <perk@charon.pnl.gov>
 -------------------------------------------------------------
 
 $Id$
@@ -31,3 +32,7 @@ Low Priority:
 
     * implement some kind of automatic scheme to determine link
       computation order. 
+
+    * when atmospheric exchange is on met data are repeatedly
+      reinterpolated; we need to recode it so that the met data is
+      interpolated once for each zone and time step

@@ -1,3 +1,10 @@
+2000-03-03  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* profile_output.f90: same as gage_output
+
+	* gage_output.f90: needed to re-call update_met_data in order to
+	get barometric pressure right
+
 2000-02-02  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* makefile.lahey: created

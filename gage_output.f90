@@ -36,7 +36,7 @@ USE date_vars
 USE scalars
 USE met_data_module
 USE gas_functions
-USE logicals, ONLY : file_exist
+USE logicals, ONLY : file_exist, do_temp, do_gas, temp_exchange, gas_exchange
 
 USE hydro_output_module
 
@@ -114,6 +114,8 @@ count = 50 + i
 link = gage_link(i)
 point = gage_point(i)
 depth = y(link,point) - thalweg(link,point)
+IF( (do_temp .AND. temp_exchange) .OR. (do_gas .AND. gas_exchange) ) &
+     &CALL update_met_data(time, met_zone(link))
 tdg_sat =   TDGasSaturation( DBLE(species(1)%conc(link,point)), DBLE(species(2)%conc(link,point)), salinity, baro_press)
 tdg_press = TDGasPress( DBLE(species(1)%conc(link,point)), DBLE(species(2)%conc(link,point)), salinity)
 

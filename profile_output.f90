@@ -44,7 +44,7 @@ USE date_vars
 USE scalars
 USE gas_functions
 USE met_data_module
-USE logicals, ONLY : file_exist
+USE logicals, ONLY : file_exist, do_temp, do_gas, temp_exchange, gas_exchange
 
 IMPLICIT NONE
 
@@ -58,7 +58,7 @@ DOUBLE PRECISION :: salinity = 0.0
 REAL, ALLOCATABLE, SAVE, DIMENSION(:,:) :: x_profile
 INTEGER,ALLOCATABLE,SAVE, DIMENSION(:,:) :: profile_link,profile_point
 
-INTEGER :: i,j,link,point,profile(maxpro,100)
+INTEGER :: i,j,link,lastlink,point,profile(maxpro,100)
 INTEGER, SAVE :: num_profiles
 INTEGER :: profile_max=0,count=0
 INTEGER, SAVE :: profile_max_points(maxpro)
@@ -197,9 +197,15 @@ WRITE(count,1005)
 	 2x,'bed shear')
 WRITE(count,1110)
 
+lastlink = -1
+
 DO j=1,profile_max_points(i)
 
 link = profile_link(i,j)
+IF (link .NE. lastlink .AND. &
+     &(do_temp .AND. temp_exchange) .OR. (do_gas .AND. gas_exchange) ) &
+     &CALL update_met_data(time, met_zone(link))
+
 point = profile_point(i,j)
 depth = y(link,point) - thalweg(link,point)
 tdg_sat =   TDGasSaturation( DBLE(species(1)%conc(link,point)), DBLE(species(2)%conc(link,point)), salinity, baro_press)
@@ -218,6 +224,7 @@ WRITE(count,1000)link,point,j,x_profile(i,j),y(link,point),q(link,point),vel(lin
 			f8.2,2x,es10.2,2x, &
 			f8.2,2x,f6.2,f6.2,es10.2,2x,es10.2)
 
+lastlink=link
 
 END DO
 
