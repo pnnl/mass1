@@ -1,5 +1,7 @@
 1999-08-12  William A. Perkins  <wa_perkins@pnl.gov>
 
+	* test/flow/lateral/runit-nt.sh: created
+
 	* makefile.dec (FLAGS): removed the -real_size 64 and -double_size
 		  64 options
 
