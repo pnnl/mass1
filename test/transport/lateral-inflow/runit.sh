@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created July  2, 1999 by William A. Perkins
-# Last Change: Fri Sep 17 08:43:58 1999 by William A. Perkins <perk@erebus.pnl.gov>
+# Last Change: Mon Sep 27 12:25:26 1999 by William A. Perkins <perk@erebus.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -45,3 +45,16 @@ rm -f mass1.cfg
         gnuplot > plot-outflow.ps
 
 cp profile1.out profile1.outflow.out
+
+rm -f mass1.cfg
+ln -f -s mass1-vary.cfg mass1.cfg
+$model
+rm -f mass1.cfg
+
+(echo \
+    set terminal postscript portrait color solid \"Helvetica\" 14\; \
+    set title \"Transport with Varying Lateral Inflow/Outflow\"\; \
+    load \"plot.gp\"\; ) | \
+        gnuplot > plot-vary.ps
+
+cp profile1.out profile1.vary.out
