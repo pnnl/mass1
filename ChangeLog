@@ -1,3 +1,9 @@
+1999-07-13  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* flow_sim.f90: Assignment of downstream flow boundary condition
+	  resulted in an incorrect flow at the boundary -- fixed and
+	  tested with test/flow/storage case.
+
 1999-04-13  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* scalars_module.f90: add y and y_old as PRIVATE module variables.

@@ -41,7 +41,7 @@ IMPLICIT NONE
 REAL :: a,b,c,d,g,ap,bp,cp,dp,gp,denom
 REAL :: latq_old,latq_new
 REAL :: depth,area_temp,width,conveyance,dkdy,hydrad
-REAL :: sum,sum2,bcval,dy,dq,y_new_time
+REAL :: sum,sum2,bcval,dy,dq,y_new_time, q_new_time
 REAL :: table_interp, temp
 
 INTEGER :: i,j,point_num,link,point,table_type
@@ -225,8 +225,8 @@ CASE(2)
 ! given Q(t)
 	table_type = 1
 	q1 = q(link,point)
-	q(link,point) = table_interp(time,table_type,dsbc_table(link),time_mult)
-	dq = q(link,point) - q1
+	q_new_time = table_interp(time,table_type,dsbc_table(link),time_mult)
+	dq = q_new_time - q1
 	dy = (dq - f(link,point))/e(link,point)
 END SELECT
 
