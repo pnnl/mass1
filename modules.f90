@@ -27,7 +27,7 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Wed Mar 24 15:35:17 1999 by William A. Perkins <perk@erebus.pnl.gov>
+! Last Change: Tue Apr 13 08:24:16 1999 by William A. Perkins <perk@tophet>
 !----------------------------------------------------------
 MODULE general_vars
 
@@ -117,7 +117,7 @@ END MODULE link_vars
 MODULE point_vars
 
 REAL, DIMENSION(:,:),ALLOCATABLE, SAVE :: x, q,thalweg,y,manning,vel,kstrick
-REAL, DIMENSION(:,:),ALLOCATABLE, SAVE :: area, area_old, q_old,k_diff
+REAL, DIMENSION(:,:),ALLOCATABLE, SAVE :: area, area_old, q_old,y_old,k_diff
 REAL, DIMENSION(:,:),ALLOCATABLE, SAVE :: top_width, hyd_radius, froude_num, friction_slope, bed_shear
 REAL, DIMENSION(:,:),ALLOCATABLE, SAVE :: lateral_inflow
 !INTEGER, DIMENSION(:,:),ALLOCATABLE, SAVE ::	

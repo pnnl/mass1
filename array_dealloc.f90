@@ -62,7 +62,7 @@ DEALLOCATE(latflowbc_table, met_zone)
 !module point_vars
 
 DEALLOCATE(x, q, q_old)
-DEALLOCATE(thalweg,y,manning,vel)
+DEALLOCATE(thalweg,y,y_old, manning,vel)
 DEALLOCATE(kstrick, area, area_old)
 DEALLOCATE(k_diff)
 DEALLOCATE(lateral_inflow)

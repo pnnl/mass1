@@ -40,7 +40,7 @@ TYPE(scalar_struct), ALLOCATABLE :: species(:)
                                 ! sub-time-stepping
 
 DOUBLE PRECISION :: scalar_time, scalar_delta_t
-REAL, DIMENSION(:,:),ALLOCATABLE, SAVE, PRIVATE :: vel, area, area_old, q, q_old 
+REAL, DIMENSION(:,:),ALLOCATABLE, SAVE, PRIVATE :: vel, area, area_old, q, q_old, y, y_old
 
 
 CONTAINS
@@ -98,7 +98,8 @@ SUBROUTINE allocate_species(error_iounit,status_iounit)
 
   ALLOCATE(vel(maxlinks,maxpoint), &
        &area(maxlinks,maxpoint), area_old(maxlinks,maxpoint),&
-       &q(maxlinks,maxpoint), q_old(maxlinks,maxpoint), STAT = alloc_stat)
+       &q(maxlinks,maxpoint), q_old(maxlinks,maxpoint), &
+       &y(maxlinks,maxpoint), y_old(maxlinks,maxpoint), STAT = alloc_stat)
   IF(alloc_stat /= 0)THEN
      WRITE(error_iounit,*)'allocation failed for scalar hydrodynamic variables'
      CALL EXIT
@@ -118,39 +119,54 @@ END SUBROUTINE allocate_species
 SUBROUTINE tvd_interp(time, htime0, htime1)
 
   USE general_vars, ONLY: maxlinks, htime=>time, htime_begin=>time_begin
-  USE link_vars, ONLY: maxpoints
-  USE point_vars, ONLY: &
-       &hvel=>vel, harea=>area, harea_old=>area_old, hq=>q, hq_old=>q_old
+  USE link_vars, ONLY: maxpoints, linktype
+  USE point_vars, ONLY: thalweg, &
+       &harea=>area, harea_old=>area_old, hq=>q, hq_old=>q_old, &
+       &hvel=>vel, hy=>y, hy_old=>y_old
 
   IMPLICIT NONE
 
   DOUBLE PRECISION :: time, htime0, htime1
+  DOUBLE PRECISION :: val, val0, val1
   INTEGER :: link, point
   EXTERNAL dlinear_interp
   DOUBLE PRECISION dlinear_interp
 
-  IF (htime .eq. htime_begin) THEN
+  IF (time .eq. htime_begin) THEN
      DO link = 1, maxlinks
-        DO point = 1, maxpoints(link)
-           area(link,point) = harea_old(link,point)
-           q(link,point) = hq_old(link,point)
-           vel(link,point) = hvel(link,point)
-        END DO
+        y(link,:) = hy_old(link,:)
+        area(link,:) = harea_old(link,:)
+        q(link,:) = hq_old(link,:)
      END DO
   END IF
 
   DO link = 1, maxlinks
+     area_old(link,:) = area(link,:)
+     q_old(link,:) = q(link,:)
+     y_old(link,:) = y(link,:)
      DO point = 1, maxpoints(link)
-        area_old(link,point) = area(link,point)
-        area(link,point) = dlinear_interp(&
-             &DBLE(harea_old(link, point)), htime0, &
-             &DBLE(harea(link, point)), htime1, &
-             &time)
-        q_old(link,point) = q(link,point)
-        q(link,point) = dlinear_interp(&
-             &DBLE(q_old(link, point)), htime0, &
-             &DBLE(q(link, point)), htime1, time)
-        vel(link, point) = hvel(link,point)
+        val0 = DBLE(hq_old(link, point))
+        val1 = DBLE(hq(link, point))
+        val = dlinear_interp(val0, htime0, val1, htime1, time)
+        q(link,point) = SNGL(val)
+
+        SELECT CASE (linktype(link))
+        CASE(1,20,21)              ! do fluvial links only
+           val0 = DBLE(hy_old(link, point))
+           val1 = DBLE(hy(link, point))
+           val = dlinear_interp(val0, htime0, val1, htime1, time)
+           y(link,point) = SNGL(val)
+
+           val = y(link,point) - thalweg(link,point)
+           CALL section(link, point, val, area(link,point), val0, val0, val0, val0)
+
+           ! val0 = DBLE(harea_old(link, point))
+           ! val1 = DBLE(harea(link, point))
+           ! val = dlinear_interp(val0, htime0, val1, htime1, time)
+           ! area(link,point) = SNGL(val)
+
+           vel(link, point) = q_old(link,point)/area_old(link,point)
+        END SELECT
      END DO
   END DO
 END SUBROUTINE tvd_interp
@@ -167,9 +183,10 @@ END SUBROUTINE tvd_interp
 SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
 
   USE transport_vars , ONLY : k_surf, dxx
-  USE general_vars, hdelta_t => delta_t, htime => time
-  USE link_vars
-  USE point_vars, hq=>q, hq_old=>q_old, harea=>area, harea_old=>area_old, hvel=>vel
+  USE general_vars, ONLY : maxlinks, maxpoint, time_mult, time_begin
+  USE link_vars, ONLY : maxpoints, comporder, linktype, num_con_links, con_links,&
+       &linkbc_table, met_zone, tempbc_table, transbc_table
+  USE point_vars, ONLY: x, hy=>y, k_diff, thalweg
   USE linkbc_vars
   USE logicals
   
@@ -222,11 +239,11 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
      ! 
      !IF(linktype(link) /= 1 )THEN
      IF( nonfluvial )THEN
-	DO j=1,num_con_links(link)
+        DO j=1,num_con_links(link)
            c(link,1) =  c(con_links(link,j),maxpoints(con_links(link,j)))
-	END DO
+        END DO
         
-	IF((linktype(i) == 6) .AND. (species_num == 1))THEN
+        IF((linktype(i) == 6) .AND. (species_num == 1))THEN
            table_type = 3 !generation flow
            qgen = table_interp(time,table_type,linkbc_table(link),time_mult)
            
@@ -262,9 +279,9 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
            ! full mixing of spill and generation waters
            c(link,2) = (c(link,2)*qspill + c(link,1)*qgen)/(qspill+qgen)
            
-	ELSE
+        ELSE
            c(link,2) =	c(link,1)
-	ENDIF
+        ENDIF
         
         
         !------ do fluvial links --------------------------------------

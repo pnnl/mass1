@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created November 11, 1998 by William A. Perkins
-# Last Change: Thu Mar 25 12:45:55 1999 by William A. Perkins <perk@erebus.pnl.gov>
+# Last Change: Tue Apr  6 21:58:01 1999 by William A. Perkins <perk@erebus.pnl.gov>
 # -------------------------------------------------------------
 # RCS ID: $Id$
 
@@ -104,157 +104,157 @@ clean::
 # dependancies for individual object files
 
 array_alloc$(OBJ): array_alloc.f90 				\
-    GENERAL_VARS$(MOD) LINKBC_VARS$(MOD) LINK_VARS$(MOD) FLOW_COEFFS$(MOD) \
-    POINT_VARS$(MOD) SECTION_VARS$(MOD) TRANSPORT_VARS$(MOD)
+    general_vars$(MOD) linkbc_vars$(MOD) link_vars$(MOD) flow_coeffs$(MOD) \
+    point_vars$(MOD) section_vars$(MOD) transport_vars$(MOD)
 
 array_dealloc$(OBJ): array_dealloc.f90		\
-    LINKBC_VARS$(MOD) LINK_VARS$(MOD) FLOW_COEFFS$(MOD) \
-    POINT_VARS$(MOD) SECTION_VARS$(MOD) TRANSPORT_VARS$(MOD)
+    linkbc_vars$(MOD) link_vars$(MOD) flow_coeffs$(MOD) \
+    point_vars$(MOD) section_vars$(MOD) transport_vars$(MOD)
 
-coeff$(OBJ): coeff.f90 FLUVIAL_COEFFS$(MOD) GENERAL_VARS$(MOD)
+coeff$(OBJ): coeff.f90 fluvial_coeffs$(MOD) general_vars$(MOD)
 
-date_to_decimal$(OBJ): date_to_decimal.f90 JULIAN$(MOD)
+date_to_decimal$(OBJ): date_to_decimal.f90 julian$(MOD)
 
-decimal_to_date$(OBJ): decimal_to_date.f90 JULIAN$(MOD)
+decimal_to_date$(OBJ): decimal_to_date.f90 julian$(MOD)
 
 energy_flux_module$(OBJ): energy_flux_module.f90
 
-file_manager$(OBJ): file_manager.f90 FILE_VARS$(MOD)
+file_manager$(OBJ): file_manager.f90 file_vars$(MOD)
 
 flow_sim$(OBJ): flow_sim.f90			\
-    GENERAL_VARS$(MOD) LINK_VARS$(MOD) POINT_VARS$(MOD) \
-    FLUVIAL_COEFFS$(MOD) FLOW_COEFFS$(MOD) LOGICALS$(MOD)
+    general_vars$(MOD) link_vars$(MOD) point_vars$(MOD) \
+    fluvial_coeffs$(MOD) flow_coeffs$(MOD) logicals$(MOD)
 
 gage_output$(OBJ): gage_output.f90 			\
-    LINK_VARS$(MOD)				\
-    GENERAL_VARS$(MOD)				\
-    POINT_VARS$(MOD)				\
-    FILE_VARS$(MOD)				\
-    TRANSPORT_VARS$(MOD)			\
-    DATE_VARS$(MOD)				\
-    SCALARS$(MOD)				\
-    MET_DATA_MODULE$(MOD)			\
-    GAS_FUNCTIONS$(MOD)
+    link_vars$(MOD)				\
+    general_vars$(MOD)				\
+    point_vars$(MOD)				\
+    file_vars$(MOD)				\
+    transport_vars$(MOD)			\
+    date_vars$(MOD)				\
+    scalars$(MOD)				\
+    met_data_module$(MOD)			\
+    gas_functions$(MOD)
 
 gas_coeffs_module$(OBJ): gas_coeffs_module.f90
 
-gas_functions_module$(OBJ): gas_functions_module.f90 GAS_COEFFS$(MOD)
+gas_functions_module$(OBJ): gas_functions_module.f90 gas_coeffs$(MOD)
 
 gas_sim$(OBJ): gas_sim.f90			\
-    TRANSPORT_VARS$(MOD) GENERAL_VARS$(MOD) LINK_VARS$(MOD) \
-    POINT_VARS$(MOD) LINKBC_VARS$(MOD) LOGICALS$(MOD)
+    transport_vars$(MOD) general_vars$(MOD) link_vars$(MOD) \
+    point_vars$(MOD) linkbc_vars$(MOD) logicals$(MOD)
 
 gastrans$(OBJ): gastrans.f90
 
 general_data$(OBJ): general_data.f90		\
-    GENERAL_VARS$(MOD) SECTION_VARS$(MOD) FILE_VARS$(MOD)
+    general_vars$(MOD) section_vars$(MOD) file_vars$(MOD)
 
 hydro_bc$(OBJ): hydro_bc.f90			\
-    LINKBC_VARS$(MOD) FILE_VARS$(MOD) GENERAL_VARS$(MOD) \
-    DATE_VARS$(MOD)
+    linkbc_vars$(MOD) file_vars$(MOD) general_vars$(MOD) \
+    date_vars$(MOD)
 
 initial_cond$(OBJ): initial_cond.f90		\
-    POINT_VARS$(MOD)				\
-    LINK_VARS$(MOD)				\
-    GENERAL_VARS$(MOD)
+    point_vars$(MOD)				\
+    link_vars$(MOD)				\
+    general_vars$(MOD)
 
 julian$(OBJ): julian.f90
 
 kick_off$(OBJ): kick_off.f90			\
-    GENERAL_VARS$(MOD)				\
-    LINK_VARS$(MOD)				\
-    DATE_VARS$(MOD)
+    general_vars$(MOD)				\
+    link_vars$(MOD)				\
+    date_vars$(MOD)
 
 latflow_bc$(OBJ): latflow_bc.f90		\
-    LINKBC_VARS$(MOD)				\
-    FILE_VARS$(MOD)
+    linkbc_vars$(MOD)				\
+    file_vars$(MOD)
 
 linear_interp$(OBJ): linear_interp.f90
 
 link_bc$(OBJ): link_bc.f90			\
-    LINKBC_VARS$(MOD)				\
-    FILE_VARS$(MOD)
+    linkbc_vars$(MOD)				\
+    file_vars$(MOD)
 
 link_data$(OBJ): link_data.f90			\
-    GENERAL_VARS$(MOD)				\
-    FILE_VARS$(MOD)
+    general_vars$(MOD)				\
+    file_vars$(MOD)
 
 mass1$(OBJ): mass1.f90				\
-    GENERAL_VARS$(MOD)				\
-    DATE_VARS$(MOD)				\
-    FILE_VARS$(MOD)				\
-    LOGICALS$(MOD)				\
-    SECTION_VARS$(MOD)				\
-    SCALARS$(MOD)				\
-    MET_DATA_MODULE$(MOD)
+    general_vars$(MOD)				\
+    date_vars$(MOD)				\
+    file_vars$(MOD)				\
+    logicals$(MOD)				\
+    section_vars$(MOD)				\
+    scalars$(MOD)				\
+    met_data_module$(MOD)
 
-met_data_module$(OBJ): met_data_module.f90 DATE_VARS$(MOD)
+met_data_module$(OBJ): met_data_module.f90 date_vars$(MOD)
 
 modules$(OBJ): modules.f90
 
-nonfluvial_coeff$(OBJ): nonfluvial_coeff.f90 LINK_VARS$(MOD)
+nonfluvial_coeff$(OBJ): nonfluvial_coeff.f90 link_vars$(MOD)
 
 point_data$(OBJ): point_data.f90		\
-    LINK_VARS$(MOD)				\
-    SECTION_VARS$(MOD)				\
-    FILE_VARS$(MOD)				\
-    GENERAL_VARS$(MOD)				\
+    link_vars$(MOD)				\
+    section_vars$(MOD)				\
+    file_vars$(MOD)				\
+    general_vars$(MOD)				\
 
 print_output$(OBJ): print_output.f90		\
-    LINK_VARS$(MOD)					\
-    GENERAL_VARS$(MOD)				\
-    POINT_VARS$(MOD)					\
-    FILE_VARS$(MOD)					\
-    TRANSPORT_VARS$(MOD)				\
-    DATE_VARS$(MOD)					\
-    SCALARS$(MOD)					\
-    GAS_FUNCTIONS$(MOD)				\
-    MET_DATA_MODULE$(MOD)
+    link_vars$(MOD)					\
+    general_vars$(MOD)				\
+    point_vars$(MOD)					\
+    file_vars$(MOD)					\
+    transport_vars$(MOD)				\
+    date_vars$(MOD)					\
+    scalars$(MOD)					\
+    gas_functions$(MOD)				\
+    met_data_module$(MOD)
 
 profile_output$(OBJ): profile_output.f90	\
-    LINK_VARS$(MOD)					\
-    GENERAL_VARS$(MOD)				\
-    POINT_VARS$(MOD)					\
-    FILE_VARS$(MOD)					\
-    TRANSPORT_VARS$(MOD)				\
-    DATE_VARS$(MOD)					\
-    SCALARS$(MOD)					\
-    GAS_FUNCTIONS$(MOD)				\
-    MET_DATA_MODULE$(MOD)
+    link_vars$(MOD)					\
+    general_vars$(MOD)				\
+    point_vars$(MOD)					\
+    file_vars$(MOD)					\
+    transport_vars$(MOD)				\
+    date_vars$(MOD)					\
+    scalars$(MOD)					\
+    gas_functions$(MOD)				\
+    met_data_module$(MOD)
 
 read_config$(OBJ): read_config.f90		\
-    FILE_VARS$(MOD)					\
-    GENERAL_VARS$(MOD)				\
-    SECTION_VARS$(MOD)				\
-    POINT_VARS$(MOD)					\
-    DATE_VARS$(MOD)					\
-    LOGICALS$(MOD)
+    file_vars$(MOD)					\
+    general_vars$(MOD)				\
+    section_vars$(MOD)				\
+    point_vars$(MOD)					\
+    date_vars$(MOD)					\
+    logicals$(MOD)
 
 read_hotstart$(OBJ): read_hotstart.f90		\
-    LINK_VARS$(MOD)				\
-    GENERAL_VARS$(MOD)				\
-    POINT_VARS$(MOD)				\
-    FILE_VARS$(MOD)				\
-    TRANSPORT_VARS$(MOD)			\
-    SCALARS$(MOD)
+    link_vars$(MOD)				\
+    general_vars$(MOD)				\
+    point_vars$(MOD)				\
+    file_vars$(MOD)				\
+    transport_vars$(MOD)			\
+    scalars$(MOD)
 
 scalars_module$(OBJ): scalars_module.f90	\
-    TRANSPORT_VARS$(MOD)			\
-    GENERAL_VARS$(MOD)				\
-    LINK_VARS$(MOD)				\
-    POINT_VARS$(MOD)				\
-    LINKBC_VARS$(MOD)				\
-    LOGICALS$(MOD)				\
-    MET_DATA_MODULE$(MOD)			\
-    ENERGY_FLUX$(MOD)				\
-    TDG_EQUATION_COEFF$(MOD)			\
-    GAS_FUNCTIONS$(MOD)
+    transport_vars$(MOD)			\
+    general_vars$(MOD)				\
+    link_vars$(MOD)				\
+    point_vars$(MOD)				\
+    linkbc_vars$(MOD)				\
+    logicals$(MOD)				\
+    met_data_module$(MOD)			\
+    energy_flux$(MOD)				\
+    tdg_equation_coeff$(MOD)			\
+    gas_functions$(MOD)
 
-section$(OBJ): section.f90 SECTION_VARS$(MOD)
+section$(OBJ): section.f90 section_vars$(MOD)
 
 section_data$(OBJ): section_data.f90		\
-    SECTION_VARS$(MOD)				\
-    FILE_VARS$(MOD)
+    section_vars$(MOD)				\
+    file_vars$(MOD)
 
 section_table$(OBJ): section_table.f90
 
@@ -265,45 +265,45 @@ table_interp$(OBJ): table_interp.f90
 tdg_equation_coeff$(OBJ): tdg_equation_coeff.f90
 
 temp_sim$(OBJ): temp_sim.f90			\
-    TRANSPORT_VARS$(MOD)				\
-    GENERAL_VARS$(MOD)				\
-    LINK_VARS$(MOD)					\
-    POINT_VARS$(MOD)					\
-    LINKBC_VARS$(MOD)					\
-    LOGICALS$(MOD)
+    transport_vars$(MOD)				\
+    general_vars$(MOD)				\
+    link_vars$(MOD)					\
+    point_vars$(MOD)					\
+    linkbc_vars$(MOD)					\
+    logicals$(MOD)
 
 trans_bc$(OBJ): trans_bc.f90			\
-    LINKBC_VARS$(MOD)				\
-    FILE_VARS$(MOD)
+    linkbc_vars$(MOD)				\
+    file_vars$(MOD)
 
 write_restart$(OBJ): write_restart.f90		\
-    LINK_VARS$(MOD)				\
-    GENERAL_VARS$(MOD)				\
-    POINT_VARS$(MOD)				\
-    FILE_VARS$(MOD)				\
-    TRANSPORT_VARS$(MOD)			\
-    SCALARS$(MOD)
+    link_vars$(MOD)				\
+    general_vars$(MOD)				\
+    point_vars$(MOD)				\
+    file_vars$(MOD)				\
+    transport_vars$(MOD)			\
+    scalars$(MOD)
 
 # dependances for individual modules:
 
-ENERGY_FLUX$(MOD): energy_flux_module$(OBJ)
+energy_flux$(MOD): energy_flux_module$(OBJ)
 
-GAS_COEFFS$(MOD): gas_coeffs_module$(OBJ)
+gas_coeffs$(MOD): gas_coeffs_module$(OBJ)
 
-GAS_FUNCTIONS$(MOD): gas_functions_module$(OBJ)
+gas_functions$(MOD): gas_functions_module$(OBJ)
 
 
-GENERAL_VARS$(MOD) DATE_VARS$(MOD) LOGICALS$(MOD) FILE_VARS$(MOD) \
-LINKBC_VARS$(MOD) LINK_VARS$(MOD) POINT_VARS$(MOD) SECTION_VARS$(MOD) \
-FLOW_COEFFS$(MOD) FLUVIAL_COEFFS$(MOD) TRANSPORT_VARS$(MOD): modules$(OBJ)
+general_vars$(MOD) date_vars$(MOD) logicals$(MOD) file_vars$(MOD) \
+linkbc_vars$(MOD) link_vars$(MOD) point_vars$(MOD) section_vars$(MOD) \
+flow_coeffs$(MOD) fluvial_coeffs$(MOD) transport_vars$(MOD): modules$(OBJ)
 
-MET_DATA_MODULE$(MOD): met_data_module$(OBJ)
+met_data_module$(MOD): met_data_module$(OBJ)
 
-SCALARS$(MOD): scalars_module$(OBJ)
+scalars$(MOD): scalars_module$(OBJ)
 
-TDG_EQUATION_COEFF$(MOD): tdg_equation_coeff$(OBJ)
+tdg_equation_coeff$(MOD): tdg_equation_coeff$(OBJ)
 
-JULIAN$(MOD): julian.o
+julian$(MOD): julian.o
 
 svgrp-test.o: svgrp-test.f90 
 

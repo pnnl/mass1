@@ -23,7 +23,7 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Mon Jan 18 07:59:22 1999 by William A. Perkins <perk@erebus.pnl.gov>
+! Last Change: Tue Apr 13 08:25:30 1999 by William A. Perkins <perk@tophet>
 ! 
 
 SUBROUTINE array_alloc
@@ -94,6 +94,7 @@ ALLOCATE(top_width(maxlinks,maxpoint),hyd_radius(maxlinks,maxpoint),&
      & froude_num(maxlinks,maxpoint),friction_slope(maxlinks,maxpoint),&
      & bed_shear(maxlinks,maxpoint))
 ALLOCATE(lateral_inflow(maxlinks,maxpoint))
+ALLOCATE(y_old(maxlinks,maxpoint))
 !-----------------------------------------------------------
 !module sections_vars
 

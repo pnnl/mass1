@@ -120,6 +120,7 @@ ky1 = dkdy
 vel(link,point_num) = q1/a1
 area_old(link,point_num) = a1
 q_old(link,point_num) = q1
+y_old(link,point_num) = y1
 
 point_num = point + 1
 depth = y(link,point+1) - thalweg(link,point+1)
@@ -135,6 +136,7 @@ ky2 = dkdy
 vel(link,point_num) = q2/a2
 area_old(link,point_num) = a2
 q_old(link,point_num) = q2
+y_old(link,point_num) = y2
 
 delta_x	= ABS(x(link,point+1) - x(link,point))
 
@@ -159,6 +161,12 @@ CALL fluvial_coeff(link,a,b,c,d,g,ap,bp,cp,dp,gp,delta_x,delta_t,grav,latq_old,l
 
 ! nonfluvial internal links ----------------------------
 ELSE
+
+                                ! nonfluvial links also need q_old for
+                                ! transport
+
+   q_old(link, :) = q(link, :)
+   
 	IF(linktype(link) == 6)THEN	  ! hydropower plant
 	table_type = 3 !generation flow
 	temp = table_interp(time,table_type,linkbc_table(link),time_mult)
