@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Tue Mar 30 11:30:52 1999 by William A. Perkins <perk@erebus.pnl.gov>
+# Last Change: Fri Jul  2 07:50:16 1999 by William A. Perkins <perk@hughie.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -20,7 +20,9 @@ set -e
 TRAP_FPE='INVALID=ABORT(1);UNDERFL=ZERO;OVERFL=ABORT(1);INT_OVERFL=ABORT(1);DIVZERO=ABORT(1);DEBUG'
 export TRAP_FPE
 
-model=../../../mass1_v082
+model=../../../mass1_v083
+
+touch nolatinflow
 
 rm -f mass1.cfg
 ln -f -s mass1-warmup.cfg mass1.cfg
