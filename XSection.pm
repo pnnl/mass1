@@ -9,8 +9,10 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created November 19, 1996 by William A. Perkins
-# Last Change: Wed Dec 10 12:33:03 1997 by William A. Perkins <perk@owl.pnl.gov>
+# Last Change: Mon Jan  5 16:01:17 1998 by William A. Perkins <perk@yama.pnl.gov>
 # -------------------------------------------------------------
+
+# RCS ID: $Id$
 
 package XSection;
 
@@ -117,6 +119,107 @@ sub max_station {
   my @junk = sort { $a <=> $b } keys %{$self->{'points'}};
   my $max = pop @junk;
   return ($max);
+}
+
+# -------------------------------------------------------------
+# XSection::min_elevation
+# -------------------------------------------------------------
+sub min_elevation {
+  my $self = shift;
+  my @junk = sort { $a <=> $b } values %{$self->{'points'}};
+  my $min = shift @junk;
+  return ($min);
+}
+
+# -------------------------------------------------------------
+# XSection::max_elevation
+# -------------------------------------------------------------
+sub max_elevation {
+  my $self = shift;
+  my @junk = sort { $a <=> $b } values %{$self->{'points'}};
+  my $max = pop @junk;
+  return ($max);
+}
+
+# -------------------------------------------------------------
+# XSection::area
+# computes the cross section area below the specified elevation
+# if the elevation is not specified, the cross section's maximum
+# elevation is used.
+# -------------------------------------------------------------
+sub area {
+  my $self = shift;
+  my $elev = shift;
+  my $area = 0.0;
+  my $laststn = undef;
+  my $stn;
+
+  if (! defined($elev)) {
+    $elev = $self->max_elevation();
+  }
+
+  foreach $stn (sort { $a <=> $b } keys %{$self->{'points'}} ) {
+    if (defined($laststn)  && 
+	( $self->{'points'}->{$stn} <= $elev && 
+	  $self->{'points'}->{$laststn} <= $elev) ) {
+      $area += abs($stn - $laststn)*
+	( ($elev - $self->{'points'}->{$stn}) + 
+	  ($elev - $self->{'points'}->{$laststn}))/2.0;
+    } elsif (defined($laststn)  && 
+	( $self->{'points'}->{$stn} <= $elev || 
+	  $self->{'points'}->{$laststn} <= $elev) ) {
+      my $b;
+      my $h;
+      if ($self->{'points'}->{$stn} <= $elev) {
+	$h = $elev - $self->{'points'}->{$stn};
+      } else {
+	$h = $elev - $self->{'points'}->{$laststn};
+      }
+      $b = abs($stn - $laststn)*$h/
+	abs($self->{'points'}->{$stn} - $self->{'points'}->{$laststn});
+      $area += $b*$h/2.0;
+    }
+    $laststn = $stn;
+  }
+  return $area;
+}
+
+# -------------------------------------------------------------
+# XSection::topwidth
+# -------------------------------------------------------------
+sub topwidth {
+  my $self = shift;
+  my $elev = shift;
+  my $width = 0.0;
+  my $stn;
+  my $laststn = undef;
+
+  if (! defined($elev)) {
+    $elev = $self->max_elevation();
+  }
+
+  foreach $stn (sort { $a <=> $b } keys %{$self->{'points'}} ) {
+    if (defined($laststn)  && 
+	( $self->{'points'}->{$stn} <= $elev && 
+	  $self->{'points'}->{$laststn} <= $elev) ) {
+      $width += abs($stn - $laststn);
+    } elsif (defined($laststn)  && 
+	( $self->{'points'}->{$stn} <= $elev || 
+	  $self->{'points'}->{$laststn} <= $elev) ) {
+      my $b;
+      my $h;
+      if ($self->{'points'}->{$stn} <= $elev) {
+	$h = $elev - $self->{'points'}->{$stn};
+      } else {
+	$h = $elev - $self->{'points'}->{$laststn};
+      }
+      $b = abs($stn - $laststn)*$h/
+	abs($self->{'points'}->{$stn} - $self->{'points'}->{$laststn});
+      $width += $b;
+    }
+    $laststn = $stn;
+  }
+  return $width;
 }
 
 # -------------------------------------------------------------
