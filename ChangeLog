@@ -1,3 +1,45 @@
+1999-12-10  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* test/transport/advection-1-segment/gage_control.dat: created  
+
+	* makefile.linux (hydro_output$(OBJ)): added dependancy on
+	gas_function module 
+
+	* makefile.dec (hydro_output$(OBJ)): added dependancy on
+	gas_function module 
+
+	* makefile (hydro_output$(OBJ)): added dependancy on
+	gas_function module 
+
+	* hydro_output.f90: add output of pressure and delta pressure 
+
+1999-12-08  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* test/transport/variable-flow/runit.sh (model): model can be set
+		  from the environment variable MODEL if necessary 
+
+	* test/transport/advection-diffusion-2-segment/runit.sh (model):
+		  model can be set from the environment variable MODEL if 
+		  necessary 
+
+	* test/transport/advection-diffusion-1-segment/runit.sh (model):
+		  model can be set from the environment variable MODEL if
+		  necessary 
+
+	* test/transport/advection-2-segment/runit.sh (model): model can
+		  be set from the environment variable MODEL if necessary 
+
+	* read_hotstart.f90: initialize lateral_inflow and
+		  lateral_inflow_old 
+
+	* initial_cond.f90: initialize lateral_inflow and
+		  lateral_inflow_old 
+
+	* test/transport/advection-1-segment/runit.sh: reversed
+		  the run order - Cn = 0.1 is first
+	  (model): model can be set from the environment variable
+		  MODEL if necessary
+
 1999-11-03  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* profile_output.f90: changed the range of I/O units to from 81-90

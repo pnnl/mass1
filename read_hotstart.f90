@@ -56,6 +56,9 @@ READ(fileunit(12))i,j,q(link,point),y(link,point),species(1)%conc(link,point),sp
 END DO
 END DO
 
+lateral_inflow = 0.0
+lateral_inflow_old = 0.0
+
 CLOSE(fileunit(12))
 
 

@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created November  2, 1999 by William A. Perkins
-! Last Change: Wed Nov  3 15:37:37 1999 by William A. Perkins <perk@mack.pnl.gov>
+! Last Change: Fri Dec 10 09:43:19 1999 by William A. Perkins <perk@mack.pnl.gov>
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -19,7 +19,7 @@ MODULE hydro_output_module
 
   CHARACTER(LEN=80), PRIVATE, SAVE :: RCS_ID = "$Id$"
 
-  INTEGER, PARAMETER, PRIVATE :: iobase = 100
+  INTEGER, PARAMETER, PRIVATE :: iobase = 110
   INTEGER, PRIVATE :: hydro_links
 
   TYPE hydro_specs_struct
@@ -30,7 +30,7 @@ MODULE hydro_output_module
   TYPE(hydro_specs_struct), ALLOCATABLE :: hydro_specs(:)
 
   REAL, DIMENSION(:), ALLOCATABLE :: hydro_spill, hydro_gen, hydro_disch, &
-       &hydro_conc, hydro_sat, hydro_temp, hydro_baro 
+       &hydro_conc, hydro_sat, hydro_temp, hydro_baro
 
 CONTAINS
 
@@ -110,7 +110,7 @@ CONTAINS
        END SELECT
     END DO
 100 FORMAT("#Date      Time       Discharge      Spill   ",&
-         &"Nonspill       Temp       Conc        Sat")
+         &"Nonspill       Temp       Conc        Sat      Press    Delta P")
   END SUBROUTINE hydro_output_setup
 
   ! ----------------------------------------------------------------
@@ -120,21 +120,27 @@ CONTAINS
 
     USE link_vars, ONLY : linktype
     USE logicals, ONLY : do_gas
+    USE gas_functions
 
     IMPLICIT NONE
 
     CHARACTER(*) :: date, time
     INTEGER :: i, link
+    DOUBLE PRECISION :: press, deltap
 
     IF (hydro_links .LE. 0 .OR. .NOT. do_gas) RETURN
 
     DO i = 1, hydro_links
        link = hydro_specs(i)%link
+
+       press = TDGasPress( DBLE(hydro_conc(link)), DBLE(hydro_temp(link)), DBLE(0.0));
+       deltap = press - hydro_baro(link)
        WRITE(iobase + i, 100) date, time, hydro_disch(link), hydro_spill(link),&
-            &hydro_gen(link), hydro_temp(link), hydro_conc(link), hydro_sat(link)
+            &hydro_gen(link), hydro_temp(link), hydro_conc(link), hydro_sat(link), &
+            &press, deltap
     END DO
 
-100 FORMAT(A10,1X,A8,1X,6(1X, F10.1))
+100 FORMAT(A10,1X,A8,1X,8(1X, F10.1))
   END SUBROUTINE hydro_output
 
   ! ----------------------------------------------------------------

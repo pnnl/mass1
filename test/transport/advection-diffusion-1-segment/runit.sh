@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Wed Mar 31 15:28:50 1999 by William A. Perkins <perk@tophet>
+# Last Change: Wed Dec  8 13:42:12 1999 by William A. Perkins <perk@mack.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -20,7 +20,7 @@ set -e
 TRAP_FPE='INVALID=ABORT(1);UNDERFL=ZERO;OVERFL=ABORT(1);INT_OVERFL=ABORT(1);DIVZERO=ABORT(1);DEBUG'
 export TRAP_FPE
 
-model=../../../mass1_v084
+model=${MODEL-../../../mass1_v084}
 
 rm -f mass1.cfg
 ln -f -s mass1-warmup.cfg mass1.cfg

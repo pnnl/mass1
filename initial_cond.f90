@@ -50,6 +50,9 @@ SUBROUTINE initial_cond
            CALL EXIT
         ENDIF
 
+        lateral_inflow = 0.0;
+        lateral_inflow_old = 0.0;
+
         DO WHILE(.TRUE.) !dangerous, assumes just right stuff is in initial.dat
 
         READ(fileunit(6),*,END=100)link, junk3, depth,junk2,junk4

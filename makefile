@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created November 11, 1998 by William A. Perkins
-# Last Change: Tue Nov  2 16:11:25 1999 by William A. Perkins <perk@gehenna.pnl.gov>
+# Last Change: Fri Dec 10 10:42:24 1999 by William A. Perkins <perk@mack.pnl.gov>
 # -------------------------------------------------------------
 # RCSID: $Id$
 
@@ -169,7 +169,7 @@ hydro_bc$(OBJ): hydro_bc.f90			\
     DATE_VARS$(MOD)
 
 hydro_output$(OBJ): hydro_output.f90			\
-    LINK_VARS$(MOD) GENERAL_VARS$(MOD) LOGICALS$(MOD)
+    LINK_VARS$(MOD) GENERAL_VARS$(MOD) LOGICALS$(MOD) GAS_FUNCTIONS$(MOD)
 
 initial_cond$(OBJ): initial_cond.f90		\
     POINT_VARS$(MOD)				\
