@@ -141,7 +141,7 @@ CASE("RESULT")
 ! thereafter at the printout frequency
 !-----------------------------------------------------------------------------
 
-CALL decimal_to_date
+CALL decimal_to_date(time)
 
 WRITE(fileunit(7),*)
 WRITE(fileunit(7),1110)

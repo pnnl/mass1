@@ -24,14 +24,14 @@
 !***************************************************************
 !
 
-SUBROUTINE decimal_to_date
+SUBROUTINE decimal_to_date(time)
 
 USE JULIAN
 USE date_vars
-USE general_vars, ONLY : time
 
 IMPLICIT NONE
 
+DOUBLE PRECISION, INTENT(IN) :: time
 DOUBLE PRECISION :: sec
 INTEGER :: days,month,day,year,hours,min, isec
 

@@ -39,6 +39,8 @@ USE link_vars, ONLY : linktype
 USE scalars
 USE met_data_module, ONLY : read_met_data
 USE tdg_equation_coeff
+USE profile_output_module
+USE accumulator
 
 IMPLICIT NONE
 
@@ -194,12 +196,15 @@ DO WHILE(run)
                                 ! print out initial conditions
 
     IF (time == time_begin) THEN
+       CALL accum_initialize()
+       CALL accum_reset(time)
+       CALL accumulate()
+       CALL accum_calc(time)
        IF (do_printout) CALL print_output("RESULT")
        IF (do_profileout) CALL profile_output
        IF (do_gageout) CALL gage_output
     END IF
        
-
 	IF(do_flow)THEN
 		CALL flow_sim
 	ENDIF
@@ -248,16 +253,22 @@ DO WHILE(run)
 	IF(model_time >= (time_end)) run = .false.
 	time_step_count = time_step_count + 1    
 
-	CALL decimal_to_date
+	CALL decimal_to_date(time)
 	WRITE(*,1020)date_string,time_string
 1020 FORMAT(' Done Crunching through ** Date: ',a10,'  Time: ',a8)
 
                                 ! do output as specified
 
     IF (MOD(time_step_count,print_freq) == 0) THEN
+       IF (.NOT. do_accumulate) THEN 
+          CALL accum_reset(time)
+          CALL accumulate()
+       END IF
+       CALL accum_calc(time)
        IF (do_printout)CALL print_output("RESULT")
        IF (do_gageout) CALL gage_output	
        IF (do_profileout) CALL profile_output
+       CALL accum_reset(time)
 	ENDIF
 
 	IF(debug_print == 1) WRITE(11,*)'simulation time = ',time/time_mult
@@ -271,6 +282,8 @@ DO WHILE(run)
 		WRITE(11,*)time,time_begin,time_end,delta_t,time_mult
 		CLOSE(11)
 	ENDIF
+
+    IF (do_accumulate) CALL accumulate()
 
 END DO ! end main time loop
 

@@ -39,6 +39,7 @@ USE gas_functions
 USE logicals, ONLY : file_exist, do_temp, do_gas, temp_exchange, gas_exchange
 
 USE hydro_output_module
+USE accumulator
 
 IMPLICIT NONE
 
@@ -113,18 +114,29 @@ count = 50 + i
 
 link = gage_link(i)
 point = gage_point(i)
-depth = y(link,point) - thalweg(link,point)
+depth = accum_var%y%sum(link,point) - thalweg(link,point)
 IF( (do_temp .AND. temp_exchange) .OR. (do_gas .AND. gas_exchange) ) &
      &CALL update_met_data(time, met_zone(link))
 tdg_sat =   TDGasSaturation( DBLE(species(1)%conc(link,point)), DBLE(species(2)%conc(link,point)), salinity, baro_press)
 tdg_press = TDGasPress( DBLE(species(1)%conc(link,point)), DBLE(species(2)%conc(link,point)), salinity)
 
-CALL decimal_to_date
+CALL decimal_to_date(accum_time)
 
-WRITE(count,1010)date_string,time_string,y(link,point),q(link,point),vel(link,point),depth, &
-     species(1)%conc(link,point),species(2)%conc(link,point), tdg_sat, tdg_press, &
-		thalweg(link,point),area(link,point),top_width(link,point),hyd_radius(link,point), &
-		froude_num(link,point),friction_slope(link,point),bed_shear(link,point)
+!!$WRITE(count,1010)date_string,time_string,y(link,point),q(link,point),vel(link,point),depth, &
+!!$     species(1)%conc(link,point),species(2)%conc(link,point), tdg_sat, tdg_press, &
+!!$		thalweg(link,point),area(link,point),top_width(link,point),hyd_radius(link,point), &
+!!$		froude_num(link,point),friction_slope(link,point),bed_shear(link,point)
+WRITE(count,1010)date_string,time_string,&
+     &accum_var%y%sum(link,point),accum_var%q%sum(link,point),&
+     &accum_var%vel%sum(link,point),depth, &
+     &accum_var%conc(1)%sum(link,point),accum_var%conc(2)%sum(link,point), &
+     &accum_var%tdg%sat%sum(link,point), accum_var%tdg%press%sum(link,point), &
+     &thalweg(link,point),accum_var%area%sum(link,point),&
+               &accum_var%top_width%sum(link,point),&
+               &accum_var%hyd_radius%sum(link,point),&
+               &accum_var%froude_num%sum(link,point),&
+               &accum_var%friction_slope%sum(link,point),&
+               &accum_var%bed_shear%sum(link,point)
 !WRITE(count,1010)date_string,time_string,y(link,point),q(link,point),vel(link,point),depth, &
 !     c(link,point),temp(link,point),thalweg(link,point),area(link,point)
 

@@ -39,7 +39,9 @@ USE logicals
 IMPLICIT NONE
 
 
-INTEGER :: dumlog 
+INTEGER :: dumlog, dumlog0
+
+do_accumulate = .FALSE.
 
 INQUIRE(FILE='mass1.cfg',EXIST=file_exist)
 
@@ -98,11 +100,17 @@ ELSE
 do_gageout = .false.
 ENDIF
 
-READ(10,*)dumlog
+dumlog0 = 0
+READ(10,*)dumlog, dumlog0 
 IF(dumlog == 1)THEN
 do_profileout	= .true.
 ELSE
 do_profileout = .false.
+ENDIF
+IF(dumlog0 == 1)THEN
+do_accumulate = .true.
+ELSE
+do_accumulate = .false.
 ENDIF
 
 READ(10,*)dumlog
@@ -234,6 +242,7 @@ WRITE(11,*)maxtimes
 WRITE(11,*)total_sections
 WRITE(11,*)scalar_steps
 WRITE(11,*)debug_print
+WRITE(11,*)'accumulate: ', do_accumulate
 WRITE(11,*)'done reading logicals and ints'
 WRITE(11,*)filename(2)
 WRITE(11,*)filename(3)

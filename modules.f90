@@ -27,7 +27,7 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Mon Sep 27 10:32:14 1999 by William A. Perkins <perk@erebus.pnl.gov>
+! Last Change: Wed Nov  8 20:16:48 2000 by William A. Perkins <perk@localhost>
 !----------------------------------------------------------
 MODULE general_vars
 
@@ -68,6 +68,7 @@ LOGICAL, SAVE :: gas_diffusion, gas_exchange
 LOGICAL, SAVE :: print_sections,write_sections,read_sections
 LOGICAL, SAVE :: do_latflow
 LOGICAL, SAVE :: file_exist
+LOGICAL, SAVE :: do_accumulate
 
 END MODULE logicals
 
