@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created July  2, 1999 by William A. Perkins
-# Last Change: Tue Jul 13 08:04:44 1999 by William A. Perkins <perk@hazel.pnl.gov>
+# Last Change: Wed Mar  8 09:37:25 2000 by William A. Perkins <perk@mack.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -18,6 +18,13 @@ set nokey
 set xlabel "Distince Along Channel, feet"
 set ylabel "Simulated Discharge, cfs"
 set yrange [0:2000]
+set key below
+
+set arrow from 0,1500 to 12000,1500 nohead lt 0
+set arrow from 0,1000 to 12000,1000 nohead lt 0
+set arrow from 0,500 to 12000,500 nohead lt 0
 
 set pointsize 0.5
-plot 'profile1.out' using (10656 - $4):6 with linespoints
+plot "<awk '/Time: 06:/, /END/ { if ($0 !~ /^ *#/) {print $4, $6;} }' profile1.inflow.out" using (10656 - $1):2 title "w/ Lateral Inflow" with linespoints 1, \
+     "<awk '/Time: 06:/, /END/ { if ($0 !~ /^ *#/) {print $4, $6;} }' profile1.outflow.out" using (10656 - $1):2 title "w/ Lateral Outflow" with linespoints 3
+
