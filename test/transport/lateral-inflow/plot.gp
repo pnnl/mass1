@@ -7,13 +7,13 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created July  2, 1999 by William A. Perkins
-# Last Change: Mon Sep 27 12:27:32 1999 by William A. Perkins <perk@erebus.pnl.gov>
+# Last Change: Thu Sep 30 14:27:03 1999 by William A. Perkins <perk@erebus.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
 
 set format x "%.0f"
-set format y "%.0f"
+set format y "%.1f"
 set nokey
 
 set pointsize 0.5
@@ -37,7 +37,9 @@ set title ''
 
 set xlabel "Distince Along Channel, feet"
 set ylabel "Simulated Temperature, C"
-set yrange [0:25]
+set yrange [12:13]
+set grid
+
 
 plot 'profile1.out' using (10656 - $4):10 with lines
 
