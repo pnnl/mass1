@@ -1,4 +1,4 @@
-#! env perl -I/home/perk/gas-transport/utilities
+#! /usr/bin/env perl -I/home/perk/gas-transport/utilities
 # -*- mode: cperl -*-
 # -------------------------------------------------------------
 # file: CHARIMAview.pl
@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 23, 2005 by William A. Perkins
-# Last Change: Wed Mar 23 12:28:40 2005 by William A. Perkins <perk@leechong.pnl.gov>
+# Last Change: Thu Mar 24 07:01:18 2005 by William A. Perkins <perk@leechong.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -28,6 +28,17 @@ my $program;
 my $usage = "usage: $program [-d device] file";
 
 my $device = "/xserve";
+
+my $plotopts = 
+  [
+   { color => 'BLACK' },
+   { color => 'RED' },
+   { color => 'BLUE' },
+   { color => 'ORANGE' },
+   { color => 'MAGENTA' },
+   { color => 'DARKGRAY' },
+   { color => 'CYAN' }
+  ];
 
 # -------------------------------------------------------------
 # read_section_file
@@ -54,7 +65,7 @@ sub read_section_file {
 # handle command line
 # -------------------------------------------------------------
 my %opts;
-die "$usage" if (!getopts('d:'));
+die "$usage" if (!getopts('d:', \%opts));
 
 $device = $opts{'d'} if (defined($opts{'d'}));
 
@@ -70,48 +81,80 @@ die "$usage\n" if (scalar(@basefile) <= 0);
 # -------------------------------------------------------------
 
 my $xsection;
+my @xsect;
+my $i;
 
-my $xsect = read_section_file($basefile[0]);
+for ($i = 0; $i < scalar(@basefile); $i++) {
+  my $xs = read_section_file($basefile[$i]);
+  die "$usage\n" if (!defined($xs));
+  @xsect[$i] = $xs;
+}
 
-die "$usage\n" if (!defined($xsect));
-
-my @rmlist = sort {$a <=> $b} keys %{$xsect};
-
-
+my @rmlist = sort {$a <=> $b} keys %{$xsect[0]};
 
 printf(STDERR "$program: info: using PGPLOT device \"%s\"\n", $device);
 
 my $plot = PDL::Graphics::PGPLOT::Window->new({Dev=>$device});
 
+my $junk = sprintf("%s", $plot->info('CURSOR'));
 my $havecursor = undef;
 
-printf(STDERR "has cursor: %s\n", $plot->info('CURSOR'));
-$havecursor = ($plot->info('CURSOR') == 'YES');
+printf(STDERR "has cursor: %s\n", $junk);
+$havecursor = ($junk =~ /YES/);
 
 my $idx = 0;
 my $done = undef;
 
 while (not $done) {
   my $rm = $rmlist[$idx];
-  $xsection = $xsect->{$rm};
-  my $id = sprintf("%d: %s", $xsection->{ID}, $xsection->{comment});
-
-  printf(STDERR "Plotting section %d: %s\n", $idx, $id);
-
-  my $x = zeroes($xsection->points());
-  my $y = zeroes($xsection->points());
-  
-  my $sidx = 0;
-  my $stn;
-  foreach $stn (sort {$a <=> $b;} keys %{$xsection->{points}}) {
-    $x->set($sidx, $stn + 0.0);
-    $y->set($sidx, $xsection->{points}->{$stn} + 0.0);
-    $sidx += 1;
+  my $id;
+  my ($xmin, $xmax, $ymin, $ymax) = (1.0e10, -1.0e10, 1.0e10, -1.0e10);
+  for ($i = 0; $i < scalar(@basefile); $i++) {
+    $xsection = $xsect[$i]->{$rm};
+    if (defined($xsection)) {
+      $xmin = $xsection->min_station() if $xsection->min_station() < $xmin;
+      $ymin = $xsection->min_elevation() if $xsection->min_elevation() < $ymin;
+      $xmax = $xsection->max_station() if $xsection->max_station() > $xmax;
+      $ymax = $xsection->max_elevation() if $xsection->max_elevation() > $ymax;
+    }
   }
-  $plot->points($x, $y);
+  $plot->env($xmin, $xmax, $ymin, $ymax);
   $plot->hold();
-  $plot->line($x, $y);
-  $plot->label_axes("Station, ft", "Elevation, ft", $id);
+  my $leg = { Text => [],
+              Color => [],
+              LineStyle => []
+            };
+
+  for ($i = 0; $i < scalar(@basefile); $i++) {
+    $xsection = $xsect[$i]->{$rm};
+    if (defined($xsection)) {
+      $id = sprintf("%d: %s", $xsection->{ID}, $xsection->{comment});
+      
+      printf(STDERR "Plotting section %d: %s (%s)\n", $idx, $id, $basefile[$i]);
+      
+      my $x = zeroes($xsection->points());
+      my $y = zeroes($xsection->points());
+      
+      my $sidx = 0;
+      my $stn;
+      foreach $stn (sort {$a <=> $b;} keys %{$xsection->{points}}) {
+        $x->set($sidx, $stn + 0.0);
+        $y->set($sidx, $xsection->{points}->{$stn} + 0.0);
+        $sidx += 1;
+      }
+      $plot->points($x, $y, {COLOR => $i+1, SYMBOL => $i});
+      $plot->line($x, $y, {COLOR => $i+1});
+      push(@{$leg->{Text}}, $basefile[$i]);
+      push(@{$leg->{Colour}}, $i+1);
+      push(@{$leg->{LineStyle}}, 'Solid');
+      # push(@{$leg->{Symbol}}, $i);
+    }
+  }
+  $plot->label_axes("Station, ft", "Elevation, ft", $id, {COLOR=>'BLACK'});
+  $leg->{Width} = 0.25*($xmax - $xmin);
+  $leg->{Height} = 0.03*($ymax - $ymin)*scalar(@{$leg->{Text}});
+  $leg->{TextColour} = $leg->{Color};
+  $plot->legend($leg->{Text}, 0.5*($xmin+$xmax), $ymax - 0.05*($ymax - $ymin), $leg);
 
   if ($havecursor) {
 
