@@ -27,7 +27,7 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Tue Jun 15 11:11:25 1999 by William A. Perkins <marshall@mack.pnl.gov>
+! Last Change: Mon Sep 27 10:32:14 1999 by William A. Perkins <perk@erebus.pnl.gov>
 !----------------------------------------------------------
 MODULE general_vars
 
@@ -120,7 +120,7 @@ MODULE point_vars
 REAL, DIMENSION(:,:),ALLOCATABLE, SAVE :: x, q,thalweg,y,manning,vel,kstrick
 REAL, DIMENSION(:,:),ALLOCATABLE, SAVE :: area, area_old, q_old,y_old,k_diff
 REAL, DIMENSION(:,:),ALLOCATABLE, SAVE :: top_width, hyd_radius, froude_num, friction_slope, bed_shear
-REAL, DIMENSION(:,:),ALLOCATABLE, SAVE :: lateral_inflow
+REAL, DIMENSION(:,:),ALLOCATABLE, SAVE :: lateral_inflow, lateral_inflow_old
 !INTEGER, DIMENSION(:,:),ALLOCATABLE, SAVE ::	
 
 	!REAL, SAVE :: x(lmax,pmax), q(lmax,pmax),qold(lmax,pmax)

@@ -41,6 +41,7 @@ TYPE(scalar_struct), ALLOCATABLE :: species(:)
 
 DOUBLE PRECISION :: scalar_time, scalar_delta_t
 REAL, DIMENSION(:,:),ALLOCATABLE, SAVE, PRIVATE :: vel, area, width, area_old, q, q_old, y, y_old
+REAL, DIMENSION(:,:),ALLOCATABLE, SAVE, PRIVATE :: latq, latq_old
 
 ! air-water gas exchange coefficient parameters
 REAL :: gasx_a = 0.0, gasx_b = 0.0 , gasx_c = 0.0, gasx_d = 0.0
@@ -101,7 +102,8 @@ SUBROUTINE allocate_species(error_iounit,status_iounit)
   ALLOCATE(vel(maxlinks,maxpoint), width(maxlinks,maxpoint), &
        &area(maxlinks,maxpoint), area_old(maxlinks,maxpoint),&
        &q(maxlinks,maxpoint), q_old(maxlinks,maxpoint), &
-       &y(maxlinks,maxpoint), y_old(maxlinks,maxpoint), STAT = alloc_stat)
+       &y(maxlinks,maxpoint), y_old(maxlinks,maxpoint), &
+       &latq(maxlinks,maxpoint), latq_old(maxlinks,maxpoint), STAT = alloc_stat)
   IF(alloc_stat /= 0)THEN
      WRITE(error_iounit,*)'allocation failed for scalar hydrodynamic variables'
      CALL EXIT
@@ -124,7 +126,8 @@ SUBROUTINE tvd_interp(time, htime0, htime1)
   USE link_vars, ONLY: maxpoints, linktype
   USE point_vars, ONLY: thalweg, &
        &harea=>area, harea_old=>area_old, hq=>q, hq_old=>q_old, &
-       &hvel=>vel, hy=>y, hy_old=>y_old
+       &hvel=>vel, hy=>y, hy_old=>y_old, hlatq=>lateral_inflow, &
+       &hlatq_old=>lateral_inflow_old
 
   IMPLICIT NONE
 
@@ -139,6 +142,7 @@ SUBROUTINE tvd_interp(time, htime0, htime1)
         y(link,:) = hy_old(link,:)
         area(link,:) = harea_old(link,:)
         q(link,:) = hq_old(link,:)
+        latq(link,:) = hlatq_old(link,:)
      END DO
   END IF
 
@@ -146,11 +150,17 @@ SUBROUTINE tvd_interp(time, htime0, htime1)
      area_old(link,:) = area(link,:)
      q_old(link,:) = q(link,:)
      y_old(link,:) = y(link,:)
+     latq_old(link,:) = latq(link,:)
      DO point = 1, maxpoints(link)
         val0 = DBLE(hq_old(link, point))
         val1 = DBLE(hq(link, point))
         val = dlinear_interp(val0, htime0, val1, htime1, time)
         q(link,point) = SNGL(val)
+
+        val0 = DBLE(hlatq_old(link, point))
+        val1 = DBLE(hlatq(link, point))
+        val = dlinear_interp(val0, htime0, val1, htime1, time)
+        latq(link,point) = SNGL(val)
 
         SELECT CASE (linktype(link))
         CASE(1,20,21)              ! do fluvial links only
@@ -210,6 +220,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
   REAL :: qspill,qgen 
   REAL :: energy_source, depth, transfer_coeff
   REAL :: tdg_saturation = 100.0, upstream_c
+  REAL :: avg_area, avg_latq
   DOUBLE PRECISION :: salinity = 0.0, ccstar
 
   LOGICAL :: diffusion, fluvial, nonfluvial
@@ -588,7 +599,26 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
         !-----------------------------------------------------------------------
         ! Source Term Step - could put in a RK4 routine to do reactions
         ! degassing, surface heat exchange, or other source/sink processes
-        !
+
+
+                                ! Correction for lateral inflow -- the
+                                ! concentration of lateral inflow
+                                ! (either incoming or outgoing) is the
+                                ! same as the current concentration
+
+        IF (do_latflow) THEN
+           DO point=2,maxpoints(link)-1
+              avg_area = (area(link,point) + area_old(link,point))/2.0
+              avg_latq = (latq(link,point) + latq_old(link,point))/2.0
+              c(link,point) = c(link,point)* (avg_area + avg_latq*delta_t)/avg_area
+              IF(c(link,point) < 0.0) c(link,point) = 0.0
+           END DO
+           c(link,maxpoints(link)) = c(link,maxpoints(link)-1)
+        END IF
+
+
+                                ! Gas exchange
+
         IF((species_num == 1) .AND. (gas_exchange) )THEN
            DO point=2,maxpoints(link)-1
               CALL update_met_data(time, met_zone(link))
@@ -603,6 +633,8 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
            END DO
            c(link,maxpoints(link)) = c(link,maxpoints(link)-1)
         ENDIF !degass if
+
+                                ! Heating/Cooling to Atmosphere
         
         !-------------------------------------------------------------------------
         IF((species_num == 2) .AND. (temp_exchange) )THEN

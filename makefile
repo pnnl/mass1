@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created November 11, 1998 by William A. Perkins
-# Last Change: Mon Aug 16 19:02:42 1999 by William A. Perkins <marshall@mack.pnl.gov>
+# Last Change: Wed Sep 29 11:31:52 1999 by William A. Perkins <perk@erebus.pnl.gov>
 # -------------------------------------------------------------
 # RCSID: $Id$
 
@@ -20,7 +20,7 @@ OBJ=.o
 
 DEBUG = -O #  -g3 -O
 FLAGS = $(DEBUG) -n32 -Ofast # -r10000 -TARG:platform=IP30
-FLAGS = $(DEBUG) -n32 -r8 -d8 -r10000 -TARG:platform=IP30
+FLAGS = $(DEBUG) -n32 -r10000 -r8 -d8 -TARG:platform=IP30
 F90FLAGS = $(FLAGS)
 LIBLOC = 
 LDFLAGS = ${LIBLOC} $(FLAGS)

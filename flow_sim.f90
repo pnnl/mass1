@@ -144,6 +144,7 @@ delta_x	= ABS(x(link,point+1) - x(link,point))
 IF(do_latflow)THEN
 	IF(latflowbc_table(link) /= 0)THEN
 	  latq_old = lateral_inflow(link,point) 
+      lateral_inflow_old(link,point) = latq_old
 	  table_type = 5 !lateral inflow
 	  lateral_inflow(link,point) = table_interp(time,table_type,latflowbc_table(link),time_mult)
       latq_new = lateral_inflow(link,point)

@@ -1,3 +1,18 @@
+1999-09-27  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* scalars_module.f90 (tvd_transport): added correction for lateral
+		  inflow
+
+	* test/transport/lateral-inflow/constant-t.dat: added $Id$
+
+	* scalars_module.f90: added latq and latq_old as PRIVATE
+		  variables to scalars module 
+	  include lateral_inflow and lateral_inflow_old from the
+		  point_vars module in tvd_interp.
+
+	* modules.f90 (point_vars): added lateral_inflow_old variable to
+		  module 
+
 1999-08-12  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* test/flow/lateral/runit-nt.sh: created
