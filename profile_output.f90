@@ -181,7 +181,7 @@ WRITE(count,1010)i,date_string,time_string,profile_max_points(i)
 !	 'bed shear '
 !1005 FORMAT(2a7,20a12)
 WRITE(count,1005)
-1005 FORMAT('link',8x,'point',2x,'distance',2x,'water elev',3x,'discharge',5x,'vel',2x,'depth', &
+1005 FORMAT('#link',8x,'point',2x,'distance',2x,'water elev',3x,'discharge',5x,'vel',2x,'depth', &
      6x,'conc',6x,'temp' ,2x,'%Sat',3x,'TDG P', &
 		 5x,'thalweg el',2x,'area ',2x,'top width',2x,'hyd rad',2x,'Fr #',2x,'frict slope', &
 	 2x,'bed shear')
