@@ -1,4 +1,4 @@
-#! /usr/unsupported/bin/perl
+#! /usr/unsupported/gnu/bin/perl
 # -*- cperl -*-
 # -------------------------------------------------------------
 # file: mass1bc.pl
@@ -13,7 +13,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October  4, 1999 by William A. Perkins
-# Last Change: Mon Oct  4 11:56:02 1999 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Sun Oct 31 10:27:23 1999 by William A. Perkins <perk@mack.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -55,12 +55,13 @@ Date::Manip::Date_Init("TZ=PST");
 
 my $field = undef;
 my $offset = undef;
+my $title = undef;
 
 # -------------------------------------------------------------
 # handle command line
 # -------------------------------------------------------------
 my %opts = ();
-die "$usage\n" unless getopts("f:o:O:l", \%opts);
+die "$usage\n" unless getopts("f:o:O:t:l0", \%opts);
 
 unless ($opts{f}) {
   printf(STDERR "$program: error: a field must be specified\n");
@@ -68,6 +69,7 @@ unless ($opts{f}) {
 }
 
 $field = $opts{f};
+$title = $opts{t} if $opts{t};
 
 if (! $fields{$field}) {
   printf(STDERR "$program: error: the specified field \"%s\" is not known\n", $field);
@@ -81,6 +83,8 @@ if ($opts{O}) {
     printf(STDERR "$program: error: time offset \"%s\" not understood\n", $opts{O});
     die "$usage\n";
   }
+} elsif ($opts{0}) {
+  $offset = Date::Manip::ParseDateDelta("0 hour");
 }
 
 if ($opts{l}) {
@@ -111,7 +115,14 @@ if ($opts{o}) {
 my $fldno = $fields{$field};
 my $line = 0;
 
-printf(OUTPUT "# Automatically generated using $program\n");
+if ($title) {
+  printf(OUTPUT "# %s: %s (Automatically generated using $program)\n",
+         $title, $fieldnames{$field});
+} else {
+  printf(OUTPUT "# %s (Automatically generated using $program)\n", 
+         $fieldnames{$field});  
+}
+
 while (<>) {
   chop;
   $line++;
