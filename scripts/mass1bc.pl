@@ -13,7 +13,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October  4, 1999 by William A. Perkins
-# Last Change: Sun Oct 31 10:27:23 1999 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Tue Mar  7 09:23:28 2000 by William A. Perkins <perk@gehenna.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -21,6 +21,84 @@
 use strict;
 use Getopt::Std;
 use Date::Manip;
+
+=pod
+
+=head1 NAME
+
+mass1bc.pl -- produce MASS1 or MASS2 boundary condition files from 
+MASS1 gage file output
+
+=head1 SYNOPSIS
+
+perl mass1bc.pl B<-f> I<field> [ B<-0> | B<-O> offset ] [ B<-o> I<output> ] [ I<file> ]
+
+perl mass1bc.pl B<-l>
+
+=head1 DESCRIPTION
+
+This is a simple script to extract a specific value from the gage
+output of a MASS1 simulation and format it such that it could be used
+as a MASS1 or MASS2 boundary condition file.  The the field is
+specified using the B<-f> option with the name of the field, for
+example C<temp> for temperature.  The B<-l> option will list available
+fields.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-l>
+
+list the available fields by name and exit
+
+=item B<-f> I<field>
+
+specify the field to be extracted. The I<field> is specified by name,
+for example: depth, temp, conc, etc. Use the B<-l> option to list
+available fields.
+
+=item B<-O> I<offset>
+
+apply an (negative) offset to the output time. The format of
+I<time_offset> is very flexible; the ParseDateDelta function in
+L<Date::Manip> is used to parse the offset. The default is "-30
+minutes", which assumes that the MASS1 output is hourly.
+
+=item B<-0> 
+
+specify a zero time offset.  The same effect can be accomplished by
+specifying C<-O "+ 0 minutes">
+
+=item B<-o> I<output> 
+
+send output to the file named I<output> instead of standard output
+
+=back
+
+=head1 EXAMPLES
+
+To obtain a list of available fields, use the B<-l> option:
+
+    perk@mack> perl mass1bc.pl -l
+    The following "field"s are recognized:
+            conc:   TDG Gas Concentration
+            depth:  Depth
+            temp:   Water Temperature
+            wselev: Water Surface Elevation
+            vel:    Velocity
+            flow:   Discharge
+            sat:    TDG Saturation
+            tdgpress:       TDG Pressure
+    usage: mass1bc.pl -f field [-0|-O offset] [-o output] [file]
+           mass1bc.pl -l
+
+
+=head1 AUTHOR
+
+William A. Perkins
+
+=cut
 
 # -------------------------------------------------------------
 #  variable initialization
@@ -63,6 +141,15 @@ my $title = undef;
 my %opts = ();
 die "$usage\n" unless getopts("f:o:O:t:l0", \%opts);
 
+if ($opts{l}) {
+  printf(STDERR "The following \"field\"s are recognized:\n");
+  foreach (keys(%fields)) {
+    printf(STDERR "\t%s:\t%s\n", $_, $fieldnames{$_});
+  }
+  printf(STDERR "$usage\n");
+  exit(0);
+}
+
 unless ($opts{f}) {
   printf(STDERR "$program: error: a field must be specified\n");
   die "$usage\n";
@@ -85,14 +172,6 @@ if ($opts{O}) {
   }
 } elsif ($opts{0}) {
   $offset = Date::Manip::ParseDateDelta("0 hour");
-}
-
-if ($opts{l}) {
-  printf(STDERR "The following \"field\"s are recognized:\n");
-  foreach (keys(%fields)) {
-    printf(STDERR "\t%s:\t%s\n", $_, $fieldnames{$_});
-  }
-  printf(STDERR "$usage\n");
 }
 
 if ($opts{o}) {
