@@ -1,3 +1,17 @@
+2001-10-23  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* mass1.f90: renamed pidlink_assemble_lagged_flow to
+	pidlink_assemble_lagged 
+
+	* flow_sim.f90: added type 12 link
+
+	* nonfluvial_coeff.f90: added type 12 link
+
+	* pidlink.f90: Allow the use of arbitrary link BC's for lagged
+	flows, added type 12 link which follows discharge instead of
+	stage, renamed pidlink_assemble_lagged_flow to
+	pidlink_assemble_lagged. 
+
 2001-10-17  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* scalars_module.f90: Added nonfluvial link types 7 and 13

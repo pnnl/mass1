@@ -58,7 +58,7 @@ link = comporder(i)
 SELECT CASE(linktype(link))
 	CASE(1,20,21)
 		fluvial = .TRUE.
-	CASE(2,3,4,5,6,7,13)
+	CASE(2,3,4,5,6,7,12,13)
 		fluvial = .FALSE.
 END SELECT
 

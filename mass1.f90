@@ -286,7 +286,7 @@ DO WHILE(run)
 
     IF (do_accumulate) CALL accumulate()
 
-    CALL pidlink_assemble_lagged_flow()
+    CALL pidlink_assemble_lagged()
 
 END DO ! end main time loop
 

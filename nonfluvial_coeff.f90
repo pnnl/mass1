@@ -61,6 +61,10 @@ CASE(2)
 	!gp = bcval - q(link,point)
 	gp = q(link,point) - bcval
 
+! Imposed Discharge w/ PID process control
+CASE(12)
+   CALL pidlink_coeff(link, point, bcval, a, b, c, d, g, ap, bp, cp, dp, gp)
+
 ! Imposed Upstream Stage Yus(t)
 CASE(3)
 	a = 0.0
