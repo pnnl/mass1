@@ -41,11 +41,27 @@ OutDir=.\Release
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "$(OUTDIR)\mass1_v082.exe"
+ALL : "$(OUTDIR)\mass1_v082.exe" "$(OUTDIR)\julian.mod"\
+ "$(OUTDIR)\fluvial_coeffs.mod" "$(OUTDIR)\flow_coeffs.mod"\
+ "$(OUTDIR)\gas_coeffs.mod" "$(OUTDIR)\met_data_module.mod"\
+ "$(OUTDIR)\energy_flux.mod" "$(OUTDIR)\tdg_equation_coeff.mod"\
+ "$(OUTDIR)\gas_functions.mod" "$(OUTDIR)\section_vars.mod"\
+ "$(OUTDIR)\linkbc_vars.mod" "$(OUTDIR)\date_vars.mod" "$(OUTDIR)\logicals.mod"\
+ "$(OUTDIR)\link_vars.mod" "$(OUTDIR)\general_vars.mod"\
+ "$(OUTDIR)\point_vars.mod" "$(OUTDIR)\file_vars.mod"\
+ "$(OUTDIR)\transport_vars.mod" "$(OUTDIR)\scalars.mod"
 
 !ELSE 
 
-ALL : "$(OUTDIR)\mass1_v082.exe"
+ALL : "$(OUTDIR)\mass1_v082.exe" "$(OUTDIR)\julian.mod"\
+ "$(OUTDIR)\fluvial_coeffs.mod" "$(OUTDIR)\flow_coeffs.mod"\
+ "$(OUTDIR)\gas_coeffs.mod" "$(OUTDIR)\met_data_module.mod"\
+ "$(OUTDIR)\energy_flux.mod" "$(OUTDIR)\tdg_equation_coeff.mod"\
+ "$(OUTDIR)\gas_functions.mod" "$(OUTDIR)\section_vars.mod"\
+ "$(OUTDIR)\linkbc_vars.mod" "$(OUTDIR)\date_vars.mod" "$(OUTDIR)\logicals.mod"\
+ "$(OUTDIR)\link_vars.mod" "$(OUTDIR)\general_vars.mod"\
+ "$(OUTDIR)\point_vars.mod" "$(OUTDIR)\file_vars.mod"\
+ "$(OUTDIR)\transport_vars.mod" "$(OUTDIR)\scalars.mod"
 
 !ENDIF 
 
@@ -111,8 +127,8 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-F90_PROJ=/include:"$(INTDIR)\\" /compile_only /nologo /warn:nofileopt\
- /module:"Release/" /object:"Release/" 
+F90_PROJ=/real_size:64 /include:"$(INTDIR)\\" /compile_only /nologo\
+ /warn:nofileopt /module:"Release/" /object:"Release/" 
 F90_OBJS=.\Release/
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\mass1_v082.bsc" 
@@ -176,11 +192,27 @@ OutDir=.\Debug
 
 !IF "$(RECURSE)" == "0" 
 
-ALL : "$(OUTDIR)\mass1_v082.exe" "$(OUTDIR)\DF50.PDB"
+ALL : "$(OUTDIR)\mass1_v082.exe" "$(OUTDIR)\DF50.PDB" "$(OUTDIR)\julian.mod"\
+ "$(OUTDIR)\fluvial_coeffs.mod" "$(OUTDIR)\flow_coeffs.mod"\
+ "$(OUTDIR)\gas_coeffs.mod" "$(OUTDIR)\met_data_module.mod"\
+ "$(OUTDIR)\energy_flux.mod" "$(OUTDIR)\tdg_equation_coeff.mod"\
+ "$(OUTDIR)\gas_functions.mod" "$(OUTDIR)\section_vars.mod"\
+ "$(OUTDIR)\linkbc_vars.mod" "$(OUTDIR)\date_vars.mod" "$(OUTDIR)\logicals.mod"\
+ "$(OUTDIR)\link_vars.mod" "$(OUTDIR)\general_vars.mod"\
+ "$(OUTDIR)\point_vars.mod" "$(OUTDIR)\file_vars.mod"\
+ "$(OUTDIR)\transport_vars.mod" "$(OUTDIR)\scalars.mod"
 
 !ELSE 
 
-ALL : "$(OUTDIR)\mass1_v082.exe" "$(OUTDIR)\DF50.PDB"
+ALL : "$(OUTDIR)\mass1_v082.exe" "$(OUTDIR)\DF50.PDB" "$(OUTDIR)\julian.mod"\
+ "$(OUTDIR)\fluvial_coeffs.mod" "$(OUTDIR)\flow_coeffs.mod"\
+ "$(OUTDIR)\gas_coeffs.mod" "$(OUTDIR)\met_data_module.mod"\
+ "$(OUTDIR)\energy_flux.mod" "$(OUTDIR)\tdg_equation_coeff.mod"\
+ "$(OUTDIR)\gas_functions.mod" "$(OUTDIR)\section_vars.mod"\
+ "$(OUTDIR)\linkbc_vars.mod" "$(OUTDIR)\date_vars.mod" "$(OUTDIR)\logicals.mod"\
+ "$(OUTDIR)\link_vars.mod" "$(OUTDIR)\general_vars.mod"\
+ "$(OUTDIR)\point_vars.mod" "$(OUTDIR)\file_vars.mod"\
+ "$(OUTDIR)\transport_vars.mod" "$(OUTDIR)\scalars.mod"
 
 !ENDIF 
 
@@ -249,8 +281,9 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-F90_PROJ=/include:"$(INTDIR)\\" /compile_only /nologo /debug:full /optimize:0\
- /warn:nofileopt /module:"Debug/" /object:"Debug/" /pdbfile:"Debug/DF50.PDB" 
+F90_PROJ=/real_size:64 /include:"$(INTDIR)\\" /compile_only /nologo /debug:full\
+ /optimize:0 /warn:nofileopt /module:"Debug/" /object:"Debug/"\
+ /pdbfile:"Debug/DF50.PDB" 
 F90_OBJS=.\Debug/
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\mass1_v082.bsc" 
@@ -323,164 +356,59 @@ LINK32_OBJS= \
 !IF "$(CFG)" == "mass1_v082 - Win32 Release" || "$(CFG)" ==\
  "mass1_v082 - Win32 Debug"
 SOURCE=.\array_alloc.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_ARRAY=\
-	".\Release\flow_coeffs.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\link_vars.mod"\
-	".\Release\linkbc_vars.mod"\
-	".\Release\point_vars.mod"\
-	".\Release\section_vars.mod"\
-	".\Release\transport_vars.mod"\
+	".\flow_coeffs.mod"\
+	".\general_vars.mod"\
+	".\link_vars.mod"\
+	".\linkbc_vars.mod"\
+	".\point_vars.mod"\
+	".\section_vars.mod"\
+	".\transport_vars.mod"\
 	
 
-"$(INTDIR)\array_alloc.obj" : $(SOURCE) $(DEP_F90_ARRAY) "$(INTDIR)"\
- "$(INTDIR)\flow_coeffs.mod" "$(INTDIR)\linkbc_vars.mod"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\point_vars.mod"\
- "$(INTDIR)\section_vars.mod" "$(INTDIR)\transport_vars.mod"\
- "$(INTDIR)\general_vars.mod"
+"$(INTDIR)\array_alloc.obj" : $(SOURCE) $(DEP_F90_ARRAY) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_ARRAY=\
-	".\Debug\flow_coeffs.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\link_vars.mod"\
-	".\Debug\linkbc_vars.mod"\
-	".\Debug\point_vars.mod"\
-	".\Debug\section_vars.mod"\
-	".\Debug\transport_vars.mod"\
-	
-
-"$(INTDIR)\array_alloc.obj" : $(SOURCE) $(DEP_F90_ARRAY) "$(INTDIR)"\
- "$(INTDIR)\flow_coeffs.mod" "$(INTDIR)\linkbc_vars.mod"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\point_vars.mod"\
- "$(INTDIR)\section_vars.mod" "$(INTDIR)\transport_vars.mod"\
- "$(INTDIR)\general_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\array_dealloc.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_ARRAY_=\
-	".\Release\flow_coeffs.mod"\
-	".\Release\link_vars.mod"\
-	".\Release\linkbc_vars.mod"\
-	".\Release\point_vars.mod"\
-	".\Release\section_vars.mod"\
-	".\Release\transport_vars.mod"\
+	".\flow_coeffs.mod"\
+	".\link_vars.mod"\
+	".\linkbc_vars.mod"\
+	".\point_vars.mod"\
+	".\section_vars.mod"\
+	".\transport_vars.mod"\
 	
 
-"$(INTDIR)\array_dealloc.obj" : $(SOURCE) $(DEP_F90_ARRAY_) "$(INTDIR)"\
- "$(INTDIR)\flow_coeffs.mod" "$(INTDIR)\linkbc_vars.mod"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\point_vars.mod"\
- "$(INTDIR)\section_vars.mod" "$(INTDIR)\transport_vars.mod"
+"$(INTDIR)\array_dealloc.obj" : $(SOURCE) $(DEP_F90_ARRAY_) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_ARRAY_=\
-	".\Debug\flow_coeffs.mod"\
-	".\Debug\link_vars.mod"\
-	".\Debug\linkbc_vars.mod"\
-	".\Debug\point_vars.mod"\
-	".\Debug\section_vars.mod"\
-	".\Debug\transport_vars.mod"\
-	
-
-"$(INTDIR)\array_dealloc.obj" : $(SOURCE) $(DEP_F90_ARRAY_) "$(INTDIR)"\
- "$(INTDIR)\flow_coeffs.mod" "$(INTDIR)\linkbc_vars.mod"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\point_vars.mod"\
- "$(INTDIR)\section_vars.mod" "$(INTDIR)\transport_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\coeff.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_COEFF=\
-	".\Release\fluvial_coeffs.mod"\
-	".\Release\general_vars.mod"\
+	".\fluvial_coeffs.mod"\
+	".\general_vars.mod"\
 	
 
-"$(INTDIR)\coeff.obj" : $(SOURCE) $(DEP_F90_COEFF) "$(INTDIR)"\
- "$(INTDIR)\fluvial_coeffs.mod" "$(INTDIR)\general_vars.mod"
+"$(INTDIR)\coeff.obj" : $(SOURCE) $(DEP_F90_COEFF) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_COEFF=\
-	".\Debug\fluvial_coeffs.mod"\
-	".\Debug\general_vars.mod"\
-	
-
-"$(INTDIR)\coeff.obj" : $(SOURCE) $(DEP_F90_COEFF) "$(INTDIR)"\
- "$(INTDIR)\fluvial_coeffs.mod" "$(INTDIR)\general_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\date_to_decimal.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_DATE_=\
-	".\Release\date_vars.mod"\
-	".\Release\julian.mod"\
+	".\date_vars.mod"\
+	".\julian.mod"\
 	
 
-"$(INTDIR)\date_to_decimal.obj" : $(SOURCE) $(DEP_F90_DATE_) "$(INTDIR)"\
- "$(INTDIR)\julian.mod" "$(INTDIR)\date_vars.mod"
+"$(INTDIR)\date_to_decimal.obj" : $(SOURCE) $(DEP_F90_DATE_) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_DATE_=\
-	".\Debug\date_vars.mod"\
-	".\Debug\julian.mod"\
-	
-
-"$(INTDIR)\date_to_decimal.obj" : $(SOURCE) $(DEP_F90_DATE_) "$(INTDIR)"\
- "$(INTDIR)\julian.mod" "$(INTDIR)\date_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\decimal_to_date.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_DECIM=\
-	".\Release\date_vars.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\julian.mod"\
+	".\date_vars.mod"\
+	".\general_vars.mod"\
+	".\julian.mod"\
 	
 
-"$(INTDIR)\decimal_to_date.obj" : $(SOURCE) $(DEP_F90_DECIM) "$(INTDIR)"\
- "$(INTDIR)\julian.mod" "$(INTDIR)\date_vars.mod" "$(INTDIR)\general_vars.mod"
+"$(INTDIR)\decimal_to_date.obj" : $(SOURCE) $(DEP_F90_DECIM) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_DECIM=\
-	".\Debug\date_vars.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\julian.mod"\
-	
-
-"$(INTDIR)\decimal_to_date.obj" : $(SOURCE) $(DEP_F90_DECIM) "$(INTDIR)"\
- "$(INTDIR)\julian.mod" "$(INTDIR)\date_vars.mod" "$(INTDIR)\general_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\energy_flux_module.f90
 
@@ -509,114 +437,42 @@ F90_MODOUT=\
 !ENDIF 
 
 SOURCE=.\file_manager.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_FILE_=\
-	".\Release\file_vars.mod"\
+	".\file_vars.mod"\
 	
 
-"$(INTDIR)\file_manager.obj" : $(SOURCE) $(DEP_F90_FILE_) "$(INTDIR)"\
- "$(INTDIR)\file_vars.mod"
+"$(INTDIR)\file_manager.obj" : $(SOURCE) $(DEP_F90_FILE_) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_FILE_=\
-	".\Debug\file_vars.mod"\
-	
-
-"$(INTDIR)\file_manager.obj" : $(SOURCE) $(DEP_F90_FILE_) "$(INTDIR)"\
- "$(INTDIR)\file_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\flow_sim.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_FLOW_=\
-	".\Release\flow_coeffs.mod"\
-	".\Release\fluvial_coeffs.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\link_vars.mod"\
-	".\Release\logicals.mod"\
-	".\Release\point_vars.mod"\
+	".\flow_coeffs.mod"\
+	".\fluvial_coeffs.mod"\
+	".\general_vars.mod"\
+	".\link_vars.mod"\
+	".\logicals.mod"\
+	".\point_vars.mod"\
 	
 
-"$(INTDIR)\flow_sim.obj" : $(SOURCE) $(DEP_F90_FLOW_) "$(INTDIR)"\
- "$(INTDIR)\general_vars.mod" "$(INTDIR)\link_vars.mod"\
- "$(INTDIR)\point_vars.mod" "$(INTDIR)\fluvial_coeffs.mod"\
- "$(INTDIR)\flow_coeffs.mod" "$(INTDIR)\logicals.mod"
+"$(INTDIR)\flow_sim.obj" : $(SOURCE) $(DEP_F90_FLOW_) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_FLOW_=\
-	".\Debug\flow_coeffs.mod"\
-	".\Debug\fluvial_coeffs.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\link_vars.mod"\
-	".\Debug\logicals.mod"\
-	".\Debug\point_vars.mod"\
-	
-
-"$(INTDIR)\flow_sim.obj" : $(SOURCE) $(DEP_F90_FLOW_) "$(INTDIR)"\
- "$(INTDIR)\general_vars.mod" "$(INTDIR)\link_vars.mod"\
- "$(INTDIR)\point_vars.mod" "$(INTDIR)\fluvial_coeffs.mod"\
- "$(INTDIR)\flow_coeffs.mod" "$(INTDIR)\logicals.mod"
-
-
-!ENDIF 
 
 SOURCE=.\gage_output.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_GAGE_=\
-	".\Release\date_vars.mod"\
-	".\Release\file_vars.mod"\
-	".\Release\gas_functions.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\link_vars.mod"\
-	".\Release\met_data_module.mod"\
-	".\Release\point_vars.mod"\
-	".\Release\scalars.mod"\
-	".\Release\transport_vars.mod"\
+	".\date_vars.mod"\
+	".\file_vars.mod"\
+	".\gas_functions.mod"\
+	".\general_vars.mod"\
+	".\link_vars.mod"\
+	".\logicals.mod"\
+	".\met_data_module.mod"\
+	".\point_vars.mod"\
+	".\scalars.mod"\
+	".\transport_vars.mod"\
 	
 
-"$(INTDIR)\gage_output.obj" : $(SOURCE) $(DEP_F90_GAGE_) "$(INTDIR)"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\general_vars.mod"\
- "$(INTDIR)\point_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\transport_vars.mod" "$(INTDIR)\date_vars.mod"\
- "$(INTDIR)\scalars.mod" "$(INTDIR)\met_data_module.mod"\
- "$(INTDIR)\gas_functions.mod"
+"$(INTDIR)\gage_output.obj" : $(SOURCE) $(DEP_F90_GAGE_) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_GAGE_=\
-	".\Debug\date_vars.mod"\
-	".\Debug\file_vars.mod"\
-	".\Debug\gas_functions.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\link_vars.mod"\
-	".\Debug\met_data_module.mod"\
-	".\Debug\point_vars.mod"\
-	".\Debug\scalars.mod"\
-	".\Debug\transport_vars.mod"\
-	
-
-"$(INTDIR)\gage_output.obj" : $(SOURCE) $(DEP_F90_GAGE_) "$(INTDIR)"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\general_vars.mod"\
- "$(INTDIR)\point_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\transport_vars.mod" "$(INTDIR)\date_vars.mod"\
- "$(INTDIR)\scalars.mod" "$(INTDIR)\met_data_module.mod"\
- "$(INTDIR)\gas_functions.mod"
-
-
-!ENDIF 
 
 SOURCE=.\gas_coeffs_module.f90
 
@@ -645,138 +501,70 @@ F90_MODOUT=\
 !ENDIF 
 
 SOURCE=.\gas_functions_module.f90
+DEP_F90_GAS_F=\
+	".\gas_coeffs.mod"\
+	
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-DEP_F90_GAS_F=\
-	".\Release\gas_coeffs.mod"\
-	
 F90_MODOUT=\
 	"gas_functions"
 
 
 "$(INTDIR)\gas_functions_module.obj"	"$(INTDIR)\gas_functions.mod" : $(SOURCE)\
- $(DEP_F90_GAS_F) "$(INTDIR)" "$(INTDIR)\gas_coeffs.mod"
+ $(DEP_F90_GAS_F) "$(INTDIR)"
 	$(F90) $(F90_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-DEP_F90_GAS_F=\
-	".\Debug\gas_coeffs.mod"\
-	
 F90_MODOUT=\
 	"gas_functions"
 
 
 "$(INTDIR)\gas_functions_module.obj"	"$(INTDIR)\gas_functions.mod" : $(SOURCE)\
- $(DEP_F90_GAS_F) "$(INTDIR)" "$(INTDIR)\gas_coeffs.mod"
+ $(DEP_F90_GAS_F) "$(INTDIR)"
 	$(F90) $(F90_PROJ) $(SOURCE)
 
 
 !ENDIF 
 
 SOURCE=.\general_data.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_GENER=\
-	".\Release\file_vars.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\logicals.mod"\
-	".\Release\section_vars.mod"\
+	".\file_vars.mod"\
+	".\general_vars.mod"\
+	".\logicals.mod"\
+	".\section_vars.mod"\
 	
 
-"$(INTDIR)\general_data.obj" : $(SOURCE) $(DEP_F90_GENER) "$(INTDIR)"\
- "$(INTDIR)\general_vars.mod" "$(INTDIR)\logicals.mod"\
- "$(INTDIR)\section_vars.mod" "$(INTDIR)\file_vars.mod"
+"$(INTDIR)\general_data.obj" : $(SOURCE) $(DEP_F90_GENER) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_GENER=\
-	".\Debug\file_vars.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\logicals.mod"\
-	".\Debug\section_vars.mod"\
-	
-
-"$(INTDIR)\general_data.obj" : $(SOURCE) $(DEP_F90_GENER) "$(INTDIR)"\
- "$(INTDIR)\general_vars.mod" "$(INTDIR)\logicals.mod"\
- "$(INTDIR)\section_vars.mod" "$(INTDIR)\file_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\hydro_bc.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_HYDRO=\
-	".\Release\date_vars.mod"\
-	".\Release\file_vars.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\linkbc_vars.mod"\
+	".\date_vars.mod"\
+	".\file_vars.mod"\
+	".\general_vars.mod"\
+	".\linkbc_vars.mod"\
+	".\logicals.mod"\
 	
 
-"$(INTDIR)\hydro_bc.obj" : $(SOURCE) $(DEP_F90_HYDRO) "$(INTDIR)"\
- "$(INTDIR)\linkbc_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\general_vars.mod" "$(INTDIR)\date_vars.mod"
+"$(INTDIR)\hydro_bc.obj" : $(SOURCE) $(DEP_F90_HYDRO) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_HYDRO=\
-	".\Debug\date_vars.mod"\
-	".\Debug\file_vars.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\linkbc_vars.mod"\
-	
-
-"$(INTDIR)\hydro_bc.obj" : $(SOURCE) $(DEP_F90_HYDRO) "$(INTDIR)"\
- "$(INTDIR)\linkbc_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\general_vars.mod" "$(INTDIR)\date_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\initial_cond.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_INITI=\
-	".\Release\file_vars.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\link_vars.mod"\
-	".\Release\point_vars.mod"\
-	".\Release\scalars.mod"\
-	".\Release\transport_vars.mod"\
+	".\file_vars.mod"\
+	".\general_vars.mod"\
+	".\link_vars.mod"\
+	".\logicals.mod"\
+	".\point_vars.mod"\
+	".\scalars.mod"\
+	".\transport_vars.mod"\
 	
 
-"$(INTDIR)\initial_cond.obj" : $(SOURCE) $(DEP_F90_INITI) "$(INTDIR)"\
- "$(INTDIR)\file_vars.mod" "$(INTDIR)\point_vars.mod"\
- "$(INTDIR)\transport_vars.mod" "$(INTDIR)\link_vars.mod"\
- "$(INTDIR)\scalars.mod" "$(INTDIR)\general_vars.mod"
+"$(INTDIR)\initial_cond.obj" : $(SOURCE) $(DEP_F90_INITI) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_INITI=\
-	".\Debug\file_vars.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\link_vars.mod"\
-	".\Debug\point_vars.mod"\
-	".\Debug\scalars.mod"\
-	".\Debug\transport_vars.mod"\
-	
-
-"$(INTDIR)\initial_cond.obj" : $(SOURCE) $(DEP_F90_INITI) "$(INTDIR)"\
- "$(INTDIR)\file_vars.mod" "$(INTDIR)\point_vars.mod"\
- "$(INTDIR)\transport_vars.mod" "$(INTDIR)\link_vars.mod"\
- "$(INTDIR)\scalars.mod" "$(INTDIR)\general_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\julian.f90
 
@@ -803,68 +591,27 @@ F90_MODOUT=\
 !ENDIF 
 
 SOURCE=.\kick_off.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_KICK_=\
-	".\Release\date_vars.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\link_vars.mod"\
+	".\date_vars.mod"\
+	".\general_vars.mod"\
+	".\link_vars.mod"\
 	
 
-"$(INTDIR)\kick_off.obj" : $(SOURCE) $(DEP_F90_KICK_) "$(INTDIR)"\
- "$(INTDIR)\general_vars.mod" "$(INTDIR)\link_vars.mod"\
- "$(INTDIR)\date_vars.mod"
+"$(INTDIR)\kick_off.obj" : $(SOURCE) $(DEP_F90_KICK_) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_KICK_=\
-	".\Debug\date_vars.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\link_vars.mod"\
-	
-
-"$(INTDIR)\kick_off.obj" : $(SOURCE) $(DEP_F90_KICK_) "$(INTDIR)"\
- "$(INTDIR)\general_vars.mod" "$(INTDIR)\link_vars.mod"\
- "$(INTDIR)\date_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\latflow_bc.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_LATFL=\
-	".\Release\date_vars.mod"\
-	".\Release\file_vars.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\link_vars.mod"\
-	".\Release\linkbc_vars.mod"\
+	".\date_vars.mod"\
+	".\file_vars.mod"\
+	".\general_vars.mod"\
+	".\link_vars.mod"\
+	".\linkbc_vars.mod"\
+	".\logicals.mod"\
 	
 
-"$(INTDIR)\latflow_bc.obj" : $(SOURCE) $(DEP_F90_LATFL) "$(INTDIR)"\
- "$(INTDIR)\linkbc_vars.mod" "$(INTDIR)\link_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\general_vars.mod" "$(INTDIR)\date_vars.mod"
+"$(INTDIR)\latflow_bc.obj" : $(SOURCE) $(DEP_F90_LATFL) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_LATFL=\
-	".\Debug\date_vars.mod"\
-	".\Debug\file_vars.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\link_vars.mod"\
-	".\Debug\linkbc_vars.mod"\
-	
-
-"$(INTDIR)\latflow_bc.obj" : $(SOURCE) $(DEP_F90_LATFL) "$(INTDIR)"\
- "$(INTDIR)\linkbc_vars.mod" "$(INTDIR)\link_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\general_vars.mod" "$(INTDIR)\date_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\linear_interp.f90
 
@@ -872,142 +619,70 @@ SOURCE=.\linear_interp.f90
 
 
 SOURCE=.\link_bc.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_LINK_=\
-	".\Release\date_vars.mod"\
-	".\Release\file_vars.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\link_vars.mod"\
-	".\Release\linkbc_vars.mod"\
+	".\date_vars.mod"\
+	".\file_vars.mod"\
+	".\general_vars.mod"\
+	".\link_vars.mod"\
+	".\linkbc_vars.mod"\
+	".\logicals.mod"\
 	
 
-"$(INTDIR)\link_bc.obj" : $(SOURCE) $(DEP_F90_LINK_) "$(INTDIR)"\
- "$(INTDIR)\linkbc_vars.mod" "$(INTDIR)\link_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\general_vars.mod" "$(INTDIR)\date_vars.mod"
+"$(INTDIR)\link_bc.obj" : $(SOURCE) $(DEP_F90_LINK_) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_LINK_=\
-	".\Debug\date_vars.mod"\
-	".\Debug\file_vars.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\link_vars.mod"\
-	".\Debug\linkbc_vars.mod"\
-	
-
-"$(INTDIR)\link_bc.obj" : $(SOURCE) $(DEP_F90_LINK_) "$(INTDIR)"\
- "$(INTDIR)\linkbc_vars.mod" "$(INTDIR)\link_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\general_vars.mod" "$(INTDIR)\date_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\link_data.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_LINK_D=\
-	".\Release\file_vars.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\link_vars.mod"\
+	".\file_vars.mod"\
+	".\general_vars.mod"\
+	".\link_vars.mod"\
+	".\logicals.mod"\
 	
 
-"$(INTDIR)\link_data.obj" : $(SOURCE) $(DEP_F90_LINK_D) "$(INTDIR)"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\general_vars.mod"\
- "$(INTDIR)\file_vars.mod"
+"$(INTDIR)\link_data.obj" : $(SOURCE) $(DEP_F90_LINK_D) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_LINK_D=\
-	".\Debug\file_vars.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\link_vars.mod"\
-	
-
-"$(INTDIR)\link_data.obj" : $(SOURCE) $(DEP_F90_LINK_D) "$(INTDIR)"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\general_vars.mod"\
- "$(INTDIR)\file_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\mass1.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_MASS1=\
-	".\Release\date_vars.mod"\
-	".\Release\file_vars.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\link_vars.mod"\
-	".\Release\logicals.mod"\
-	".\Release\met_data_module.mod"\
-	".\Release\scalars.mod"\
-	".\Release\section_vars.mod"\
-	".\Release\tdg_equation_coeff.mod"\
+	".\date_vars.mod"\
+	".\file_vars.mod"\
+	".\general_vars.mod"\
+	".\link_vars.mod"\
+	".\logicals.mod"\
+	".\met_data_module.mod"\
+	".\scalars.mod"\
+	".\section_vars.mod"\
+	".\tdg_equation_coeff.mod"\
 	
 
-"$(INTDIR)\mass1.obj" : $(SOURCE) $(DEP_F90_MASS1) "$(INTDIR)"\
- "$(INTDIR)\general_vars.mod" "$(INTDIR)\date_vars.mod"\
- "$(INTDIR)\file_vars.mod" "$(INTDIR)\logicals.mod" "$(INTDIR)\section_vars.mod"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\scalars.mod"\
- "$(INTDIR)\met_data_module.mod" "$(INTDIR)\tdg_equation_coeff.mod"
+"$(INTDIR)\mass1.obj" : $(SOURCE) $(DEP_F90_MASS1) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_MASS1=\
-	".\Debug\date_vars.mod"\
-	".\Debug\file_vars.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\link_vars.mod"\
-	".\Debug\logicals.mod"\
-	".\Debug\met_data_module.mod"\
-	".\Debug\scalars.mod"\
-	".\Debug\section_vars.mod"\
-	".\Debug\tdg_equation_coeff.mod"\
-	
-
-"$(INTDIR)\mass1.obj" : $(SOURCE) $(DEP_F90_MASS1) "$(INTDIR)"\
- "$(INTDIR)\general_vars.mod" "$(INTDIR)\date_vars.mod"\
- "$(INTDIR)\file_vars.mod" "$(INTDIR)\logicals.mod" "$(INTDIR)\section_vars.mod"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\scalars.mod"\
- "$(INTDIR)\met_data_module.mod" "$(INTDIR)\tdg_equation_coeff.mod"
-
-
-!ENDIF 
 
 SOURCE=.\met_data_module.f90
+DEP_F90_MET_D=\
+	".\date_vars.mod"\
+	".\logicals.mod"\
+	
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-DEP_F90_MET_D=\
-	".\Release\date_vars.mod"\
-	
 F90_MODOUT=\
 	"met_data_module"
 
 
 "$(INTDIR)\met_data_module.obj"	"$(INTDIR)\met_data_module.mod" : $(SOURCE)\
- $(DEP_F90_MET_D) "$(INTDIR)" "$(INTDIR)\date_vars.mod"
+ $(DEP_F90_MET_D) "$(INTDIR)"
 	$(F90) $(F90_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-DEP_F90_MET_D=\
-	".\Debug\date_vars.mod"\
-	
 F90_MODOUT=\
 	"met_data_module"
 
 
 "$(INTDIR)\met_data_module.obj"	"$(INTDIR)\met_data_module.mod" : $(SOURCE)\
- $(DEP_F90_MET_D) "$(INTDIR)" "$(INTDIR)\date_vars.mod"
+ $(DEP_F90_MET_D) "$(INTDIR)"
 	$(F90) $(F90_PROJ) $(SOURCE)
 
 
@@ -1068,396 +743,158 @@ F90_MODOUT=\
 !ENDIF 
 
 SOURCE=.\nonfluvial_coeff.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_NONFL=\
-	".\Release\link_vars.mod"\
-	".\Release\point_vars.mod"\
+	".\link_vars.mod"\
+	".\point_vars.mod"\
 	
 
-"$(INTDIR)\nonfluvial_coeff.obj" : $(SOURCE) $(DEP_F90_NONFL) "$(INTDIR)"\
- "$(INTDIR)\point_vars.mod" "$(INTDIR)\link_vars.mod"
+"$(INTDIR)\nonfluvial_coeff.obj" : $(SOURCE) $(DEP_F90_NONFL) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_NONFL=\
-	".\Debug\link_vars.mod"\
-	".\Debug\point_vars.mod"\
-	
-
-"$(INTDIR)\nonfluvial_coeff.obj" : $(SOURCE) $(DEP_F90_NONFL) "$(INTDIR)"\
- "$(INTDIR)\point_vars.mod" "$(INTDIR)\link_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\point_data.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_POINT=\
-	".\Release\file_vars.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\link_vars.mod"\
-	".\Release\point_vars.mod"\
-	".\Release\section_vars.mod"\
-	".\Release\transport_vars.mod"\
+	".\file_vars.mod"\
+	".\general_vars.mod"\
+	".\link_vars.mod"\
+	".\logicals.mod"\
+	".\point_vars.mod"\
+	".\section_vars.mod"\
+	".\transport_vars.mod"\
 	
 
-"$(INTDIR)\point_data.obj" : $(SOURCE) $(DEP_F90_POINT) "$(INTDIR)"\
- "$(INTDIR)\point_vars.mod" "$(INTDIR)\link_vars.mod"\
- "$(INTDIR)\section_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\general_vars.mod" "$(INTDIR)\transport_vars.mod"
+"$(INTDIR)\point_data.obj" : $(SOURCE) $(DEP_F90_POINT) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_POINT=\
-	".\Debug\file_vars.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\link_vars.mod"\
-	".\Debug\point_vars.mod"\
-	".\Debug\section_vars.mod"\
-	".\Debug\transport_vars.mod"\
-	
-
-"$(INTDIR)\point_data.obj" : $(SOURCE) $(DEP_F90_POINT) "$(INTDIR)"\
- "$(INTDIR)\point_vars.mod" "$(INTDIR)\link_vars.mod"\
- "$(INTDIR)\section_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\general_vars.mod" "$(INTDIR)\transport_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\print_output.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_PRINT=\
-	".\Release\date_vars.mod"\
-	".\Release\file_vars.mod"\
-	".\Release\gas_functions.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\link_vars.mod"\
-	".\Release\linkbc_vars.mod"\
-	".\Release\logicals.mod"\
-	".\Release\met_data_module.mod"\
-	".\Release\point_vars.mod"\
-	".\Release\scalars.mod"\
-	".\Release\section_vars.mod"\
-	".\Release\transport_vars.mod"\
+	".\date_vars.mod"\
+	".\file_vars.mod"\
+	".\gas_functions.mod"\
+	".\general_vars.mod"\
+	".\link_vars.mod"\
+	".\linkbc_vars.mod"\
+	".\logicals.mod"\
+	".\met_data_module.mod"\
+	".\point_vars.mod"\
+	".\scalars.mod"\
+	".\section_vars.mod"\
+	".\transport_vars.mod"\
 	
 
-"$(INTDIR)\print_output.obj" : $(SOURCE) $(DEP_F90_PRINT) "$(INTDIR)"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\general_vars.mod"\
- "$(INTDIR)\point_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\transport_vars.mod" "$(INTDIR)\date_vars.mod"\
- "$(INTDIR)\linkbc_vars.mod" "$(INTDIR)\section_vars.mod"\
- "$(INTDIR)\logicals.mod" "$(INTDIR)\scalars.mod" "$(INTDIR)\gas_functions.mod"\
- "$(INTDIR)\met_data_module.mod"
+"$(INTDIR)\print_output.obj" : $(SOURCE) $(DEP_F90_PRINT) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_PRINT=\
-	".\Debug\date_vars.mod"\
-	".\Debug\file_vars.mod"\
-	".\Debug\gas_functions.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\link_vars.mod"\
-	".\Debug\linkbc_vars.mod"\
-	".\Debug\logicals.mod"\
-	".\Debug\met_data_module.mod"\
-	".\Debug\point_vars.mod"\
-	".\Debug\scalars.mod"\
-	".\Debug\section_vars.mod"\
-	".\Debug\transport_vars.mod"\
-	
-
-"$(INTDIR)\print_output.obj" : $(SOURCE) $(DEP_F90_PRINT) "$(INTDIR)"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\general_vars.mod"\
- "$(INTDIR)\point_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\transport_vars.mod" "$(INTDIR)\date_vars.mod"\
- "$(INTDIR)\linkbc_vars.mod" "$(INTDIR)\section_vars.mod"\
- "$(INTDIR)\logicals.mod" "$(INTDIR)\scalars.mod" "$(INTDIR)\gas_functions.mod"\
- "$(INTDIR)\met_data_module.mod"
-
-
-!ENDIF 
 
 SOURCE=.\profile_output.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_PROFI=\
-	".\Release\date_vars.mod"\
-	".\Release\file_vars.mod"\
-	".\Release\gas_functions.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\link_vars.mod"\
-	".\Release\met_data_module.mod"\
-	".\Release\point_vars.mod"\
-	".\Release\scalars.mod"\
-	".\Release\transport_vars.mod"\
+	".\date_vars.mod"\
+	".\file_vars.mod"\
+	".\gas_functions.mod"\
+	".\general_vars.mod"\
+	".\link_vars.mod"\
+	".\logicals.mod"\
+	".\met_data_module.mod"\
+	".\point_vars.mod"\
+	".\scalars.mod"\
+	".\transport_vars.mod"\
 	
 
-"$(INTDIR)\profile_output.obj" : $(SOURCE) $(DEP_F90_PROFI) "$(INTDIR)"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\general_vars.mod"\
- "$(INTDIR)\point_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\transport_vars.mod" "$(INTDIR)\date_vars.mod"\
- "$(INTDIR)\scalars.mod" "$(INTDIR)\gas_functions.mod"\
- "$(INTDIR)\met_data_module.mod"
+"$(INTDIR)\profile_output.obj" : $(SOURCE) $(DEP_F90_PROFI) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_PROFI=\
-	".\Debug\date_vars.mod"\
-	".\Debug\file_vars.mod"\
-	".\Debug\gas_functions.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\link_vars.mod"\
-	".\Debug\met_data_module.mod"\
-	".\Debug\point_vars.mod"\
-	".\Debug\scalars.mod"\
-	".\Debug\transport_vars.mod"\
-	
-
-"$(INTDIR)\profile_output.obj" : $(SOURCE) $(DEP_F90_PROFI) "$(INTDIR)"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\general_vars.mod"\
- "$(INTDIR)\point_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\transport_vars.mod" "$(INTDIR)\date_vars.mod"\
- "$(INTDIR)\scalars.mod" "$(INTDIR)\gas_functions.mod"\
- "$(INTDIR)\met_data_module.mod"
-
-
-!ENDIF 
 
 SOURCE=.\read_config.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_READ_=\
-	".\Release\date_vars.mod"\
-	".\Release\file_vars.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\logicals.mod"\
-	".\Release\point_vars.mod"\
-	".\Release\section_vars.mod"\
+	".\date_vars.mod"\
+	".\file_vars.mod"\
+	".\general_vars.mod"\
+	".\logicals.mod"\
+	".\point_vars.mod"\
+	".\section_vars.mod"\
 	
 
-"$(INTDIR)\read_config.obj" : $(SOURCE) $(DEP_F90_READ_) "$(INTDIR)"\
- "$(INTDIR)\file_vars.mod" "$(INTDIR)\general_vars.mod"\
- "$(INTDIR)\section_vars.mod" "$(INTDIR)\point_vars.mod"\
- "$(INTDIR)\date_vars.mod" "$(INTDIR)\logicals.mod"
+"$(INTDIR)\read_config.obj" : $(SOURCE) $(DEP_F90_READ_) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_READ_=\
-	".\Debug\date_vars.mod"\
-	".\Debug\file_vars.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\logicals.mod"\
-	".\Debug\point_vars.mod"\
-	".\Debug\section_vars.mod"\
-	
-
-"$(INTDIR)\read_config.obj" : $(SOURCE) $(DEP_F90_READ_) "$(INTDIR)"\
- "$(INTDIR)\file_vars.mod" "$(INTDIR)\general_vars.mod"\
- "$(INTDIR)\section_vars.mod" "$(INTDIR)\point_vars.mod"\
- "$(INTDIR)\date_vars.mod" "$(INTDIR)\logicals.mod"
-
-
-!ENDIF 
 
 SOURCE=.\read_hotstart.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_READ_H=\
-	".\Release\file_vars.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\link_vars.mod"\
-	".\Release\point_vars.mod"\
-	".\Release\scalars.mod"\
-	".\Release\transport_vars.mod"\
+	".\file_vars.mod"\
+	".\general_vars.mod"\
+	".\link_vars.mod"\
+	".\logicals.mod"\
+	".\point_vars.mod"\
+	".\scalars.mod"\
+	".\transport_vars.mod"\
 	
 
-"$(INTDIR)\read_hotstart.obj" : $(SOURCE) $(DEP_F90_READ_H) "$(INTDIR)"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\general_vars.mod"\
- "$(INTDIR)\point_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\transport_vars.mod" "$(INTDIR)\scalars.mod"
+"$(INTDIR)\read_hotstart.obj" : $(SOURCE) $(DEP_F90_READ_H) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_READ_H=\
-	".\Debug\file_vars.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\link_vars.mod"\
-	".\Debug\point_vars.mod"\
-	".\Debug\scalars.mod"\
-	".\Debug\transport_vars.mod"\
-	
-
-"$(INTDIR)\read_hotstart.obj" : $(SOURCE) $(DEP_F90_READ_H) "$(INTDIR)"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\general_vars.mod"\
- "$(INTDIR)\point_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\transport_vars.mod" "$(INTDIR)\scalars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\scalars_module.f90
+DEP_F90_SCALA=\
+	".\energy_flux.mod"\
+	".\gas_functions.mod"\
+	".\general_vars.mod"\
+	".\link_vars.mod"\
+	".\linkbc_vars.mod"\
+	".\logicals.mod"\
+	".\met_data_module.mod"\
+	".\point_vars.mod"\
+	".\tdg_equation_coeff.mod"\
+	".\transport_vars.mod"\
+	
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-DEP_F90_SCALA=\
-	".\Release\energy_flux.mod"\
-	".\Release\gas_functions.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\link_vars.mod"\
-	".\Release\linkbc_vars.mod"\
-	".\Release\logicals.mod"\
-	".\Release\met_data_module.mod"\
-	".\Release\point_vars.mod"\
-	".\Release\tdg_equation_coeff.mod"\
-	".\Release\transport_vars.mod"\
-	
 F90_MODOUT=\
 	"scalars"
 
 
 "$(INTDIR)\scalars_module.obj"	"$(INTDIR)\scalars.mod" : $(SOURCE)\
- $(DEP_F90_SCALA) "$(INTDIR)" "$(INTDIR)\general_vars.mod"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\point_vars.mod"\
- "$(INTDIR)\transport_vars.mod" "$(INTDIR)\linkbc_vars.mod"\
- "$(INTDIR)\logicals.mod" "$(INTDIR)\met_data_module.mod"\
- "$(INTDIR)\energy_flux.mod" "$(INTDIR)\tdg_equation_coeff.mod"\
- "$(INTDIR)\gas_functions.mod"
+ $(DEP_F90_SCALA) "$(INTDIR)"
 	$(F90) $(F90_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-DEP_F90_SCALA=\
-	".\Debug\energy_flux.mod"\
-	".\Debug\gas_functions.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\link_vars.mod"\
-	".\Debug\linkbc_vars.mod"\
-	".\Debug\logicals.mod"\
-	".\Debug\met_data_module.mod"\
-	".\Debug\point_vars.mod"\
-	".\Debug\tdg_equation_coeff.mod"\
-	".\Debug\transport_vars.mod"\
-	
 F90_MODOUT=\
 	"scalars"
 
 
 "$(INTDIR)\scalars_module.obj"	"$(INTDIR)\scalars.mod" : $(SOURCE)\
- $(DEP_F90_SCALA) "$(INTDIR)" "$(INTDIR)\general_vars.mod"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\point_vars.mod"\
- "$(INTDIR)\transport_vars.mod" "$(INTDIR)\linkbc_vars.mod"\
- "$(INTDIR)\logicals.mod" "$(INTDIR)\met_data_module.mod"\
- "$(INTDIR)\energy_flux.mod" "$(INTDIR)\tdg_equation_coeff.mod"\
- "$(INTDIR)\gas_functions.mod"
+ $(DEP_F90_SCALA) "$(INTDIR)"
 	$(F90) $(F90_PROJ) $(SOURCE)
 
 
 !ENDIF 
 
 SOURCE=.\section.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_SECTI=\
-	".\Release\general_vars.mod"\
-	".\Release\point_vars.mod"\
-	".\Release\section_vars.mod"\
+	".\general_vars.mod"\
+	".\point_vars.mod"\
+	".\section_vars.mod"\
 	
 
-"$(INTDIR)\section.obj" : $(SOURCE) $(DEP_F90_SECTI) "$(INTDIR)"\
- "$(INTDIR)\section_vars.mod" "$(INTDIR)\general_vars.mod"\
- "$(INTDIR)\point_vars.mod"
+"$(INTDIR)\section.obj" : $(SOURCE) $(DEP_F90_SECTI) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_SECTI=\
-	".\Debug\general_vars.mod"\
-	".\Debug\point_vars.mod"\
-	".\Debug\section_vars.mod"\
-	
-
-"$(INTDIR)\section.obj" : $(SOURCE) $(DEP_F90_SECTI) "$(INTDIR)"\
- "$(INTDIR)\section_vars.mod" "$(INTDIR)\general_vars.mod"\
- "$(INTDIR)\point_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\section_data.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_SECTIO=\
-	".\Release\file_vars.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\logicals.mod"\
-	".\Release\section_vars.mod"\
+	".\file_vars.mod"\
+	".\general_vars.mod"\
+	".\logicals.mod"\
+	".\section_vars.mod"\
 	
 
-"$(INTDIR)\section_data.obj" : $(SOURCE) $(DEP_F90_SECTIO) "$(INTDIR)"\
- "$(INTDIR)\section_vars.mod" "$(INTDIR)\file_vars.mod" "$(INTDIR)\logicals.mod"\
- "$(INTDIR)\general_vars.mod"
+"$(INTDIR)\section_data.obj" : $(SOURCE) $(DEP_F90_SECTIO) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_SECTIO=\
-	".\Debug\file_vars.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\logicals.mod"\
-	".\Debug\section_vars.mod"\
-	
-
-"$(INTDIR)\section_data.obj" : $(SOURCE) $(DEP_F90_SECTIO) "$(INTDIR)"\
- "$(INTDIR)\section_vars.mod" "$(INTDIR)\file_vars.mod" "$(INTDIR)\logicals.mod"\
- "$(INTDIR)\general_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\section_table.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_SECTION=\
-	".\Release\logicals.mod"\
-	".\Release\section_vars.mod"\
+	".\logicals.mod"\
+	".\section_vars.mod"\
 	
 
-"$(INTDIR)\section_table.obj" : $(SOURCE) $(DEP_F90_SECTION) "$(INTDIR)"\
- "$(INTDIR)\section_vars.mod" "$(INTDIR)\logicals.mod"
+"$(INTDIR)\section_table.obj" : $(SOURCE) $(DEP_F90_SECTION) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_SECTION=\
-	".\Debug\logicals.mod"\
-	".\Debug\section_vars.mod"\
-	
-
-"$(INTDIR)\section_table.obj" : $(SOURCE) $(DEP_F90_SECTION) "$(INTDIR)"\
- "$(INTDIR)\section_vars.mod" "$(INTDIR)\logicals.mod"
-
-
-!ENDIF 
 
 SOURCE=.\svgrp.f90
 
@@ -1465,132 +902,68 @@ SOURCE=.\svgrp.f90
 
 
 SOURCE=.\table_interp.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_TABLE=\
-	".\Release\general_vars.mod"\
-	".\Release\linkbc_vars.mod"\
+	".\general_vars.mod"\
+	".\linkbc_vars.mod"\
 	
 
-"$(INTDIR)\table_interp.obj" : $(SOURCE) $(DEP_F90_TABLE) "$(INTDIR)"\
- "$(INTDIR)\linkbc_vars.mod" "$(INTDIR)\general_vars.mod"
+"$(INTDIR)\table_interp.obj" : $(SOURCE) $(DEP_F90_TABLE) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_TABLE=\
-	".\Debug\general_vars.mod"\
-	".\Debug\linkbc_vars.mod"\
-	
-
-"$(INTDIR)\table_interp.obj" : $(SOURCE) $(DEP_F90_TABLE) "$(INTDIR)"\
- "$(INTDIR)\linkbc_vars.mod" "$(INTDIR)\general_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\tdg_equation_coeff.f90
+DEP_F90_TDG_E=\
+	".\file_vars.mod"\
+	".\logicals.mod"\
+	
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-DEP_F90_TDG_E=\
-	".\Release\file_vars.mod"\
-	
 F90_MODOUT=\
 	"tdg_equation_coeff"
 
 
 "$(INTDIR)\tdg_equation_coeff.obj"	"$(INTDIR)\tdg_equation_coeff.mod" : \
-$(SOURCE) $(DEP_F90_TDG_E) "$(INTDIR)" "$(INTDIR)\file_vars.mod"
+$(SOURCE) $(DEP_F90_TDG_E) "$(INTDIR)"
 	$(F90) $(F90_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-DEP_F90_TDG_E=\
-	".\Debug\file_vars.mod"\
-	
 F90_MODOUT=\
 	"tdg_equation_coeff"
 
 
 "$(INTDIR)\tdg_equation_coeff.obj"	"$(INTDIR)\tdg_equation_coeff.mod" : \
-$(SOURCE) $(DEP_F90_TDG_E) "$(INTDIR)" "$(INTDIR)\file_vars.mod"
+$(SOURCE) $(DEP_F90_TDG_E) "$(INTDIR)"
 	$(F90) $(F90_PROJ) $(SOURCE)
 
 
 !ENDIF 
 
 SOURCE=.\trans_bc.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_TRANS=\
-	".\Release\date_vars.mod"\
-	".\Release\file_vars.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\linkbc_vars.mod"\
+	".\date_vars.mod"\
+	".\file_vars.mod"\
+	".\general_vars.mod"\
+	".\linkbc_vars.mod"\
+	".\logicals.mod"\
 	
 
-"$(INTDIR)\trans_bc.obj" : $(SOURCE) $(DEP_F90_TRANS) "$(INTDIR)"\
- "$(INTDIR)\linkbc_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\general_vars.mod" "$(INTDIR)\date_vars.mod"
+"$(INTDIR)\trans_bc.obj" : $(SOURCE) $(DEP_F90_TRANS) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_TRANS=\
-	".\Debug\date_vars.mod"\
-	".\Debug\file_vars.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\linkbc_vars.mod"\
-	
-
-"$(INTDIR)\trans_bc.obj" : $(SOURCE) $(DEP_F90_TRANS) "$(INTDIR)"\
- "$(INTDIR)\linkbc_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\general_vars.mod" "$(INTDIR)\date_vars.mod"
-
-
-!ENDIF 
 
 SOURCE=.\write_restart.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
 DEP_F90_WRITE=\
-	".\Release\file_vars.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\link_vars.mod"\
-	".\Release\point_vars.mod"\
-	".\Release\scalars.mod"\
-	".\Release\transport_vars.mod"\
+	".\file_vars.mod"\
+	".\general_vars.mod"\
+	".\link_vars.mod"\
+	".\point_vars.mod"\
+	".\scalars.mod"\
+	".\transport_vars.mod"\
 	
 
-"$(INTDIR)\write_restart.obj" : $(SOURCE) $(DEP_F90_WRITE) "$(INTDIR)"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\general_vars.mod"\
- "$(INTDIR)\point_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\transport_vars.mod" "$(INTDIR)\scalars.mod"
+"$(INTDIR)\write_restart.obj" : $(SOURCE) $(DEP_F90_WRITE) "$(INTDIR)"
 
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-DEP_F90_WRITE=\
-	".\Debug\file_vars.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\link_vars.mod"\
-	".\Debug\point_vars.mod"\
-	".\Debug\scalars.mod"\
-	".\Debug\transport_vars.mod"\
-	
-
-"$(INTDIR)\write_restart.obj" : $(SOURCE) $(DEP_F90_WRITE) "$(INTDIR)"\
- "$(INTDIR)\link_vars.mod" "$(INTDIR)\general_vars.mod"\
- "$(INTDIR)\point_vars.mod" "$(INTDIR)\file_vars.mod"\
- "$(INTDIR)\transport_vars.mod" "$(INTDIR)\scalars.mod"
-
-
-!ENDIF 
 
 
 !ENDIF 
