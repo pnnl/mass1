@@ -99,7 +99,7 @@ DEP_F90_ARRAY=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_ARRAY=\
+NODEP_F90_ARRAY=\
 	".\Debug\flow_coeffs.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\
@@ -129,7 +129,7 @@ DEP_F90_ARRAY_=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_ARRAY_=\
+NODEP_F90_ARRAY_=\
 	".\Debug\flow_coeffs.mod"\
 	".\Debug\link_vars.mod"\
 	".\Debug\linkbc_vars.mod"\
@@ -154,7 +154,7 @@ DEP_F90_COEFF=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_COEFF=\
+NODEP_F90_COEFF=\
 	".\Debug\fluvial_coeffs.mod"\
 	".\Debug\general_vars.mod"\
 	
@@ -175,7 +175,7 @@ DEP_F90_DATE_=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_DATE_=\
+NODEP_F90_DATE_=\
 	".\Debug\date_vars.mod"\
 	".\Debug\julian.mod"\
 	
@@ -197,7 +197,7 @@ DEP_F90_DECIM=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_DECIM=\
+NODEP_F90_DECIM=\
 	".\Debug\date_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\julian.mod"\
@@ -229,7 +229,7 @@ DEP_F90_FILE_=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_FILE_=\
+NODEP_F90_FILE_=\
 	".\Debug\file_vars.mod"\
 	
 
@@ -253,7 +253,7 @@ DEP_F90_FLOW_=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_FLOW_=\
+NODEP_F90_FLOW_=\
 	".\Debug\flow_coeffs.mod"\
 	".\Debug\fluvial_coeffs.mod"\
 	".\Debug\general_vars.mod"\
@@ -285,7 +285,7 @@ DEP_F90_GAGE_=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_GAGE_=\
+NODEP_F90_GAGE_=\
 	".\Debug\date_vars.mod"\
 	".\Debug\file_vars.mod"\
 	".\Debug\gas_functions.mod"\
@@ -317,13 +317,13 @@ SOURCE=.\gas_functions_module.f90
 
 !IF  "$(CFG)" == "mass1_v081 - Win32 Release"
 
-DEP_F90_GAS_F=\
+NODEP_F90_GAS_F=\
 	".\Release\gas_coeffs.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_GAS_F=\
+NODEP_F90_GAS_F=\
 	".\Debug\gas_coeffs.mod"\
 	
 
@@ -345,7 +345,7 @@ DEP_F90_GENER=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_GENER=\
+NODEP_F90_GENER=\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\logicals.mod"\
@@ -370,7 +370,7 @@ DEP_F90_HYDRO=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_HYDRO=\
+NODEP_F90_HYDRO=\
 	".\Debug\date_vars.mod"\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
@@ -397,7 +397,7 @@ DEP_F90_INITI=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_INITI=\
+NODEP_F90_INITI=\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\
@@ -434,7 +434,7 @@ DEP_F90_KICK_=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_KICK_=\
+NODEP_F90_KICK_=\
 	".\Debug\date_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\
@@ -459,7 +459,7 @@ DEP_F90_LATFL=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_LATFL=\
+NODEP_F90_LATFL=\
 	".\Debug\date_vars.mod"\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
@@ -490,7 +490,7 @@ DEP_F90_LINK_=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_LINK_=\
+NODEP_F90_LINK_=\
 	".\Debug\date_vars.mod"\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
@@ -515,7 +515,7 @@ DEP_F90_LINK_D=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_LINK_D=\
+NODEP_F90_LINK_D=\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\
@@ -544,7 +544,7 @@ DEP_F90_MASS1=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_MASS1=\
+NODEP_F90_MASS1=\
 	".\Debug\date_vars.mod"\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
@@ -571,7 +571,7 @@ DEP_F90_MET_D=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_MET_D=\
+NODEP_F90_MET_D=\
 	".\Debug\date_vars.mod"\
 	
 
@@ -602,7 +602,7 @@ DEP_F90_NONFL=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_NONFL=\
+NODEP_F90_NONFL=\
 	".\Debug\link_vars.mod"\
 	".\Debug\point_vars.mod"\
 	
@@ -627,7 +627,7 @@ DEP_F90_POINT=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_POINT=\
+NODEP_F90_POINT=\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\
@@ -662,7 +662,7 @@ DEP_F90_PRINT=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_PRINT=\
+NODEP_F90_PRINT=\
 	".\Debug\date_vars.mod"\
 	".\Debug\file_vars.mod"\
 	".\Debug\gas_functions.mod"\
@@ -700,7 +700,7 @@ DEP_F90_PROFI=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_PROFI=\
+NODEP_F90_PROFI=\
 	".\Debug\date_vars.mod"\
 	".\Debug\file_vars.mod"\
 	".\Debug\gas_functions.mod"\
@@ -732,7 +732,7 @@ DEP_F90_READ_=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_READ_=\
+NODEP_F90_READ_=\
 	".\Debug\date_vars.mod"\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
@@ -761,7 +761,7 @@ DEP_F90_READ_H=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_READ_H=\
+NODEP_F90_READ_H=\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\
@@ -794,7 +794,7 @@ DEP_F90_SCALA=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_SCALA=\
+NODEP_F90_SCALA=\
 	".\Debug\energy_flux.mod"\
 	".\Debug\gas_functions.mod"\
 	".\Debug\general_vars.mod"\
@@ -824,7 +824,7 @@ DEP_F90_SECTI=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_SECTI=\
+NODEP_F90_SECTI=\
 	".\Debug\general_vars.mod"\
 	".\Debug\point_vars.mod"\
 	".\Debug\section_vars.mod"\
@@ -848,7 +848,7 @@ DEP_F90_SECTIO=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_SECTIO=\
+NODEP_F90_SECTIO=\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\logicals.mod"\
@@ -871,7 +871,7 @@ DEP_F90_SECTION=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_SECTION=\
+NODEP_F90_SECTION=\
 	".\Debug\logicals.mod"\
 	".\Debug\section_vars.mod"\
 	
@@ -896,7 +896,7 @@ DEP_F90_TABLE=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_TABLE=\
+NODEP_F90_TABLE=\
 	".\Debug\general_vars.mod"\
 	".\Debug\linkbc_vars.mod"\
 	
@@ -916,7 +916,7 @@ DEP_F90_TDG_E=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_TDG_E=\
+NODEP_F90_TDG_E=\
 	".\Debug\file_vars.mod"\
 	
 
@@ -938,7 +938,7 @@ DEP_F90_TRANS=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_TRANS=\
+NODEP_F90_TRANS=\
 	".\Debug\date_vars.mod"\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
@@ -965,7 +965,7 @@ DEP_F90_WRITE=\
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-DEP_F90_WRITE=\
+NODEP_F90_WRITE=\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\

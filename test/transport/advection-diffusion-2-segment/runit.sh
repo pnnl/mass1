@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Wed Mar 31 15:28:50 1999 by William A. Perkins <perk@tophet>
+# Last Change: Thu Apr  1 09:52:03 1999 by William A. Perkins <perk@tophet>
 # -------------------------------------------------------------
 # $Id$
 
@@ -33,7 +33,7 @@ rm -f mass1.cfg
 
 (echo \
     'set terminal postscript landscape color solid "Helvetica" 14;' \
-    'set title "Advective Diffusion Analytic Solution: Courant Number = 1.0";' \
+    'set title "Multiple Segment Advection Diffusion: Courant Number = 1.0";' \
     'load "plot.gp";' ) | \
         gnuplot > plot-Cn=1.0.ps
 
@@ -43,7 +43,7 @@ rm -f mass1.cfg
 
 (echo \
     set terminal postscript landscape color solid \"Helvetica\" 14\; \
-    set title \"Advective Diffusion Analytic Solution: Courant Number = 0.1\"\; \
+    set title \"Multiple Segment Advection Diffusion: Courant Number = 0.1\"\; \
     load \"plot.gp\"\; ) | \
         gnuplot > plot-Cn=0.1.ps
 
@@ -53,22 +53,6 @@ rm -f mass1.cfg
 
 (echo \
     set terminal postscript landscape color solid \"Helvetica\" 14\; \
-    set title \"Advective Diffusion Analytic Solution: Courant Number = 0.01\"\; \
+    set title \"Multiple Segment Advection Diffusion: Courant Number = 0.01\"\; \
     load \"plot.gp\"\; ) | \
         gnuplot > plot-Cn=0.01.ps
-
-rm -f mass1.cfg
-ln -f -s mass1-warmup-2.cfg mass1.cfg
-$model
-rm -f mass1.cfg
-
-ln -f -s mass1-Cn=1.0-2.cfg mass1.cfg
-$model
-rm -f mass1.cfg
-
-(echo \
-    set terminal postscript landscape color solid \"Helvetica\" 14\; \
-    set title \"Advective Diffusion Analytic Solution: Courant Number = 1.0 \(D = 70\)\"\; \
-    load \"plot-2.gp\"\; ) | \
-        gnuplot > plot-Cn=1.0-2.ps
-

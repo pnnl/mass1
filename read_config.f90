@@ -176,6 +176,7 @@ READ(10,*)maxpoint
 READ(10,*)maxtable
 READ(10,*)maxtimes
 READ(10,*)total_sections
+READ(10,*)scalar_steps
 READ(10,*)debug_print
 
 
@@ -222,6 +223,7 @@ WRITE(11,*)maxpoint
 WRITE(11,*)maxtable
 WRITE(11,*)maxtimes
 WRITE(11,*)total_sections
+WRITE(11,*)scalar_steps
 WRITE(11,*)debug_print
 WRITE(11,*)'done reading logicals and ints'
 WRITE(11,*)filename(2)

@@ -39,7 +39,7 @@ TYPE(scalar_struct), ALLOCATABLE :: species(:)
                                 ! these are used for transport
                                 ! sub-time-stepping
 
-DOUBLE PRECISION :: scalar_delta_t
+DOUBLE PRECISION :: scalar_time, scalar_delta_t
 REAL, DIMENSION(:,:),ALLOCATABLE, SAVE, PRIVATE :: vel, area, area_old, q, q_old 
 
 
@@ -167,7 +167,7 @@ END SUBROUTINE tvd_interp
 SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
 
   USE transport_vars , ONLY : k_surf, dxx
-  USE general_vars, hdelta_t => delta_t
+  USE general_vars, hdelta_t => delta_t, htime => time
   USE link_vars
   USE point_vars, hq=>q, hq_old=>q_old, harea=>area, harea_old=>area_old, hvel=>vel
   USE linkbc_vars
@@ -191,10 +191,13 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
   REAL :: qspill,qgen 
   REAL :: energy_source, depth
   REAL :: tdg_saturation = 100.0, upstream_c
-  DOUBLE PRECISION :: salinity = 0.0, delta_t
+  DOUBLE PRECISION :: salinity = 0.0
 
   LOGICAL :: diffusion, fluvial, nonfluvial
 
+  DOUBLE PRECISION :: time, delta_t
+
+  time = scalar_time
   delta_t = scalar_delta_t
   
   !WRITE(*,*)'done with alloc; link loop'
@@ -445,6 +448,10 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
         
         c(link,maxpoints(link)) = c(link,maxpoints(link)-1)
         c_old(link,maxpoints(link)) = c_old(link,maxpoints(link)-1)
+        ! c(link,maxpoints(link)) = &
+        !      &(c(link,maxpoints(link)-1) - c(link,maxpoints(link)-2))/dxx(link, maxpoints(link)-2)*&
+        !      &(dxx(link, maxpoints(link)-2) + dxx(link, maxpoints(link)-1) + c(link,maxpoints(link)-2))
+        ! c_old(link,maxpoints(link)) = c(link,maxpoints(link))
         !c(link,maxpoints(link)) = 0.0
         
         

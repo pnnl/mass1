@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created November 11, 1998 by William A. Perkins
-# Last Change: Wed Mar 10 13:01:36 1999 by William A. Perkins <perk@erebus.pnl.gov>
+# Last Change: Thu Mar 25 12:47:26 1999 by William A. Perkins <perk@erebus.pnl.gov>
 # -------------------------------------------------------------
 # RCSID: $Id$
 
@@ -316,3 +316,14 @@ clean::
 
 %$(OBJ): %.f90
 	${COMPILE.f90} $<
+
+# -------------------------------------------------------------
+# make tags for emacs
+# -------------------------------------------------------------
+tags: TAGS
+TAGS: ${SRCS} 
+	etags ${SRCS}
+
+clean::
+	rm -f TAGS
+

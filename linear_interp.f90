@@ -48,3 +48,27 @@ ENDIF
 
 
 END FUNCTION linear_interp
+
+
+DOUBLE PRECISION FUNCTION dlinear_interp(x0,y0,x1,y1,y)
+
+  ! returns x value
+  ! given a y value and end points of a line
+  ! origin is at x0,y0
+
+  ! y - y0 = slope*(x - x0)
+
+  DOUBLE PRECISION :: x0,y0,x1,y1,slope,y
+  
+  ! check for a vertical line
+  IF(x0 == x1)THEN
+     dlinear_interp = x0
+  ELSE
+     slope = (y1 - y0)/(x1 - x0)
+     IF(slope /= 0.0)THEN
+        dlinear_interp = x0 + (y - y0)/slope
+     ELSE
+        dlinear_interp = x0
+     ENDIF
+  ENDIF
+END FUNCTION dlinear_interp

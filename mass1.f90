@@ -48,7 +48,7 @@ INTEGER :: error_iounit = 11,status_iounit = 99, species_num, i
 INTEGER :: link
 LOGICAL run
 
-version = 'MASS1 Version 0.81 Date: 11-15-1998'
+version = 'MASS1 Version 0.82 Date: 03-25-1999'
 WRITE(*,*)'Modular Aquatic Simulation System 1D (MASS1)'
 WRITE(*,*)'Pacific Northwest National Laboratory'
 WRITE(*,*)' '
@@ -155,12 +155,12 @@ ENDIF
 !------------------------------------------------------------------------------
 
 model_time = time_begin
+time = model_time/time_mult
+scalar_delta_t = delta_t/DBLE(scalar_steps)
 
 IF(model_time <= time_end) run = .true.
 
 DO WHILE(run)
-	time = model_time/time_mult
-	IF(model_time >= (time_end)) run = .false.
 
 	IF((debug_print == 1).AND.(time == time_begin))THEN
 		WRITE(11,*)'main computational loop in mass1'
@@ -168,32 +168,73 @@ DO WHILE(run)
 		WRITE(11,*)' '
 	ENDIF
 
+                                ! print out initial conditions
+
+    IF (time == time_begin) THEN
+       IF (do_printout) CALL print_output
+       IF (do_profileout) CALL profile_output
+       IF (do_gageout) CALL gage_output
+    END IF
+       
+
 	IF(do_flow)THEN
 		CALL flow_sim
 	ENDIF
 
-	IF(do_gas)THEN
-		species_num = 1
-		CALL tvd_transport(species_num, species(species_num)%conc,species(species_num)%concold &
-			& ,status_iounit, error_iounit)
-	END IF
+                                ! transport simulation is performed at
+                                ! integral divisions of the hydrodynamic
+                                ! time step
 
-	IF(do_temp)THEN
-		species_num = 2
-		CALL tvd_transport(species_num, species(species_num)%conc,species(species_num)%concold &
-			& , status_iounit, error_iounit)
-	END IF
+    IF (do_gas .OR. do_temp) THEN
 
-	IF(do_printout .OR. (time == time_begin))THEN
-		IF(MOD(time_step_count,print_freq) == 0)CALL print_output
-	END IF
+       scalar_time = model_time
 
-	IF(do_gageout)THEN
-		IF(MOD(time_step_count,print_freq) == 0)CALL gage_output	
-	ENDIF
+       DO i = 1, scalar_steps
 
-	IF(do_profileout)THEN
-		IF(MOD(time_step_count,print_freq) == 0)CALL profile_output
+          IF((debug_print == 1))THEN
+             WRITE(11,*)'transport sub loop in mass1'
+             WRITE(11,*)i, scalar_time,model_time
+             WRITE(11,*)' '
+          ENDIF
+
+          CALL tvd_interp(scalar_time, model_time, model_time + delta_t)
+          
+          IF(do_gas)THEN
+             species_num = 1
+             CALL tvd_transport(species_num, species(species_num)%conc,species(species_num)%concold &
+                  & ,status_iounit, error_iounit)
+          END IF
+
+          IF(do_temp)THEN
+             species_num = 2
+             CALL tvd_transport(species_num, species(species_num)%conc,species(species_num)%concold &
+                  & , status_iounit, error_iounit)
+          END IF
+
+          scalar_time = model_time + DBLE(i)/DBLE(scalar_steps)*time_step
+
+       END DO
+
+    END IF
+
+                                ! update time step here so correct
+                                ! time is placed in output
+
+	model_time = model_time + time_step
+	time = model_time/time_mult
+	IF(model_time >= (time_end)) run = .false.
+	time_step_count = time_step_count + 1    
+
+	CALL decimal_to_date
+	WRITE(*,1020)date_string,time_string
+1020 FORMAT(' Done Crunching through ** Date: ',a10,'  Time: ',a8)
+
+                                ! do output as specified
+
+    IF (MOD(time_step_count,print_freq) == 0) THEN
+       IF (do_printout)CALL print_output
+       IF (do_gageout) CALL gage_output	
+       IF (do_profileout) CALL profile_output
 	ENDIF
 
 	IF(debug_print == 1) WRITE(11,*)'simulation time = ',time/time_mult
@@ -202,26 +243,15 @@ DO WHILE(run)
 		CALL write_restart
 	ENDIF
 
-! deallocation of arrays 
-	IF(time >= time_end)THEN
-		CALL array_dealloc
-	ENDIF
-
 	IF((debug_print == 1).AND.(time >= time_end))THEN
 		WRITE(11,*)'ALL DONE!!'
 		WRITE(11,*)time,time_begin,time_end,delta_t,time_mult
 		CLOSE(11)
 	ENDIF
 
-	CALL decimal_to_date
-	WRITE(*,1020)date_string,time_string
-1020 FORMAT(' Done Crunching through ** Date: ',a10,'  Time: ',a8)
-
-! update time
-	model_time = model_time + time_step
-	time_step_count = time_step_count + 1    
-
 END DO ! end main time loop
+
+CALL array_dealloc
 
 CLOSE(99)
 

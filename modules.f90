@@ -27,7 +27,7 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Mon Feb 22 21:21:28 1999 by William A. Perkins <perk@erebus.pnl.gov>
+! Last Change: Wed Mar 24 15:35:17 1999 by William A. Perkins <perk@erebus.pnl.gov>
 !----------------------------------------------------------
 MODULE general_vars
 
@@ -39,7 +39,7 @@ MODULE general_vars
 	INTEGER, SAVE :: lateral_inflow_flag, sediment_flag, contaminant_flag
     INTEGER, SAVE :: diffusion_flag,degass_flag,infiltration_flag
 	INTEGER, SAVE :: print_output_flag, plot_output_flag
-	INTEGER, SAVE :: maxlinks,maxpoint,maxtable,maxtimes
+	INTEGER, SAVE :: maxlinks,maxpoint,maxtable,maxtimes,scalar_steps
 	INTEGER, SAVE :: dsbc_type
 	REAL, SAVE :: res_coeff,grav, delta_x
     REAL, SAVE :: unit_weight_h2o,density_h2o

@@ -1,3 +1,65 @@
+1999-03-30  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* mass1.f90: added new calls to profile_output and gage_output so
+	  that initial conditions would be output; updated the time
+	  earlier in the time loop; moved the call to array_dealloc
+	  outside time loop; output should now report proper time
+	  
+
+1999-03-26  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* makefile.sun: added TAGS target and emacs mode line
+
+	* test/transport/advection-diffusion-1-segment/runit-nt.sh:
+	  created, and successfully run 
+
+	* mass1.f90: removed local variable scalar_time, and put it in
+	  scalars_module
+
+	* scalars_module.f90 (tvd_transport): added local variable "time"
+	  and changed general_vars' time to htime
+
+1999-03-25  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* makefile.linux: added EMACS mode line
+	 (tags): added tags target
+
+	* makefile.dec (TAGS): added TAGS target
+
+	* makefile (tags): added tags/TAGS target
+
+	* scalars_module.f90: added module variable scalar_delta_t
+
+1999-03-24  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* read_config.f90 (read_config): read scalar_steps right after
+	  maxtimes 
+
+	* modules.f90: added scalar_steps to general_vars module
+
+	* mass1.f90 (mass1): added local variables scalar_time and updated
+	  version to 0.82.  Added transport simulation sub-timestep loop.
+
+	* scalars_module.f90 (tvd_interp): created SUBROUTINE tvd_interp
+
+	* linear_interp.f90 (dlinear_interp): created a double precision
+	  version of the linear_interp function
+
+	* scalars_module.f90: added PRIVATE module variables vel, area,
+	  area_old, q, and q_old and public variable tvd_time; allocation
+	  of these PRIVATE variables in performed in allocate_species.  
+		  
+
+1999-03-22  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* profile_output.f90: added another decimal place on distance in
+	  the profile output 
+
+1999-03-19  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* scalars_module.f90: reformated SUBROUTINE tvd_transport so I
+	  could read it.  
+
 1999-03-05  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* gage_output.f90: increased the dimensions of gage_link and

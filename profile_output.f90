@@ -193,7 +193,7 @@ WRITE(count,1000)link,point,j,x_profile(i,j),y(link,point),q(link,point),vel(lin
 !old WRITE(count,1000)link,point,j,x_profile(i,j),y(link,point),q(link,point),vel(link,point),depth, &
 !     c(link,point),temp(link,point),thalweg(link,point),area(link,point)
 
-1000 FORMAT(i5,1x,i5,1x,i5,1x,f8.2,2x,f8.2,2x,f12.2,2x,f6.2,2x,f7.2,2x,f10.2,2x,f6.2,2x,f6.2,2x,f6.1,2x, &
+1000 FORMAT(i5,1x,i5,1x,i5,1x,f9.3,1x,f8.2,2x,f12.2,2x,f6.2,2x,f7.2,2x,f10.2,2x,f6.2,2x,f6.2,2x,f6.1,2x, &
 			f8.2,2x,es10.2,2x, &
 			f8.2,2x,f6.2,f6.2,es10.2,2x,es10.2)
 
