@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created November 19, 1996 by William A. Perkins
-# Last Change: Tue Dec  3 14:06:28 1996 by William A. Perkins <perk@yama.pnl.gov>
+# Last Change: Wed Dec 10 12:33:03 1997 by William A. Perkins <perk@owl.pnl.gov>
 # -------------------------------------------------------------
 
 package XSection;
@@ -78,7 +78,7 @@ sub addpoint {
   my $y = shift;
   $x = $x + 0;
   $y = $y + 0;
-  $self->{points}->{$x} = $y;
+  $self->{'points'}->{$x} = $y;
   return ($self->points());
 }
 
@@ -89,12 +89,60 @@ sub removepoint {
   my $self = shift;
   my $stn = shift;
   my $elev = shift;
-  if (exists($self->{points}->{$stn})) {
-    $elev = $self->{points}->{$stn};
-    delete $self->{points}->{$stn};
+  if (exists($self->{'points'}->{$stn})) {
+    $elev = $self->{'points'}->{$stn};
+    delete $self->{'points'}->{$stn};
     return $elev;
   }    
   return;
+}
+
+# -------------------------------------------------------------
+# XSection::min_station
+# Returns the minimum station, and cooresponding elevation, in the x
+# section
+# -------------------------------------------------------------
+sub min_station {
+  my $self = shift;
+  my @junk = sort { $a <=> $b } keys %{$self->{'points'}};
+  my $min = shift @junk;
+  return ($min);
+}
+
+# -------------------------------------------------------------
+# XSection::max_station
+# -------------------------------------------------------------
+sub max_station {
+  my $self = shift;
+  my @junk = sort { $a <=> $b } keys %{$self->{'points'}};
+  my $max = pop @junk;
+  return ($max);
+}
+
+# -------------------------------------------------------------
+# XSection::insert
+# inserts one cross section into another, but only if it fits
+# completely inside the original cross section.  
+# -------------------------------------------------------------
+sub insert {
+  my $self = shift;
+  my $sect = shift;
+  my ($min, $max) = ($self->min_station() + 0.0, 
+		     $self->max_station() + 0.0);
+  my ($in_min, $in_max) = ($sect->min_station() + 0.0, 
+			   $sect->max_station() + 0.0);
+  if ($min = $in_min && $max >= $in_max) {
+    my $stn;
+    foreach $stn (keys %{$self->{'points'}}) {
+      if ($stn + 0.0 >= $in_min && $stn + 0.0 <= $in_max) {
+	$self->removepoint($stn);
+      }
+    }
+    foreach $stn (sort { $a <=> $b } keys %{$sect->{'points'}}) {
+      $self->addpoint($stn, $sect->{'points'}->{$stn});
+    }
+  }
+  return $self;
 }
 
 
@@ -107,10 +155,10 @@ sub thalweg {
   my $minstn = -1.0;
   my $minelv = 9999999.0;
   my $stn;
-  foreach $stn (sort keys %{$self->{points}} ) {
-    if ( $self->{points}->{$stn} < $minelv ) {
+  foreach $stn (sort keys %{$self->{'points'}} ) {
+    if ( $self->{'points'}->{$stn} < $minelv ) {
       $minstn = $stn + 0.0;
-      $minelv = $self->{points}->{$stn} + 0.0;
+      $minelv = $self->{'points'}->{$stn} + 0.0;
     }
   }
   return ($minstn, $minelv);
@@ -124,9 +172,9 @@ sub print_table {
   my $river = $self->river();
   my $rivermile = $self->rivermile();
   my $stn;
-  foreach $stn (sort keys %{$self->{points}} ) {
+  foreach $stn (sort keys %{$self->{'points'}} ) {
     printf("\"%s\",%.2f,%.2f,%.2f\n", $river, $rivermile, 
-           $stn, $self->{points}->{$stn});
+           $stn, $self->{'points'}->{$stn});
   } 
   return;
 }
