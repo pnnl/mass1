@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created November 19, 1996 by William A. Perkins
-# Last Change: Mon Jan  5 16:01:17 1998 by William A. Perkins <perk@yama.pnl.gov>
+# Last Change: Wed Mar 23 12:57:04 2005 by William A. Perkins <perk@leechong.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -248,6 +248,33 @@ sub insert {
   return $self;
 }
 
+# -------------------------------------------------------------
+# XSection::fill
+# Uses another section to fill gaps in this section
+# -------------------------------------------------------------
+sub fill {
+  my $self = shift;
+  my $sect = shift;
+  my $gapsize  = shift;             # minimum gap size 
+  my $min = $self->min_station() + 0.0;
+
+  my @stns = sort {$a <=> $b;} keys %{$self->{'points'}};
+  my @fillstns = sort { $a <=> $b } keys %{$sect->{'points'}};
+  my $laststn = $min;
+  my $stn;
+  my $fstn;
+  foreach $stn (@stns) {
+    if ($stn - $laststn >= $gapsize) {
+      foreach $fstn (@fillstns) {
+        if ($fstn > $laststn && $fstn < $stn) {
+          $self->addpoint($fstn, $sect->{'points'}->{$fstn});
+        }
+      }
+    }
+    $laststn = $stn
+  }
+}
+
 
 # -------------------------------------------------------------
 # XSection::thalweg
@@ -387,7 +414,7 @@ sub write_section {
     $steps = 50;
   }
 
-  printf($fd "%5d%5d%5d   RM=%6.2f, %s River\n", 
+  printf($fd "%5d%5d%10.1f   RM=%6.3f, %s River\n", 
          $id, $steps, 1, $rm, $river);
   printf($fd "%5d%5d\n", 1, $count);
   
