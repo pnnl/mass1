@@ -1,3 +1,8 @@
+2002-01-08  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* scalars_module.f90: added new gas production equation form,
+	number 4, S = a + b*ln(c*q)
+
 2001-11-19  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* met_data_module.f90: Print final met coefficients to status

@@ -275,6 +275,12 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
               !			OR 
               !			gas_eqn_type = 2 exponetial equation
               !			tdg = a_gas + b_gas*EXP(c_gas*Qspill)
+              !			OR 
+              !			gas_eqn_type = 3 exponetial equation
+              !			tdg = a_gas + b_gas*EXP(c_gas*Qspill)
+              !			OR 
+              !			gas_eqn_type = 4 logaritmic equation
+              !			tdg = a_gas + b_gas*LOG(c_gas*Qspill)
               
               qspill = qspill + qgen_frac(link)*qgen
               qgen   = qgen - qgen_frac(link)*qgen
@@ -287,6 +293,16 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
               CASE(2)
                  tdg_saturation = a_gas(link) + b_gas(link)*EXP(c_gas(link)*qspill/1000.0)
                  c(link,2) = SNGL(TDGasConcfromSat( DBLE(tdg_saturation), t_water, salinity, baro_press))
+              CASE(3)
+                 tdg_saturation = a_gas(link) + b_gas(link)*EXP(c_gas(link)*qspill/1000.0)
+                 c(link,point) = SNGL(TDGasConcfromSat( DBLE(tdg_saturation), t_water, salinity, baro_press))
+              CASE(4) 
+                 tdg_saturation = a_gas(link) + b_gas(link)*LOG(c_gas(link)*qspill/1000.0)
+                 c(link,point) = SNGL(TDGasConcfromSat( DBLE(tdg_saturation), t_water, salinity, baro_press))
+              CASE DEFAULT
+                 WRITE(*,*)'ABORT - no gas eqn error in type ', linktype(link), ' link BCs at link = ',link
+                 WRITE(99,*)'ABORT - no gas eqn error in type ', linktype(link), ' link BCs at link = ',link
+                 CALL EXIT(1)
               END SELECT
               hydro_sat(link) = tdg_saturation
               hydro_conc(link) = c(link,2)
@@ -376,6 +392,9 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                     !			OR 
                     !			gas_eqn_type = 3 exponetial equation
                     !			tdg = a_gas + b_gas*EXP(c_gas*Qspill)
+                    !			OR 
+                    !			gas_eqn_type = 4 logaritmic equation
+                    !			tdg = a_gas + b_gas*LOG(c_gas*Qspill)
                     
                     qspill = qspill + qgen_frac(link)*qgen
                     qgen   = qgen - qgen_frac(link)*qgen
@@ -386,6 +405,9 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                        c(link,point) = SNGL(TDGasConcfromSat( DBLE(tdg_saturation), t_water, salinity, baro_press))
                     CASE(3)
                        tdg_saturation = a_gas(link) + b_gas(link)*EXP(c_gas(link)*qspill/1000.0)
+                       c(link,point) = SNGL(TDGasConcfromSat( DBLE(tdg_saturation), t_water, salinity, baro_press))
+                    CASE(4) 
+                       tdg_saturation = a_gas(link) + b_gas(link)*LOG(c_gas(link)*qspill/1000.0)
                        c(link,point) = SNGL(TDGasConcfromSat( DBLE(tdg_saturation), t_water, salinity, baro_press))
                     CASE DEFAULT
                        WRITE(*,*)'ABORT - no eqn error in type 21 link BCs at link = ',link
@@ -460,6 +482,9 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                     !			OR 
                     !			gas_eqn_type = 3 exponetial equation
                     !			tdg = a_gas + b_gas*EXP(c_gas*Qspill)
+                    !			OR 
+                    !			gas_eqn_type = 4 logaritmic equation
+                    !			tdg = a_gas + b_gas*LOG(c_gas*Qspill)
                     
                     qspill = qspill + qgen_frac(link)*qgen
                     qgen   = qgen - qgen_frac(link)*qgen
@@ -483,6 +508,11 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                        hydro_sat(link) = tdg_saturation
                     CASE(3)
                        tdg_saturation = a_gas(link) + b_gas(link)*EXP(c_gas(link)*qspill/1000.0)
+                       c(link,point) = SNGL(TDGasConcfromSat( DBLE(tdg_saturation), t_water, salinity, baro_press))
+                       hydro_conc(link) = c(link,point)
+                       hydro_sat(link) = tdg_saturation
+                    CASE(4) 
+                       tdg_saturation = a_gas(link) + b_gas(link)*LOG(c_gas(link)*qspill/1000.0)
                        c(link,point) = SNGL(TDGasConcfromSat( DBLE(tdg_saturation), t_water, salinity, baro_press))
                        hydro_conc(link) = c(link,point)
                        hydro_sat(link) = tdg_saturation
