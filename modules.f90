@@ -27,7 +27,7 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Tue Apr 13 08:24:16 1999 by William A. Perkins <perk@tophet>
+! Last Change: Tue Jun 15 11:11:25 1999 by William A. Perkins <marshall@mack.pnl.gov>
 !----------------------------------------------------------
 MODULE general_vars
 
@@ -67,13 +67,14 @@ LOGICAL, SAVE :: temp_diffusion, temp_exchange
 LOGICAL, SAVE :: gas_diffusion, gas_exchange
 LOGICAL, SAVE :: print_sections,write_sections,read_sections
 LOGICAL, SAVE :: do_latflow
+LOGICAL, SAVE :: file_exist
 
 END MODULE logicals
 
 !----------------------------------------------------------
 MODULE file_vars
 
-	CHARACTER (LEN = 80), SAVE :: filename(20)
+	CHARACTER (LEN = 100), SAVE :: filename(20)
 	INTEGER, SAVE :: ii,fileunit(20) = (/(ii,ii=20,39)/)
 
 END MODULE file_vars

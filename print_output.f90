@@ -52,6 +52,7 @@ IF(time == time_begin )THEN
   
 	iounit1 = fileunit(7)
 	OPEN(fileunit(7),file=filename(7))
+    WRITE(99,*)'general output file ', filename(7),' opened'
 
 	 WRITE(iounit1,1026)
 1026 FORMAT(5x,'Modular Aquatic Simulation System 1D (MASS1)'/)

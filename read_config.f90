@@ -41,7 +41,16 @@ IMPLICIT NONE
 
 INTEGER :: dumlog 
 
-OPEN(10,file='mass1.cfg')
+INQUIRE(FILE='mass1.cfg',EXIST=file_exist)
+
+IF(file_exist)THEN
+   OPEN(10,file='mass1.cfg')
+   WRITE(99,*)'opening mass1.cfg file'
+ELSE
+   WRITE(*,*)'The mass1.cfg file does not exist - ABORT RUN'
+   WRITE(99,*)'The mass1.cfg file does not exist - ABORT RUN'
+   CALL EXIT
+ENDIF
 
 READ(10,1000)config_version
 1000 FORMAT(a100)

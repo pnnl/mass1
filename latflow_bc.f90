@@ -33,17 +33,26 @@ USE link_vars
 USE file_vars
 USE general_vars, ONLY: units,maxlinks
 USE date_vars
+USE logicals, ONLY : file_exist
 
 IMPLICIT NONE
 
 INTEGER :: i,count, latflowbc_num
 DOUBLE PRECISION :: date_to_decimal
-CHARACTER(LEN=80) :: latflowbc_filename
+CHARACTER(LEN=100) :: latflowbc_filename
 INTEGER :: iounit1 = 50, iounit2 = 51
 
 ! read in general lateral inlfow for link-related boundary condition table
-  OPEN(fileunit(16),file=filename(16))
-	iounit2 = fileunit(16)
+  INQUIRE(FILE=filename(16), EXIST=file_exist)
+  IF(file_exist)THEN
+     OPEN(fileunit(16),file=filename(16))
+     WRITE(99,*)'opened lateral inflow file list: ',filename(16)
+  ELSE
+     WRITE(*,*)'lateral inflow file list does not exist - ABORT: ',filename(16)
+     WRITE(99,*)'lateral inflow file list does not exist - ABORT: ',filename(16)
+     CALL EXIT
+  ENDIF
+  iounit2 = fileunit(16)
 
   count = 0
 
@@ -66,8 +75,18 @@ CASE(2) ! date/time format is used mm:dd:yyyy hh:mm:ss converted to decimal juli
 
 		DO WHILE(.TRUE.)
 			READ(iounit2,*,END=200)latflowbc_num,latflowbc_filename
-			OPEN(iounit1, file = latflowbc_filename)
-			READ(iounit1,*,END=100)latflowbc_header(latflowbc_num)
+
+			INQUIRE(FILE=latflowbc_filename,EXIST=file_exist)
+            IF(file_exist)THEN
+               OPEN(iounit1, file = latflowbc_filename)
+               WRITE(99,*)'lateral inflow BC file opened: ',latflowbc_filename
+			ELSE
+               WRITE(*,*)'lateral inflow BC file does not exist - ABORT: ',latflowbc_filename
+               WRITE(99,*)'lateral inflow BC file does not exist - ABORT: ',latflowbc_filename
+               CALL EXIT
+            ENDIF
+
+            READ(iounit1,*,END=100)latflowbc_header(latflowbc_num)
 			count = 0
 			DO WHILE(.TRUE.)
 				count = count + 1

@@ -41,8 +41,15 @@ SUBROUTINE section_data
         INTEGER :: i,j,num_pairs
 		REAL :: xy(2*maxpairs)
         
-
-        OPEN(fileunit(4),file=filename(4))
+        INQUIRE(FILE=filename(4),EXIST=file_exist)
+        IF(file_exist)THEN
+           OPEN(fileunit(4),file=filename(4))
+           WRITE(99,*)'cross section data file opened: ',filename(4)
+        ELSE
+           WRITE(*,*)'cross section file does not exist - ABORT: ',filename(4)
+           WRITE(99,*)'cross section file does not exist - ABORT: ',filename(4)
+           CALL EXIT
+        ENDIF
 
         DO i=1,total_sections
 

@@ -34,17 +34,28 @@ USE link_vars
 USE file_vars
 USE general_vars, ONLY: units,maxlinks
 USE date_vars
+USE logicals, ONLY : file_exist
 
 IMPLICIT NONE
 
 INTEGER :: i,count, link, linkbc_num
 DOUBLE PRECISION :: date_to_decimal
 
-CHARACTER(LEN=80) :: linkbc_filename
+CHARACTER(LEN=100) :: linkbc_filename
 INTEGER :: iounit1 = 50, iounit2 = 51
 
 ! read in general link-related boundary condition table
-OPEN(fileunit(5),file=filename(5))
+
+   INQUIRE(FILE=filename(5), EXIST=file_exist)
+   IF(file_exist)THEN
+      OPEN(fileunit(5),file=filename(5))
+      WRITE(99,*)'link BC list file opened: ',filename(5)
+   ELSE
+      WRITE(*,*)'link BC list file does not exist - ABORT: ',filename(5)
+      WRITE(99,*)'link BC list file does not exist - ABORT: ',filename(5)
+      CALL EXIT
+  ENDIF
+
 iounit2 = fileunit(5)
 count = 0
 
@@ -66,7 +77,17 @@ CASE(2) ! date/time format is used mm:dd:yyyy hh:mm:ss converted to decimal juli
 
 		DO WHILE(.TRUE.)
 			READ(iounit2,*,END=200)linkbc_num,linkbc_filename
-			OPEN(iounit1, file = linkbc_filename)
+
+            INQUIRE(FILE=linkbc_filename,EXIST=file_exist)
+            IF(file_exist)THEN
+               OPEN(iounit1, file = linkbc_filename)
+               WRITE(99,*)'link BC file opened: ',linkbc_filename
+            ELSE
+               WRITE(*,*)'link BC file does not exist - ABORT: ',linkbc_filename
+               WRITE(99,*)'link BC file does not exist - ABORT: ',linkbc_filename
+               CALL EXIT
+            ENDIF
+
 			READ(iounit1,*,END=100)linkbc_header(linkbc_num)
 			count = 0
 			DO WHILE(.TRUE.)

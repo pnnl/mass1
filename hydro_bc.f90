@@ -32,16 +32,26 @@ USE linkbc_vars
 USE file_vars
 USE general_vars, ONLY: units
 USE date_vars
+USE logicals, ONLY: file_exist
 
 IMPLICIT NONE
 
 INTEGER :: count, linkbc_num
-CHARACTER(LEN=80) :: hydrobc_filename
+CHARACTER(LEN=100) :: hydrobc_filename
 INTEGER :: iounit1 = 50, iounit2 = 51, i, j = 0
 DOUBLE PRECISION :: date_to_decimal
 
 iounit2 = fileunit(10)
-OPEN(fileunit(10),file=filename(10))
+
+INQUIRE(FILE=filename(10),EXIST=file_exist)
+IF(file_exist)THEN
+   OPEN(fileunit(10),file=filename(10))
+   WRITE(99,*)'opening hydro BC file list: ',filename(10)
+ELSE
+   WRITE(*,*)'hydro BC file list does not exist - ABORT: ',filename(10)
+   WRITE(99,*)'hydro BC file list does not exist - ABORT: ',filename(10)
+   CALL EXIT
+ENDIF
 
 count = 0
 
@@ -64,8 +74,17 @@ SELECT CASE(time_option)
 	
 		DO WHILE(.TRUE.)
 			READ(iounit2,*,END=200)linkbc_num,hydrobc_filename
-			OPEN(iounit1, file = hydrobc_filename)
-			READ(iounit1,*,END=100)hydrobc_header(linkbc_num)
+
+			INQUIRE(FILE=hydrobc_filename,EXIST=file_exist)
+            IF(file_exist)THEN
+               OPEN(iounit1, file = hydrobc_filename)
+               WRITE(99,*)'opening hydro BC file: ',hydrobc_filename
+			ELSE
+               WRITE(*,*)'hydro BC file does not exist - ABORT: ',hydrobc_filename
+               WRITE(99,*)'hydro BC file does not exist - ABORT: ',hydrobc_filename
+               CALL EXIT
+            ENDIF
+            READ(iounit1,*,END=100)hydrobc_header(linkbc_num)
 			count = 0
 			DO WHILE(.TRUE.)
 				count = count + 1

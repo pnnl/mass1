@@ -32,17 +32,24 @@ SUBROUTINE initial_cond
     USE link_vars
     USE scalars, ONLY: species
     USE general_vars, ONLY : maxlinks,units
+    USE logicals, ONLY : file_exist
 
-        IMPLICIT NONE
+    IMPLICIT NONE
 
 
         INTEGER :: link,point, i
         REAL :: junk3,depth,junk2,junk4
         
+        INQUIRE(FILE=filename(6), EXIST=file_exist)
+        IF(file_exist)THEN
+           OPEN(fileunit(6),file = filename(6))
+           WRITE(99,*)'initial condition file opened: ',filename(6)
+        ELSE
+           WRITE(*,*)'initial condition file does not exist - ABORT: ',filename(6)
+           WRITE(99,*)'initial condition file does not exist - ABORT: ',filename(6)
+           CALL EXIT
+        ENDIF
 
-        OPEN(fileunit(6),file = filename(6))
-
-        
         DO WHILE(.TRUE.) !dangerous, assumes just right stuff is in initial.dat
 
         READ(fileunit(6),*,END=100)link, junk3, depth,junk2,junk4

@@ -8,6 +8,7 @@
 MODULE met_data_module
 
 USE date_vars
+USE logicals, ONLY : file_exist
 
 IMPLICIT NONE
 INTEGER, PARAMETER  :: max_cell_values = 5
@@ -24,7 +25,7 @@ TYPE table_entry_struct
 END TYPE table_entry_struct
 
 TYPE table_bc_struct
-	CHARACTER (LEN=80) :: file_name
+	CHARACTER (LEN=100) :: file_name
 	CHARACTER (LEN=10) :: table_type
 	INTEGER :: max_entries
         INTEGER :: start_entry
@@ -47,12 +48,21 @@ CONTAINS
 !##################################################################################################
 SUBROUTINE read_met_data(met_files, max_times, status_iounit, error_iounit)
   IMPLICIT NONE
-  CHARACTER(LEN=80) :: met_files, weather_filename
+  CHARACTER(LEN=100) :: met_files, weather_filename
   INTEGER :: max_zones, max_times, status_iounit, error_iounit, alloc_stat
   INTEGER :: iounit1 = 50, iounit2 = 51, i, j = 0, met_zone
   DOUBLE PRECISION :: date_to_decimal
 
-  OPEN(iounit2, file = met_files)
+  INQUIRE(FILE=met_files,EXIST=file_exist)
+  IF(file_exist)THEN
+     OPEN(iounit2, file = met_files)
+     WRITE(status_iounit,*)'weather file list opened',met_files
+  ELSE
+     WRITE(*,*)'weather file list does not exist - ABORT',met_files
+     WRITE(status_iounit,*)'weather file list does not exist - ABORT',met_files
+     CALL EXIT(2)
+  ENDIF
+
   max_zones = 0
   DO WHILE(.TRUE.)
      max_zones = max_zones + 1
@@ -91,7 +101,17 @@ SUBROUTINE read_met_data(met_files, max_times, status_iounit, error_iounit)
      READ(iounit2,*,END=200)met_zone, weather_filename
      met_data(met_zone)%start_entry = 0
      met_data(met_zone)%max_entries = 0
-     OPEN(iounit1, file = weather_filename)
+     
+     INQUIRE(FILE=weather_filename,EXIST=file_exist)
+     IF(file_exist)THEN
+        OPEN(iounit1, file = weather_filename)
+        WRITE(status_iounit,*)'weather file opened: ',weather_filename
+     ELSE
+        WRITE(*,*)'weather file does not exist - ABORT: ',weather_filename
+        WRITE(status_iounit,*)'weather file does not exist - ABORT: ',weather_filename
+        CALL EXIT(2)
+     ENDIF
+
      j = 0
      DO WHILE(.TRUE.)
        j = j + 1

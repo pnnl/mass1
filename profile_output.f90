@@ -44,6 +44,7 @@ USE date_vars
 USE scalars
 USE gas_functions
 USE met_data_module
+USE logicals, ONLY : file_exist
 
 IMPLICIT NONE
 
@@ -68,7 +69,17 @@ CHARACTER*4 profile_x_units(maxpro)
 IF(time == time_begin )THEN
         
 	count = 0
-	OPEN(fileunit(15),file=filename(15))
+
+    INQUIRE(FILE=filename(15),EXIST=file_exist)
+    IF(file_exist)THEN
+       OPEN(fileunit(15),file=filename(15))
+       WRITE(99,*)'profile control file opened: ',filename(15)
+    ELSE
+       WRITE(*,*)'profile control file does not exist - ABORT: ',filename(15)
+       WRITE(99,*)'profile control file` does not exist - ABORT: ',filename(15)
+       CALL EXIT
+    ENDIF
+
 	DO WHILE(.TRUE.)
 	count=count+1	
 	READ(fileunit(15),*,END=100)profile_num_links(count),profile_x_units(count),x_pro_start(count)

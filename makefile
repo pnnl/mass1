@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created November 11, 1998 by William A. Perkins
-# Last Change: Thu Mar 25 12:47:26 1999 by William A. Perkins <perk@erebus.pnl.gov>
+# Last Change: Tue Jun 15 15:59:53 1999 by William A. Perkins <marshall@mack.pnl.gov>
 # -------------------------------------------------------------
 # RCSID: $Id$
 
@@ -18,15 +18,15 @@ LINK.f90 = $(F90) $(LDFLAGS)
 MOD=.mod
 OBJ=.o
 
-DEBUG = -g3 -O
-# FLAGS = $(DEBUG) -n32 # -r10000 -TARG:platform=IP30
-FLAGS = $(DEBUG) -n32 -r8 -d8 -r10000 -TARG:platform=IP30
+#DEBUG = -O #  -g3 -O
+FLAGS = $(DEBUG) -n32 -Ofast # -r10000 -TARG:platform=IP30
+#FLAGS = $(DEBUG) -n32 -r8 -d8 -r10000 -TARG:platform=IP30
 F90FLAGS = $(FLAGS)
 LIBLOC = 
 LDFLAGS = ${LIBLOC} $(FLAGS)
 LIBS = -lfpe
 
-TARGET = mass1_v082
+TARGET = mass1_v083
 SRCS = \
     array_alloc.f90				\
     array_dealloc.f90				\

@@ -36,6 +36,7 @@ USE date_vars
 USE scalars
 USE met_data_module
 USE gas_functions
+USE logicals, ONLY : file_exist
 
 IMPLICIT NONE
 
@@ -50,13 +51,22 @@ CHARACTER*20 fname,string1,string2
         
 IF(time == time_begin )THEN
     count=0    
-	OPEN(fileunit(14),file=filename(14))
-	DO WHILE(.TRUE.)
+    INQUIRE(FILE=filename(14),EXIST=file_exist)
+    IF(file_exist)THEN
+       OPEN(fileunit(14),file=filename(14))
+       WRITE(99,*)'opening gage control file:  ',filename(14)
+    ELSE
+       WRITE(*,*)'gage control file - does not exist - ABORT: ',filename(14)
+       WRITE(99,*)'gage control file - does not exist - ABORT: ',filename(14)
+       CALL EXIT
+    ENDIF
+
+    DO WHILE(.TRUE.)
 	count=count+1	
 	READ(fileunit(14),*, END=100)gage_link(count),gage_point(count)
 	END DO
 100     CLOSE(fileunit(14))
-        IF (count .gt. 0) count = count - 1
+    IF (count .gt. 0) count = count - 1
 	num_gages=count
 	DO i=1,num_gages
 	count = 50 + i

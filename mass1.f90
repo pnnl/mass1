@@ -48,12 +48,14 @@ INTEGER :: error_iounit = 11,status_iounit = 99, species_num, i
 INTEGER :: link
 LOGICAL run
 
-version = 'MASS1 Version 0.82 Date: 03-25-1999'
+version = 'MASS1 Version 0.83 Date: 06-15-1999'
 WRITE(*,*)'Modular Aquatic Simulation System 1D (MASS1)'
 WRITE(*,*)'Pacific Northwest National Laboratory'
 WRITE(*,*)' '
 WRITE(*,*)version
 
+! open the status file - this file records progress through the
+! input stream and errors
 !
 OPEN(unit=99,file='status.out')
 

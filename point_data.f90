@@ -38,15 +38,24 @@ SUBROUTINE point_data
         USE file_vars
         USE general_vars, ONLY : units,channel_length_units
 		USE transport_vars, ONLY : k_surf
+        USE logicals, ONLY : file_exist
 
         IMPLICIT NONE
 
         INTEGER :: i,link, junk, point,sec_num
         REAL :: delta_x, slope, start_el,end_el,manning_n,length,diffusion
 		REAL :: surface_mass_trans
+        
+        INQUIRE(FILE=filename(3),EXIST=file_exist)
+        IF(file_exist)THEN
+           OPEN(fileunit(3),file=filename(3))
+           WRITE(99,*)'point data file opened: ',filename(3)
+        ELSE
+           WRITE(*,*)'point data file does not exist - ABORT: ',filename(3)
+           WRITE(99,*)'point data file does not exist - ABORT: ',filename(3)
+           CALL EXIT
+        ENDIF
 
-        OPEN(fileunit(3),file=filename(3))
-   
 
         DO WHILE(.TRUE.)
 
