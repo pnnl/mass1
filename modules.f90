@@ -27,7 +27,7 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Wed Nov  8 20:16:48 2000 by William A. Perkins <perk@localhost>
+! Last Change: Tue May  1 13:13:33 2001 by William A. Perkins <perk@gehenna.pnl.gov>
 !----------------------------------------------------------
 MODULE general_vars
 
@@ -112,7 +112,7 @@ INTEGER, DIMENSION(:,:),ALLOCATABLE, SAVE :: con_links
 	!INTEGER, SAVE ::  maxpoints(lmax),linkorder(lmax)
 	!INTEGER, SAVE :: linkbc_table(lmax),num_con_links(lmax),con_links(lmax,5),ds_conlink(lmax)
     !INTEGER, SAVE :: comporder(lmax)
-
+REAL, DIMENSION(:), ALLOCATABLE, SAVE :: crest
 END MODULE link_vars
 
 !----------------------------------------------------------

@@ -58,6 +58,7 @@ DEALLOCATE(maxpoints,linkname,linkorder,linktype,input_option)
 DEALLOCATE(linkbc_table,num_con_links,con_links,ds_conlink)
 DEALLOCATE(comporder,dsbc_table,transbc_table,tempbc_table)
 DEALLOCATE(latflowbc_table, met_zone)
+DEALLOCATE(crest)
 
 !-----------------------------------------------------------
 !module point_vars

@@ -1,3 +1,15 @@
+2001-06-12  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* energy_flux_module.f90: the coefficient for conduction is now
+	settable like the wind function coefficients
+
+2001-04-25  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* flow_sim.f90: Added a downstream boundary condition (3) that was
+	supposed to allow waves to cross a held head boundary.  It does
+	not work, but might if the total energy, instead of stage, is
+	used. 
+
 2000-12-04  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* makefile: added accumulator and profile output modules

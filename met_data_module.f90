@@ -27,7 +27,7 @@ END TYPE table_entry_struct
 TYPE table_bc_struct
 	CHARACTER (LEN=100) :: file_name
 	CHARACTER (LEN=10) :: table_type
-    DOUBLE PRECISION :: coeff(2) ! coefficients: currently just wind function
+    DOUBLE PRECISION :: coeff(4) ! coefficients: 1,2 wind function, 3 conduction, 4 brunt
 	INTEGER :: max_entries
         INTEGER :: start_entry
 
@@ -91,8 +91,10 @@ SUBROUTINE read_met_data(met_files, max_times, status_iounit, error_iounit)
   DO i = 1, max_zones
                                 ! default wind function coefficients
 
-     met_data(i)%coeff(1) = 0.46
-     met_data(i)%coeff(2) = 9.2
+     met_data(i)%coeff(1) = 0.46 ! wind function multiplier
+     met_data(i)%coeff(2) = 9.2  ! wind function offset
+     met_data(i)%coeff(3) = 0.47 ! conduction coefficient
+     met_data(i)%coeff(4) = 0.65 ! "brunt" coefficient for lw atm radiation
 
      ALLOCATE(met_data(i)%table_entry(max_times), STAT = alloc_stat)
      IF (alloc_stat /= 0) THEN

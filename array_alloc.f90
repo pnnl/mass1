@@ -23,7 +23,7 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Tue Nov  2 16:09:40 1999 by William A. Perkins <perk@gehenna.pnl.gov>
+! Last Change: Tue May  1 13:15:18 2001 by William A. Perkins <perk@gehenna.pnl.gov>
 ! 
 
 SUBROUTINE array_alloc
@@ -83,6 +83,9 @@ ALLOCATE(maxpoints(maxlinks),linkname(maxlinks),linkorder(maxlinks),linktype(max
 ALLOCATE(linkbc_table(maxlinks),num_con_links(maxlinks),con_links(maxlinks,5),ds_conlink(maxlinks))
 ALLOCATE(comporder(maxlinks),dsbc_table(maxlinks),transbc_table(maxlinks),tempbc_table(maxlinks))
 ALLOCATE(latflowbc_table(maxlinks), met_zone(maxlinks))
+ALLOCATE(crest(maxlinks))
+
+crest = -999.0
 
 !-----------------------------------------------------------
 !module point_vars

@@ -24,7 +24,7 @@ DOUBLE PRECISION :: net_solar,t_water, t_air, t_dew, wind_speed
 
 
 net_heat_flux = net_solar + &
-     &net_longwave(t_air, t_dew) + &
+     &net_longwave(coeff, t_air, t_dew) + &
      &back_radiation(t_water) + &
      &evaporation(coeff, t_water, t_dew, wind_speed) + &
      &conduction(coeff, t_water, t_air, wind_speed) 
@@ -44,19 +44,21 @@ net_solar_rad = 0.0
 END FUNCTION net_solar_rad
 
 !######################################################################
-DOUBLE PRECISION FUNCTION net_longwave(t_air, t_dew)
+DOUBLE PRECISION FUNCTION net_longwave(coeff, t_air, t_dew)
 !
 ! Han - (Watts/meter^2)
 !
 ! net longwave atmospheric radiation ( W/m2 )
 ! Formula 2.1.1 in Edinger, Brady, Geyer (1974)
 IMPLICIT NONE
+DOUBLE PRECISION :: coeff(*)
 DOUBLE PRECISION :: t_air, t_dew
 DOUBLE PRECISION :: reflect = 0.03			! relflectance assumed to be 0.03 
-DOUBLE PRECISION :: brunt_coeff = 0.65	! ave. value
+DOUBLE PRECISION :: brunt_coeff ! = 0.65	! ave. value
 
+brunt_coeff  = coeff(4)
 net_longwave = 4.4e-8*(t_air + 273.15)**4 * &
-							 ( brunt_coeff + 0.031*SQRT(sat_vapor_press(t_dew)) )*(1.0 - reflect)
+     ( brunt_coeff + 0.031*SQRT(sat_vapor_press(t_dew)) )*(1.0 - reflect)
 
 END FUNCTION net_longwave
 
@@ -105,7 +107,9 @@ DOUBLE PRECISION :: t_water	! water surface temperature in degrees C
 DOUBLE PRECISION :: t_air		! air temperature in degrees C
 DOUBLE PRECISION :: wind_speed	! wind speed in m/s at a height 7 m above water surface
 
-conduction = -0.47*windspeed(coeff, wind_speed)*(t_water - t_air)
+!conduction = -0.47*windspeed(coeff, wind_speed)*(t_water - t_air)
+conduction = -coeff(3)*windspeed(coeff, wind_speed)*(t_water - t_air)
+!conduction = -0.018*windspeed(t_water,wind_speed)*(t_water - t_air)
 
 END FUNCTION conduction
 
@@ -120,6 +124,15 @@ IMPLICIT NONE
 DOUBLE PRECISION :: coeff(*)
 DOUBLE PRECISION :: wind_speed	! wind speed in m/s at a height 7 m above water surface
 
+! formula 2.4.6 of in Edinger, Brady, Geyer (1974)
+! windspeed = 9.2 + 0.46*wind_speed**2
+! windspeed = 0.5*windspeed
+
+! from the QUAL2E formulation (with unit conversions)
+
+!!$windspeed = 1000.0              ! density: kg/m3 
+!!$windspeed = windspeed*(595 - 0.5*temp)*4186.8 ! latent heat of vaporization J/kg
+!!$windspeed = windspeed*(2.3D-09 + 2.0D-09*wind_speed)
 windspeed = coeff(2) + coeff(1)*wind_speed**2
 
 END FUNCTION windspeed
