@@ -253,9 +253,17 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
      ! 
      !IF(linktype(link) /= 1 )THEN
      IF( nonfluvial )THEN
+        sum = 0.0
+        point = 1
         DO j=1,num_con_links(link)
-           c(link,1) =  c(con_links(link,j),maxpoints(con_links(link,j)))
+           sum = sum + &
+                &q(con_links(link,j),maxpoints(con_links(link,j)))*&
+                &c(con_links(link,j),maxpoints(con_links(link,j)))
         END DO
+        c(link,point) = sum/q(link,point)
+!!$        DO j=1,num_con_links(link)
+!!$           c(link,1) =  c(con_links(link,j),maxpoints(con_links(link,j)))
+!!$        END DO
         
         IF((linktype(i) == 6) .AND. (species_num == 1))THEN
            table_type = 3 !generation flow

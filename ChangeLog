@@ -1,3 +1,11 @@
+2005-04-05  William A. Perkins  <william.perkins@pnl.gov>
+
+	* gage_output.f90 (gage_output): size of fixed gage location
+	arrays increased
+
+	* scalars_module.f90 (tvd_transport): concentration into
+	nonfluvial links needs to be based on mass flux
+
 2002-01-08  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* scalars_module.f90: added new gas production equation form,

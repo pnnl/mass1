@@ -50,7 +50,7 @@ REAL :: depth, tdg_sat, tdg_press
 DOUBLE PRECISION :: salinity = 0.0
 INTEGER :: i,link,point,count=0
 INTEGER, SAVE :: num_gages
-INTEGER, SAVE :: gage_link(50),gage_point(50)
+INTEGER, SAVE :: gage_link(500),gage_point(500)
 INTEGER :: len1,len2,spot1,spot2
 CHARACTER*20 fname,string1,string2
         
