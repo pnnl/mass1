@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created November 11, 1998 by William A. Perkins
-# Last Change: Thu Mar  2 16:15:54 2000 by William A. Perkins <perk@minos.pnl.gov>
+# Last Change: Thu Oct 18 19:06:36 2001 by William A. Perkins <perk@localhost>
 # -------------------------------------------------------------
 # RCS ID: $Id$
 
@@ -68,7 +68,9 @@ SRCS =											\
     trans_bc.f90								\
     date_to_decimal.f90							\
     decimal_to_date.f90							\
-    write_restart.f90
+    write_restart.f90							\
+	accumulator.f90								\
+	pidlink.f90
 
 MODULES =										\
     energy_flux$(MOD)							\
@@ -89,7 +91,9 @@ MODULES =										\
     transport_vars$(MOD)						\
     scalars$(MOD)								\
     julian$(MOD)								\
-    tdg_equation_coeff$(MOD)
+    tdg_equation_coeff$(MOD)					\
+	accumulator$(MOD)							\
+	pidlink$(MOD)
 
 OBJS = $(SRCS:%.f90=%$(OBJ))
 
@@ -106,6 +110,13 @@ clean::
 	rm -f svgrp-test
 
 # dependancies for individual object files
+
+accumulator$(OBJ) : accumulator.f90					\
+    general_vars$(MOD)								\
+	link_vars$(MOD)									\
+    point_vars$(MOD)								\
+    scalars$(MOD)	
+accumulator$(MOD): accumulator$(OBJ)							
 
 array_alloc$(OBJ): array_alloc.f90				\
     general_vars$(MOD) 							\
@@ -150,7 +161,8 @@ gage_output$(OBJ): gage_output.f90				\
     scalars$(MOD)								\
     met_data_module$(MOD)						\
     gas_functions$(MOD)							\
-	hydro_output_module$(MOD)
+	hydro_output_module$(MOD)					\
+	accumulator$(MOD)
 
 gas_coeffs_module$(OBJ): gas_coeffs_module.f90
 
@@ -180,10 +192,11 @@ initial_cond$(OBJ): initial_cond.f90			\
 
 julian$(OBJ): julian.f90
 
-kick_off$(OBJ): kick_off.f90			\
-    general_vars$(MOD)				\
-    link_vars$(MOD)				\
-    date_vars$(MOD)
+kick_off$(OBJ): kick_off.f90					\
+    general_vars$(MOD)							\
+    link_vars$(MOD)								\
+    date_vars$(MOD)								\
+	pidlink$(MOD)
 
 latflow_bc$(OBJ): latflow_bc.f90		\
     linkbc_vars$(MOD)				\
@@ -199,20 +212,31 @@ link_data$(OBJ): link_data.f90			\
     general_vars$(MOD)				\
     file_vars$(MOD)
 
-mass1$(OBJ): mass1.f90				\
-    general_vars$(MOD)				\
-    date_vars$(MOD)				\
-    file_vars$(MOD)				\
-    logicals$(MOD)				\
-    section_vars$(MOD)				\
-    scalars$(MOD)				\
-    met_data_module$(MOD)
+mass1$(OBJ): mass1.f90							\
+    general_vars$(MOD)							\
+    date_vars$(MOD)								\
+    file_vars$(MOD)								\
+    logicals$(MOD)								\
+    section_vars$(MOD)							\
+    scalars$(MOD)								\
+    met_data_module$(MOD)						\
+	profile_output_module$(MOD)					\
+	accumulator$(MOD)							\
+	pidlink$(MOD)
 
 met_data_module$(OBJ): met_data_module.f90 date_vars$(MOD)
 
 modules$(OBJ): modules.f90
 
-nonfluvial_coeff$(OBJ): nonfluvial_coeff.f90 link_vars$(MOD)
+nonfluvial_coeff$(OBJ): nonfluvial_coeff.f90	\
+	link_vars$(MOD)								\
+	pidlink$(MOD)
+
+pidlink$(OBJ): pidlink.f90						\
+	general_vars$(MOD)							\
+	link_vars$(MOD)								\
+	point_vars$(MOD)
+pidlink$(MOD): pidlink$(OBJ)
 
 point_data$(OBJ): point_data.f90		\
     link_vars$(MOD)				\
@@ -231,16 +255,18 @@ print_output$(OBJ): print_output.f90		\
     gas_functions$(MOD)				\
     met_data_module$(MOD)
 
-profile_output$(OBJ): profile_output.f90	\
-    link_vars$(MOD)					\
-    general_vars$(MOD)				\
-    point_vars$(MOD)					\
-    file_vars$(MOD)					\
-    transport_vars$(MOD)				\
-    date_vars$(MOD)					\
-    scalars$(MOD)					\
-    gas_functions$(MOD)				\
-    met_data_module$(MOD)
+profile_output$(OBJ): profile_output.f90		\
+    link_vars$(MOD)								\
+    general_vars$(MOD)							\
+    point_vars$(MOD)							\
+    file_vars$(MOD)								\
+    transport_vars$(MOD)						\
+    date_vars$(MOD)								\
+    scalars$(MOD)								\
+    gas_functions$(MOD)							\
+    met_data_module$(MOD)						\
+	accumulator$(MOD)
+profile_output_module$(MOD): profile_output$(OBJ)
 
 read_config$(OBJ): read_config.f90		\
     file_vars$(MOD)					\
