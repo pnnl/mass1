@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created September 16, 1997 by William A. Perkins
-# Last Change: Wed Dec 10 09:25:57 1997 by William A. Perkins <perk@owl.pnl.gov>
+# Last Change: Wed Mar 23 12:12:23 2005 by William A. Perkins <perk@leechong.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -52,16 +52,18 @@ unless (open(INSECT, "<$insfile")) {
   die $usage;
 }
 
-$base_sect = {};
+$insert_sect = {};
+
+while (($xsection = CHARIMASection::read_section(\*INSECT)) != 0) {
+  $insert_sect->{$xsection->rivermile()} = $xsection;
+}
+close (INSECT);
 
 while (($xsection = CHARIMASection::read_section(\*BASESECT)) != 0) {
-  $base_sect->{$xsection->rivermile()} = $xsection;
+  if (defined($insert_sect->{$xsection->rivermile()})) {
+    $xsection->insert($insert_sect->{$xsection->rivermile()});
+  }
+  $xsection->write_section(\*STDOUT);
 }
 close (BASESECT);
 
-while (($xsection = CHARIMASection::read_section(\*INSECT)) != 0) {
-  $xsect_new = 
-    $base_sect->{$xsection->rivermile()}->insert($xsection);
-  $xsect_new->write_section(STDOUT);
-}
-close (INSECT);
