@@ -27,6 +27,7 @@ TYPE table_bc_struct
 	CHARACTER (LEN=80) :: file_name
 	CHARACTER (LEN=10) :: table_type
 	INTEGER :: max_entries
+        INTEGER :: start_entry
 
 	TYPE(table_entry_struct), POINTER :: table_entry(:)
 END TYPE table_bc_struct
@@ -88,6 +89,7 @@ SUBROUTINE read_met_data(met_files, max_times, status_iounit, error_iounit)
 	
   DO WHILE(.TRUE.)
      READ(iounit2,*,END=200)met_zone, weather_filename
+     met_data(met_zone)%start_entry = 0
      met_data(met_zone)%max_entries = 0
      OPEN(iounit1, file = weather_filename)
      j = 0
@@ -113,15 +115,18 @@ SUBROUTINE update_met_data(time, met_zone)
 	IMPLICIT NONE
 	DOUBLE PRECISION :: interp(5)
 	DOUBLE PRECISION :: time
-	INTEGER ::  i, j, num_values = 5, met_zone
+	INTEGER ::  i, j, num_values = 5, met_zone, jstart
 	DOUBLE PRECISION :: factor
 
-	DO j=1,met_data(met_zone)%max_entries-1
+        jstart = MAX(met_data(met_zone)%start_entry, 1)
+	DO j=jstart,met_data(met_zone)%max_entries-1
 
            IF((time >= met_data(met_zone)%table_entry(j)%datetime%time)&
                 & .AND. (time <= met_data(met_zone)%table_entry(j+1)%datetime%time)) EXIT
 
 	END DO
+        met_data(met_zone)%start_entry =&
+             & MAX(MIN(j - 1, met_data(met_zone)%max_entries - 2), 0)
         factor = (time - met_data(met_zone)%table_entry(j)%datetime%time)/ &
              (met_data(met_zone)%table_entry(j+1)%datetime%time - met_data(met_zone)%table_entry(j)%datetime%time)
 

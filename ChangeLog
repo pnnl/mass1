@@ -1,3 +1,22 @@
+Mon Jan 18 07:28:38 1999  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* met_data_module.f90: added start_entry index to table_bc_struct
+		  TYPE. 
+
+		  added code to use start_entry to initialize table search
+
+	* table_interp.f90: (table_interp): each table search now starts
+		  with the index used in the previous step
+
+	* array_alloc.f90 (array_alloc): add code to allocate and
+		  initialize initial BC table search index
+
+	* modules.f90 (module linkbc_vars): add arrays to hold initial
+		  search index: linkbc_start, transbc_start, tempbc_start,
+		  latflowbc_start 
+	
+		  also added version ID string
+
 Wed Jan 13 10:55:25 1999  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* table_interp.f90: added a debug print message used when

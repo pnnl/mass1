@@ -26,8 +26,8 @@
 !
 !
 !***************************************************************
-!
-
+! CVS ID: $Id$
+! Last Change: Mon Jan 18 07:33:59 1999 by William A. Perkins <perk@erebus.pnl.gov>
 !----------------------------------------------------------
 MODULE general_vars
 
@@ -82,17 +82,19 @@ END MODULE file_vars
 
 MODULE linkbc_vars
 	
-	DOUBLE PRECISION, ALLOCATABLE,SAVE :: linkbc_time(:,:),transbc_time(:,:),tempbc_time(:,:),latflowbc_time(:,:)
+  DOUBLE PRECISION, ALLOCATABLE,SAVE :: linkbc_time(:,:),transbc_time(:,:),tempbc_time(:,:),latflowbc_time(:,:)
   REAL, ALLOCATABLE,SAVE :: linkbc(:,:),transbc(:,:),tempbc(:,:),latflowbc(:,:)
-	DOUBLE PRECISION, ALLOCATABLE, SAVE :: gen_time(:,:),spill_time(:,:)
-	REAL, ALLOCATABLE, SAVE :: gen_flow(:,:),spill_flow(:,:)
+  INTEGER, ALLOCATABLE, SAVE :: linkbc_start(:), transbc_start(:), tempbc_start(:), latflowbc_start(:)
+  DOUBLE PRECISION, ALLOCATABLE, SAVE :: gen_time(:,:),spill_time(:,:)
+  REAL, ALLOCATABLE, SAVE :: gen_flow(:,:),spill_flow(:,:)
+  INTEGER, ALLOCATABLE, SAVE :: gen_start(:), spill_start(:)
   
-	CHARACTER(LEN=100), ALLOCATABLE :: linkbc_header(:),transbc_header(:),tempbc_header(:),latflowbc_header(:)
-	CHARACTER(LEN=100), ALLOCATABLE :: hydrobc_header(:)
+  CHARACTER(LEN=100), ALLOCATABLE :: linkbc_header(:),transbc_header(:),tempbc_header(:),latflowbc_header(:)
+  CHARACTER(LEN=100), ALLOCATABLE :: hydrobc_header(:)
 
-		!REAL, ALLOCATABLE,SAVE :: inflow_time(maxtimes),inflow(maxtimes,maxtables)
-        !REAL, SAVE :: contam_inflow(maxtimes,maxtables),contam_inflow_time(maxtimes)
-        !REAL, SAVE :: sedi_inflow_time(maxtimes),sedi_inflow(maxtimes,maxtables,2)
+  !REAL, ALLOCATABLE,SAVE :: inflow_time(maxtimes),inflow(maxtimes,maxtables)
+  !REAL, SAVE :: contam_inflow(maxtimes,maxtables),contam_inflow_time(maxtimes)
+  !REAL, SAVE :: sedi_inflow_time(maxtimes),sedi_inflow(maxtimes,maxtables,2)
 
 END MODULE linkbc_vars
 

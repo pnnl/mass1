@@ -22,7 +22,9 @@
 !
 !
 !***************************************************************
-!
+! CVS ID: $Id$
+! Last Change: Mon Jan 18 07:59:22 1999 by William A. Perkins <perk@erebus.pnl.gov>
+! 
 
 SUBROUTINE array_alloc
 
@@ -60,6 +62,18 @@ ALLOCATE(latflowbc_time(maxtimes,maxtable),latflowbc(maxtimes,maxtable))
 ALLOCATE(tempbc_time(maxtimes,maxtable),tempbc(maxtimes,maxtable))
 ALLOCATE(linkbc_header(maxtable),transbc_header(maxtable),tempbc_header(maxtable))
 ALLOCATE(hydrobc_header(maxtable),latflowbc_header(maxtable))
+
+                                ! allocate and initialize search start index
+
+ALLOCATE(linkbc_start(maxtable), transbc_start(maxtable), tempbc_start(maxtable),&
+     & latflowbc_start(maxtable), gen_start(maxtable), spill_start(maxtable))
+
+linkbc_start = 0
+transbc_start = 0
+tempbc_start = 0
+latflowbc_start = 0
+gen_start = 0
+spill_start = 0
 
 !----------------------------------------------------------
 !module link_vars
