@@ -1,0 +1,75 @@
+Wed Jan 13 10:55:25 1999  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* table_interp.f90: added a debug print message used when
+		  interpolating the tempbc array
+
+Thu Jan  7 15:22:24 1999  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* mass1.f90: modified call to read_met_data
+
+	* met_data_module.f90 (read_met_data): made met_data() ALLOCATABLE
+		  which required modification to the interface of read_met_data.
+
+Mon Dec 21 09:49:14 1998  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* profile_output.f90: num_profiles needed to be 'SAVE'd
+
+	* gage_output.f90: num_gages, gage_link and gage_point needed to
+		  be 'SAVE'd 
+
+	* profile_output.f90: count incremented too many times in READ loop
+
+	* gage_output.f90: count incremented too many times in READ loop
+
+	* write_restart.f90: FORM='binary' changed to FORM='unformatted'
+		  in OPEN statement
+
+	* decimal_to_date.f90: removed reference to NUMERICAL_LIBRARIES
+	 	module, and used JULIAN module instead
+
+	* table_interp.f90: >132 column lines shortened
+
+	* section_table.f90: Removed reference to IMSL libraries
+
+	         >132 column lines shortened
+
+	* section_data.f90: Commented $DEBUG
+
+	* read_hotstart.f90: FORM='binary' changed to FORM='unformatted'
+		  in OPEN statement
+
+	* profile_output.f90: Commented $DEBUG
+
+	* print_output.f90: Removed unnecessary commas in WRITE statements
+
+	* point_data.f90: >132 column lines shortened
+
+	* link_data.f90: >132 column lines shortened
+
+	* date_to_decimal.f90 (date_to_decimal): Parentheses necessary in
+ 		  FUNCTION statement.
+	  (date_to_decimal): removed reference to NUMERICAL_LIBRARIES
+ 		  module, and used JULIAN module instead
+
+	* gastrans.f90: Commented $DEBUG
+
+	* tdg_equation_coeff.f90: Use of intrisic function EOF changed to
+		  END= in READ
+
+	* met_data_module.f90: initialization of 'max_entries' in
+		  table_bc_struct TYPE declaration statement, initialized
+		  in 'read_met_data' instead
+		  
+		  >132 column lines shortened
+
+	* flow_sim.f90: Commented $DEBUG
+
+	* file_manager.f90: Use of intrisic function EOF changed to END=
+		  in READ
+
+	* modules.f90: >132 column lines shortened
+
+	* array_alloc.f90: Commented $DEBUG, >132 column lines shortened
+
+	* makefile: created
+
