@@ -55,7 +55,7 @@ IF(file_exist)THEN
 ELSE
    WRITE(*,*)'transport BC file list does not exist - ABORT: ',filename(9)
    WRITE(99,*)'transport BC file list does not exist - ABORT: ',filename(9)
-   CALL EXIT
+   CALL EXIT(1)
 ENDIF
 
 SELECT CASE(time_option)
@@ -86,7 +86,7 @@ CASE(2) ! date/time format is used mm:dd:yyyy hh:mm:ss converted to decimal juli
             ELSE
                WRITE(*,*)'transport BC file does not exist - ABORT: ',transbc_filename
                WRITE(99,*)'transport BC file does not exist - ABORT: ',transbc_filename
-               CALL EXIT
+               CALL EXIT(1)
             ENDIF
                
 			READ(iounit1,*,END=100)transbc_header(transbc_num)
@@ -119,7 +119,7 @@ CASE(2) !speices = 2 is Temperature
     ELSE
        WRITE(*,*)'temperature BC file list does not exist - ABORT: ',filename(17)
        WRITE(99,*)'temperature BC file list does not exist - ABORT: ',filename(17)
-       CALL EXIT
+       CALL EXIT(1)
     ENDIF
 
 	SELECT CASE(time_option)
@@ -149,7 +149,7 @@ CASE(2) ! date/time format is used mm:dd:yyyy hh:mm:ss converted to decimal juli
             ELSE
                WRITE(*,*)'temperature BC file does not exist - ABORT: ',tempbc_filename
                WRITE(99,*)'temperature BC file does not exist - ABORT: ',tempbc_filename
-               CALL EXIT
+               CALL EXIT(1)
             ENDIF
 
 			READ(iounit1,*,END=300)tempbc_header(tempbc_num)

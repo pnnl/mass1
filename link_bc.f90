@@ -53,7 +53,7 @@ INTEGER :: iounit1 = 50, iounit2 = 51
    ELSE
       WRITE(*,*)'link BC list file does not exist - ABORT: ',filename(5)
       WRITE(99,*)'link BC list file does not exist - ABORT: ',filename(5)
-      CALL EXIT
+      CALL EXIT(1)
   ENDIF
 
 iounit2 = fileunit(5)
@@ -85,7 +85,7 @@ CASE(2) ! date/time format is used mm:dd:yyyy hh:mm:ss converted to decimal juli
             ELSE
                WRITE(*,*)'link BC file does not exist - ABORT: ',linkbc_filename
                WRITE(99,*)'link BC file does not exist - ABORT: ',linkbc_filename
-               CALL EXIT
+               CALL EXIT(1)
             ENDIF
 
 			READ(iounit1,*,END=100)linkbc_header(linkbc_num)

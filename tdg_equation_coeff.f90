@@ -48,7 +48,7 @@ SUBROUTINE allocate_tdg_coeff(maxlinks,status_iounit, error_iounit)
 		& ,c_gas(maxlinks), qgen_frac(maxlinks), STAT = alloc_stat)
 	IF(alloc_stat /= 0)THEN
 		WRITE(error_iounit,*)'allocation failed for the gas equation - maxlinks=', maxlinks
-		CALL EXIT
+		CALL EXIT(1)
 	ELSE
 		WRITE(status_iounit,*)'allocation successful for gas equation - maxlinks=', maxlinks
 	ENDIF
@@ -79,7 +79,7 @@ IF(file_exist)THEN
 ELSE
    WRITE(*,*)'TDG coeff file does not exist - ABORT: ',filename(11)
    WRITE(99,*)'TDG coeff file does not exist - ABORT: ',filename(11)
-   CALL EXIT
+   CALL EXIT(1)
 ENDIF
 
 DO WHILE(.TRUE.)

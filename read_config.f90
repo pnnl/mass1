@@ -49,7 +49,7 @@ IF(file_exist)THEN
 ELSE
    WRITE(*,*)'The mass1.cfg file does not exist - ABORT RUN'
    WRITE(99,*)'The mass1.cfg file does not exist - ABORT RUN'
-   CALL EXIT
+   CALL EXIT(1)
 ENDIF
 
 READ(10,1000)config_version

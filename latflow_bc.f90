@@ -50,7 +50,7 @@ INTEGER :: iounit1 = 50, iounit2 = 51
   ELSE
      WRITE(*,*)'lateral inflow file list does not exist - ABORT: ',filename(16)
      WRITE(99,*)'lateral inflow file list does not exist - ABORT: ',filename(16)
-     CALL EXIT
+     CALL EXIT(1)
   ENDIF
   iounit2 = fileunit(16)
 
@@ -83,7 +83,7 @@ CASE(2) ! date/time format is used mm:dd:yyyy hh:mm:ss converted to decimal juli
 			ELSE
                WRITE(*,*)'lateral inflow BC file does not exist - ABORT: ',latflowbc_filename
                WRITE(99,*)'lateral inflow BC file does not exist - ABORT: ',latflowbc_filename
-               CALL EXIT
+               CALL EXIT(1)
             ENDIF
 
             READ(iounit1,*,END=100)latflowbc_header(latflowbc_num)

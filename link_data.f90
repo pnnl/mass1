@@ -52,7 +52,7 @@ IF(file_exist)THEN
 ELSE
    WRITE(*,*)'link specification file does not exist - ABORT: ',filename(2)
    WRITE(99,*)'link specification file does not exist - ABORT: ',filename(2)
-   CALL EXIT
+   CALL EXIT(1)
 ENDIF
 
 CALL print_output("LINKS ")

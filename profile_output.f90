@@ -79,7 +79,7 @@ IF(time == time_begin )THEN
     ELSE
        WRITE(*,*)'profile control file does not exist - ABORT: ',filename(15)
        WRITE(99,*)'profile control file` does not exist - ABORT: ',filename(15)
-       CALL EXIT
+       CALL EXIT(1)
     ENDIF
 
 	DO WHILE(.TRUE.)
@@ -97,7 +97,9 @@ IF(time == time_begin )THEN
 
 	DO i=1,num_profiles
 	count = iobase + i
-        fname = ''
+
+                                !this does not work with Lahey
+    fname = ''  
 	fname(1:7) = 'profile'
 	WRITE(string1,*)i
 	string1 = ADJUSTL(string1)
@@ -107,6 +109,12 @@ IF(time == time_begin )THEN
 	spot1 = spot2 + 1
 	spot2 = spot1 + LEN_TRIM('.out')
 	fname(spot1:spot2) = '.out'
+    
+                                ! this does not work on SGI or Absoft
+
+    ! fname = ''
+    ! WRITE (fname, '(''profile'', I0.1, ''.out'')') i
+
 	OPEN(count,file=fname)
 	END DO
 

@@ -47,7 +47,7 @@ SUBROUTINE initial_cond
         ELSE
            WRITE(*,*)'initial condition file does not exist - ABORT: ',filename(6)
            WRITE(99,*)'initial condition file does not exist - ABORT: ',filename(6)
-           CALL EXIT
+           CALL EXIT(1)
         ENDIF
 
         lateral_inflow = 0.0;

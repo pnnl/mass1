@@ -159,7 +159,7 @@ IF(do_gas)THEN
        ELSE
           WRITE(*,*)'gas exchange coefficient file does not exist - ABORT'
           WRITE(99,*)'gas exchange coefficient file does not exist - ABORT: '
-          CALL EXIT
+          CALL EXIT(1)
        ENDIF
     ENDIF
 ENDIF

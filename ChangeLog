@@ -1,3 +1,51 @@
+2000-02-02  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* makefile.lahey: created
+
+	* tdg_equation_coeff.f90: CALL EXIT needed argument to satisfy
+	Lahey compiler 
+
+	* scalars_module.f90: CALL EXIT needed argument to satisfy Lahey
+	compiler 
+
+	* gage_output.f90: CALL EXIT needed argument to satisfy Lahey
+	compiler 
+
+	* hydro_bc.f90: CALL EXIT needed argument to satisfy Lahey
+	compiler 
+
+	* initial_cond.f90: CALL EXIT needed argument to satisfy Lahey
+	compiler 
+
+	* latflow_bc.f90: CALL EXIT needed argument to satisfy Lahey
+	compiler 
+
+	* link_bc.f90: CALL EXIT needed argument to satisfy Lahey compiler 
+
+	* link_data.f90: CALL EXIT needed argument to satisfy Lahey
+	compiler 
+
+	* mass1.f90: CALL EXIT needed argument to satisfy Lahey compiler
+
+	* point_data.f90: CALL EXIT needed argument to satisfy Lahey
+	compiler 
+
+	* profile_output.f90: CALL EXIT needed argument to satisfy Lahey
+	compiler
+
+	* read_config.f90: CALL EXIT needed argument to satisfy Lahey
+	compiler
+
+	* read_hotstart.f90: CALL EXIT needed argument to satisfy Lahey
+	compiler
+
+	* section_data.f90: CALL EXIT needed argument to satisfy Lahey
+	compiler
+
+	* trans_bc.f90: CALL EXIT needed argument to satisfy Lahey
+	compiler
+	
+
 1999-12-10  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* test/transport/advection-1-segment/gage_control.dat: created  

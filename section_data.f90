@@ -48,7 +48,7 @@ SUBROUTINE section_data
         ELSE
            WRITE(*,*)'cross section file does not exist - ABORT: ',filename(4)
            WRITE(99,*)'cross section file does not exist - ABORT: ',filename(4)
-           CALL EXIT
+           CALL EXIT(1)
         ENDIF
 
         io_unit = fileunit(7)

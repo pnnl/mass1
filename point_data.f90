@@ -53,7 +53,7 @@ SUBROUTINE point_data
         ELSE
            WRITE(*,*)'point data file does not exist - ABORT: ',filename(3)
            WRITE(99,*)'point data file does not exist - ABORT: ',filename(3)
-           CALL EXIT
+           CALL EXIT(1)
         ENDIF
         
         io_unit = fileunit(7)

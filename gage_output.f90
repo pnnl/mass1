@@ -62,7 +62,7 @@ IF(time == time_begin )THEN
     ELSE
        WRITE(*,*)'gage control file - does not exist - ABORT: ',filename(14)
        WRITE(99,*)'gage control file - does not exist - ABORT: ',filename(14)
-       CALL EXIT
+       CALL EXIT(1)
     ENDIF
 
     DO WHILE(.TRUE.)

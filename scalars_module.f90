@@ -62,7 +62,7 @@ SUBROUTINE allocate_species_components(i, imax, jmax, status_iounit, error_iouni
   ALLOCATE(species(i)%conc(imax,0:jmax+2), STAT = alloc_stat)		! c depth-ave concentration
   IF(alloc_stat /= 0)THEN
      WRITE(error_iounit,*)'allocation failed for the concentration'
-     CALL EXIT
+     CALL EXIT(1)
   ELSE
      WRITE(status_iounit,*)'allocation successful for concentration'
   ENDIF
@@ -70,7 +70,7 @@ SUBROUTINE allocate_species_components(i, imax, jmax, status_iounit, error_iouni
   ALLOCATE(species(i)%concold(imax,0:jmax+2), STAT = alloc_stat)	! c old depth-ave concentration
   IF(alloc_stat /= 0)THEN
      WRITE(error_iounit,*)'allocation failed for the old concentration'
-     CALL EXIT
+     CALL EXIT(1)
   ELSE
      WRITE(status_iounit,*)'allocation successful for old concentration'
   ENDIF
@@ -91,7 +91,7 @@ SUBROUTINE allocate_species(error_iounit,status_iounit)
   ALLOCATE(species(max_species), STAT = alloc_stat)
   IF(alloc_stat /= 0)THEN
      WRITE(error_iounit,*)'allocation failed for the array of species - max_species=', max_species
-     CALL EXIT
+     CALL EXIT(1)
   ELSE
      WRITE(status_iounit,*)'allocation successful for array of species - max_species=', max_species
   ENDIF
@@ -106,7 +106,7 @@ SUBROUTINE allocate_species(error_iounit,status_iounit)
        &latq(maxlinks,maxpoint), latq_old(maxlinks,maxpoint), STAT = alloc_stat)
   IF(alloc_stat /= 0)THEN
      WRITE(error_iounit,*)'allocation failed for scalar hydrodynamic variables'
-     CALL EXIT
+     CALL EXIT(1)
   ELSE
      WRITE(status_iounit,*)'allocation successful for scalar hydrodynamic variables'
   ENDIF
@@ -390,7 +390,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                     CASE DEFAULT
                        WRITE(*,*)'ABORT - no eqn error in type 21 link BCs at link = ',link
                        WRITE(99,*)'ABORT - no eqn error in type 21 link BCs at link = ',link
-                       CALL EXIT
+                       CALL EXIT(1)
                     END SELECT
                     hydro_sat(link) = tdg_saturation
                     hydro_conc(link) = c(link,point)
@@ -489,7 +489,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                     CASE DEFAULT
                        WRITE(*,*)'ABORT - no eqn error in type 21 link BCs at link = ',link
                        WRITE(99,*)'ABORT - no eqn error in type 21 link BCs at link = ',link
-                       CALL EXIT
+                       CALL EXIT(1)
                     END SELECT
                  ELSE
                     hydro_sat(link) = 100.0
@@ -522,7 +522,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
            ELSE 
               WRITE(*,*)'no trans BC specification for link',link,' -- ABORT'
               WRITE(99,*)'no trans BC specification for link',link,' -- ABORT'
-              CALL EXIT
+              CALL EXIT(1)
            ENDIF
            
         CASE(2) ! temperature species
@@ -541,7 +541,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
            ELSE 
               WRITE(*,*)'no temp BC specification for link',link,' -- ABORT'
               WRITE(99,*)'no temp BC specification for link',link,' -- ABORT'
-              CALL EXIT
+              CALL EXIT(1)
            ENDIF
         END SELECT
         

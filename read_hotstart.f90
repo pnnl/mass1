@@ -47,7 +47,7 @@ IF(file_exist)THEN
 ELSE
    WRITE(*,*)'hotstart file does not exist - ABORT: ',filename(12)
    WRITE(99,*)'hotstart file does not exist - ABORT: ',filename(12)
-   CALL EXIT
+   CALL EXIT(1)
 ENDIF
 
 DO link=1,maxlinks

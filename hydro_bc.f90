@@ -50,7 +50,7 @@ IF(file_exist)THEN
 ELSE
    WRITE(*,*)'hydro BC file list does not exist - ABORT: ',filename(10)
    WRITE(99,*)'hydro BC file list does not exist - ABORT: ',filename(10)
-   CALL EXIT
+   CALL EXIT(1)
 ENDIF
 
 count = 0
@@ -82,7 +82,7 @@ SELECT CASE(time_option)
 			ELSE
                WRITE(*,*)'hydro BC file does not exist - ABORT: ',hydrobc_filename
                WRITE(99,*)'hydro BC file does not exist - ABORT: ',hydrobc_filename
-               CALL EXIT
+               CALL EXIT(1)
             ENDIF
             READ(iounit1,*,END=100)hydrobc_header(linkbc_num)
 			count = 0
