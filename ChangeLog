@@ -1,3 +1,9 @@
+1999-10-08  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* scalars_module.f90 (tvd_transport): for type 6 and type 21
+		  links, needed to deal with the case where the sum of
+		  spill and generation flow is zero
+
 1999-09-27  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* scalars_module.f90 (tvd_transport): added correction for lateral

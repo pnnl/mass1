@@ -263,10 +263,9 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
            table_type = 4 !spill flow
            qspill = table_interp(time,table_type,linkbc_table(link),time_mult)
            
+           IF(do_temp .AND. temp_exchange) CALL update_met_data(time, met_zone(link))
+           IF(do_temp) t_water = species(2)%conc(link,2)
            IF(qspill > 0.0)THEN
-              IF(do_temp .AND. temp_exchange) CALL update_met_data(time, met_zone(link))
-              IF(do_temp) t_water = species(2)%conc(link,2)
-              
               !			equations are for %Sat and effective Spill Q in Kcfs
               !			Qspill is in effective KCFS = Qspill + qgen_frac*Qgen
               !			gas_eqn_type = 1 general quadratic function
@@ -289,8 +288,13 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
               END SELECT
            ENDIF
            
-           ! full mixing of spill and generation waters
-           c(link,2) = (c(link,2)*qspill + c(link,1)*qgen)/(qspill+qgen)
+           IF (qspill + qgen .gt. 0.0) THEN
+              ! full mixing of spill and generation waters
+              c(link,2) = (c(link,2)*qspill + c(link,1)*qgen)/(qspill+qgen)
+           ELSE
+              c(link,2) = TDGasConcfromSat( DBLE(100.0), t_water, &
+                   &salinity, baro_press)              
+           END IF
            
         ELSE
            c(link,2) =	c(link,1)
@@ -381,8 +385,14 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                  upstream_c = table_interp(time,table_type,transbc_table(link),time_mult)
                  upstream_c = SNGL(TDGasConcfromSat( DBLE(upstream_c), t_water, salinity, baro_press))
                  
-                 ! full mixing of spill and generation waters
-                 c(link,point) = (c(link,point)*qspill + upstream_c*qgen)/(qspill+qgen)
+                 IF (qspill + qgen .gt. 0.0) THEN
+                    ! full mixing of spill and generation waters
+                    c(link,point) = (c(link,point)*qspill + upstream_c*qgen)/(qspill+qgen)
+                 ELSE 
+                    c(link,point) = TDGasConcfromSat( DBLE(100.0), t_water, &
+                         &salinity, baro_press)              
+                 END IF
+                    
                  !-----hydro inflow end
                  
               END SELECT
@@ -456,10 +466,17 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                   sum = sum + q(con_links(link,j),maxpoints(con_links(link,j)))*c(con_links(link,j),maxpoints(con_links(link,j)))
                   upstream_c = sum/q(link,point)
                  END DO
-                 ! full mixing of spill and generation waters
-                 c(link,point) = (c(link,point)*qspill + upstream_c*qgen)/(qspill+qgen)
+
+                 IF (qspill + qgen .gt. 0.0) THEN
+                    ! full mixing of spill and generation waters
+                    c(link,point) = (c(link,point)*qspill + upstream_c*qgen)/(qspill+qgen)
+                 ELSE 
+                    c(link,point) = TDGasConcfromSat( DBLE(100.0), t_water, &
+                         &salinity, baro_press)
+                 END IF
+
                  !-----hydro inflow end
-                 
+
               END SELECT
            ELSE 
               WRITE(*,*)'no trans BC specification for link',link,' -- ABORT'
