@@ -1,3 +1,10 @@
+1999-08-12  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* makefile.dec (FLAGS): removed the -real_size 64 and -double_size
+		  64 options
+
+	* test/flow/storage/runit-nt.sh: created
+
 1999-07-13  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* flow_sim.f90: Assignment of downstream flow boundary condition

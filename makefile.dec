@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created November 11, 1998 by William A. Perkins
-# Last Change: Fri Jul  2 15:01:03 1999 by William A. Perkins <perk@hughie.pnl.gov>
+# Last Change: Thu Aug 12 13:03:43 1999 by William A. Perkins <perk@mack.pnl.gov>
 # -------------------------------------------------------------
 # RCS ID: $Id$
 
@@ -18,8 +18,10 @@ LINK.f90 = $(F90) $(LDFLAGS)
 MOD=.mod
 OBJ=.o
 
-DEBUG = -g3 -O
-FLAGS = $(DEBUG) -real_size 64 -double_size 64 -fpe
+# DEBUG = -g3 -O
+# FLAGS = $(DEBUG) -real_size 64 -double_size 64 -fpe
+DEBUG = -O
+FLAGS = $(DEBUG) -fast -fpe
 F90FLAGS = $(FLAGS)
 LIBLOC = 
 LDFLAGS = ${LIBLOC} $(FLAGS) -non_shared
