@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Wed Dec  8 13:42:12 1999 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Tue Dec 14 16:10:11 1999 by William A. Perkins <perk@mack.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -36,6 +36,11 @@ rm -f mass1.cfg
     'set title "Advective Diffusion Analytic Solution: Courant Number = 1.0";' \
     'load "plot.gp";' ) | \
         gnuplot > plot-Cn=1.0.ps
+(echo \
+    'set terminal postscript eps color solid "Helvetica" 14;' \
+    'set title "Advective Diffusion Analytic Solution: Courant Number = 1.0";' \
+    'load "plot.gp";' ) | \
+        gnuplot > plot-Cn=1.0.eps
 
 ln -f -s mass1-Cn=0.1.cfg mass1.cfg
 $model
@@ -46,6 +51,11 @@ rm -f mass1.cfg
     set title \"Advective Diffusion Analytic Solution: Courant Number = 0.1\"\; \
     load \"plot.gp\"\; ) | \
         gnuplot > plot-Cn=0.1.ps
+(echo \
+    set terminal postscript eps color solid \"Helvetica\" 14\; \
+    set title \"Advective Diffusion Analytic Solution: Courant Number = 0.1\"\; \
+    load \"plot.gp\"\; ) | \
+        gnuplot > plot-Cn=0.1.eps
 
 ln -f -s mass1-Cn=0.01.cfg mass1.cfg
 $model
@@ -56,6 +66,11 @@ rm -f mass1.cfg
     set title \"Advective Diffusion Analytic Solution: Courant Number = 0.01\"\; \
     load \"plot.gp\"\; ) | \
         gnuplot > plot-Cn=0.01.ps
+(echo \
+    set terminal postscript eps color solid \"Helvetica\" 14\; \
+    set title \"Advective Diffusion Analytic Solution: Courant Number = 0.01\"\; \
+    load \"plot.gp\"\; ) | \
+        gnuplot > plot-Cn=0.01.eps
 
 rm -f mass1.cfg
 ln -f -s mass1-warmup-2.cfg mass1.cfg
@@ -71,4 +86,9 @@ rm -f mass1.cfg
     set title \"Advective Diffusion Analytic Solution: Courant Number = 1.0 \(D = 70\)\"\; \
     load \"plot-2.gp\"\; ) | \
         gnuplot > plot-Cn=1.0-2.ps
+(echo \
+    set terminal postscript eps color solid \"Helvetica\" 14\; \
+    set title \"Advective Diffusion Analytic Solution: Courant Number = 1.0 \(D = 70\)\"\; \
+    load \"plot-2.gp\"\; ) | \
+        gnuplot > plot-Cn=1.0-2.eps
 

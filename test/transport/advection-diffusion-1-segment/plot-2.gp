@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 22, 1999 by William A. Perkins
-# Last Change: Wed Mar 31 15:33:22 1999 by William A. Perkins <perk@tophet>
+# Last Change: Tue Dec 14 16:11:15 1999 by William A. Perkins <perk@mack.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -23,7 +23,8 @@ set format y "%.1f"
 set ylabel 'Concentration'
 set xrange [0:10500]
 set pointsize 0.5
-set timestamp
+#set timestamp
+set key below
 
                                 # If delta t is 18.0s (0.005 hr), t =
                                 # 360.0 is 20 time steps, t = 1080.0

@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created July  2, 1999 by William A. Perkins
-# Last Change: Tue Jul 13 11:52:31 1999 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Tue Dec 14 22:39:38 1999 by William A. Perkins <perk@mack.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -20,7 +20,7 @@ set -e
 TRAP_FPE='INVALID=ABORT(1);UNDERFL=ZERO;OVERFL=ABORT(1);INT_OVERFL=ABORT(1);DIVZERO=ABORT(1);DEBUG'
 export TRAP_FPE
 
-model=../../../mass1_v084
+model=${MODEL-../../../mass1_v084}
 
                                 # run warmup with stage BC's
 
@@ -48,6 +48,12 @@ gawk -f profile-storage.gawk profile1-flowbc.out > storage-flowbc.out
         set title \"MASS1 Storage Test \(Inflow/Outflow Pulse\)\"\; ; \
     sed -e 's/@CASE@/flowbc/' plot.gp \
 ) | gnuplot > plot-flowbc.ps
+( \
+    echo \
+        set terminal postscript eps color solid \"Helvetica\" 14\; \
+        set title \"MASS1 Storage Test \(Inflow/Outflow Pulse\)\"\; ; \
+    sed -e 's/@CASE@/flowbc/' plot.gp \
+) | gnuplot > plot-flowbc.eps
 
 
 
@@ -71,3 +77,9 @@ gawk -f profile-storage.gawk profile1-lateral.out > storage-lateral.out
         set title \"MASS1 Storage Test \(Lateral Inflow/Outflow Pulse\)\"\; ; \
     sed -e 's/@CASE@/lateral/' plot.gp \
 ) | gnuplot > plot-lateral.ps
+( \
+    echo \
+        set terminal postscript eps color solid \"Helvetica\" 14\; \
+        set title \"MASS1 Storage Test \(Lateral Inflow/Outflow Pulse\)\"\; ; \
+    sed -e 's/@CASE@/lateral/' plot.gp \
+) | gnuplot > plot-lateral.eps

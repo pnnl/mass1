@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 22, 1999 by William A. Perkins
-# Last Change: Wed Mar 31 15:02:44 1999 by William A. Perkins <perk@tophet>
+# Last Change: Tue Dec 14 16:08:13 1999 by William A. Perkins <perk@mack.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -24,11 +24,13 @@ set xlabel 'Longitudinal Distance, ft'
 set format y "%.1f"
 set ylabel 'Concentration'
 set pointsize 0.5
-set timestamp
+# set timestamp
+set key below
 
 plot C(24*60 - x/u,Tp) title 'Translated BC @ t = 24 min' with lines, \
      C(48*60 - x/u,Tp) title 'Translated BC @ t = 48 min' with lines, \
      C(72*60 - x/u,Tp) title 'Translated BC @ t = 72 min' with lines, \
-     'profile1.out' using (10656 - $4):10 title 'Simulated' with linespoints 7
+     C(96*60 - x/u,Tp) title 'Translated BC @ t = 96 min' with lines, \
+     'profile1.out' using (10656 - $4):10 title 'Simulated' with points 7
 
 
