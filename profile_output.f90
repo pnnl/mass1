@@ -159,10 +159,10 @@ DO i=1,num_profiles
 
 count = 80 + i
 WRITE(count,1110)
-1110 FORMAT(160('-'))
+1110 FORMAT('#',160('-'))
 CALL decimal_to_date
 WRITE(count,1010)i,date_string,time_string,profile_max_points(i)
-1010 FORMAT('Profile Number - ',i3,'   for Date: ',a10,'  Time: ',a8,'  Max number of points on profile = ',i6/)
+1010 FORMAT('#Profile Number - ',i3,'   for Date: ',a10,'  Time: ',a8,'  Max number of points on profile = ',i6/)
 !WRITE(count,1020)time/time_mult,profile_max_points(i)
 !1020 FORMAT(f14.8,2x,i6)
 !WRITE(count,1005)'link','point','distance','water el','discharge','velocity','depth', &

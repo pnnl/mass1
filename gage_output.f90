@@ -44,7 +44,7 @@ REAL :: depth, tdg_sat, tdg_press
 DOUBLE PRECISION :: salinity = 0.0
 INTEGER :: i,link,point,count=0
 INTEGER, SAVE :: num_gages
-INTEGER, SAVE :: gage_link(20),gage_point(20)
+INTEGER, SAVE :: gage_link(50),gage_point(50)
 INTEGER :: len1,len2,spot1,spot2
 CHARACTER*20 fname,string1,string2
         
@@ -83,7 +83,7 @@ IF(time == time_begin )THEN
 	! 'bed shear '
 !1005 FORMAT(2a7,20a12)
 	WRITE(count,1005)
-1005 FORMAT(2x,'date',8x,'time',5x,'water elev',2x,'discharge',5x,'vel',4x,'depth', &
+1005 FORMAT('#',1x,'date',8x,'time',5x,'water elev',2x,'discharge',5x,'vel',4x,'depth', &
      7x,'conc',4x,'temp' ,2x,'%Sat',3x,'TDG P', &
 		4x,'thalweg el',2x,'area ',2x,'top width',2x,'hyd rad',2x,'Fr #',2x,'frict slope', &
 		2x,'bed shear')

@@ -336,7 +336,7 @@ cflx =  ave_vel*delta_t/dxx(link,point)
            
 if(velave.ge.0)then   !!! +ve velocity case 
       f(point)=c(link,point+1)-c(link,point)
- if(abs(f(point)).gt.1.e-40)then
+ if(abs(f(point)).gt.1.d-40)then
   corr = 0.5*(dxx(link,point+1)+dxx(link,point))/	 &
         (0.5*(dxx(link,point)+dxx(link,point-1)))
   s = corr *	&
@@ -352,12 +352,12 @@ if(velave.ge.0)then   !!! +ve velocity case
      
  else        !!! -ve velocity case
       f(point)=c(link,point)-c(link,point+1)
-   if(abs(f(point)).gt.1.e-40)then
+   if(abs(f(point)).gt.1.d-40)then
      corr = 0.5*(dxx(link,point+1)+dxx(link,point))/	&
             (0.5*(dxx(link,point+1)+dxx(link,point+2)))	  
      s=corr*						 &
        (c(link,point+1)-c(link,point+2))/f(point)	 
-     phi=max(0.0,min(2.d0,2.d0*s,  &
+     phi=max(0.0d0,min(2.d0,2.d0*s,  &
          0.33333333333333333d0*		  &
         (2.d0-cflx+(1.d0+cflx)*s)))
    else

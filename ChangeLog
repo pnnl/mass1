@@ -1,3 +1,31 @@
+1999-03-05  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* gage_output.f90: increased the dimensions of gage_link and
+	  gage_point to 50
+
+Thu Feb 11 13:06:53 1999  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* gage_output.f90 (gage_output): added a '#' to the output header
+		  lines so gnuplot will skip the lines
+
+	* profile_output.f90 (profile_output): added a '#' to the output
+		  header lines, so gnuplot will skip the lines
+
+	* modules.f90: beta returned to 0.5 from 1.0
+
+Wed Feb 10 12:14:09 1999  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* initial_cond.f90: initialize species(i)%conc and
+		  species(i)%concold instead of c(i) and temp(i)
+
+Mon Feb  8 16:14:58 1999  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* makefile.sun: created
+
+	* scalars_module.f90 (tvd_transport): changed a constant 0.0 to
+		  0.0d0 to satisfy the Absoft compiler on Linux and two
+		  constant 1.e-40 to 1.d-40 to satify the DEC compiler.
+
 Mon Jan 18 07:28:38 1999  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* met_data_module.f90: added start_entry index to table_bc_struct

@@ -1,0 +1,211 @@
+# -------------------------------------------------------------
+# file: Makefile
+# Makefile for MASS1 on Digital Unix
+# -------------------------------------------------------------
+# -------------------------------------------------------------
+# Battelle Memorial Institute
+# Pacific Northwest Laboratory
+# -------------------------------------------------------------
+# -------------------------------------------------------------
+# Created November 11, 1998 by William A. Perkins
+# Last Change: Mon Feb  8 16:48:47 1999 by William A. Perkins <perk@erebus.pnl.gov>
+# -------------------------------------------------------------
+# RCS ID: $Id$
+
+F90 = f90
+COMPILE.f90 = $(F90) $(F90FLAGS) -c $(DEBUG)
+LINK.f90 = $(F90) $(LDFLAGS)
+MOD=.M
+OBJ=.o
+
+DEBUG = -O
+FLAGS = $(DEBUG) 
+F90FLAGS = $(FLAGS)
+LIBLOC = 
+LDFLAGS = ${LIBLOC} $(FLAGS)
+LIBS = 
+
+TARGET = mass1_v081
+SRCS = \
+    array_alloc.f90				\
+    array_dealloc.f90				\
+    coeff.f90					\
+    energy_flux_module.f90			\
+    file_manager.f90				\
+    flow_sim.f90				\
+    gage_output.f90				\
+    gas_coeffs_module.f90			\
+    gas_functions_module.f90			\
+    gastrans.f90				\
+    general_data.f90				\
+    hydro_bc.f90				\
+    initial_cond.f90				\
+    julian.f90					\
+    kick_off.f90				\
+    latflow_bc.f90				\
+    linear_interp.f90				\
+    link_bc.f90					\
+    link_data.f90				\
+    mass1.f90					\
+    met_data_module.f90				\
+    modules.f90					\
+    nonfluvial_coeff.f90			\
+    point_data.f90				\
+    print_output.f90				\
+    profile_output.f90				\
+    read_config.f90				\
+    read_hotstart.f90				\
+    scalars_module.f90				\
+    section.f90					\
+    section_data.f90				\
+    section_table.f90				\
+    svgrp.f90					\
+    table_interp.f90				\
+    tdg_equation_coeff.f90			\
+    trans_bc.f90				\
+    date_to_decimal.f90				\
+    decimal_to_date.f90				\
+    write_restart.f90
+
+MODULES = 					\
+    energy_flux_module$(MOD)			\
+    gas_coeffs_module$(MOD)				\
+    gas_functions_module$(MOD)			\
+    julian$(MOD)					\
+    met_data_module$(MOD)				\
+    modules$(MOD)					\
+    scalars_module$(MOD)				\
+    tdg_equation_coeff$(MOD)
+
+OBJS = $(SRCS:%.f90=%$(OBJ))
+
+${TARGET}: ${OBJS}
+	${LINK.f90} ${OBJS} ${LIBS} -o ${TARGET}
+
+clean::
+	rm -f ${TARGET}
+
+svgrp-test: svgrp-test.o svgrp.o
+	${LINK.f90} svgrp-test.o svgrp.o ${LIBS} -o $@
+
+clean:: 
+	rm -f svgrp-test
+
+# dependancies for individual object files
+
+array_alloc$(OBJ): array_alloc.f90 modules$(MOD)
+
+array_dealloc$(OBJ): array_dealloc.f90 modules$(MOD)
+
+coeff$(OBJ): coeff.f90 modules$(MOD)
+
+date_to_decimal$(OBJ): date_to_decimal.f90 julian$(MOD)
+
+decimal_to_date$(OBJ): decimal_to_date.f90 julian$(MOD)
+
+energy_flux_module$(OBJ): energy_flux_module.f90
+
+file_manager$(OBJ): file_manager.f90 modules$(MOD)
+
+flow_sim$(OBJ): flow_sim.f90 modules$(MOD)
+
+gage_output$(OBJ): gage_output.f90 modules$(MOD) gas_functions_module$(MOD) \
+    met_data_module$(MOD) scalars_module$(MOD)
+
+gas_coeffs_module$(OBJ): gas_coeffs_module.f90
+
+gas_functions_module$(OBJ): gas_functions_module.f90 gas_coeffs_module$(MOD)
+
+gas_sim$(OBJ): gas_sim.f90 modules$(MOD)
+
+gastrans$(OBJ): gastrans.f90
+
+general_data$(OBJ): general_data.f90 modules$(MOD)
+
+hydro_bc$(OBJ): hydro_bc.f90 modules$(MOD)
+
+initial_cond$(OBJ): initial_cond.f90 modules$(MOD)
+
+julian$(OBJ): julian.f90
+
+kick_off$(OBJ): kick_off.f90 modules$(MOD)
+
+latflow_bc$(OBJ): latflow_bc.f90 modules$(MOD)
+
+linear_interp$(OBJ): linear_interp.f90
+
+link_bc$(OBJ): link_bc.f90 modules$(MOD)
+
+link_data$(OBJ): link_data.f90 modules$(MOD)
+
+mass1$(OBJ): mass1.f90 modules$(MOD) met_data_module$(MOD) scalars_module$(MOD)
+
+met_data_module$(OBJ): met_data_module.f90 modules$(MOD)
+
+modules$(OBJ): modules.f90
+
+nonfluvial_coeff$(OBJ): nonfluvial_coeff.f90 modules$(MOD)
+
+point_data$(OBJ): point_data.f90 modules$(MOD)
+
+print_output$(OBJ): print_output.f90 modules$(MOD) scalars_module$(MOD) \
+    tdg_equation_coeff$(MOD) met_data_module$(MOD)
+
+profile_output$(OBJ): profile_output.f90 scalars_module$(MOD) \
+    tdg_equation_coeff$(MOD) met_data_module$(MOD)
+
+read_config$(OBJ): read_config.f90 modules$(MOD)
+
+read_hotstart$(OBJ): read_hotstart.f90 modules$(MOD) scalars_module$(MOD)
+
+scalars_module$(OBJ): scalars_module.f90 modules$(MOD) \
+    energy_flux_module$(MOD) met_data_module$(MOD) tdg_equation_coeff$(MOD) \
+    gas_functions_module$(MOD)
+
+section$(OBJ): section.f90 modules$(MOD)
+
+section_data$(OBJ): section_data.f90 modules$(MOD)
+
+section_table$(OBJ): section_table.f90
+
+svgrp$(OBJ): svgrp.f90
+
+table_interp$(OBJ): table_interp.f90
+
+tdg_equation_coeff$(OBJ): tdg_equation_coeff.f90
+
+temp_sim$(OBJ): temp_sim.f90 modules$(MOD)
+
+trans_bc$(OBJ): trans_bc.f90 modules$(MOD)
+
+write_restart$(OBJ): write_restart.f90 modules$(MOD) scalars_module$(MOD)
+
+# dependances for individual modules:
+
+modules$(MOD): modules$(OBJ) modules.f90
+
+energy_flux_module$(MOD): energy_flux_module$(OBJ)
+
+gas_coeffs_module$(MOD): gas_coeffs_module$(OBJ)
+
+gas_functions_module$(MOD): gas_functions_module$(OBJ) 
+
+
+met_data_module$(MOD): met_data_module$(OBJ)
+
+scalars_module$(MOD): scalars_module$(OBJ)
+
+tdg_equation_coeff$(MOD): tdg_equation_coeff$(OBJ)
+
+julian$(MOD): julian.o
+
+svgrp-test.o: svgrp-test.f90 
+
+clean::
+	rm -f ${OBJS}
+	rm -f ${MODULES}
+	rm -f svgrp-test.o
+	rm -f *~ *% ,*
+
+%$(OBJ): %.f90
+	${COMPILE.f90} $<

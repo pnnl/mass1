@@ -63,10 +63,10 @@ SUBROUTINE initial_cond
 		 temp(link,i) = temp(link,i)
 
 		END SELECT
-                ! species(1)%conc(link,i) = c(link,i)
-                ! species(1)%concold(link,i) = c(link,i)
-                ! species(2)%conc(link,i) = temp(link,i)
-                ! species(2)%concold(link,i) = temp(link,i)
+                species(1)%conc(link,i) = c(link,i)
+                species(1)%concold(link,i) = c(link,i)
+                species(2)%conc(link,i) = temp(link,i)
+                species(2)%concold(link,i) = temp(link,i)
         END DO  
 
         END DO

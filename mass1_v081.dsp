@@ -317,13 +317,13 @@ SOURCE=.\gas_functions_module.f90
 
 !IF  "$(CFG)" == "mass1_v081 - Win32 Release"
 
-NODEP_F90_GAS_F=\
+DEP_F90_GAS_F=\
 	".\Release\gas_coeffs.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v081 - Win32 Debug"
 
-NODEP_F90_GAS_F=\
+DEP_F90_GAS_F=\
 	".\Debug\gas_coeffs.mod"\
 	
 

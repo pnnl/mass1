@@ -27,7 +27,7 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Mon Jan 18 07:33:59 1999 by William A. Perkins <perk@erebus.pnl.gov>
+! Last Change: Mon Feb 22 21:21:28 1999 by William A. Perkins <perk@erebus.pnl.gov>
 !----------------------------------------------------------
 MODULE general_vars
 
@@ -166,7 +166,7 @@ MODULE fluvial_coeffs
 
 ! REAL, SAVE :: alpha=1.0,beta=0.5,theta=1.0,q1,q2,a1,a2,b1,b2,k1,k2	&
 !               ,ky1,ky2,y2,y1
-REAL, SAVE :: alpha=1.0,beta=1.0,theta=1.0,q1,q2,a1,a2,b1,b2,k1,k2,ky1,ky2,y2,y1
+REAL, SAVE :: alpha=1.0,beta=0.5,theta=1.0,q1,q2,a1,a2,b1,b2,k1,k2,ky1,ky2,y2,y1
 
 END MODULE fluvial_coeffs
 
