@@ -9,14 +9,14 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Thu Apr  1 10:18:11 1999 by William A. Perkins <perk@tophet>
+# Last Change: Thu Apr  1 11:47:46 1999 by William A. Perkins <perk@tophet>
 # -------------------------------------------------------------
 # $Id$
 
 set -x
 set -e
 
-model=../../../Release/mass1_v081
+model=../../../Release/mass1_v082
 
 rm -f mass1.cfg
 cp mass1-warmup.cfg mass1.cfg

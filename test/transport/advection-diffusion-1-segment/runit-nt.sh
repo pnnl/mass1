@@ -9,14 +9,14 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Fri Mar 26 14:49:42 1999 by William A. Perkins <perk@erebus.pnl.gov>
+# Last Change: Thu Apr  1 11:48:24 1999 by William A. Perkins <perk@tophet>
 # -------------------------------------------------------------
 # $Id$
 
 set -x
 set -e
 
-model=../../../Release/mass1_v081
+model=../../../Release/mass1_v082
 
 rm -f mass1.cfg
 cp mass1-warmup.cfg mass1.cfg

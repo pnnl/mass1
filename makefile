@@ -26,7 +26,7 @@ LIBLOC =
 LDFLAGS = ${LIBLOC} $(FLAGS)
 LIBS = -lfpe
 
-TARGET = mass1_v081
+TARGET = mass1_v082
 SRCS = \
     array_alloc.f90				\
     array_dealloc.f90				\

@@ -1,3 +1,37 @@
+1999-04-01  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* test/transport/advection-1-segment/runit-nt.sh (model): changed
+	  model to mass1_v082
+	
+	* test/transport/advection-2-segment/runit-nt.sh (model): changed
+	  model to mass1_v082
+
+	* test/transport/advection-diffusion-1-segment/runit-nt.sh (model): changed
+	  model to mass1_v082
+
+	* test/transport/advection-diffusion-2-segment/runit-nt.sh (model): changed
+	  model to mass1_v082
+
+	* test/transport/advection-diffusion-2-segment/runit.sh (model): changed
+	  model to mass1_v082
+
+	* test/transport/advection-diffusion-1-segment/runit.sh (model): changed 
+	  model to mass1_v082
+
+	* test/transport/advection-2-segment/runit.sh (model): changed
+	  model to mass1_v082
+
+	* test/transport/advection-1-segment/runit.sh (model): changed
+	  model to mass1_v082
+
+	* makefile (TARGET): TARGET changed to mass1_v082
+
+	* makefile.dec (TARGET): TARGET changed to mass1_v082
+
+	* makefile.linux (TARGET): TARGET changed to mass1_v082
+
+	* makefile.sun (TARGET): TARGET changed to mass1_v082
+
 1999-03-30  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* mass1.f90: added new calls to profile_output and gage_output so
