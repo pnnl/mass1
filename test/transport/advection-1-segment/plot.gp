@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 22, 1999 by William A. Perkins
-# Last Change: Tue Dec 14 16:08:13 1999 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Thu Mar 16 07:29:07 2000 by William A. Perkins <perk@mack.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -31,6 +31,9 @@ plot C(24*60 - x/u,Tp) title 'Translated BC @ t = 24 min' with lines, \
      C(48*60 - x/u,Tp) title 'Translated BC @ t = 48 min' with lines, \
      C(72*60 - x/u,Tp) title 'Translated BC @ t = 72 min' with lines, \
      C(96*60 - x/u,Tp) title 'Translated BC @ t = 96 min' with lines, \
-     'profile1.out' using (10656 - $4):10 title 'Simulated' with points 7
+     "<awk '/Time: 06:24/, /Time: 06:26/ { if ($0 !~ /^ *#/) {print $4, $10;} }' profile1.out" using (10656 - $1):2 title 'Simulated' with points 7, \
+     "<awk '/Time: 06:48/, /Time: 06:50/ { if ($0 !~ /^ *#/) {print $4, $10;} }' profile1.out" using (10656 - $1):2 notitle with points 7, \
+     "<awk '/Time: 07:12/, /Time: 07:14/ { if ($0 !~ /^ *#/) {print $4, $10;} }' profile1.out" using (10656 - $1):2 notitle with points 7, \
+     "<awk '/Time: 07:36/, /Time: 07:38/ { if ($0 !~ /^ *#/) {print $4, $10;} }' profile1.out" using (10656 - $1):2 notitle with points 7
 
 

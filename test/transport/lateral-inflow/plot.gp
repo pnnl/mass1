@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created July  2, 1999 by William A. Perkins
-# Last Change: Thu Sep 30 14:27:03 1999 by William A. Perkins <perk@erebus.pnl.gov>
+# Last Change: Thu Mar  9 11:05:04 2000 by William A. Perkins <perk@mack.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -27,7 +27,7 @@ set xlabel ''
 set ylabel "Simulated Discharge, cfs"
 set yrange [0:2000]
 
-plot 'profile1.out' using (10656 - $4):6 with linespoints
+plot '<tail +155 profile1.out' using (10656 - $4):6 with linespoints
 
 set origin 0.0, 0.0
 set size 1.0, 0.5

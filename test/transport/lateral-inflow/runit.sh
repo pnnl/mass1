@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created July  2, 1999 by William A. Perkins
-# Last Change: Wed Dec  8 14:26:53 1999 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Thu Mar 16 09:18:18 2000 by William A. Perkins <perk@mack.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -30,7 +30,7 @@ $model
     set terminal postscript portrait color solid \"Helvetica\" 14\; \
     set title \"Transport with Lateral Inflow\"\; \
     load \"plot.gp\"\; ) | \
-        gnuplot > plot-inflow.ps
+        gnuplot > plot-inflow.eps
 
 cp profile1.out profile1.inflow.out
 rm -f mass1.cfg
@@ -42,7 +42,7 @@ rm -f mass1.cfg
     set terminal postscript portrait color solid \"Helvetica\" 14\; \
     set title \"Transport with Lateral Outflow\"\; \
     load \"plot.gp\"\; ) | \
-        gnuplot > plot-outflow.ps
+        gnuplot > plot-outflow.eps
 
 cp profile1.out profile1.outflow.out
 
@@ -55,6 +55,6 @@ rm -f mass1.cfg
     set terminal postscript portrait color solid \"Helvetica\" 14\; \
     set title \"Transport with Varying Lateral Inflow/Outflow\"\; \
     load \"plot.gp\"\; ) | \
-        gnuplot > plot-vary.ps
+        gnuplot > plot-vary.eps
 
 cp profile1.out profile1.vary.out

@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Tue Dec 14 16:07:24 1999 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Thu Mar 16 08:09:59 2000 by William A. Perkins <perk@mack.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -44,6 +44,17 @@ rm -f mass1.cfg
     'load "plot.gp";' ) | \
         gnuplot > plot-Cn=1.0.eps
 
+(echo \
+    set terminal postscript landscape color solid \"Helvetica\" 14\; \
+    set title \"Advection: Courant Number = 0.1\"\; \
+    load \"mass-plot.gp\"\; ) | \
+        gnuplot > mass-plot-Cn=0.1.ps
+(echo \
+    set terminal postscript eps color solid \"Helvetica\" 14\; \
+    set title \"Advection: Courant Number = 0.1\"\; \
+    load \"mass-plot.gp\"\; ) | \
+        gnuplot > mass-plot-Cn=0.1.eps
+
 ln -f -s mass1-Cn=0.1.cfg mass1.cfg
 $model
 rm -f mass1.cfg
@@ -58,3 +69,15 @@ rm -f mass1.cfg
     set title \"Multiple Segment Advection: Courant Number = 0.1\"\; \
     load \"plot.gp\"\; ) | \
         gnuplot > plot-Cn=0.1.eps
+
+(echo \
+    'set terminal postscript landscape color solid "Helvetica" 14;' \
+    'set title "Advection: Courant Number = 1.0";' \
+    'load "mass-plot.gp";' ) | \
+        gnuplot > mass-plot-Cn=1.0.ps
+(echo \
+    'set terminal postscript eps color solid "Helvetica" 14;' \
+    'set title "Advection: Courant Number = 1.0";' \
+    'load "mass-plot.gp";' ) | \
+        gnuplot > mass-plot-Cn=1.0.eps
+

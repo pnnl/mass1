@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created July  2, 1999 by William A. Perkins
-# Last Change: Wed Mar  8 11:00:53 2000 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Thu Mar 16 08:57:49 2000 by William A. Perkins <perk@mack.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -50,7 +50,7 @@ gawk -f profile-storage.gawk profile1-flowbc.out > storage-flowbc.out
 ) | gnuplot > plot-flowbc.ps
 ( \
     echo \
-        set terminal postscript eps color solid \"Helvetica\" 14\; \
+        set terminal postscript eps color solid \"Helvetica\" 14\; ; \
     sed -e 's/@CASE@/flowbc/' plot.gp \
 ) | gnuplot > plot-flowbc.eps
 
@@ -62,7 +62,7 @@ gawk -f profile-storage.gawk profile1-flowbc.out > storage-flowbc.out
 ) | gnuplot > plot-flowbc-stage.ps
 ( \
     echo \
-        set terminal postscript eps color solid \"Helvetica\" 14\; \
+        set terminal postscript eps color solid \"Helvetica\" 14\; ; \
     sed -e 's/@CASE@/flowbc/' plot-stage.gp \
 ) | gnuplot > plot-flowbc-stage.eps
 
@@ -89,7 +89,18 @@ gawk -f profile-storage.gawk profile1-lateral.out > storage-lateral.out
 ) | gnuplot > plot-lateral.ps
 ( \
     echo \
-        set terminal postscript eps color solid \"Helvetica\" 14\; \
-        set title \"MASS1 Storage Test \(Lateral Inflow/Outflow Pulse\)\"\; ; \
+        set terminal postscript eps color solid \"Helvetica\" 14\; ; \
     sed -e 's/@CASE@/lateral/' plot.gp \
 ) | gnuplot > plot-lateral.eps
+
+( \
+    echo \
+        set terminal postscript landscape color solid \"Helvetica\" 14\; \
+        set title \"MASS1 Storage Test \(Inflow/Outflow Pulse\)\"\; ; \
+    sed -e 's/@CASE@/lateral/' plot-stage.gp \
+) | gnuplot > plot-lateral-stage.ps
+( \
+    echo \
+        set terminal postscript eps color solid \"Helvetica\" 14\; ; \
+    sed -e 's/@CASE@/lateral/' plot-stage.gp \
+) | gnuplot > plot-lateral-stage.eps
