@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October 10, 2001 by William A. Perkins
-! Last Change: Tue Oct 23 12:18:09 2001 by William A. Perkins <perk@leechong.pnl.gov>
+! Last Change: Mon Nov  5 08:20:59 2001 by William A. Perkins <perk@leechong.pnl.gov>
 ! ----------------------------------------------------------------
 
 
@@ -199,6 +199,7 @@ CONTAINS
                                 ! identify and check the specified link
 
           laglink = INT(lagvalues(i*2 - 1))
+          piddata(l)%lagged(i)%usebc = .FALSE.
           IF (laglink .LT. 0) THEN
              laglink = -laglink
              piddata(l)%lagged(i)%usebc = .TRUE.

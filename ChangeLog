@@ -1,3 +1,7 @@
+2001-11-12  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* pidlink.f90: Oops, forgot to initialize usebc
+
 2001-10-23  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* mass1.f90: renamed pidlink_assemble_lagged_flow to
