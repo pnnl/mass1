@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created November 11, 1998 by William A. Perkins
-# Last Change: Wed Sep 29 11:31:52 1999 by William A. Perkins <perk@erebus.pnl.gov>
+# Last Change: Tue Nov  2 16:11:25 1999 by William A. Perkins <perk@gehenna.pnl.gov>
 # -------------------------------------------------------------
 # RCSID: $Id$
 
@@ -27,65 +27,67 @@ LDFLAGS = ${LIBLOC} $(FLAGS)
 LIBS = -lfpe
 
 TARGET = mass1_v084
-SRCS = \
-    array_alloc.f90				\
-    array_dealloc.f90				\
-    coeff.f90					\
-    energy_flux_module.f90			\
-    file_manager.f90				\
-    flow_sim.f90				\
-    gage_output.f90				\
-    gas_coeffs_module.f90			\
-    gas_functions_module.f90			\
-    gastrans.f90				\
-    general_data.f90				\
-    hydro_bc.f90				\
-    initial_cond.f90				\
-    julian.f90					\
-    kick_off.f90				\
-    latflow_bc.f90				\
-    linear_interp.f90				\
-    link_bc.f90					\
-    link_data.f90				\
-    mass1.f90					\
-    met_data_module.f90				\
-    modules.f90					\
-    nonfluvial_coeff.f90			\
-    point_data.f90				\
-    print_output.f90				\
-    profile_output.f90				\
-    read_config.f90				\
-    read_hotstart.f90				\
-    scalars_module.f90				\
-    section.f90					\
-    section_data.f90				\
-    section_table.f90				\
-    svgrp.f90					\
-    table_interp.f90				\
-    tdg_equation_coeff.f90			\
-    trans_bc.f90				\
-    date_to_decimal.f90				\
-    decimal_to_date.f90				\
+SRCS =											\
+    array_alloc.f90								\
+    array_dealloc.f90							\
+    coeff.f90									\
+    energy_flux_module.f90						\
+    file_manager.f90							\
+    flow_sim.f90								\
+    gage_output.f90								\
+    gas_coeffs_module.f90						\
+    gas_functions_module.f90					\
+    gastrans.f90								\
+    general_data.f90							\
+    hydro_bc.f90								\
+	hydro_output.f90							\
+    initial_cond.f90							\
+    julian.f90									\
+    kick_off.f90								\
+    latflow_bc.f90								\
+    linear_interp.f90							\
+    link_bc.f90									\
+    link_data.f90								\
+    mass1.f90									\
+    met_data_module.f90							\
+    modules.f90									\
+    nonfluvial_coeff.f90						\
+    point_data.f90								\
+    print_output.f90							\
+    profile_output.f90							\
+    read_config.f90								\
+    read_hotstart.f90							\
+    scalars_module.f90							\
+    section.f90									\
+    section_data.f90							\
+    section_table.f90							\
+    svgrp.f90									\
+    table_interp.f90							\
+    tdg_equation_coeff.f90						\
+    trans_bc.f90								\
+    date_to_decimal.f90							\
+    decimal_to_date.f90							\
     write_restart.f90
 
-MODULES = 					\
-    ENERGY_FLUX$(MOD)				\
-    GAS_COEFFS$(MOD)				\
-    GAS_FUNCTIONS$(MOD)				\
-    MET_DATA_MODULE$(MOD)			\
-    GENERAL_VARS$(MOD)				\
-    DATE_VARS$(MOD)				\
-    LOGICALS$(MOD)				\
-    FILE_VARS$(MOD)				\
-    LINKBC_VARS$(MOD)				\
-    LINK_VARS$(MOD)				\
-    POINT_VARS$(MOD)				\
-    SECTION_VARS$(MOD)				\
-    FLOW_COEFFS$(MOD)				\
-    FLUVIAL_COEFFS$(MOD)			\
-    TRANSPORT_VARS$(MOD)			\
-    SCALARS$(MOD)				\
-    JULIAN$(MOD)				\
+MODULES =										\
+    ENERGY_FLUX$(MOD)							\
+    GAS_COEFFS$(MOD)							\
+    GAS_FUNCTIONS$(MOD)							\
+    MET_DATA_MODULE$(MOD)						\
+    GENERAL_VARS$(MOD)							\
+    DATE_VARS$(MOD)								\
+	HYDRO_OUTPUT_MODULE$(MOD)					\
+    LOGICALS$(MOD)								\
+    FILE_VARS$(MOD)								\
+    LINKBC_VARS$(MOD)							\
+    LINK_VARS$(MOD)								\
+    POINT_VARS$(MOD)							\
+    SECTION_VARS$(MOD)							\
+    FLOW_COEFFS$(MOD)							\
+    FLUVIAL_COEFFS$(MOD)						\
+    TRANSPORT_VARS$(MOD)						\
+    SCALARS$(MOD)								\
+    JULIAN$(MOD)								\
     TDG_EQUATION_COEFF$(MOD)
 
 OBJS = $(SRCS:%.f90=%$(OBJ))
@@ -104,13 +106,24 @@ clean::
 
 # dependancies for individual object files
 
-array_alloc$(OBJ): array_alloc.f90 				\
-    GENERAL_VARS$(MOD) LINKBC_VARS$(MOD) LINK_VARS$(MOD) FLOW_COEFFS$(MOD) \
-    POINT_VARS$(MOD) SECTION_VARS$(MOD) TRANSPORT_VARS$(MOD)
+array_alloc$(OBJ): array_alloc.f90				\
+    GENERAL_VARS$(MOD)							\
+	LINKBC_VARS$(MOD)							\
+	LINK_VARS$(MOD)								\
+	FLOW_COEFFS$(MOD)							\
+    POINT_VARS$(MOD)							\
+	SECTION_VARS$(MOD)							\
+	TRANSPORT_VARS$(MOD)						\
+	HYDRO_OUTPUT_MODULE$(MOD)
 
-array_dealloc$(OBJ): array_dealloc.f90		\
-    LINKBC_VARS$(MOD) LINK_VARS$(MOD) FLOW_COEFFS$(MOD) \
-    POINT_VARS$(MOD) SECTION_VARS$(MOD) TRANSPORT_VARS$(MOD)
+array_dealloc$(OBJ): array_dealloc.f90			\
+    LINKBC_VARS$(MOD)							\
+	LINK_VARS$(MOD)								\
+	FLOW_COEFFS$(MOD)							\
+    POINT_VARS$(MOD)							\
+	SECTION_VARS$(MOD)							\
+	TRANSPORT_VARS$(MOD)						\
+	HYDRO_OUTPUT_MODULE$(MOD)
 
 coeff$(OBJ): coeff.f90 FLUVIAL_COEFFS$(MOD) GENERAL_VARS$(MOD)
 
@@ -126,16 +139,17 @@ flow_sim$(OBJ): flow_sim.f90			\
     GENERAL_VARS$(MOD) LINK_VARS$(MOD) POINT_VARS$(MOD) \
     FLUVIAL_COEFFS$(MOD) FLOW_COEFFS$(MOD) LOGICALS$(MOD)
 
-gage_output$(OBJ): gage_output.f90 			\
-    LINK_VARS$(MOD)				\
-    GENERAL_VARS$(MOD)				\
-    POINT_VARS$(MOD)				\
-    FILE_VARS$(MOD)				\
-    TRANSPORT_VARS$(MOD)			\
-    DATE_VARS$(MOD)				\
-    SCALARS$(MOD)				\
-    MET_DATA_MODULE$(MOD)			\
-    GAS_FUNCTIONS$(MOD)
+gage_output$(OBJ): gage_output.f90				\
+    LINK_VARS$(MOD)								\
+    GENERAL_VARS$(MOD)							\
+    POINT_VARS$(MOD)							\
+    FILE_VARS$(MOD)								\
+    TRANSPORT_VARS$(MOD)						\
+    DATE_VARS$(MOD)								\
+    SCALARS$(MOD)								\
+    MET_DATA_MODULE$(MOD)						\
+    GAS_FUNCTIONS$(MOD)							\
+	HYDRO_OUTPUT_MODULE$(MOD)
 
 gas_coeffs_module$(OBJ): gas_coeffs_module.f90
 
@@ -153,6 +167,9 @@ general_data$(OBJ): general_data.f90		\
 hydro_bc$(OBJ): hydro_bc.f90			\
     LINKBC_VARS$(MOD) FILE_VARS$(MOD) GENERAL_VARS$(MOD) \
     DATE_VARS$(MOD)
+
+hydro_output$(OBJ): hydro_output.f90			\
+    LINK_VARS$(MOD) GENERAL_VARS$(MOD) LOGICALS$(MOD)
 
 initial_cond$(OBJ): initial_cond.f90		\
     POINT_VARS$(MOD)				\
@@ -239,17 +256,18 @@ read_hotstart$(OBJ): read_hotstart.f90		\
     TRANSPORT_VARS$(MOD)			\
     SCALARS$(MOD)
 
-scalars_module$(OBJ): scalars_module.f90	\
-    TRANSPORT_VARS$(MOD)			\
-    GENERAL_VARS$(MOD)				\
-    LINK_VARS$(MOD)				\
-    POINT_VARS$(MOD)				\
-    LINKBC_VARS$(MOD)				\
-    LOGICALS$(MOD)				\
-    MET_DATA_MODULE$(MOD)			\
-    ENERGY_FLUX$(MOD)				\
-    TDG_EQUATION_COEFF$(MOD)			\
-    GAS_FUNCTIONS$(MOD)
+scalars_module$(OBJ): scalars_module.f90		\
+    TRANSPORT_VARS$(MOD)						\
+    GENERAL_VARS$(MOD)							\
+    LINK_VARS$(MOD)								\
+    POINT_VARS$(MOD)							\
+    LINKBC_VARS$(MOD)							\
+    LOGICALS$(MOD)								\
+    MET_DATA_MODULE$(MOD)						\
+    ENERGY_FLUX$(MOD)							\
+    TDG_EQUATION_COEFF$(MOD)					\
+    GAS_FUNCTIONS$(MOD)							\
+	HYDRO_OUTPUT_MODULE$(MOD)
 
 section$(OBJ): section.f90 SECTION_VARS$(MOD)
 
@@ -293,6 +311,8 @@ GAS_COEFFS$(MOD): gas_coeffs_module$(OBJ)
 
 GAS_FUNCTIONS$(MOD): gas_functions_module$(OBJ)
 
+
+HYDRO_OUTPUT_MODULE$(MOD): hydro_output$(OBJ)
 
 GENERAL_VARS$(MOD) DATE_VARS$(MOD) LOGICALS$(MOD) FILE_VARS$(MOD) \
 LINKBC_VARS$(MOD) LINK_VARS$(MOD) POINT_VARS$(MOD) SECTION_VARS$(MOD) \

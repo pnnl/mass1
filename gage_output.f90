@@ -38,6 +38,8 @@ USE met_data_module
 USE gas_functions
 USE logicals, ONLY : file_exist
 
+USE hydro_output_module
+
 IMPLICIT NONE
 
 
@@ -100,6 +102,8 @@ IF(time == time_begin )THEN
 
 	END DO
 
+    CALL hydro_output_setup()
+
 ENDIF
 
 DO i=1,num_gages
@@ -131,6 +135,7 @@ WRITE(count,1010)date_string,time_string,y(link,point),q(link,point),vel(link,po
 
 END DO
 
+IF (time > time_begin) CALL hydro_output(date_string,time_string)
 
 IF(time >= time_end)THEN
 

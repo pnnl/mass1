@@ -23,7 +23,7 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Mon Sep 27 11:30:03 1999 by William A. Perkins <perk@erebus.pnl.gov>
+! Last Change: Tue Nov  2 16:09:40 1999 by William A. Perkins <perk@gehenna.pnl.gov>
 ! 
 
 SUBROUTINE array_alloc
@@ -37,6 +37,7 @@ USE point_vars
 USE section_vars
 USE transport_vars
 USE general_vars, ONLY : maxlinks,maxpoint,maxtable,maxtimes
+USE hydro_output_module
 
 IMPLICIT NONE
 
@@ -114,6 +115,11 @@ ALLOCATE(dxx(maxlinks,0:maxpoint+2))
 ALLOCATE(k_surf(maxlinks,maxpoint))
 ALLOCATE(temp(maxlinks,0:maxpoint+2))
 
+!----------------------------------------------------------
+!MODULE hydro_output_module
+
+ALLOCATE(hydro_spill(maxlinks), hydro_gen(maxlinks), hydro_disch(maxlinks),&
+     &hydro_conc(maxlinks), hydro_sat(maxlinks), hydro_temp(maxlinks), hydro_baro(maxlinks))
 
 !----------------------------------------------------------
 END SUBROUTINE array_alloc

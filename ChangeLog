@@ -1,3 +1,20 @@
+1999-11-02  William A. Perkins  <wa_perkins@pnl.gov>
+
+	* makefile (SRCS): added hydro_output.f90
+
+	* makefile.linux (TARGET): changed default target to
+		  'mass1_v084.linux' and added hydro_output
+
+	* scalars_module.f90: the hydro_? arrays are filled for
+		  hydro_output
+
+	* gage_output.f90: added calls to hydro_ouput routines
+
+	* makefile.dec (hydro_output$(OBJ)): added
+
+	* hydro_output.f90: created -- routines to dump computed/read in
+		  spill wq data for hydro links (6, 21)
+
 1999-10-08  William A. Perkins  <wa_perkins@pnl.gov>
 
 	* scalars_module.f90 (tvd_transport): for type 6 and type 21

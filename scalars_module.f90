@@ -206,6 +206,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
   USE energy_flux
   USE tdg_equation_coeff
   USE gas_functions
+  USE hydro_output_module
 
   IMPLICIT NONE
 
@@ -262,6 +263,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
            
            table_type = 4 !spill flow
            qspill = table_interp(time,table_type,linkbc_table(link),time_mult)
+
            
            IF(do_temp .AND. temp_exchange) CALL update_met_data(time, met_zone(link))
            IF(do_temp) t_water = species(2)%conc(link,2)
@@ -286,7 +288,17 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                  tdg_saturation = a_gas(link) + b_gas(link)*EXP(c_gas(link)*qspill/1000.0)
                  c(link,2) = SNGL(TDGasConcfromSat( DBLE(tdg_saturation), t_water, salinity, baro_press))
               END SELECT
+              hydro_sat(link) = tdg_saturation
+              hydro_conc(link) = c(link,2)
+           ELSE
+              hydro_sat(link) = 100.0
+              hydro_conc(link) = SNGL(TDGasConcfromSat( DBLE(hydro_sat(link)), t_water, salinity, baro_press))
            ENDIF
+           hydro_temp(link) = t_water
+           hydro_baro(link) = baro_press
+           hydro_gen(link) = qgen
+           hydro_spill(link) = qspill
+           hydro_disch(link) = q(link, 1)
            
            IF (qspill + qgen .gt. 0.0) THEN
               ! full mixing of spill and generation waters
@@ -354,7 +366,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                  
                  table_type = 4 !spill flow
                  qspill = table_interp(time,table_type,linkbc_table(link),time_mult)
-                 
+
                  IF(qspill > 0.0)THEN
                     
                     !			equations are for %Sat and effective Spill Q in Kcfs
@@ -380,7 +392,19 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                        WRITE(99,*)'ABORT - no eqn error in type 21 link BCs at link = ',link
                        CALL EXIT
                     END SELECT
+                    hydro_sat(link) = tdg_saturation
+                    hydro_conc(link) = c(link,point)
+                 ELSE
+                    hydro_sat(link) = 100.0
+                    hydro_conc(link) = SNGL(TDGasConcfromSat( DBLE(hydro_sat(link)), t_water, salinity, baro_press))
                  ENDIF
+
+                 hydro_temp(link) = t_water
+                 hydro_baro(link) = baro_press
+                 hydro_gen(link) = qgen
+                 hydro_spill(link) = qspill
+                 hydro_disch(link) = q(link, 1)
+
                  table_type = 2
                  upstream_c = table_interp(time,table_type,transbc_table(link),time_mult)
                  upstream_c = SNGL(TDGasConcfromSat( DBLE(upstream_c), t_water, salinity, baro_press))
@@ -444,22 +468,39 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                     CASE(0)
                        table_type = 2
                        c(link,point) = table_interp(time,table_type,transbc_table(link),time_mult)
+                       hydro_conc(link) = c(link,point)
+                       hydro_sat(link) = SNGL(TDGasSaturation( DBLE(hydro_conc(link)), t_water, salinity, baro_press))
                     CASE(1)
                        table_type = 2
                        tdg_saturation = table_interp(time,table_type,transbc_table(link),time_mult)
                        c(link,point) = SNGL(TDGasConcfromSat( DBLE(tdg_saturation), t_water, salinity, baro_press))
+                       hydro_conc(link) = c(link,point)
+                       hydro_sat(link) = tdg_saturation
                     CASE(2)
                        tdg_saturation = a_gas(link) + b_gas(link)*qspill/1000.0 + c_gas(link)*(qspill/1000.0)**2 
                        c(link,point) = SNGL(TDGasConcfromSat( DBLE(tdg_saturation), t_water, salinity, baro_press))
+                       hydro_conc(link) = c(link,point)
+                       hydro_sat(link) = tdg_saturation
                     CASE(3)
                        tdg_saturation = a_gas(link) + b_gas(link)*EXP(c_gas(link)*qspill/1000.0)
                        c(link,point) = SNGL(TDGasConcfromSat( DBLE(tdg_saturation), t_water, salinity, baro_press))
+                       hydro_conc(link) = c(link,point)
+                       hydro_sat(link) = tdg_saturation
                     CASE DEFAULT
                        WRITE(*,*)'ABORT - no eqn error in type 21 link BCs at link = ',link
                        WRITE(99,*)'ABORT - no eqn error in type 21 link BCs at link = ',link
                        CALL EXIT
                     END SELECT
+                 ELSE
+                    hydro_sat(link) = 100.0
+                    hydro_conc(link) = SNGL(TDGasConcfromSat( DBLE(hydro_sat(link)), t_water, salinity, baro_press))
                  ENDIF
+
+                 hydro_gen(link) = qgen
+                 hydro_temp(link) = t_water
+                 hydro_baro(link) = baro_press
+                 hydro_spill(link) = qspill
+                 hydro_disch(link) = q(link, 1)
                  
                  sum = 0.0
                  DO j=1,num_con_links(link)

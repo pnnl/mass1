@@ -32,6 +32,7 @@ USE link_vars
 USE point_vars
 USE section_vars
 USE transport_vars
+USE hydro_output_module
 
 IMPLICIT NONE
 
@@ -88,6 +89,10 @@ DEALLOCATE(dxx)
 DEALLOCATE(k_surf)
 DEALLOCATE(temp)
 
+!----------------------------------------------------------
+!MODULE hydro_output_module
 
+DEALLOCATE(hydro_spill, hydro_gen, hydro_disch, &
+     &hydro_conc, hydro_sat, hydro_temp, hydro_baro)
 
 END SUBROUTINE array_dealloc
