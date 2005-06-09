@@ -33,12 +33,12 @@ IMPLICIT NONE
 
 DOUBLE PRECISION, INTENT(IN) :: time
 DOUBLE PRECISION :: sec
-INTEGER :: days,month,day,year,hours,min, isec
+INTEGER :: days,month,day,yr,hours,min, isec
 
-CALL CALCDATE(time, month, day, year, hours, min, sec)
+CALL CALCDATE(time, month, day, yr, hours, min, sec)
 isec = sec
 
-WRITE(date_string(7:10),'(i4.4)')year
+WRITE(date_string(7:10),'(i4.4)')yr
 WRITE(date_string(4:5),'(i2.2)')day
 WRITE(date_string(1:2),'(i2.2)')month
 
