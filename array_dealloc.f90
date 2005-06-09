@@ -22,6 +22,8 @@
 !			   lateral inflows; mcr 3/25/98
 !
 !***************************************************************
+! CVS ID: $Id$
+! Last Change: Thu Jun  9 14:47:50 2005 by William A. Perkins <perk@McPerk.pnl.gov>
 !
 
 SUBROUTINE array_dealloc
@@ -50,6 +52,10 @@ DEALLOCATE(gen_time,gen_flow)
 DEALLOCATE(spill_time,spill_flow)
 DEALLOCATE(latflowbc_time,latflowbc)
 DEALLOCATE(tempbc_time,tempbc)
+DEALLOCATE(linkbc_header, transbc_header,tempbc_header)
+DEALLOCATE(hydrobc_header,latflowbc_header)
+DEALLOCATE(linkbc_start, transbc_start, tempbc_start, &
+     &latflowbc_start, gen_start, spill_start)
 
 !----------------------------------------------------------
 !module link_vars
@@ -67,8 +73,8 @@ DEALLOCATE(x, q, q_old)
 DEALLOCATE(thalweg,y,y_old, manning,vel)
 DEALLOCATE(kstrick, area, area_old)
 DEALLOCATE(k_diff)
-DEALLOCATE(lateral_inflow)
-!DEALLOCATE(top_width,hyd_radius,froude_num,friction_slope,bed_shear)
+DEALLOCATE(top_width,hyd_radius,froude_num,friction_slope,bed_shear)
+DEALLOCATE(lateral_inflow, lateral_inflow_old)
 
 !-----------------------------------------------------------
 !module sections_vars

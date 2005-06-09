@@ -26,6 +26,7 @@
 
 SUBROUTINE initial_cond
 
+  USE utility
 	USE file_vars
     USE point_vars
 	USE transport_vars
@@ -39,17 +40,9 @@ SUBROUTINE initial_cond
 
         INTEGER :: link,point, i
         REAL :: junk3,depth,junk2,junk4
-        
-        INQUIRE(FILE=filename(6), EXIST=file_exist)
-        IF(file_exist)THEN
-           OPEN(fileunit(6),file = filename(6))
-           WRITE(99,*)'initial condition file opened: ',filename(6)
-        ELSE
-           WRITE(*,*)'initial condition file does not exist - ABORT: ',filename(6)
-           WRITE(99,*)'initial condition file does not exist - ABORT: ',filename(6)
-           CALL EXIT(1)
-        ENDIF
 
+        CALL open_existing(filename(6), fileunit(6))
+        
         lateral_inflow = 0.0;
         lateral_inflow_old = 0.0;
 

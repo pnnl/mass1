@@ -27,7 +27,7 @@
 
 SUBROUTINE hydro_bc
 
-
+USE utility
 USE linkbc_vars
 USE file_vars
 USE general_vars, ONLY: units
@@ -42,16 +42,7 @@ INTEGER :: iounit1 = 50, iounit2 = 51, i, j = 0
 DOUBLE PRECISION :: date_to_decimal
 
 iounit2 = fileunit(10)
-
-INQUIRE(FILE=filename(10),EXIST=file_exist)
-IF(file_exist)THEN
-   OPEN(fileunit(10),file=filename(10))
-   WRITE(99,*)'opening hydro BC file list: ',filename(10)
-ELSE
-   WRITE(*,*)'hydro BC file list does not exist - ABORT: ',filename(10)
-   WRITE(99,*)'hydro BC file list does not exist - ABORT: ',filename(10)
-   CALL EXIT(1)
-ENDIF
+CALL open_existing(filename(10), fileunit(10), fatal=.TRUE.)
 
 count = 0
 
@@ -75,15 +66,7 @@ SELECT CASE(time_option)
 		DO WHILE(.TRUE.)
 			READ(iounit2,*,END=200)linkbc_num,hydrobc_filename
 
-			INQUIRE(FILE=hydrobc_filename,EXIST=file_exist)
-            IF(file_exist)THEN
-               OPEN(iounit1, file = hydrobc_filename)
-               WRITE(99,*)'opening hydro BC file: ',hydrobc_filename
-			ELSE
-               WRITE(*,*)'hydro BC file does not exist - ABORT: ',hydrobc_filename
-               WRITE(99,*)'hydro BC file does not exist - ABORT: ',hydrobc_filename
-               CALL EXIT(1)
-            ENDIF
+            CALL open_existing(hydrobc_filename, iounit1, fatal=.TRUE.)
             READ(iounit1,*,END=100)hydrobc_header(linkbc_num)
 			count = 0
 			DO WHILE(.TRUE.)

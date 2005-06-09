@@ -27,7 +27,7 @@
 
 SUBROUTINE read_config
 
-
+USE utility
 USE file_vars
 USE general_vars
 USE section_vars
@@ -43,16 +43,8 @@ INTEGER :: dumlog, dumlog0
 
 do_accumulate = .FALSE.
 
-INQUIRE(FILE='mass1.cfg',EXIST=file_exist)
 
-IF(file_exist)THEN
-   OPEN(10,file='mass1.cfg')
-   WRITE(99,*)'opening mass1.cfg file'
-ELSE
-   WRITE(*,*)'The mass1.cfg file does not exist - ABORT RUN'
-   WRITE(99,*)'The mass1.cfg file does not exist - ABORT RUN'
-   CALL EXIT(1)
-ENDIF
+CALL open_existing('mass1.cfg', 10, fatal=.TRUE.)
 
 READ(10,1000)config_version
 1000 FORMAT(a100)

@@ -7,6 +7,7 @@
 
 MODULE met_data_module
 
+USE utility
 USE date_vars
 USE logicals, ONLY : file_exist
 
@@ -54,15 +55,7 @@ SUBROUTINE read_met_data(met_files, max_times, status_iounit, error_iounit)
   INTEGER :: iounit1 = 50, iounit2 = 51, i, j = 0, met_zone
   DOUBLE PRECISION :: date_to_decimal
 
-  INQUIRE(FILE=met_files,EXIST=file_exist)
-  IF(file_exist)THEN
-     OPEN(iounit2, file = met_files)
-     WRITE(status_iounit,*)'weather file list opened',met_files
-  ELSE
-     WRITE(*,*)'weather file list does not exist - ABORT',met_files
-     WRITE(status_iounit,*)'weather file list does not exist - ABORT',met_files
-     CALL EXIT(2)
-  ENDIF
+  CALL open_existing(met_files, iounit2, fatal=.TRUE.)
 
   max_zones = 0
   DO WHILE(.TRUE.)
@@ -116,15 +109,7 @@ SUBROUTINE read_met_data(met_files, max_times, status_iounit, error_iounit)
      WRITE (status_iounit, *) '    Conduction = ' , met_data(met_zone)%coeff(3)
      WRITE (status_iounit, *) '         Brunt = ' , met_data(met_zone)%coeff(4)
 		
-     INQUIRE(FILE=weather_filename,EXIST=file_exist)
-     IF(file_exist)THEN
-        OPEN(iounit1, file = weather_filename)
-        WRITE(status_iounit,*)'weather file opened: ',weather_filename
-     ELSE
-        WRITE(*,*)'weather file does not exist - ABORT: ',weather_filename
-        WRITE(status_iounit,*)'weather file does not exist - ABORT: ',weather_filename
-        CALL EXIT(2)
-     ENDIF
+     CALL open_existing(weather_filename, iounit1, fatal=.TRUE.)
 
      j = 0
      DO WHILE(.TRUE.)

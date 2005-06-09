@@ -29,6 +29,7 @@ PROGRAM mass1
 ! set units and time constant
 
 
+USE utility
 USE general_vars
 USE date_vars
 USE file_vars
@@ -62,8 +63,7 @@ WRITE(*,*)version
 ! open the status file - this file records progress through the
 ! input stream and errors
 !
-OPEN(unit=99,file='status.out')
-
+CALL open_new('status.out', 99)
 
 ! read in configuration file
 CALL read_config
@@ -153,17 +153,7 @@ IF(do_gas)THEN
 		END SELECT
 	END DO
     IF(gas_exchange)THEN
-       INQUIRE(FILE='gas_exchange_coeff.dat', EXIST=file_exist)
-       IF(file_exist)THEN
-          OPEN(88,file='gas_exchange_coeff.dat')
-          WRITE(99,*)'gas exchange coefficient file opened: '
-          READ(88,*)gasx_a,gasx_b,gasx_c, gasx_d
-          CLOSE(88)
-       ELSE
-          WRITE(*,*)'gas exchange coefficient file does not exist - ABORT'
-          WRITE(99,*)'gas exchange coefficient file does not exist - ABORT: '
-          CALL EXIT(1)
-       ENDIF
+       CALL open_existing('gas_exchange_coeff.dat', 88, fatal=.TRUE.)
     ENDIF
 ENDIF
 

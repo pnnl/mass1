@@ -13,13 +13,11 @@ mass1_SOURCES = \
     array_dealloc.f90							\
     coeff.f90									\
     energy_flux_module.f90						\
-    file_manager.f90							\
     flow_sim.f90								\
     gage_output.f90								\
     gas_coeffs_module.f90						\
     gas_functions_module.f90					\
     gastrans.f90								\
-    general_data.f90							\
     hydro_bc.f90								\
 	hydro_output.f90							\
     initial_cond.f90							\
@@ -68,7 +66,6 @@ flow_sim.$(OBJEXT): modules.$(OBJEXT)
 gage_output.$(OBJEXT): 	modules.$(OBJEXT) scalars_module.$(OBJEXT) met_data_module.$(OBJEXT) accumulator.$(OBJEXT) gas_functions_module.$(OBJEXT) hydro_output.$(OBJEXT)
 gas_functions_module.$(OBJEXT): gas_coeffs_module.$(OBJEXT) 
 gas_sim.$(OBJEXT): modules.$(OBJEXT) 
-general_data.$(OBJEXT): modules.$(OBJEXT) 
 hydro_bc.$(OBJEXT): modules.$(OBJEXT) 
 hydro_output.$(OBJEXT): modules.$(OBJEXT) gas_functions_module.$(OBJEXT)
 initial_cond.$(OBJEXT): modules.$(OBJEXT) 

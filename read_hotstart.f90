@@ -27,6 +27,7 @@
 
 SUBROUTINE read_hotstart
 
+USE utility
 USE link_vars
 USE general_vars
 USE point_vars
@@ -40,15 +41,7 @@ IMPLICIT NONE
 INTEGER :: link,point,i,j
 
 !OPEN(91,file='hotstart.dat',form='binary')
-INQUIRE(FILE=filename(12),EXIST=file_exist)
-IF(file_exist)THEN
-   OPEN(fileunit(12),file=filename(12),form='unformatted')
-   WRITE(99,*)'hotstart file opened: ',filename(12)
-ELSE
-   WRITE(*,*)'hotstart file does not exist - ABORT: ',filename(12)
-   WRITE(99,*)'hotstart file does not exist - ABORT: ',filename(12)
-   CALL EXIT(1)
-ENDIF
+CALL open_existing(filename(12), fileunit(12), fatal=.TRUE.)
 
 DO link=1,maxlinks
 DO point=1,maxpoints(link)

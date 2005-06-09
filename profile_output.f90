@@ -73,15 +73,7 @@ CONTAINS
 	count = 0
     profile_max = 0
 
-    INQUIRE(FILE=filename(15),EXIST=file_exist)
-    IF(file_exist)THEN
-       OPEN(fileunit(15),file=filename(15))
-       WRITE(99,*)'profile control file opened: ',filename(15)
-    ELSE
-       WRITE(*,*)'profile control file does not exist - ABORT: ',filename(15)
-       WRITE(99,*)'profile control file` does not exist - ABORT: ',filename(15)
-       CALL EXIT(1)
-    ENDIF
+    CALL open_existing(filename(15), fileunit(15), fatal=.TRUE.)
 
 	DO WHILE(.TRUE.)
        count=count+1	

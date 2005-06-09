@@ -33,7 +33,7 @@ SUBROUTINE link_data
 ! input_option == 1 is point-style; properties set for each point
 ! input_option == 2 is link-style; quick, uniform properties on each link
 
-
+USE utility
 USE link_vars
 USE general_vars, ONLY : maxlinks
 USE file_vars
@@ -44,16 +44,7 @@ IMPLICIT NONE
 INTEGER :: i,link,junk,io_unit
 
 io_unit = fileunit(7)
-
-INQUIRE(FILE=filename(2),EXIST=file_exist)
-IF(file_exist)THEN
-   OPEN(fileunit(2),file=filename(2))
-   WRITE(99,*)'link specification file opened: ',filename(2)
-ELSE
-   WRITE(*,*)'link specification file does not exist - ABORT: ',filename(2)
-   WRITE(99,*)'link specification file does not exist - ABORT: ',filename(2)
-   CALL EXIT(1)
-ENDIF
+CALL open_existing(filename(2), fileunit(2), fatal=.TRUE.)
 
 CALL print_output("LINKS ")
 

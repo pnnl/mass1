@@ -64,6 +64,7 @@ END SUBROUTINE allocate_tdg_coeff
 !#####################################################################
 SUBROUTINE tdg_coeff_read(status_iounit, error_iounit)
 
+USE utility
 USE file_vars
 USE logicals, ONLY : file_exist
 
@@ -72,15 +73,7 @@ IMPLICIT NONE
 INTEGER :: i,link,junk,status_iounit, error_iounit
 
 ! read in general link-related boundary condition table
-INQUIRE(FILE=filename(11),EXIST=file_exist)
-IF(file_exist)THEN
-   OPEN(fileunit(11),file=filename(11))
-   WRITE(99,*)'TDG coeff file opened: ',filename(11)
-ELSE
-   WRITE(*,*)'TDG coeff file does not exist - ABORT: ',filename(11)
-   WRITE(99,*)'TDG coeff file does not exist - ABORT: ',filename(11)
-   CALL EXIT(1)
-ENDIF
+CALL open_existing(filename(11), fileunit(11), fatal=.TRUE.)
 
 DO WHILE(.TRUE.)
 	READ(fileunit(11),*,END=100)link

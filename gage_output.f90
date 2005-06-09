@@ -26,6 +26,7 @@
 
 SUBROUTINE gage_output
 
+USE utility
 USE link_vars
 USE general_vars
 USE point_vars
@@ -55,16 +56,8 @@ INTEGER :: len1,len2,spot1,spot2
 CHARACTER*20 fname,string1,string2
         
 IF(time == time_begin )THEN
-    count=0    
-    INQUIRE(FILE=filename(14),EXIST=file_exist)
-    IF(file_exist)THEN
-       OPEN(fileunit(14),file=filename(14))
-       WRITE(99,*)'opening gage control file:  ',filename(14)
-    ELSE
-       WRITE(*,*)'gage control file - does not exist - ABORT: ',filename(14)
-       WRITE(99,*)'gage control file - does not exist - ABORT: ',filename(14)
-       CALL EXIT(1)
-    ENDIF
+    count=0
+    CALL open_existing(filename(14), fileunit(14), fatal=.TRUE.)
 
     DO WHILE(.TRUE.)
 	count=count+1	

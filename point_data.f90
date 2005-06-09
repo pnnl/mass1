@@ -32,6 +32,7 @@ SUBROUTINE point_data
 ! input_option == 1 is point-style; properties set for each point
 ! input_option == 2 is link-style; quick, uniform properties on each link
 
+  USE utility
 		USE point_vars
         USE link_vars
         USE section_vars, ONLY : section_number
@@ -45,16 +46,8 @@ SUBROUTINE point_data
         INTEGER :: i,link, junk, point,sec_num,io_unit
         REAL :: delta_x, slope, start_el,end_el,manning_n,length,diffusion
 		REAL :: surface_mass_trans
-        
-        INQUIRE(FILE=filename(3),EXIST=file_exist)
-        IF(file_exist)THEN
-           OPEN(fileunit(3),file=filename(3))
-           WRITE(99,*)'point data file opened: ',filename(3)
-        ELSE
-           WRITE(*,*)'point data file does not exist - ABORT: ',filename(3)
-           WRITE(99,*)'point data file does not exist - ABORT: ',filename(3)
-           CALL EXIT(1)
-        ENDIF
+
+        CALL open_existing(filename(3), fileunit(3), fatal=.TRUE.)
         
         io_unit = fileunit(7)
         CALL print_output("POINTS")

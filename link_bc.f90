@@ -29,6 +29,7 @@
 SUBROUTINE link_bc
 
 
+USE utility
 USE linkbc_vars
 USE link_vars
 USE file_vars
@@ -45,18 +46,8 @@ CHARACTER(LEN=100) :: linkbc_filename
 INTEGER :: iounit1 = 50, iounit2 = 51
 
 ! read in general link-related boundary condition table
-
-   INQUIRE(FILE=filename(5), EXIST=file_exist)
-   IF(file_exist)THEN
-      OPEN(fileunit(5),file=filename(5))
-      WRITE(99,*)'link BC list file opened: ',filename(5)
-   ELSE
-      WRITE(*,*)'link BC list file does not exist - ABORT: ',filename(5)
-      WRITE(99,*)'link BC list file does not exist - ABORT: ',filename(5)
-      CALL EXIT(1)
-  ENDIF
-
-iounit2 = fileunit(5)
+   iounit2 = fileunit(5)
+   CALL open_existing(filename(5), iounit2, fatal=.TRUE.)
 count = 0
 
 SELECT CASE(time_option)
@@ -78,15 +69,7 @@ CASE(2) ! date/time format is used mm:dd:yyyy hh:mm:ss converted to decimal juli
 		DO WHILE(.TRUE.)
 			READ(iounit2,*,END=200)linkbc_num,linkbc_filename
 
-            INQUIRE(FILE=linkbc_filename,EXIST=file_exist)
-            IF(file_exist)THEN
-               OPEN(iounit1, file = linkbc_filename)
-               WRITE(99,*)'link BC file opened: ',linkbc_filename
-            ELSE
-               WRITE(*,*)'link BC file does not exist - ABORT: ',linkbc_filename
-               WRITE(99,*)'link BC file does not exist - ABORT: ',linkbc_filename
-               CALL EXIT(1)
-            ENDIF
+            CALL open_existing(linkbc_filename, iounit1, fatal=.TRUE.)
 
 			READ(iounit1,*,END=100)linkbc_header(linkbc_num)
 			count = 0

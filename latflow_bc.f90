@@ -27,7 +27,7 @@
 
 SUBROUTINE latflow_bc
 
-
+USE utility
 USE linkbc_vars
 USE link_vars
 USE file_vars
@@ -43,15 +43,7 @@ CHARACTER(LEN=100) :: latflowbc_filename
 INTEGER :: iounit1 = 50, iounit2 = 51
 
 ! read in general lateral inlfow for link-related boundary condition table
-  INQUIRE(FILE=filename(16), EXIST=file_exist)
-  IF(file_exist)THEN
-     OPEN(fileunit(16),file=filename(16))
-     WRITE(99,*)'opened lateral inflow file list: ',filename(16)
-  ELSE
-     WRITE(*,*)'lateral inflow file list does not exist - ABORT: ',filename(16)
-     WRITE(99,*)'lateral inflow file list does not exist - ABORT: ',filename(16)
-     CALL EXIT(1)
-  ENDIF
+CALL open_existing(filename(16), fileunit(16), fatal=.TRUE.)
   iounit2 = fileunit(16)
 
   count = 0

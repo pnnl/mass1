@@ -27,6 +27,7 @@
 
 SUBROUTINE transport_bc(species_num)
 
+USE utility
 USE linkbc_vars
 USE file_vars
 USE general_vars, ONLY: units
@@ -48,15 +49,7 @@ SELECT CASE(species_num)
 CASE(1) ! species = 1 is total dissolved gas
 
 iounit2 = fileunit(9)
-INQUIRE(FILE=filename(9),EXIST=file_exist)
-IF(file_exist)THEN
-   OPEN(fileunit(9),file=filename(9))
-   WRITE(99,*)'transport BC file list opened: ',filename(9)
-ELSE
-   WRITE(*,*)'transport BC file list does not exist - ABORT: ',filename(9)
-   WRITE(99,*)'transport BC file list does not exist - ABORT: ',filename(9)
-   CALL EXIT(1)
-ENDIF
+CALL open_existing(filename(9), iounit2, fatal=.TRUE.)
 
 SELECT CASE(time_option)
 
@@ -79,15 +72,7 @@ CASE(2) ! date/time format is used mm:dd:yyyy hh:mm:ss converted to decimal juli
 		DO WHILE(.TRUE.)
 			READ(iounit2,*,END=200)transbc_num,transbc_filename
             
-            INQUIRE(FILE=transbc_filename,EXIST=file_exist)
-            IF(file_exist)THEN
-               OPEN(iounit1, file = transbc_filename)
-               WRITE(99,*)'transport BC file opened: ',transbc_filename
-            ELSE
-               WRITE(*,*)'transport BC file does not exist - ABORT: ',transbc_filename
-               WRITE(99,*)'transport BC file does not exist - ABORT: ',transbc_filename
-               CALL EXIT(1)
-            ENDIF
+            CALL open_existing(transbc_filename, iounit1, fatal=.TRUE.)
                
 			READ(iounit1,*,END=100)transbc_header(transbc_num)
 			count = 0
@@ -112,15 +97,7 @@ CASE(2) ! date/time format is used mm:dd:yyyy hh:mm:ss converted to decimal juli
 CASE(2) !speices = 2 is Temperature
 
 	iounit2 = fileunit(17)
-    INQUIRE(FILE=filename(17),EXIST=file_exist)
-    IF(file_exist)THEN
-       OPEN(fileunit(17),file=filename(17))
-       WRITE(99,*)'temperature file list opened: ',filename(17)
-    ELSE
-       WRITE(*,*)'temperature BC file list does not exist - ABORT: ',filename(17)
-       WRITE(99,*)'temperature BC file list does not exist - ABORT: ',filename(17)
-       CALL EXIT(1)
-    ENDIF
+    CALL open_existing(filename(17), iounit2, fatal=.TRUE.)
 
 	SELECT CASE(time_option)
 
@@ -142,15 +119,7 @@ CASE(2) ! date/time format is used mm:dd:yyyy hh:mm:ss converted to decimal juli
 		DO WHILE(.TRUE.)
 			READ(iounit2,*,END=400)tempbc_num,tempbc_filename
 
-            INQUIRE(FILE=tempbc_filename,EXIST=file_exist)
-            IF(file_exist)THEN
-               OPEN(iounit1, file = tempbc_filename)
-               WRITE(99,*)'temperature BC file opened: ',tempbc_filename
-            ELSE
-               WRITE(*,*)'temperature BC file does not exist - ABORT: ',tempbc_filename
-               WRITE(99,*)'temperature BC file does not exist - ABORT: ',tempbc_filename
-               CALL EXIT(1)
-            ENDIF
+            CALL open_existing(tempbc_filename, iounit1, fatal=.TRUE.)
 
 			READ(iounit1,*,END=300)tempbc_header(tempbc_num)
 			count = 0

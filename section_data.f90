@@ -31,6 +31,7 @@ SUBROUTINE section_data
 ! for section type=5 (x-y pair definition)
 
 ! $DEBUG
+  USE utility
         USE section_vars
         USE file_vars
 		USE logicals
@@ -41,15 +42,7 @@ SUBROUTINE section_data
         INTEGER :: i,j,num_pairs,io_unit
 		REAL :: xy(2*maxpairs)
         
-        INQUIRE(FILE=filename(4),EXIST=file_exist)
-        IF(file_exist)THEN
-           OPEN(fileunit(4),file=filename(4))
-           WRITE(99,*)'cross section data file opened: ',filename(4)
-        ELSE
-           WRITE(*,*)'cross section file does not exist - ABORT: ',filename(4)
-           WRITE(99,*)'cross section file does not exist - ABORT: ',filename(4)
-           CALL EXIT(1)
-        ENDIF
+        CALL open_existing(filename(4), fileunit(4), fatal=.TRUE.)
 
         io_unit = fileunit(7)
         CALL print_output("SECTIO")

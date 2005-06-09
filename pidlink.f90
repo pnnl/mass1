@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October 10, 2001 by William A. Perkins
-! Last Change: Mon Nov  5 08:20:59 2001 by William A. Perkins <perk@leechong.pnl.gov>
+! Last Change: Thu Jun  9 15:35:06 2005 by William A. Perkins <perk@McPerk.pnl.gov>
 ! ----------------------------------------------------------------
 
 
@@ -78,6 +78,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   SUBROUTINE read_pidlink_info()
 
+    USE utility
     USE general_vars, ONLY: maxlinks, maxtable
     USE link_vars, ONLY: linktype
 
@@ -119,15 +120,7 @@ CONTAINS
 
                                 ! open and read the pidlink data file
 
-    INQUIRE(FILE=fname,EXIST=file_exist)
-    IF(file_exist)THEN
-       OPEN(iounit,file=fname)
-       WRITE(99,*)'pidlink coefficient file opened: ', fname
-    ELSE
-       WRITE(*,*)'pidlink coefficient file does not exist - ABORT: ',fname
-       WRITE(99,*)'pidlink coefficient file does not exist - ABORT: ',fname
-       CALL EXIT(1)
-    ENDIF
+    CALL open_existing(fname, iounit, fatal=.TRUE.)
 
     ALLOCATE(piddata(count))
 
