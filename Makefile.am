@@ -23,7 +23,6 @@ mass1_SOURCES = \
     hydro_bc.f90								\
 	hydro_output.f90							\
     initial_cond.f90							\
-    julian.f90									\
     kick_off.f90								\
     latflow_bc.f90								\
     linear_interp.f90							\
@@ -52,7 +51,7 @@ mass1_SOURCES = \
 	accumulator.f90								\
 	pidlink.f90
 
-mass1_LDADD = 
+mass1_LDADD =  time_series/libts.a
 
 
 svgrptest_SOURCES = svgrp-test.f90 svgrp.f90
@@ -64,8 +63,6 @@ accumulator.$(OBJEXT): modules.$(OBJEXT) scalars_module.$(OBJEXT)
 array_alloc.$(OBJEXT):  modules.$(OBJEXT) hydro_output.$(OBJEXT)
 array_dealloc.$(OBJEXT): modules.$(OBJEXT) hydro_output.$(OBJEXT)
 coeff.$(OBJEXT): modules.$(OBJEXT) 
-date_to_decimal.$(OBJEXT): julian.$(OBJEXT)
-decimal_to_date.$(OBJEXT): julian.$(OBJEXT)
 file_manager.$(OBJEXT): modules.$(OBJEXT) 
 flow_sim.$(OBJEXT): modules.$(OBJEXT) 
 gage_output.$(OBJEXT): 	modules.$(OBJEXT) scalars_module.$(OBJEXT) met_data_module.$(OBJEXT) accumulator.$(OBJEXT) gas_functions_module.$(OBJEXT) hydro_output.$(OBJEXT)

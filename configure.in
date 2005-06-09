@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 25, 2003 by William A. Perkins
-# Last Change: Thu Jun  9 14:01:14 2005 by William A. Perkins <perk@McPerk.pnl.gov>
+# Last Change: Thu Jun  9 14:17:38 2005 by William A. Perkins <perk@McPerk.pnl.gov>
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -47,7 +47,7 @@ AC_LANG(Fortran)
                                 # search for modules in the
                                 # time_series directory
 
-FCFLAGS="$FCFLAGS"
+FCFLAGS="$FCFLAGS  ${F90MODPATH}time_series"
 FFLAGS="$FCFLAGS"
 LIBS="$LIBS $F90LIBS"
 
