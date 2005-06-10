@@ -8,17 +8,12 @@
 MODULE met_data_module
 
 USE utility
+USE date_time
 USE date_vars
 USE logicals, ONLY : file_exist
 
 IMPLICIT NONE
 INTEGER, PARAMETER  :: max_cell_values = 5
-
-TYPE datetime_struct
-	CHARACTER (LEN=10) :: date_string
-	CHARACTER (LEN=8)	 :: time_string
-	DOUBLE PRECISION :: time
-END TYPE datetime_struct
 
 TYPE table_entry_struct
 	TYPE(datetime_struct) :: datetime
@@ -53,7 +48,6 @@ SUBROUTINE read_met_data(met_files, max_times, status_iounit, error_iounit)
   CHARACTER(LEN=100) :: met_files, weather_filename
   INTEGER :: max_zones, max_times, status_iounit, error_iounit, alloc_stat
   INTEGER :: iounit1 = 50, iounit2 = 51, i, j = 0, met_zone
-  DOUBLE PRECISION :: date_to_decimal
 
   CALL open_existing(met_files, iounit2, fatal=.TRUE.)
 
@@ -119,7 +113,7 @@ SUBROUTINE read_met_data(met_files, max_times, status_iounit, error_iounit)
        met_data(met_zone)%max_entries = met_data(met_zone)%max_entries + 1
 			 date_string = met_data(met_zone)%table_entry(j)%datetime%date_string
 			 time_string = met_data(met_zone)%table_entry(j)%datetime%time_string
-       met_data(met_zone)%table_entry(j)%datetime%time = date_to_decimal()
+       met_data(met_zone)%table_entry(j)%datetime%time = date_to_decimal(date_string, time_string)
 
 		END DO
 100		CLOSE(iounit1)

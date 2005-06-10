@@ -28,6 +28,7 @@
 SUBROUTINE hydro_bc
 
 USE utility
+USE date_time
 USE linkbc_vars
 USE file_vars
 USE general_vars, ONLY: units
@@ -39,7 +40,6 @@ IMPLICIT NONE
 INTEGER :: count, linkbc_num
 CHARACTER(LEN=100) :: hydrobc_filename
 INTEGER :: iounit1 = 50, iounit2 = 51, i, j = 0
-DOUBLE PRECISION :: date_to_decimal
 
 iounit2 = fileunit(10)
 CALL open_existing(filename(10), fileunit(10), fatal=.TRUE.)
@@ -72,8 +72,8 @@ SELECT CASE(time_option)
 			DO WHILE(.TRUE.)
 				count = count + 1
 				READ(iounit1,*,END=100)date_string,time_string,gen_flow(count,linkbc_num),spill_flow(count,linkbc_num)
-				gen_time(count,linkbc_num) = date_to_decimal()
-				spill_time(count,linkbc_num) = date_to_decimal()
+				gen_time(count,linkbc_num) = date_to_decimal(date_string, time_string)
+				spill_time(count,linkbc_num) = date_to_decimal(date_string, time_string)
 			END DO
 100		CLOSE(iounit1)
 		END DO

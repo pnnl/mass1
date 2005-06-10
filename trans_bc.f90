@@ -28,6 +28,7 @@
 SUBROUTINE transport_bc(species_num)
 
 USE utility
+USE date_time
 USE linkbc_vars
 USE file_vars
 USE general_vars, ONLY: units
@@ -37,8 +38,6 @@ USE logicals, ONLY : file_exist
 IMPLICIT NONE
 
 INTEGER :: count, species_num, transbc_num, tempbc_num
-
-DOUBLE PRECISION :: date_to_decimal
 
 CHARACTER(LEN=100) :: transbc_filename, tempbc_filename
 INTEGER :: iounit1 = 50, iounit2 = 51
@@ -79,7 +78,7 @@ CASE(2) ! date/time format is used mm:dd:yyyy hh:mm:ss converted to decimal juli
 			DO WHILE(.TRUE.)
 				count = count + 1
 				READ(iounit1,*,END=100)date_string,time_string,transbc(count,transbc_num)
-				transbc_time(count,transbc_num) = date_to_decimal()
+				transbc_time(count,transbc_num) = date_to_decimal(date_string, time_string)
 				
 			END DO
 100		CLOSE(iounit1)
@@ -126,7 +125,7 @@ CASE(2) ! date/time format is used mm:dd:yyyy hh:mm:ss converted to decimal juli
 			DO WHILE(.TRUE.)
 				count = count + 1
 				READ(iounit1,*,END=300)date_string,time_string,tempbc(count,tempbc_num)
-				tempbc_time(count,tempbc_num) = date_to_decimal()
+				tempbc_time(count,tempbc_num) = date_to_decimal(date_string, time_string)
 				
 			END DO
 300		CLOSE(iounit1)

@@ -30,6 +30,7 @@ SUBROUTINE link_bc
 
 
 USE utility
+USE date_time
 USE linkbc_vars
 USE link_vars
 USE file_vars
@@ -40,7 +41,6 @@ USE logicals, ONLY : file_exist
 IMPLICIT NONE
 
 INTEGER :: i,count, link, linkbc_num
-DOUBLE PRECISION :: date_to_decimal
 
 CHARACTER(LEN=100) :: linkbc_filename
 INTEGER :: iounit1 = 50, iounit2 = 51
@@ -76,7 +76,7 @@ CASE(2) ! date/time format is used mm:dd:yyyy hh:mm:ss converted to decimal juli
 			DO WHILE(.TRUE.)
 				count = count + 1
 				READ(iounit1,*,END=100)date_string,time_string,linkbc(count,linkbc_num)
-				linkbc_time(count,linkbc_num) = date_to_decimal()
+				linkbc_time(count,linkbc_num) = date_to_decimal(date_string, time_string)
 				
 			END DO
 100		CLOSE(iounit1)

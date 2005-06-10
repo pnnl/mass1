@@ -42,8 +42,6 @@ mass1_SOURCES = \
     table_interp.f90							\
     tdg_equation_coeff.f90						\
     trans_bc.f90								\
-    date_to_decimal.f90							\
-    decimal_to_date.f90							\
     write_restart.f90							\
 	accumulator.f90								\
 	pidlink.f90

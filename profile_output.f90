@@ -175,6 +175,8 @@ CONTAINS
 
     ! $DEBUG
 
+    USE date_time
+
     IMPLICIT NONE
 
     REAL :: depth
@@ -191,7 +193,7 @@ CONTAINS
        count = iobase + i
        WRITE(count,1110)
 1110   FORMAT('#',160('-'))
-       CALL decimal_to_date(accum_time)
+       CALL decimal_to_date(accum_time, date_string, time_string)
        WRITE(count,1010)i,date_string,time_string,profile_max_points(i)
 1010   FORMAT('#Profile Number - ',i3,'   for Date: ',a10,'  Time: ',a8,'  Max number of points on profile = ',i6/)
        WRITE(count,1005)

@@ -39,6 +39,7 @@ USE logicals
 USE scalars
 USE gas_functions
 USE met_data_module
+USE date_time
 
 IMPLICIT NONE
 
@@ -141,7 +142,7 @@ CASE("RESULT")
 ! thereafter at the printout frequency
 !-----------------------------------------------------------------------------
 
-CALL decimal_to_date(time)
+CALL decimal_to_date(time, date_string, time_string)
 
 WRITE(fileunit(7),*)
 WRITE(fileunit(7),1110)

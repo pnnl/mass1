@@ -41,6 +41,7 @@ USE logicals, ONLY : file_exist, do_temp, do_gas, temp_exchange, gas_exchange
 
 USE hydro_output_module
 USE accumulator
+USE date_time
 
 IMPLICIT NONE
 
@@ -113,7 +114,7 @@ IF( (do_temp .AND. temp_exchange) .OR. (do_gas .AND. gas_exchange) ) &
 tdg_sat =   TDGasSaturation( DBLE(species(1)%conc(link,point)), DBLE(species(2)%conc(link,point)), salinity, baro_press)
 tdg_press = TDGasPress( DBLE(species(1)%conc(link,point)), DBLE(species(2)%conc(link,point)), salinity)
 
-CALL decimal_to_date(accum_time)
+CALL decimal_to_date(accum_time, date_string, time_string)
 
 !!$WRITE(count,1010)date_string,time_string,y(link,point),q(link,point),vel(link,point),depth, &
 !!$     species(1)%conc(link,point),species(2)%conc(link,point), tdg_sat, tdg_press, &

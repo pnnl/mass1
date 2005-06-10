@@ -30,6 +30,7 @@ PROGRAM mass1
 
 
 USE utility
+USE date_time
 USE general_vars
 USE date_vars
 USE file_vars
@@ -46,11 +47,15 @@ USE pidlink
 
 IMPLICIT NONE
 
-DOUBLE PRECISION  model_time, date_to_decimal
+DOUBLE PRECISION  model_time
 INTEGER, SAVE :: time_step_count = 0
-INTEGER :: error_iounit = 11,status_iounit = 99, species_num, i
+INTEGER :: species_num, i
 INTEGER :: link
 LOGICAL run
+
+CALL date_time_flags()
+utility_error_iounit = 11
+utility_status_iounit = 99
 
 version = 'MASS1 Version 0.84 Date: 08-15-1999'
 WRITE(*,*)'Modular Aquatic Simulation System 1D (MASS1)'
@@ -63,7 +68,7 @@ WRITE(*,*)version
 ! open the status file - this file records progress through the
 ! input stream and errors
 !
-CALL open_new('status.out', 99)
+CALL open_new('status.out', utility_status_iounit)
 
 ! read in configuration file
 CALL read_config
@@ -77,11 +82,11 @@ IF(debug_print == 1) WRITE(11,*)'done reading configuration file'
 IF(time_option == 2)THEN
     date_string = date_run_begins
     time_string = time_run_begins
-    time_begin = date_to_decimal()
+    time_begin = date_to_decimal(date_string, time_string)
 
     date_string = date_run_ends
     time_string = time_run_ends
-		time_end = date_to_decimal()
+		time_end = date_to_decimal(date_string, time_string)
     WRITE(*,1120)date_run_begins,time_run_begins
 1120 FORMAT(//' Simulation Starts on Date: ',a10,'  Time: ',a8/)
 	 WRITE(*,1130)date_run_ends,time_run_ends
@@ -98,9 +103,9 @@ ENDIF
 ! call startup routines 
     
 CALL array_alloc
-CALL allocate_species(error_iounit,status_iounit)
+CALL allocate_species(utility_error_iounit, utility_status_iounit)
 DO i=1,max_species
-	CALL allocate_species_components(i, maxlinks, maxpoint, status_iounit, error_iounit)
+	CALL allocate_species_components(i, maxlinks, maxpoint, utility_status_iounit, utility_error_iounit)
 END DO
 	IF(debug_print == 1)WRITE(11,*)'done with array alloc'
 
@@ -142,13 +147,13 @@ IF(do_gas)THEN
 	species_num = 1
 	CALL transport_bc(species_num)
 	IF(debug_print == 1) WRITE(11,*)'done reading gas transport table'
-	CALL allocate_tdg_coeff(maxlinks,status_iounit, error_iounit)
+	CALL allocate_tdg_coeff(maxlinks,utility_status_iounit, utility_error_iounit)
 			! read tdg spill coefficient tables
 			! if linktype 6,20, or 21 is there, then open and read file
 	DO link=1,maxlinks
 			SELECT CASE(linktype(link)) 
 			CASE(6,21)
-			CALL tdg_coeff_read(status_iounit, error_iounit)
+			CALL tdg_coeff_read(utility_status_iounit, utility_error_iounit)
 			EXIT
 		END SELECT
 	END DO
@@ -161,7 +166,7 @@ IF(do_temp)THEN
 	species_num = 2
 	CALL transport_bc(species_num)
 	IF(temp_exchange)&
-             & CALL read_met_data(filename(18), maxtimes, status_iounit, error_iounit)
+             & CALL read_met_data(filename(18), maxtimes, utility_status_iounit, utility_error_iounit)
 	IF(debug_print == 1) WRITE(11,*)'done reading temp transport table'
 ENDIF
 
@@ -221,13 +226,13 @@ DO WHILE(run)
           IF(do_gas)THEN
              species_num = 1
              CALL tvd_transport(species_num, species(species_num)%conc,species(species_num)%concold &
-                  & ,status_iounit, error_iounit)
+                  & ,utility_status_iounit, utility_error_iounit)
           END IF
 
           IF(do_temp)THEN
              species_num = 2
              CALL tvd_transport(species_num, species(species_num)%conc,species(species_num)%concold &
-                  & , status_iounit, error_iounit)
+                  & , utility_status_iounit, utility_error_iounit)
           END IF
 
           scalar_time = model_time + DBLE(i)/DBLE(scalar_steps)*time_step
@@ -244,7 +249,7 @@ DO WHILE(run)
 	IF(model_time >= (time_end)) run = .false.
 	time_step_count = time_step_count + 1    
 
-	CALL decimal_to_date(time)
+	CALL decimal_to_date(time, date_string, time_string)
 	WRITE(*,1020)date_string,time_string
 1020 FORMAT(' Done Crunching through ** Date: ',a10,'  Time: ',a8)
 
