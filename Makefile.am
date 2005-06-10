@@ -17,7 +17,6 @@ mass1_SOURCES = \
     gage_output.f90								\
     gas_coeffs_module.f90						\
     gas_functions_module.f90					\
-    gastrans.f90								\
     hydro_bc.f90								\
 	hydro_output.f90							\
     initial_cond.f90							\

@@ -1,0 +1,119 @@
+-*- mode: text -*--------------------------------------------
+file: README
+-------------------------------------------------------------
+-------------------------------------------------------------
+Battelle Memorial Institute
+Pacific Northwest Laboratory
+-------------------------------------------------------------
+-------------------------------------------------------------
+Created June 10, 2005 by William A. Perkins
+Last Change: Fri Jun 10 09:04:58 2005 by William A. Perkins <perk@McPerk.pnl.gov>
+-------------------------------------------------------------
+
+-------------------------------------------------------------
+MASS1 compilation via GNU autotools
+-------------------------------------------------------------
+
+MASS1 is configured and compiled using the GNU autotools.  If you
+check MASS1 out of CVS, you must build the configure script on a
+system that has the GNU autotools installed (Linux systems usually
+do).  The configure script is built by the command
+
+    sh bootstrap.sh
+
+You do not have to do this on the machine you which to compile for;
+the only requirement is that a reasonably recent version of autotools
+is installed (autoconf and automake).
+
+To compile MASS1, the configure script must be run on the architecture
+you wish to run MASS1.  The following architectures and compilers are
+supported: 
+
+    * Silicon Graphics with SGI Fortran 90 compiler (f90),
+    * OSF4 on DEC/Compaq/HP Alpha with the DEC/Compaq/HP Fortran 90
+      compiler (f90, f95), 
+    * Linux on DEC/Compaq/HP Alpha with the DEC/Compaq/HP Fortran 90
+      compiler (fort),
+    * Linux on Intel with any of 
+        * Absoft Fortran 95/90 (version 7.5 or above) compiler (f90, f95),
+        * Intel Fortran (version 7.0 or above) compiler (ifc) , or
+        * Lahey Fortran 95 Pro (version 6.1 or above) compiler (lf95).
+    * Mac OS X with any of
+        * Absoft Fortran 95/90 (Absoft Tools version 4.0.0) (f90, f95),
+        * IBM XL Fortran (version 8.1) compiler (xlf95, xlf90)
+        * GNU G95 (0.50-20050529) (g95)
+        * GNU Compiler Collection (version 4.1.0-20050424) (gfortran)
+
+If you try to configure without when not working with one of these
+architectures, the configure script will crash with an error.  If
+however, you set the F77 environment variable to the compiler you want
+(or use --with-f90, see below) configure will try to make it work with
+some (probably wrong) compilation flags.  You can also use the F77
+environment variable (or --with-f90) to choose the compiler when there
+are multiple choices.
+
+The configure script has several options.  To get a complete list,
+issue the command
+
+    configure --help
+
+The options specific to the compilation of MASS1 are as follows:
+
+    --with-f90=cmd
+
+        Use "cmd" as the Fortran 90 compiler command.
+
+    --enable-f90-optimize
+
+        Optimization is turned on using flags appropriate to the
+        compiler/architecture.
+
+    --enable-f90-debug (default)
+
+        Debugging flags are included by default.  If
+        --enable-f90-optimize is specified, the debugging flags are
+        not included.  Use --enable-f90-debug to include debugging
+        with optimization.
+
+    --enable-f90-profile
+
+        Turn on profiling.
+
+    --with-extra-f90flags=flags
+
+        Use the specified flags in addition to the flags added by the
+        above options.  This is mostly used to add CPU specific
+        optimization options.  For example, with the Intel ia32
+        compiler, these flags are used to compile two different
+        executables specialized for the Pentium 3 and Pentium 4:
+
+            P3: -tpp6 -xK
+            P4: -tpp7 -xW
+
+        The same thing can be accomplished by setting F90FLAGS or
+        FFLAGS in the environment before running configure.
+
+-------------------------------------------------------------
+distributing MASS1
+-------------------------------------------------------------
+If the MASS1 source code is to be sent to someone, or it is to be
+transferred to and compiled on a machine without GNU autotools, one
+can generate a "distribution" file automatically with make.  This is
+to ensure all necessary files are included when the code is
+transferred.  
+
+You must prepare a MASS1 distribution on a machine that has GNU
+autotools installed.  Once MASS1 is checked out of CVS, build the
+configure scripts with
+
+    sh bootstrap.sh
+
+Then configure MASS1 appropriately, as discussed above, and make the
+distribution file with
+
+    make dist
+
+This will make a gzip'd tar file named something like
+mass1-0.30.tar.gz.  It contains the MASS1 distribution and should have
+all the necessary files to build MASS1. 
+

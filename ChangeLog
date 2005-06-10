@@ -1,3 +1,13 @@
+2005-06-10  William A. Perkins  <william.perkins@pnl.gov>
+
+	* read_hotstart.f90 (read_hotstart): cannot use open_existing()
+	here 
+
+	* gastrans.f90: deleted, not used
+
+	* gage_output.f90: GNU gfortran had problems with TABs in this
+	file 
+
 2005-04-05  William A. Perkins  <william.perkins@pnl.gov>
 
 	* gage_output.f90 (gage_output): size of fixed gage location
