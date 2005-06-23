@@ -8,19 +8,19 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 25, 2003 by William A. Perkins
-# Last Change: Thu Jun  9 14:17:38 2005 by William A. Perkins <perk@McPerk.pnl.gov>
+# Last Change: Thu Jun 23 07:41:31 2005 by William A. Perkins <perk@McPerk.local>
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
 # Initialization
 # -------------------------------------------------------------
 AC_INIT(mass1.f90)
-AM_INIT_AUTOMAKE(mass1,0.80)
+AM_INIT_AUTOMAKE(MASS1,0.80)
 
 # -------------------------------------------------------------
 # Stuff to include subdirectories
 # -------------------------------------------------------------
-SUBDIRS="time_series"
+SUBDIRS="time_series . scripts"
 AC_SUBST(SUBDIRS)
 
 # -------------------------------------------------------------
@@ -35,6 +35,23 @@ AC_PROG_INSTALL()
 AC_PROG_LN_S()
 AC_PROG_MAKE_SET()
 AC_PROG_F90()
+
+# -------------------------------------------------------------
+# Check perl to see if we do the scripts
+# -------------------------------------------------------------
+AC_SUBST(POD2MAN)
+AC_ARG_VAR(PERLINTERP, [Command to run Perl interpreter])
+AC_ARG_VAR(POD2MAN, [Command to convert POD format files to UNIX man format])
+AX_SYS_PERLSHARPBANG()
+PERL=$PERLINTERP
+AC_PROG_PERL_VERSION(5.0.6, CONFIG_PERL=yes, CONFIG_PERL=no)
+AC_PROG_PERL_MODULES(Date::Manip, CONFIG_PERL_DATEMANIP=yes, CONFIG_PERL_DATEMANIP=no)
+AM_CONDITIONAL(CONFIG_PERL,[test x"$CONFIG_PERL" = xyes])
+AM_CONDITIONAL(CONFIG_PERL_DATEMANIP,[test x"$CONFIG_PERL_DATEMANIP" = xyes])
+
+if test x"$CONFIG_PERL" = xyes ; then
+    AC_PATH_PROG(POD2MAN,pod2man,pod2man)
+fi
 
 # -------------------------------------------------------------
 # check some command line options
@@ -53,4 +70,5 @@ LIBS="$LIBS $F90LIBS"
 
 AC_CONFIG_SUBDIRS(time_series)
 AC_OUTPUT(Makefile)
+AC_OUTPUT(scripts/Makefile)
 

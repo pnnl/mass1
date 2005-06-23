@@ -1,3 +1,13 @@
+2005-06-23  William A. Perkins  <william.perkins@pnl.gov>
+
+	* configure.in: perform several perl tests for scripts
+
+	* scripts/Makefile.am (Module): added script configuration
+
+	* scripts/mass1bc.in (Module): reworked from mass1bc.pl
+
+	* scripts/mass1profile.in (Module): copied from doprofile.pl
+
 2005-06-10  William A. Perkins  <william.perkins@pnl.gov>
 
 	* read_hotstart.f90 (read_hotstart): cannot use open_existing()

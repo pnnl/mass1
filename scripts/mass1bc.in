@@ -1,4 +1,4 @@
-#! /usr/unsupported/gnu/bin/perl
+#!@PERL@
 # -*- cperl -*-
 # -------------------------------------------------------------
 # file: mass1bc.pl
@@ -13,7 +13,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October  4, 1999 by William A. Perkins
-# Last Change: Tue Mar  7 09:23:28 2000 by William A. Perkins <perk@gehenna.pnl.gov>
+# Last Change: Thu Jun 23 07:09:45 2005 by William A. Perkins <perk@McPerk.local>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -43,6 +43,8 @@ as a MASS1 or MASS2 boundary condition file.  The the field is
 specified using the B<-f> option with the name of the field, for
 example C<temp> for temperature.  The B<-l> option will list available
 fields.
+
+This script is part of the @PACKAGE@ distribution (Version @VERSION@)
 
 =head1 OPTIONS
 

@@ -1,0 +1,542 @@
+#!@PERL@
+# -*- cperl -*-
+# -------------------------------------------------------------
+# file: mass1profile.pl
+# -------------------------------------------------------------
+# -------------------------------------------------------------
+# Battelle Memorial Institute
+# Pacific Northwest Laboratory
+# -------------------------------------------------------------
+# -------------------------------------------------------------
+# Created April 13, 1998 by 
+# Last Change: Thu Jun 23 07:09:50 2005 by William A. Perkins <perk@McPerk.local>
+# -------------------------------------------------------------
+
+# RCS ID: $Id$
+
+# -------------------------------------------------------------
+# documentation
+# -------------------------------------------------------------
+=pod
+
+=head1 NAME
+
+mass1profile - process MASS1 profile files and compute statistics
+
+=head1 SYNOPSIS
+
+perl B<doprofile.pl> 
+
+=head1 DESCRIPTION
+
+This script is used to do statistical analyses on profiles produced by MASS1. 
+
+This script has primarily been used when profiles are dumped at daily
+intervals from MASS1.  The statistical analyses would probably not be
+relevant otherwise.
+
+This script is part of the @PACKAGE@ distribution (Version @VERSION@)
+
+=head2 Operation Modes
+
+=over 4
+
+=item B<By Rivermile>
+
+Statistics are computed at each rivermile, and reported by rivermile.
+
+=item B<At a Single Rivermile>
+
+Statistics are computed for each day of the year (1 through 366) at
+the specified rivermile.
+
+=item B<For a Single Day>
+
+Statistics are computed for each rivermile, but only for those values
+which fall in the day of year specified.
+
+=item B<For a Single Month>
+
+Statistics are computed for each rivermile, but only for those values
+which fall in the month specified.
+
+=back
+
+=head2 Field Names
+
+=over 4
+
+=item I<wselev>
+
+water surface elevation,
+
+=item I<disch>
+
+discharge,
+
+=item I<vel>
+
+average cross section velocity,
+
+=item I<depth>
+
+cross section hydraulic depth,
+
+=item I<conc>
+
+contaminent concentration, and 
+
+=item I<temp>
+
+temperature.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-v>
+
+if included B<doprofile.pl> will produce a message on standard error
+noting which profile time plane is being read
+
+=item B<-f>  I<field_name>
+
+selects the profile field for which statistics are computed (see
+L<Field Names> above)
+
+=item B<-X> I<file>
+
+=item B<-r> I<rivermile>
+
+select a single rivermile for which statistics are computed, producing
+a table of statistics for each day of the year
+
+=item B<-d> I<day>
+
+select a single day of year for which statistics are computed,
+producing a table of statistics for each rivermile
+
+=back
+
+=head1 INTERNALS
+
+=over 4
+
+=item Perl Modules Required
+
+L<Getopt::Std;>, L<Date::Manip>
+
+=back
+
+=cut
+
+# -------------------------------------------------------------
+# Required Modules
+# -------------------------------------------------------------
+use strict;
+use Getopt::Std;
+use Date::Manip;
+
+# -------------------------------------------------------------
+#  variable initialization
+# -------------------------------------------------------------
+my $program;
+($program = $0) =~ s/.*[\/\\]//;
+my $usage;
+$usage = 
+  "usage: ${program} [-r rm | -d day | -l value ] [-L value] [-v] [-f fld] [-X date_list_file] [-o output] [file]";
+
+                                # initialize Date::Manip 
+
+Date::Manip::Date_Init("TZ=PST");
+
+                                # this will hold the data for which
+                                # statistics are computed
+
+my $profiledat = {};
+
+                                # fields in profile file
+
+my $fldind = 
+{
+  rm => 3, wselev => 4, disch => 5, vel => 6,
+  depth => 7, conc => 8, temp => 9, sat => 10,
+  press => 11, thalweg => 12, area => 13, twidth => 14
+};
+
+                                # percentiles to compute
+
+my @percentiles = (0.0, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 1.00);
+
+                                # choices are: byrm, onedate,
+                                # startlevel, endlevel, onerm, and one
+                                # profile
+
+my $mode = 'byrm'; 
+
+                                # operation mode variables
+
+my $verbose = 0;
+my $field = $fldind->{temp};
+my $xdatelist = undef;
+my $dorm = undef;
+my $dodate = undef;
+my $domonth = undef;
+my $dolevel = undef;
+my $dolevelcnt;
+
+my $default_level_cnt = 7;
+
+# -------------------------------------------------------------
+# sub ReadDateList
+#
+# This routine reads, from a file, a list of date ranges.  Each line
+# of the file contains 4 fields: start date, start time, end date, end
+# time.  The fields need to be readable by Date::Manip::ParseDate.  If
+# all of the ranges are read successfully, a reference to an array is
+# returned, otherwise undef is returned.
+# -------------------------------------------------------------
+sub ReadDateList {
+  my $fname = shift;
+  my $dl = [];
+  my $cnt = 0;
+  
+  unless (open(IN, "<$fname")) {
+    printf(STDERR "${main::program}: error: unable to open file \"%s\" for reading\n", 
+           $fname);
+    return undef;
+  }
+
+  
+  while (<IN>) {
+    my @fld = split;
+    my $start = Date::Manip::ParseDate($fld[0] . $fld[1]);
+    my $end = Date::Manip::ParseDate($fld[2] . $fld[3]);
+    if (! $start) {
+      printf(STDERR "${main::program}: error: unable to parse date: $start\n");
+      return undef;
+    }
+    if (! $end) {
+      printf(STDERR "${main::program}: error: unable to parse date: $end\n");
+      return undef;
+    }
+    push(@{$dl}, [ $start, $end ]);
+  }
+
+  close(IN);
+  return $dl;
+}
+
+# -------------------------------------------------------------
+# EndOfYear
+# This routine determines if the specified date is the last day of the
+# year.
+# -------------------------------------------------------------
+sub EndOfYear {
+  my $date = shift;             # a parsed date
+  my $year = Date::Manip::UnixDate($date, "%Y") + 0.0;
+  my $day = Date::Manip::UnixDate($date, "%j") + 0.0;
+
+  if (Date::Manip::Date_LeapYear($year)) {
+    return ($day == 366);
+  } 
+  return ($day == 365);
+}
+
+
+# -------------------------------------------------------------
+# DateGood
+# This routine looks for the passed date in the date list ranges. If
+# the date falls in any of the ranges, undef is returned.
+# -------------------------------------------------------------
+sub DateGood {
+  my $date = shift;             # a parsed date
+  my $dl = shift;               # built by ReadDateList
+  my $i;
+
+  foreach $i (@{$dl}) {
+    my $date1 = $i->[0];
+    my $date2 = $i->[1];
+    if (($date ge $date1) and ($date le $date2) ) {
+      return 0;
+    }
+  }
+
+  return 1;
+}
+# -------------------------------------------------------------
+# handle command line
+# -------------------------------------------------------------
+my %opts = ();
+die "$usage\n" unless getopts("vf:o:r:X:d:m:l:L:n:x:", \%opts);
+
+$verbose = 1 if ($opts{v});
+
+if ($opts{r}) {
+  $dorm = $opts{r};
+  $mode = 'onerm';
+} elsif ($opts{d}) {
+  my $tmpdate;
+  my $tmpdatestr = $opts{d};
+  if (! ($tmpdate = Date::Manip::ParseDate($tmpdatestr))) {
+    printf(STDERR 
+           "$program: error: selected date \"%s\" for -d not understood\n", 
+           $tmpdatestr);
+    die "$usage\n";
+  } 
+  $dodate = Date::Manip::UnixDate($tmpdate, "%j");
+  $mode = 'onedate';
+} elsif ($opts{l}) {
+  $dolevel = $opts{l};
+  $mode = 'startlevel';
+} elsif ($opts{L}) {
+  $dolevel = $opts{L};
+  $mode = 'endlevel';
+} elsif ($opts{x}) {
+  my $tmpdate;
+  my $tmpdatestr = $opts{x};
+  if (! ($tmpdate = Date::Manip::ParseDate($tmpdatestr))) {
+    printf(STDERR 
+           "$program: error: selected date \"%s\" for -x not understood\n", 
+           $tmpdatestr);
+    die "$usage\n";
+  } 
+  $dodate = Date::Manip::UnixDate($tmpdate, "%q");
+  $mode = 'oneprofile';
+} elsif ($opts{m}) {
+  $domonth = $opts{m};
+  if ($domonth <= 0 || $domonth > 12) {
+    printf(STDERR 
+           "$program: error: month number \"%s\" for -m not understood\n", 
+           $opts{m});
+    die "$usage\n";
+  }
+  $mode = 'onemonth';
+} else {
+  $mode = 'byrm';
+}
+
+if ($opts{n}) {
+  $dolevelcnt = $opts{n};
+} else {
+  $dolevelcnt = $default_level_cnt;
+}
+
+if ($opts{o}) {
+  my $name = $opts{o};
+  unless (open(OUTPUT, ">$name")) {
+    printf(STDERR "$program: error: unable to open file \"%s\" for writing\n", 
+           $name);
+    die "$usage\n";
+  }
+} else {
+  unless (open(OUTPUT, ">&STDOUT")) {
+    die "$program: error: Unable to dup STDOUT\n";
+  }
+}
+
+if ($opts{X}) {
+  my $name = $opts{X};
+  $xdatelist = ReadDateList($name);
+  unless($xdatelist) {
+    printf(STDERR "$program: error: error reading exclude date list in \"$name\"\n");
+    die "$usage\n";
+  }
+} else {
+  $xdatelist = [];
+}
+
+if ($opts{f}) {
+  my $test = $opts{f};
+  my $found = 0;
+  foreach (keys %{$fldind}) {
+    if ($_ eq $test) {
+      $field = $fldind->{$test};
+      $found = 1;
+      last;
+    }
+  }
+  if (! $found) {
+    printf(STDERR "$program: error: specified field (-f %s) not understood\n", $test);
+    die "$usage\n";
+  }
+}
+
+# -------------------------------------------------------------
+# main program
+# -------------------------------------------------------------
+
+my $rm;
+my $date = 0;
+my $jdate;
+my $lastdate = 0;
+my $datestr;
+my $dategood = undef;
+my $year = undef;
+my $lastyear = undef;
+my $endofyear = undef;
+my $levelcnt = undef;
+my $leveldone = undef;
+my $levelendcnt = undef;
+
+while (<>) {
+  chop;
+  if (/Date:\s+(\d\d)-(\d\d)-(\d\d\d\d)\s+Time:\s+(\d\d):(\d\d):(\d\d)/) {
+
+    # handle the date and decide if we are interested in this date or
+    # not
+
+    $datestr = "$1/$2/$3 $4:$5:$6";
+    $lastdate = $jdate;
+    $date = Date::Manip::ParseDate($datestr);
+    $endofyear = EndOfYear($date);
+    $jdate = Date::Manip::UnixDate($date, "%j") + 0.0;
+    $dategood = DateGood($date, $xdatelist);
+
+    $year = Date::Manip::UnixDate($date, "%Y") + 0.0;
+    if ($year != $lastyear) {
+      $levelcnt = undef;
+      $levelendcnt = undef;
+      $leveldone = undef;
+      $lastyear = $year;
+    }
+
+    if ($mode eq 'onedate') {
+      $dategood = ($dategood && ($jdate == $dodate));
+    } elsif ($mode eq 'oneprofile') {
+      $dategood = ($dodate eq Date::Manip::UnixDate($date, "%q"));
+    } elsif ($mode eq 'onemonth') {
+      $dategood = ($domonth == Date::Manip::UnixDate($date, "%m") + 0);
+    } elsif ($mode eq 'startlevel' && $levelcnt ) {
+      my $test = 1;
+      my $i;
+      foreach $i (keys %{$levelcnt}) {
+        $test = ($test && (scalar(@{$levelcnt->{$i}}) > $dolevelcnt));
+      }
+      $leveldone = $test;
+      $dategood = ($dategood && not $leveldone);
+    } elsif ($mode eq 'endlevel' && $levelendcnt) {
+      my $test = 1;
+      my $i;
+      foreach $i (keys %{$levelendcnt}) {
+        $test = ($test && (scalar(@{$levelendcnt->{$i}}) > $dolevelcnt));
+      }
+      $leveldone = $test;
+      $dategood = ($dategood && not $leveldone);
+    }
+
+    if ($dategood) {
+      print STDERR "Processing $datestr   \r" if ($verbose);
+    } else {
+      print STDERR "Skipping   $datestr   \r" if ($verbose);
+    }
+  } elsif (/^\s+\d+\s+\d+/ && ($jdate ne $lastdate) && $dategood) {
+    my @fld = split;
+
+    $rm = $fld[$fldind->{rm}];
+    if ($mode eq 'byrm' || $mode eq 'onedate' || $mode eq 'onemonth') {
+      if (!defined($profiledat->{$rm})) {
+        $profiledat->{$rm} = [];
+      }
+      push(@{$profiledat->{$rm}}, $fld[$field]);
+    } elsif ($mode eq 'onerm') {
+      if ($rm == $dorm) {
+        if (!defined($profiledat->{$jdate})) {
+          $profiledat->{$jdate} = [];
+        }
+        push(@{$profiledat->{$jdate}}, $fld[$field]);
+      }
+    } elsif ($mode eq 'startlevel' || $mode eq 'endlevel') {
+      $levelcnt = {} unless ($levelcnt);
+      $levelcnt->{$rm} = [] unless ($levelcnt->{$rm});
+      $levelendcnt = {} unless ($levelendcnt);
+      $levelendcnt->{$rm} = [] unless ($levelendcnt->{$rm});
+
+      if ($fld[$field] >= $dolevel) {
+        my $last;
+
+        if ($last  = $levelcnt->{$rm}->[scalar(@{$levelcnt->{$rm}}) - 1]) {
+          if ($last - $jdate > 1) {
+            $levelcnt->{$rm} = [];
+          }
+        }
+
+        push(@{$levelcnt->{$rm}}, $jdate);
+
+        if ($mode eq 'startlevel' &&
+            scalar(@{$levelcnt->{$rm}}) == $dolevelcnt) {
+          if (!defined($profiledat->{$rm})) {
+            $profiledat->{$rm} = [];
+          }
+          push(@{$profiledat->{$rm}}, 
+               @{$levelcnt->{$rm}}->[scalar(@{$levelcnt->{$rm}}) - 1]);
+        }
+      } elsif ($mode eq 'endlevel' && 
+               $fld[$field] < $dolevel && 
+               (scalar(@{$levelcnt->{$rm}}) >= $dolevelcnt ||
+                ($endofyear))) {
+        
+        my $last;
+
+        if ($last  = $levelendcnt->{$rm}->[scalar(@{$levelendcnt->{$rm}}) - 1]) {
+          if ($last - $jdate > 1) {
+            $levelendcnt->{$rm} = [];
+          }
+        }
+
+        push(@{$levelendcnt->{$rm}}, $jdate) unless ($endofyear);
+
+        if (scalar(@{$levelendcnt->{$rm}}) == $dolevelcnt ||
+            ($endofyear && scalar(@{$levelendcnt->{$rm}}) > 0)) {
+          if (!defined($profiledat->{$rm})) {
+            $profiledat->{$rm} = [];
+          }
+          push(@{$profiledat->{$rm}}, 
+               @{$levelendcnt->{$rm}}->[0]);
+        }
+        
+      }
+    } elsif ($mode eq 'oneprofile') {
+      die "This should not happen!\n";
+    } else {
+      die "This should not happen!\n";
+    }
+  }
+}
+print STDERR "\n" if ($verbose);
+
+my $outkey;
+
+foreach $outkey (sort {$a <=> $b} keys %{$profiledat}) {
+  my @lst = sort {$a <=> $b} @{$profiledat->{$outkey}};
+  my $cnt = scalar(@lst);
+  my $p;
+  
+  if ($mode eq 'startlevel' || $mode eq 'endlevel') {
+    printf(OUTPUT "%10.2f%10.2f%12d", $outkey, $dolevel, $cnt);
+  } else {
+    printf(OUTPUT "%10.2f%12d", $outkey, $cnt);
+  }
+  
+  foreach $p (@percentiles) {
+    my $i = int((1.0 - $p)*($cnt - 1) + 0.5);
+    $i = 0 if ($i < 0);
+    $i = $cnt - 1 if ($i > $cnt - 1);
+    printf(OUTPUT "%12.2f", $lst[$i]);
+  }
+
+  my $sum = 0.0;
+  my $sum2 = 0.0;
+  foreach $p (@lst) {
+    $sum += $p;
+    $sum2 += $p**2;
+  }
+  printf(OUTPUT "%12.2f", $sum/$cnt); # mean
+  printf(OUTPUT "%12.2f", sqrt($sum2/$cnt - ($sum/$cnt)**2)); # std. dev.
+  printf(OUTPUT "\n");
+}
+
+
+

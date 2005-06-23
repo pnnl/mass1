@@ -1,4 +1,15 @@
 # -*- makefile -*----------------------------------------------
+# -------------------------------------------------------------
+# file: Makefile.am
+# -------------------------------------------------------------
+# -------------------------------------------------------------
+# Battelle Memorial Institute
+# Pacific Northwest Laboratory
+# -------------------------------------------------------------
+# -------------------------------------------------------------
+# Created June 23, 2005 by William A. Perkins
+# Last Change: Thu Jun 23 08:03:09 2005 by William A. Perkins <perk@McPerk.local>
+# -------------------------------------------------------------
 # RCS ID: $Id$
 
 AM_FFLAGS = $(FCFLAGS)
@@ -102,5 +113,5 @@ EXTRA_DIST = \
 	makefile.sun \
 	mass1_v082.dsp \
 	mass1_v082.dsw \
-	mass1_v082.mak \
-	scripts/mass1bc.pl 
+	mass1_v082.mak
+
