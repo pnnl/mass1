@@ -244,10 +244,11 @@ DO WHILE(run)
                                 ! update time step here so correct
                                 ! time is placed in output
 
-	model_time = model_time + time_step
+    ! model_time = model_time + time_step
+	time_step_count = time_step_count + 1    
+	model_time = time_begin + time_step_count*time_step
 	time = model_time/time_mult
 	IF(model_time >= (time_end)) run = .false.
-	time_step_count = time_step_count + 1    
 
 	CALL decimal_to_date(time, date_string, time_string)
 	WRITE(*,1020)date_string,time_string

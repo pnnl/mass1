@@ -1,3 +1,7 @@
+2005-07-20  William A. Perkins  <william.perkins@pnl.gov>
+
+	* mass1.f90 (mass1): fix model time increments
+
 2005-06-23  William A. Perkins  <william.perkins@pnl.gov>
 
 	* configure.in: perform several perl tests for scripts
