@@ -1,0 +1,41 @@
+% -------------------------------------------------------------
+% file: pictures.tex
+% -------------------------------------------------------------
+% -------------------------------------------------------------
+% Battelle Memorial Institute
+% Pacific Northwest Laboratory
+% -------------------------------------------------------------
+% -------------------------------------------------------------
+% Created July 19, 2005 by William A. Perkins
+% Last Change: Tue Jul 19 12:04:28 2005 by William A. Perkins <perk@McPerk.pnl.gov>
+% -------------------------------------------------------------
+
+% SCCS ID: $Id$ Battelle PNL
+\documentclass[pdftex,11pt,notes=hide]{beamer}
+
+\usepackage{beamerthemeplain}
+\usepackage{times}
+\usepackage{graphicx}
+
+\hypersetup{pdfpagemode=None}
+
+\begin{document}
+
+\frame{
+  \frametitle{Lower Granite Dam}
+  \begin{columns}
+    \begin{column}{0.475\textwidth}
+      \centering
+      Discharge
+      \colorbox{white}{\pgfimage[width=\textwidth]{../LWG-scatter-QTL}}
+    \end{column}
+    \begin{column}{0.475\textwidth}
+      \centering
+      Forebay Stage
+      \colorbox{white}{\pgfimage[width=\textwidth]{../LWG-scatter-FBE}}
+    \end{column}
+  \end{columns}
+  
+}
+
+\end{document}
