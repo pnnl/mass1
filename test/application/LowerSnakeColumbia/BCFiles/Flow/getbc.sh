@@ -26,7 +26,7 @@ if [ -z "$PGDATABASE" ]; then
 fi
 
 dams="DWR LWG LGS LMN IHR MCN JDA TDA BON"
-dams="JDA"
+dams="DWR"
 start="01/01/1998"
 end="06/02/2005"
 
