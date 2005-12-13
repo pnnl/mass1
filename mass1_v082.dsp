@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE F90 /include:"mass1_v0/" /compile_only /nologo /warn:nofileopt
-# ADD F90 /real_size:64 /include:"Release/" /compile_only /nologo /warn:nofileopt
+# ADD F90 /real_size:64 /include:"Release/" /include:"time_series/Release/" /compile_only /nologo /warn:nofileopt
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -65,7 +65,7 @@ LINK32=link.exe
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE F90 /include:"mass1_v1/" /compile_only /nologo /debug:full /optimize:0 /warn:nofileopt
-# ADD F90 /real_size:64 /include:"Debug/" /compile_only /nologo /debug:full /optimize:0 /warn:nofileopt
+# ADD F90 /real_size:64 /include:"Debug/" /include:"time_series/Debug" /compile_only /nologo /debug:full /optimize:0 /warn:nofileopt
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -99,7 +99,7 @@ NODEP_F90_ACCUM=\
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_ACCUM=\
+DEP_F90_ACCUM=\
 	".\Debug\gas_functions.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\
@@ -110,6 +110,9 @@ NODEP_F90_ACCUM=\
 	
 
 !ENDIF 
+
+F90_MODOUT=\
+	"accumulator"
 
 # End Source File
 # Begin Source File
@@ -131,7 +134,7 @@ NODEP_F90_ARRAY=\
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_ARRAY=\
+DEP_F90_ARRAY=\
 	".\Debug\flow_coeffs.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\hydro_output_module.mod"\
@@ -163,7 +166,7 @@ NODEP_F90_ARRAY_=\
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_ARRAY_=\
+DEP_F90_ARRAY_=\
 	".\Debug\flow_coeffs.mod"\
 	".\Debug\hydro_output_module.mod"\
 	".\Debug\link_vars.mod"\
@@ -189,51 +192,9 @@ NODEP_F90_COEFF=\
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_COEFF=\
+DEP_F90_COEFF=\
 	".\Debug\fluvial_coeffs.mod"\
 	".\Debug\general_vars.mod"\
-	
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\date_to_decimal.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
-NODEP_F90_DATE_=\
-	".\Release\date_vars.mod"\
-	".\Release\julian.mod"\
-	
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-NODEP_F90_DATE_=\
-	".\Debug\date_vars.mod"\
-	".\Debug\julian.mod"\
-	
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\decimal_to_date.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
-NODEP_F90_DECIM=\
-	".\Release\date_vars.mod"\
-	".\Release\julian.mod"\
-	
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-NODEP_F90_DECIM=\
-	".\Debug\date_vars.mod"\
-	".\Debug\julian.mod"\
 	
 
 !ENDIF 
@@ -249,24 +210,8 @@ SOURCE=.\energy_flux_module.f90
 
 !ENDIF 
 
-# End Source File
-# Begin Source File
-
-SOURCE=.\file_manager.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
-NODEP_F90_FILE_=\
-	".\Release\file_vars.mod"\
-	
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-NODEP_F90_FILE_=\
-	".\Debug\file_vars.mod"\
-	
-
-!ENDIF 
+F90_MODOUT=\
+	"energy_flux"
 
 # End Source File
 # Begin Source File
@@ -286,7 +231,7 @@ NODEP_F90_FLOW_=\
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_FLOW_=\
+DEP_F90_FLOW_=\
 	".\Debug\flow_coeffs.mod"\
 	".\Debug\fluvial_coeffs.mod"\
 	".\Debug\general_vars.mod"\
@@ -304,7 +249,7 @@ SOURCE=.\gage_output.f90
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-NODEP_F90_GAGE_=\
+DEP_F90_GAGE_=\
 	".\Release\accumulator.mod"\
 	".\Release\date_vars.mod"\
 	".\Release\file_vars.mod"\
@@ -317,11 +262,13 @@ NODEP_F90_GAGE_=\
 	".\Release\point_vars.mod"\
 	".\Release\scalars.mod"\
 	".\Release\transport_vars.mod"\
+	".\time_series\Release\date_time.mod"\
+	".\time_series\Release\utility.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_GAGE_=\
+DEP_F90_GAGE_=\
 	".\Debug\accumulator.mod"\
 	".\Debug\date_vars.mod"\
 	".\Debug\file_vars.mod"\
@@ -334,6 +281,8 @@ NODEP_F90_GAGE_=\
 	".\Debug\point_vars.mod"\
 	".\Debug\scalars.mod"\
 	".\Debug\transport_vars.mod"\
+	".\time_series\Debug\date_time.mod"\
+	".\time_series\Debug\utility.mod"\
 	
 
 !ENDIF 
@@ -349,6 +298,9 @@ SOURCE=.\gas_coeffs_module.f90
 
 !ENDIF 
 
+F90_MODOUT=\
+	"gas_coeffs"
+
 # End Source File
 # Begin Source File
 
@@ -362,36 +314,14 @@ NODEP_F90_GAS_F=\
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_GAS_F=\
+DEP_F90_GAS_F=\
 	".\Debug\gas_coeffs.mod"\
 	
 
 !ENDIF 
 
-# End Source File
-# Begin Source File
-
-SOURCE=.\general_data.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
-NODEP_F90_GENER=\
-	".\Release\file_vars.mod"\
-	".\Release\general_vars.mod"\
-	".\Release\logicals.mod"\
-	".\Release\section_vars.mod"\
-	
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
-
-NODEP_F90_GENER=\
-	".\Debug\file_vars.mod"\
-	".\Debug\general_vars.mod"\
-	".\Debug\logicals.mod"\
-	".\Debug\section_vars.mod"\
-	
-
-!ENDIF 
+F90_MODOUT=\
+	"gas_functions"
 
 # End Source File
 # Begin Source File
@@ -400,22 +330,26 @@ SOURCE=.\hydro_bc.f90
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-NODEP_F90_HYDRO=\
+DEP_F90_HYDRO=\
 	".\Release\date_vars.mod"\
 	".\Release\file_vars.mod"\
 	".\Release\general_vars.mod"\
 	".\Release\linkbc_vars.mod"\
 	".\Release\logicals.mod"\
+	".\time_series\Release\date_time.mod"\
+	".\time_series\Release\utility.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_HYDRO=\
+DEP_F90_HYDRO=\
 	".\Debug\date_vars.mod"\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\linkbc_vars.mod"\
 	".\Debug\logicals.mod"\
+	".\time_series\Debug\date_time.mod"\
+	".\time_series\Debug\utility.mod"\
 	
 
 !ENDIF 
@@ -436,7 +370,7 @@ NODEP_F90_HYDRO_=\
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_HYDRO_=\
+DEP_F90_HYDRO_=\
 	".\Debug\gas_functions.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\
@@ -445,6 +379,9 @@ NODEP_F90_HYDRO_=\
 
 !ENDIF 
 
+F90_MODOUT=\
+	"hydro_output_module"
+
 # End Source File
 # Begin Source File
 
@@ -452,7 +389,7 @@ SOURCE=.\initial_cond.f90
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-NODEP_F90_INITI=\
+DEP_F90_INITI=\
 	".\Release\file_vars.mod"\
 	".\Release\general_vars.mod"\
 	".\Release\link_vars.mod"\
@@ -460,11 +397,12 @@ NODEP_F90_INITI=\
 	".\Release\point_vars.mod"\
 	".\Release\scalars.mod"\
 	".\Release\transport_vars.mod"\
+	".\time_series\Release\utility.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_INITI=\
+DEP_F90_INITI=\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\
@@ -472,18 +410,8 @@ NODEP_F90_INITI=\
 	".\Debug\point_vars.mod"\
 	".\Debug\scalars.mod"\
 	".\Debug\transport_vars.mod"\
+	".\time_series\Debug\utility.mod"\
 	
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\julian.f90
-
-!IF  "$(CFG)" == "mass1_v082 - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
 !ENDIF 
 
@@ -503,7 +431,7 @@ NODEP_F90_KICK_=\
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_KICK_=\
+DEP_F90_KICK_=\
 	".\Debug\date_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\
@@ -519,24 +447,28 @@ SOURCE=.\latflow_bc.f90
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-NODEP_F90_LATFL=\
+DEP_F90_LATFL=\
 	".\Release\date_vars.mod"\
 	".\Release\file_vars.mod"\
 	".\Release\general_vars.mod"\
 	".\Release\link_vars.mod"\
 	".\Release\linkbc_vars.mod"\
 	".\Release\logicals.mod"\
+	".\time_series\Release\date_time.mod"\
+	".\time_series\Release\utility.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_LATFL=\
+DEP_F90_LATFL=\
 	".\Debug\date_vars.mod"\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\
 	".\Debug\linkbc_vars.mod"\
 	".\Debug\logicals.mod"\
+	".\time_series\Debug\date_time.mod"\
+	".\time_series\Debug\utility.mod"\
 	
 
 !ENDIF 
@@ -552,24 +484,28 @@ SOURCE=.\link_bc.f90
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-NODEP_F90_LINK_=\
+DEP_F90_LINK_=\
 	".\Release\date_vars.mod"\
 	".\Release\file_vars.mod"\
 	".\Release\general_vars.mod"\
 	".\Release\link_vars.mod"\
 	".\Release\linkbc_vars.mod"\
 	".\Release\logicals.mod"\
+	".\time_series\Release\date_time.mod"\
+	".\time_series\Release\utility.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_LINK_=\
+DEP_F90_LINK_=\
 	".\Debug\date_vars.mod"\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\
 	".\Debug\linkbc_vars.mod"\
 	".\Debug\logicals.mod"\
+	".\time_series\Debug\date_time.mod"\
+	".\time_series\Debug\utility.mod"\
 	
 
 !ENDIF 
@@ -581,20 +517,22 @@ SOURCE=.\link_data.f90
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-NODEP_F90_LINK_D=\
+DEP_F90_LINK_D=\
 	".\Release\file_vars.mod"\
 	".\Release\general_vars.mod"\
 	".\Release\link_vars.mod"\
 	".\Release\logicals.mod"\
+	".\time_series\Release\utility.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_LINK_D=\
+DEP_F90_LINK_D=\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\
 	".\Debug\logicals.mod"\
+	".\time_series\Debug\utility.mod"\
 	
 
 !ENDIF 
@@ -606,7 +544,7 @@ SOURCE=.\mass1.f90
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-NODEP_F90_MASS1=\
+DEP_F90_MASS1=\
 	".\Release\accumulator.mod"\
 	".\Release\date_vars.mod"\
 	".\Release\file_vars.mod"\
@@ -619,11 +557,13 @@ NODEP_F90_MASS1=\
 	".\Release\scalars.mod"\
 	".\Release\section_vars.mod"\
 	".\Release\tdg_equation_coeff.mod"\
+	".\time_series\Release\date_time.mod"\
+	".\time_series\Release\utility.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_MASS1=\
+DEP_F90_MASS1=\
 	".\Debug\accumulator.mod"\
 	".\Debug\date_vars.mod"\
 	".\Debug\file_vars.mod"\
@@ -636,6 +576,8 @@ NODEP_F90_MASS1=\
 	".\Debug\scalars.mod"\
 	".\Debug\section_vars.mod"\
 	".\Debug\tdg_equation_coeff.mod"\
+	".\time_series\Debug\date_time.mod"\
+	".\time_series\Debug\utility.mod"\
 	
 
 !ENDIF 
@@ -647,19 +589,26 @@ SOURCE=.\met_data_module.f90
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-NODEP_F90_MET_D=\
+DEP_F90_MET_D=\
 	".\Release\date_vars.mod"\
 	".\Release\logicals.mod"\
+	".\time_series\Release\date_time.mod"\
+	".\time_series\Release\utility.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_MET_D=\
+DEP_F90_MET_D=\
 	".\Debug\date_vars.mod"\
 	".\Debug\logicals.mod"\
+	".\time_series\Debug\date_time.mod"\
+	".\time_series\Debug\utility.mod"\
 	
 
 !ENDIF 
+
+F90_MODOUT=\
+	"met_data_module"
 
 # End Source File
 # Begin Source File
@@ -671,6 +620,19 @@ SOURCE=.\modules.f90
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
 !ENDIF 
+
+F90_MODOUT=\
+	"general_vars" \
+	"date_vars" \
+	"logicals" \
+	"file_vars" \
+	"linkbc_vars" \
+	"link_vars" \
+	"point_vars" \
+	"section_vars" \
+	"flow_coeffs" \
+	"fluvial_coeffs" \
+	"transport_vars"
 
 # End Source File
 # Begin Source File
@@ -688,7 +650,7 @@ NODEP_F90_NONFL=\
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_NONFL=\
+DEP_F90_NONFL=\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\
 	".\Debug\pidlink.mod"\
@@ -704,23 +666,28 @@ SOURCE=.\pidlink.f90
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-NODEP_F90_PIDLI=\
+DEP_F90_PIDLI=\
 	".\Release\date_vars.mod"\
 	".\Release\general_vars.mod"\
 	".\Release\link_vars.mod"\
 	".\Release\point_vars.mod"\
+	".\time_series\Release\utility.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_PIDLI=\
+DEP_F90_PIDLI=\
 	".\Debug\date_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\
 	".\Debug\point_vars.mod"\
+	".\time_series\Debug\utility.mod"\
 	
 
 !ENDIF 
+
+F90_MODOUT=\
+	"pidlink"
 
 # End Source File
 # Begin Source File
@@ -729,7 +696,7 @@ SOURCE=.\point_data.f90
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-NODEP_F90_POINT=\
+DEP_F90_POINT=\
 	".\Release\file_vars.mod"\
 	".\Release\general_vars.mod"\
 	".\Release\link_vars.mod"\
@@ -737,11 +704,12 @@ NODEP_F90_POINT=\
 	".\Release\point_vars.mod"\
 	".\Release\section_vars.mod"\
 	".\Release\transport_vars.mod"\
+	".\time_series\Release\utility.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_POINT=\
+DEP_F90_POINT=\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\
@@ -749,6 +717,7 @@ NODEP_F90_POINT=\
 	".\Debug\point_vars.mod"\
 	".\Debug\section_vars.mod"\
 	".\Debug\transport_vars.mod"\
+	".\time_series\Debug\utility.mod"\
 	
 
 !ENDIF 
@@ -760,7 +729,7 @@ SOURCE=.\print_output.f90
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-NODEP_F90_PRINT=\
+DEP_F90_PRINT=\
 	".\Release\date_vars.mod"\
 	".\Release\file_vars.mod"\
 	".\Release\gas_functions.mod"\
@@ -773,11 +742,12 @@ NODEP_F90_PRINT=\
 	".\Release\scalars.mod"\
 	".\Release\section_vars.mod"\
 	".\Release\transport_vars.mod"\
+	".\time_series\Release\date_time.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_PRINT=\
+DEP_F90_PRINT=\
 	".\Debug\date_vars.mod"\
 	".\Debug\file_vars.mod"\
 	".\Debug\gas_functions.mod"\
@@ -790,6 +760,7 @@ NODEP_F90_PRINT=\
 	".\Debug\scalars.mod"\
 	".\Debug\section_vars.mod"\
 	".\Debug\transport_vars.mod"\
+	".\time_series\Debug\date_time.mod"\
 	
 
 !ENDIF 
@@ -801,7 +772,7 @@ SOURCE=.\profile_output.f90
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-NODEP_F90_PROFI=\
+DEP_F90_PROFI=\
 	".\Release\accumulator.mod"\
 	".\Release\date_vars.mod"\
 	".\Release\file_vars.mod"\
@@ -813,11 +784,12 @@ NODEP_F90_PROFI=\
 	".\Release\point_vars.mod"\
 	".\Release\scalars.mod"\
 	".\Release\transport_vars.mod"\
+	".\time_series\Release\date_time.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_PROFI=\
+DEP_F90_PROFI=\
 	".\Debug\accumulator.mod"\
 	".\Debug\date_vars.mod"\
 	".\Debug\file_vars.mod"\
@@ -829,9 +801,13 @@ NODEP_F90_PROFI=\
 	".\Debug\point_vars.mod"\
 	".\Debug\scalars.mod"\
 	".\Debug\transport_vars.mod"\
+	".\time_series\Debug\date_time.mod"\
 	
 
 !ENDIF 
+
+F90_MODOUT=\
+	"profile_output_module"
 
 # End Source File
 # Begin Source File
@@ -840,24 +816,26 @@ SOURCE=.\read_config.f90
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-NODEP_F90_READ_=\
+DEP_F90_READ_=\
 	".\Release\date_vars.mod"\
 	".\Release\file_vars.mod"\
 	".\Release\general_vars.mod"\
 	".\Release\logicals.mod"\
 	".\Release\point_vars.mod"\
 	".\Release\section_vars.mod"\
+	".\time_series\Release\utility.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_READ_=\
+DEP_F90_READ_=\
 	".\Debug\date_vars.mod"\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\logicals.mod"\
 	".\Debug\point_vars.mod"\
 	".\Debug\section_vars.mod"\
+	".\time_series\Debug\utility.mod"\
 	
 
 !ENDIF 
@@ -869,7 +847,7 @@ SOURCE=.\read_hotstart.f90
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-NODEP_F90_READ_H=\
+DEP_F90_READ_H=\
 	".\Release\file_vars.mod"\
 	".\Release\general_vars.mod"\
 	".\Release\link_vars.mod"\
@@ -877,11 +855,12 @@ NODEP_F90_READ_H=\
 	".\Release\point_vars.mod"\
 	".\Release\scalars.mod"\
 	".\Release\transport_vars.mod"\
+	".\time_series\Release\utility.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_READ_H=\
+DEP_F90_READ_H=\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\
@@ -889,6 +868,7 @@ NODEP_F90_READ_H=\
 	".\Debug\point_vars.mod"\
 	".\Debug\scalars.mod"\
 	".\Debug\transport_vars.mod"\
+	".\time_series\Debug\utility.mod"\
 	
 
 !ENDIF 
@@ -916,7 +896,7 @@ NODEP_F90_SCALA=\
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_SCALA=\
+DEP_F90_SCALA=\
 	".\Debug\energy_flux.mod"\
 	".\Debug\gas_functions.mod"\
 	".\Debug\general_vars.mod"\
@@ -931,6 +911,9 @@ NODEP_F90_SCALA=\
 	
 
 !ENDIF 
+
+F90_MODOUT=\
+	"scalars"
 
 # End Source File
 # Begin Source File
@@ -947,7 +930,7 @@ NODEP_F90_SECTI=\
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_SECTI=\
+DEP_F90_SECTI=\
 	".\Debug\general_vars.mod"\
 	".\Debug\point_vars.mod"\
 	".\Debug\section_vars.mod"\
@@ -962,20 +945,22 @@ SOURCE=.\section_data.f90
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-NODEP_F90_SECTIO=\
+DEP_F90_SECTIO=\
 	".\Release\file_vars.mod"\
 	".\Release\general_vars.mod"\
 	".\Release\logicals.mod"\
 	".\Release\section_vars.mod"\
+	".\time_series\Release\utility.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_SECTIO=\
+DEP_F90_SECTIO=\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\logicals.mod"\
 	".\Debug\section_vars.mod"\
+	".\time_series\Debug\utility.mod"\
 	
 
 !ENDIF 
@@ -994,7 +979,7 @@ NODEP_F90_SECTION=\
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_SECTION=\
+DEP_F90_SECTION=\
 	".\Debug\logicals.mod"\
 	".\Debug\section_vars.mod"\
 	
@@ -1019,7 +1004,7 @@ NODEP_F90_TABLE=\
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_TABLE=\
+DEP_F90_TABLE=\
 	".\Debug\general_vars.mod"\
 	".\Debug\linkbc_vars.mod"\
 	
@@ -1033,19 +1018,24 @@ SOURCE=.\tdg_equation_coeff.f90
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-NODEP_F90_TDG_E=\
+DEP_F90_TDG_E=\
 	".\Release\file_vars.mod"\
 	".\Release\logicals.mod"\
+	".\time_series\Release\utility.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_TDG_E=\
+DEP_F90_TDG_E=\
 	".\Debug\file_vars.mod"\
 	".\Debug\logicals.mod"\
+	".\time_series\Debug\utility.mod"\
 	
 
 !ENDIF 
+
+F90_MODOUT=\
+	"tdg_equation_coeff"
 
 # End Source File
 # Begin Source File
@@ -1054,22 +1044,26 @@ SOURCE=.\trans_bc.f90
 
 !IF  "$(CFG)" == "mass1_v082 - Win32 Release"
 
-NODEP_F90_TRANS=\
+DEP_F90_TRANS=\
 	".\Release\date_vars.mod"\
 	".\Release\file_vars.mod"\
 	".\Release\general_vars.mod"\
 	".\Release\linkbc_vars.mod"\
 	".\Release\logicals.mod"\
+	".\time_series\Release\date_time.mod"\
+	".\time_series\Release\utility.mod"\
 	
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_TRANS=\
+DEP_F90_TRANS=\
 	".\Debug\date_vars.mod"\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\linkbc_vars.mod"\
 	".\Debug\logicals.mod"\
+	".\time_series\Debug\date_time.mod"\
+	".\time_series\Debug\utility.mod"\
 	
 
 !ENDIF 
@@ -1092,7 +1086,7 @@ NODEP_F90_WRITE=\
 
 !ELSEIF  "$(CFG)" == "mass1_v082 - Win32 Debug"
 
-NODEP_F90_WRITE=\
+DEP_F90_WRITE=\
 	".\Debug\file_vars.mod"\
 	".\Debug\general_vars.mod"\
 	".\Debug\link_vars.mod"\

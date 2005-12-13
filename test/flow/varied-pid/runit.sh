@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Wed Oct 17 10:46:23 2001 by William A. Perkins <perk@gehenna.pnl.gov>
+# Last Change: Mon Dec 12 09:29:33 2005 by William A. Perkins <d3g096@r101243.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -21,9 +21,10 @@ TRAP_FPE='INVALID=ABORT(1);UNDERFL=ZERO;OVERFL=ABORT(1);INT_OVERFL=ABORT(1);DIVZ
 export TRAP_FPE
 
 model=${MODEL-../../../mass1_v084}
+gnuplot=${GNUPLOT:gnuplot}
 
 cp mass1-warmup.cfg mass1.cfg
-$model > /dev/null
+$model 
 
 
 case=0
@@ -69,7 +70,7 @@ while [ $case -lt 4 ]; do
         mass1-run.cfg > mass1.cfg
     $model > /dev/null
     sed -e 's/@TITLE@/MASS1 with Regular Dam Link\\n'"$title"/ plot.gp | \
-        gnuplot > plot-$code-clamp.ps
+        $gnuplot > plot-$code-clamp.ps
 
                                 # then run the case with a PID link
     
@@ -78,7 +79,7 @@ while [ $case -lt 4 ]; do
         mass1-run.cfg > mass1.cfg
     $model > /dev/null
     sed -e 's/@TITLE@/MASS1 with PID Dam Link\\n'"$title"/ plot.gp | \
-        gnuplot > plot-$code.ps
+        $gnuplot > plot-$code.ps
     
 done
 

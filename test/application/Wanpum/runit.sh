@@ -17,7 +17,7 @@
 # links.  Each of the cases use observed from July 2000.  
 
 pwd=`pwd`
-model=${MODEL-$pwd../../mass1_v084}
+model=${MODEL-$pwd/../../mass1_v084}
 
 subdir=" \
     Rampdown \
