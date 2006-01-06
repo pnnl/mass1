@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Thu Mar 16 08:10:00 2000 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Fri Jan  6 14:27:26 2006 by William A. Perkins <perk@McPerk.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -20,7 +20,7 @@ set -e
 TRAP_FPE='INVALID=ABORT(1);UNDERFL=ZERO;OVERFL=ABORT(1);INT_OVERFL=ABORT(1);DIVZERO=ABORT(1);DEBUG'
 export TRAP_FPE
 
-model=${MODEL-../../../mass1_v084}
+model=${MODEL-../../../mass1}
 
 touch nolatinflow
 
@@ -39,9 +39,9 @@ rm -f mass1.cfg
     load \"plot.gp\"\; ) | \
         gnuplot > plot-Cn=0.1.ps
 (echo \
-    set terminal postscript eps color solid \"Helvetica\" 14\; \
+    set terminal postscript eps color solid \"Helvetica\" 22\; \
     set title \"Advection: Courant Number = 0.1\"\; \
-    load \"plot.gp\"\; ) | \
+    set size 1,1.25\; load \"plot.gp\"\; ) | \
         gnuplot > plot-Cn=0.1.eps
 
 (echo \
@@ -50,7 +50,7 @@ rm -f mass1.cfg
     load \"mass-plot.gp\"\; ) | \
         gnuplot > mass-plot-Cn=0.1.ps
 (echo \
-    set terminal postscript eps color solid \"Helvetica\" 14\; \
+    set terminal postscript eps color solid \"Helvetica\" 22\; \
     set title \"Advection: Courant Number = 0.1\"\; \
     load \"mass-plot.gp\"\; ) | \
         gnuplot > mass-plot-Cn=0.1.eps
@@ -65,9 +65,9 @@ rm -f mass1.cfg
     'load "plot.gp";' ) | \
         gnuplot > plot-Cn=1.0.ps
 (echo \
-    'set terminal postscript eps color solid "Helvetica" 14;' \
+    'set terminal postscript eps color solid "Helvetica" 22;' \
     'set title "Advection: Courant Number = 1.0";' \
-    'load "plot.gp";' ) | \
+    'set size 1,1.25; load "plot.gp";' ) | \
         gnuplot > plot-Cn=1.0.eps
 
 (echo \
@@ -76,8 +76,8 @@ rm -f mass1.cfg
     'load "mass-plot.gp";' ) | \
         gnuplot > mass-plot-Cn=1.0.ps
 (echo \
-    'set terminal postscript eps color solid "Helvetica" 14;' \
+    'set terminal postscript eps color solid "Helvetica" 22;' \
     'set title "Advection: Courant Number = 1.0";' \
-    'load "mass-plot.gp";' ) | \
+    'set size 1,1.25; load "mass-plot.gp";' ) | \
         gnuplot > mass-plot-Cn=1.0.eps
 

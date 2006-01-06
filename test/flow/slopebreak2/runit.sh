@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Tue Mar  7 22:11:39 2000 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Fri Jan  6 14:04:13 2006 by William A. Perkins <perk@McPerk.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -29,7 +29,7 @@ $model
     load \"plot.gp\"\; ) | \
         gnuplot > plot.ps
 (echo \
-    set terminal postscript eps color solid \"Helvetica\" 14 \; \
+    set terminal postscript eps color solid \"Helvetica\" 22 \; \
     load \"plot.gp\"\; ) | \
         gnuplot > plot.eps
 
@@ -38,7 +38,7 @@ $model
     load \"plot-elev.gp\"\; ) | \
         gnuplot > plot-elev.ps
 (echo \
-    set terminal postscript eps color solid \"Helvetica\" 14 \; \
+    set terminal postscript eps color solid \"Helvetica\" 22 \; \
     load \"plot-elev.gp\"\; ) | \
         gnuplot > plot-elev.eps
 

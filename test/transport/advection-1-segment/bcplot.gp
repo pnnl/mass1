@@ -7,11 +7,11 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 14, 1999 by William A. Perkins
-# Last Change: Tue Dec 14 16:25:16 1999 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Fri Jan  6 14:33:40 2006 by William A. Perkins <perk@McPerk.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
-set term postscript eps color dashed "Helvetica" 14
+set term postscript eps color dashed "Helvetica" 22
 set output 'bcplot.eps'
 
 set xdata time

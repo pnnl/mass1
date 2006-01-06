@@ -7,7 +7,7 @@
 % -------------------------------------------------------------
 % -------------------------------------------------------------
 % Created December 13, 1999 by William A. Perkins
-% Last Change: Thu Jan  5 08:27:58 2006 by William A. Perkins <perk@McPerk.pnl.gov>
+% Last Change: Fri Jan  6 14:34:16 2006 by William A. Perkins <perk@McPerk.pnl.gov>
 % -------------------------------------------------------------
 \documentclass[12pt,dvips,letterpaper]{article}
 
@@ -21,7 +21,7 @@
 \usepackage[figuresright]{rotating}
 \usepackage{color}
 
-\title{MASS1 Test Applications}
+\title{MASS1 Validation Applications}
 
 \begin{document}
 
@@ -30,8 +30,9 @@
 \tableofcontents{}
 % \appendix{}
 
+\vspace{0.5in}
 
-This section presents a series of simple tests that are used to check
+This document presents a series of simple tests that are used to check
 the operation of MASS1. All necessary boundary condition and
 configuration files are incorporated into the MASS1 source
 repository, and so are distributed with the source.  These tests
@@ -43,8 +44,29 @@ check the basic functions of  MASS1: hydrodynamics
 \label{sec:hydro-tests}
 
 
-\subsection{Normal Flow}
+\subsection{Uniform Flow in a Rectangular Channel}
 \label{sec:normal-flow}
+
+This test was used to verify that MASS2 was able simulate 
+subcritical uniform open channel flow and does so with multiple
+computational mesh blocks.  The model was configured to simulate a
+rectangular channel 3048~m (10,000~ft) long and 152.4~m (500~ft) wide
+(Figure~\ref{fig:normal-channel}).  A normal depth of 1.524~m
+(5.0~ft), an average velocity of 0.61~m/sec (2.0~ft/sec), and a Manning's
+roughness coefficient of 0.026 were chosen.  The slope of the channel
+required to produce these given conditions was predicted with
+Manning's equation \citep{Chow59}:
+\begin{displaymath}
+  S_{o} = \left[ { V n } \over { d^{2 \over 3} } \right]^{2} ~ 
+  = ~ 1.425 \times 10^{-4} ~ \textrm{m} \slash \textrm{m}
+\end{displaymath}
+Note that the bottom slope was computed using depth rather than
+wetted perimeter.  This is consistent with the representation of
+bottom friction in MASS2 (Section~\ref{sec:hydrodynamics-theory}),
+where sidewall friction is not included.  The normal depth was applied
+as the downstream boundary condition. A discharge of 141.6~m$^{3}$/sec
+(5000 cfs) was applied at the upstream boundary.
+
 
 This is a simple test in which MASS1 simulates normal flow conditions
 in a simple channel.  The configuration consists of a single channel
@@ -70,24 +92,63 @@ with a depth of 5.0 feet, the normal depth, everywhere.
 \begin{figure}[htbp]
   \begin{center}
     \input{channel.pstex_t}
-    \caption{Channel configuration used in the normal flow test.}
+    \caption{Channel configuration used for the uniform flow in a
+      rectangular channel test.}
     \label{fig:normal-flow-channel}
   \end{center}
 \end{figure}
 \begin{figure}[htbp]
+  \centering
+  \includegraphics[width=3.0in]{../flow/normal/plot-elev.eps}
+  \includegraphics[width=3.0in]{../flow/normal/plot.eps}
+  \caption{Results of the uniform flow in a rectangular channel test
+    showing the initial elevation (top) and depth and those for the
+    final steady state conditions.}
+  \label{fig:normal-flow-results}
+\end{figure}
+
+\subsection{Gradually Varied Flow in a Rectangular Channel}
+\label{sec:subcr-norm-flow}
+
+\emph{NOTE: these use multiple links.}
+
+In this test, the channel used in Section~\ref{sec:normal-flow} was
+extended to double its length in two ways
+(Figure~\ref{fig:normal-slopebreak}).  In case 1, the extension was
+placed downstream of the original channel.  The slope of this
+extension was made steeper than the original channel, $S_{o} = 1.4208
+\times 10^{-3}$, so that the expected flow would be subcritical, with a
+depth of 0.762~m (2.5~ft), a velocity of 1.22~m/sec (4~ft/sec), and
+a channel discharge of 141.6~m$^{3}$/sec (5000 cfs).  In case 2, the
+steeper extension was placed upstream of the original channel.
+
+\begin{figure}[tbph]
   \begin{center}
-    \includegraphics[width=4.5in]{../flow/normal/plot-elev.eps}
-    \includegraphics[width=4.5in]{../flow/normal/plot.eps}
-    \caption{Results of the normal flow test showing the initial
-      elevation (top) and depth and those for the final steady state
-      conditions.}
-    \label{fig:normal-flow-results}
+    \begin{tabular}[c]{m{3.0in}m{3.0in}}
+    \multicolumn{1}{c}{Case 1} & \multicolumn{1}{c}{Case 2} \\
+    \input{channel1.pstex_t} &    
+    \input{channel2.pstex_t} \\
+    \end{tabular}
+    \caption{Dimensions of channel used for the gradually varying flow
+      in a channel tests.}
+    \label{fig:normal-slopebreak}
   \end{center}
 \end{figure}
 
+MASS2 was configured to simulate each of these cases with a 200 by
+10-cell single-block grid.  The channel discharge was imposed as the upstream
+boundary condition and the expected normal depth was imposed as the
+downstream boundary condition.  The simulations were started with a
+constant depth and of 0.91~m (3.0~ft) a longitudinal velocity of
+0.061~m/sec (0.2~ft/sec).   
 
-\subsection{Gradually Varied Subcritical Flow in a Rectangular Channel}
-\label{sec:subcr-norm-flow}
+In both cases, normal depth in the downstream reach was simulated as
+expected (Figure~\ref{fig:slopebreak-depth}).  In case~2, the expected
+normal depth was also simulated in the upper reach. In case~1,
+however, the upper reach was not long enough to obtain normal depth to
+become established.  Instead, a classic M2 profile \citep{Chow59} was
+simulated where depth was in transition to the shallower downstream
+depth.  
 
 \begin{figure}[htbp]
   \centering
@@ -103,6 +164,67 @@ with a depth of 5.0 feet, the normal depth, everywhere.
   \label{fig:slopebreak-depth}
 \end{figure}
 
+
+\subsection{Varied Flow in a Rectangular Channel}
+\label{sec:vari-flow-rect}
+
+\cite{macdonald97:_analytic} presented analytic solutions to a set of
+gradually and rapidly open channel flow problems.  
+
+
+
+
+\subsection{Varied Flow in a Trapezoidal Channel}
+\label{sec:grad-vari-flow}
+
+\cite{macdonald97:_analytic} presented analytic solutions to a set of
+gradually and rapidly open channel flow problems.  Their test
+problem~3 considered subcritical flow in a channel with a varying
+bottom slope.  The channel was 5~km (3.1~miles) long with a Manning
+roughness coefficient of 0.030 and a trapezoidal section with a base
+width of 10~m (32.8~ft) and a 1:2 side slope.  The channel discharge
+was 20~m$^{3}$/sec (707.3~cfs) and the downstream depth was 1.125~m
+(3.69~ft).  The bottom slope was given by
+\begin{equation}
+  S_{o} ~ = ~ \left\{ 1 - { { 400 \left[ 10 + 4d(x) \right] } \over { g
+  \left[ 10 + 2d(x) \right]^{3} d(x)^{3} } } \right\} d'(x)
+  ~ + ~ 0.36 { { \left[ 10 + 2d(x)\sqrt{5} \right]^{4 \slash 3} } \over {
+  \left[ 10 + 2d(x) \right]^{10 \slash 3} d(x)^{10 \slash 3} } } \nonumber
+\end{equation}
+where slope, $S_{o}$, and hydraulic depth, $d(x)$, are functions of
+distance along the channel, $x$, and $g$ is gravitational
+acceleration.  The depth and its derivative is given by
+\begin{equation}
+  \label{eq:mac-3-d}
+  d(x) ~ = ~ \frac{9}{8} + \frac{1}{4} \sin \left(\frac{\pi x}{500}\right)
+\end{equation}
+and
+\begin{equation}
+  d'(x) ~ = ~ \frac{\pi}{2000} \cos \left(\frac{\pi x}{500}\right) \nonumber
+\end{equation}
+The solution to the problem is given by equation~\ref{eq:mac-3-d}.
+MASS2 was configured to simulate this problem using a 2500 by 24 cell
+grid that was 18~m (59.1~ft) wide.  This grid would allow depths up to
+2~m without exceeding the top of trapezoidal section. The dry and
+rewetting depths used were very small: $1.52 \times 10^{-3}$~m
+(0.005~ft) and $1.83 \times 10^{-3}$~m (0.006~ft), respectively.
+
+Depths simulated by MASS2 were consistent with, but slightly lower
+than, the analytic solution (Figure~\ref{fig:macdonald-3-results}).
+This is probably due to the representation of friction in MASS2.
+MASS2 friction is based on the bed area projected to a horizontal
+plane, whereas the analytic solution uses the wetted perimeter.
+Consequently, friction on the sides of the trapezoidal section was
+slightly underestimated.
+
+\begin{figure}[hbtp]
+  \centering
+  \includegraphics[width=3.0in]{../flow/MacDonald-3/plot-elev.eps}
+  \includegraphics[width=3.0in]{../flow/MacDonald-3/plot-depth.eps}  
+  \caption{Simulated water surface elevation and depth compared with the
+    analytic solution to problem~3 of \cite{macdonald97:_analytic}.}
+  \label{fig:macdonald-3-results}
+\end{figure}
 
 \subsection{Lateral Inflow and Outflow}
 \label{sec:test-lateral}
@@ -236,7 +358,7 @@ number, the pulse becomes smoothed due to numerical diffusion.
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[width=4.0in]{../transport/advection-1-segment/bcplot.eps}
+    \includegraphics[width=3.0in]{../transport/advection-1-segment/bcplot.eps}
     \caption{Upstream concentration boundary condition used for
       advection tests.} 
     \label{fig:test-advection-bc}
@@ -245,8 +367,8 @@ number, the pulse becomes smoothed due to numerical diffusion.
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[width=5.0in]{../transport/advection-1-segment/plot-Cn=1.0.eps}
-    \includegraphics[width=5.0in]{../transport/advection-1-segment/plot-Cn=0.1.eps}
+    \includegraphics[width=3.0in]{../transport/advection-1-segment/plot-Cn=1.0.eps}
+    \includegraphics[width=3.0in]{../transport/advection-1-segment/plot-Cn=0.1.eps}
     \caption{Results for the advection through a single link test;
       simulated concentration is compared to translations of the
       boundary condition.} 
@@ -254,21 +376,16 @@ number, the pulse becomes smoothed due to numerical diffusion.
   \end{center}
 \end{figure}
 
-% \clearpage{}
-
-% \subsection{Advection through Multiple Links}
-% \label{sec:test-advection-2-link}
-
-% \begin{figure}[htbp]
-%   \begin{center}
-%     \includegraphics[width=4.5in]{../transport/advection-2-segment/plot-Cn=1.0.eps}
-%     \includegraphics[width=4.5in]{../transport/advection-2-segment/plot-Cn=0.1.eps}
-%     \caption{Results for the test of advection through multiple links;
-%       simulated concentration is compared to translations of the upstream
-%       boundary condition.}
-%     \label{fig:test-advection-2-results}
-%   \end{center}
-% \end{figure}
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=3.0in]{../transport/advection-2-segment/plot-Cn=1.0.eps}
+    \includegraphics[width=3.0in]{../transport/advection-2-segment/plot-Cn=0.1.eps}
+    \caption{Results for the test of advection through multiple links;
+      simulated concentration is compared to translations of the upstream
+      boundary condition.}
+    \label{fig:test-advection-2-results}
+  \end{center}
+\end{figure}
 
 % \clearpage{}
 
@@ -313,20 +430,15 @@ times, and compares it to (\ref{eq:2}).
 \end{figure}
 
 
-% \subsection{Advection and Diffusion through a Multiple Links}
-% \label{sec:test-advection-diffusion-2-link}
-
-% \begin{figure}[htbp]
-%   \begin{center}
-%     \includegraphics[width=4.5in]{../transport/advection-diffusion-2-segment/plot-Cn=1.0.eps}
-%     \includegraphics[width=4.5in]{../transport/advection-diffusion-2-segment/plot-Cn=0.1.eps}
-%     \caption{Results for the test of advective diffusion through multiple links;
-%       simulated concentration is compared to an analytical solution.}
-%     \label{fig:test-advection-diffusion-2-results}
-%   \end{center}
-% \end{figure}
-
-% \clearpage{}
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=4.5in]{../transport/advection-diffusion-2-segment/plot-Cn=1.0.eps}
+    \includegraphics[width=4.5in]{../transport/advection-diffusion-2-segment/plot-Cn=0.1.eps}
+    \caption{Results for the test of advective diffusion through multiple links;
+      simulated concentration is compared to an analytical solution.}
+    \label{fig:test-advection-diffusion-2-results}
+  \end{center}
+\end{figure}
 
 
 \subsection{Transport with Lateral Inflow/Outflow}
@@ -389,6 +501,9 @@ Figure~\ref{fig:test-tranport-lateral-outflow}.
 %     \label{fig:test-tranport-lateral-vary}
 %   \end{center}
 % \end{figure}
+
+\bibliographystyle{pnnl}
+\bibliography{mass1test}
 
 
 \end{document}
