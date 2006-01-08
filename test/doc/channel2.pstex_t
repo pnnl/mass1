@@ -1,0 +1,33 @@
+\begin{picture}(0,0)%
+\includegraphics{channel2.pstex}%
+\end{picture}%
+\setlength{\unitlength}{868sp}%
+%
+\begingroup\makeatletter\ifx\SetFigFont\undefined%
+\gdef\SetFigFont#1#2#3#4#5{%
+  \reset@font\fontsize{#1}{#2pt}%
+  \fontfamily{#3}\fontseries{#4}\fontshape{#5}%
+  \selectfont}%
+\fi\endgroup%
+\begin{picture}(15750,9022)(2326,-10561)
+\put(13801,-10561){\makebox(0,0)[b]{\smash{\SetFigFont{7}{8.4}{\rmdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}10000 ft}%
+}}}
+\put(18076,-8611){\makebox(0,0)[lb]{\smash{\SetFigFont{7}{8.4}{\rmdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}5.0 ft}%
+}}}
+\put(2326,-2011){\makebox(0,0)[rb]{\smash{\SetFigFont{7}{8.4}{\rmdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}2.5 ft}%
+}}}
+\put(2326,-5386){\makebox(0,0)[rb]{\smash{\SetFigFont{7}{8.4}{\rmdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}14.358 ft}%
+}}}
+\put(2401,-9136){\makebox(0,0)[rb]{\smash{\SetFigFont{7}{8.4}{\rmdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}1.425 ft}%
+}}}
+\put(15601,-9286){\makebox(0,0)[lb]{\smash{\SetFigFont{7}{8.4}{\rmdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$1.425 \times 10^{-4}$}%
+}}}
+\put(15076,-9061){\makebox(0,0)[b]{\smash{\SetFigFont{7}{8.4}{\rmdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}1}%
+}}}
+\put(7051,-7036){\makebox(0,0)[b]{\smash{\SetFigFont{7}{8.4}{\rmdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}1}%
+}}}
+\put(6376,-6436){\makebox(0,0)[rb]{\smash{\SetFigFont{7}{8.4}{\rmdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$1.4358 \times 10^{-3}$}%
+}}}
+\put(6076,-10561){\makebox(0,0)[b]{\smash{\SetFigFont{7}{8.4}{\rmdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}10000 ft}%
+}}}
+\end{picture}
