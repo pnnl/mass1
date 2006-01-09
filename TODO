@@ -9,7 +9,7 @@ Pacific Northwest Laboratory
 -------------------------------------------------------------
 -------------------------------------------------------------
 Created November  1, 1999 by William A. Perkins
-Last Change: Fri Mar  3 08:10:47 2000 by William A. Perkins <perk@charon.pnl.gov>
+Last Change: Thu Dec 29 07:39:38 2005 by William A. Perkins <perk@mcperktop.pnl.gov>
 -------------------------------------------------------------
 
 $Id$
@@ -19,6 +19,9 @@ High Priority:
     * BC and other tables: either (1) make sure that the beginning and
       ending dates are within the simulation, and crash if not, or (2)
       just use the first/last values before/after table start/end.
+
+    * Check transport at downstream boundary and at junctions under
+      reverse flow conditions.  
 
 Low Priority:
 
