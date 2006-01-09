@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Thu Jan  5 18:48:38 2006 by William A. Perkins <perk@mcperktop.local>
+# Last Change: Sun Jan  8 09:47:36 2006 by William A. Perkins <perk@mcperktop.local>
 # -------------------------------------------------------------
 # $Id$
 
@@ -29,7 +29,7 @@ $model
     load \"plot-depth.gp\"\; ) | \
         gnuplot > plot-depth.ps
 (echo \
-    set terminal postscript eps color solid \"Helvetica\" 14 \; \
+    set terminal postscript eps color solid \"Helvetica\" 22 \; \
     load \"plot-depth.gp\"\; ) | \
         gnuplot > plot-depth.eps
 
@@ -38,7 +38,7 @@ $model
     load \"plot-elev.gp\"\; ) | \
         gnuplot > plot-elev.ps
 (echo \
-    set terminal postscript eps color solid \"Helvetica\" 14 \; \
+    set terminal postscript eps color solid \"Helvetica\" 22 \; \
     load \"plot-elev.gp\"\; ) | \
         gnuplot > plot-elev.eps
 

@@ -7,7 +7,7 @@
 % -------------------------------------------------------------
 % -------------------------------------------------------------
 % Created December 13, 1999 by William A. Perkins
-% Last Change: Fri Jan  6 14:34:16 2006 by William A. Perkins <perk@McPerk.pnl.gov>
+% Last Change: Sun Jan  8 15:43:13 2006 by William A. Perkins <perk@mcperktop.local>
 % -------------------------------------------------------------
 \documentclass[12pt,dvips,letterpaper]{article}
 
@@ -36,7 +36,7 @@ This document presents a series of simple tests that are used to check
 the operation of MASS1. All necessary boundary condition and
 configuration files are incorporated into the MASS1 source
 repository, and so are distributed with the source.  These tests
-check the basic functions of  MASS1: hydrodynamics
+check the basic function of  MASS1 hydrodynamics
 (Section~\ref{sec:hydro-tests}) and contaminant transport
 (Section~\ref{sec:transport-tests}).  
 
@@ -47,47 +47,45 @@ check the basic functions of  MASS1: hydrodynamics
 \subsection{Uniform Flow in a Rectangular Channel}
 \label{sec:normal-flow}
 
-This test was used to verify that MASS2 was able simulate 
-subcritical uniform open channel flow and does so with multiple
-computational mesh blocks.  The model was configured to simulate a
-rectangular channel 3048~m (10,000~ft) long and 152.4~m (500~ft) wide
-(Figure~\ref{fig:normal-channel}).  A normal depth of 1.524~m
-(5.0~ft), an average velocity of 0.61~m/sec (2.0~ft/sec), and a Manning's
-roughness coefficient of 0.026 were chosen.  The slope of the channel
-required to produce these given conditions was predicted with
-Manning's equation \citep{Chow59}:
-\begin{displaymath}
-  S_{o} = \left[ { V n } \over { d^{2 \over 3} } \right]^{2} ~ 
-  = ~ 1.425 \times 10^{-4} ~ \textrm{m} \slash \textrm{m}
-\end{displaymath}
-Note that the bottom slope was computed using depth rather than
-wetted perimeter.  This is consistent with the representation of
-bottom friction in MASS2 (Section~\ref{sec:hydrodynamics-theory}),
-where sidewall friction is not included.  The normal depth was applied
-as the downstream boundary condition. A discharge of 141.6~m$^{3}$/sec
-(5000 cfs) was applied at the upstream boundary.
+%% This test was used to verify that MASS1 was able simulate 
+%% uniform open channel flow and does so with multiple
+%% computational mesh blocks.  The model was configured to simulate a
+%% rectangular channel 3048~m (10,000~ft) long and 152.4~m (500~ft) wide
+%% (Figure~\ref{fig:normal-channel}).  A normal depth of 1.524~m
+%% (5.0~ft), an average velocity of 0.61~m/sec (2.0~ft/sec), and a Manning's
+%% roughness coefficient of 0.026 were chosen.  The slope of the channel
+%% required to produce these given conditions was predicted with
+%% Manning's equation \citep{Chow59}:
+%% \begin{displaymath}
+%%   S_{o} = \left[ { V n } \over { d^{2 \over 3} } \right]^{2} ~ 
+%%   = ~ 1.425 \times 10^{-4} ~ \textrm{m} \slash \textrm{m}
+%% \end{displaymath}
+%% Note that the bottom slope was computed using depth rather than
+%% wetted perimeter.  This is consistent with the representation of
+%% bottom friction in MASS2 (Section~\ref{sec:hydrodynamics-theory}),
+%% where sidewall friction is not included.  The normal depth was applied
+%% as the downstream boundary condition. A discharge of 141.6~m$^{3}$/sec
+%% (5000 cfs) was applied at the upstream boundary.
 
 
 This is a simple test in which MASS1 simulates normal flow conditions
 in a simple channel.  The configuration consists of a single channel
-link having a constant rectangular cross section with the following
-dimensions (see also Figure:
-\begin{itemize}
-\item 10656 feet long;
-\item bottom width of 100.0 feet;
-\item 5.0 feet flow depth; and
-\item Manning's $n$ of 0.026.
-\end{itemize}
-A total of 75 cross sections were used, spaced 144 feet apart. If a
-velocity of 2.0 feet/second, corresponding to a flow of 1000.0 cfs, is
-assumed, the channel slope would be $1.672 \times 10^{-4}$ feet/foot,
-or a rise of 1.724 feet over the length of the channel.  
-
-The test results are shown in Figure~\ref{fig:normal-flow-results}.
-The initial elevation was set to 6.0 feet in the channel.  Boundary
-conditions were held flow of 1000 cfs upstream and held stage of 5.0
-feet downstream. After a short time, a steady flow was established
-with a depth of 5.0 feet, the normal depth, everywhere.  
+link 3248~m (10656~ft) long having a rectangular cross section 30.48~m
+(100~ft) wide.  A flow depth of 1.524~m (5.0~ft), average velocity of
+0.609~m/s (2.0~ft/s), and a Manning's $n$ of 0.026 were chosen.  The
+slope of the channel required to produce these conditions is given by
+Manning's equation \citep{Chow59}:
+\begin{displaymath}
+  S_{o} = \left[ { V n } \over { d^{2 \over 3} } \right]^{2} ~ 
+  = ~ 1.672 \times 10^{-4} ~ \textrm{m} \slash \textrm{m}
+\end{displaymath}
+or a rise of 1.782 feet over the length of the channel.  A total of 75
+cross sections were used, spaced 144 feet apart. The simulation
+results are shown in Figure~\ref{fig:normal-flow-results}.  The
+initial elevation was set to 6.0 feet in the channel.  Boundary
+conditions were a flow of 1000 cfs upstream and a stage of 5.0 feet
+downstream. After a short time, a steady flow was established with a
+depth of 5.0 feet, the normal depth, everywhere.
 
 \begin{figure}[htbp]
   \begin{center}
@@ -109,8 +107,6 @@ with a depth of 5.0 feet, the normal depth, everywhere.
 
 \subsection{Gradually Varied Flow in a Rectangular Channel}
 \label{sec:subcr-norm-flow}
-
-\emph{NOTE: these use multiple links.}
 
 In this test, the channel used in Section~\ref{sec:normal-flow} was
 extended to double its length in two ways
@@ -135,13 +131,6 @@ steeper extension was placed upstream of the original channel.
   \end{center}
 \end{figure}
 
-MASS2 was configured to simulate each of these cases with a 200 by
-10-cell single-block grid.  The channel discharge was imposed as the upstream
-boundary condition and the expected normal depth was imposed as the
-downstream boundary condition.  The simulations were started with a
-constant depth and of 0.91~m (3.0~ft) a longitudinal velocity of
-0.061~m/sec (0.2~ft/sec).   
-
 In both cases, normal depth in the downstream reach was simulated as
 expected (Figure~\ref{fig:slopebreak-depth}).  In case~2, the expected
 normal depth was also simulated in the upper reach. In case~1,
@@ -165,35 +154,67 @@ depth.
 \end{figure}
 
 
-\subsection{Varied Flow in a Rectangular Channel}
-\label{sec:vari-flow-rect}
+\subsection{Gradually Varied Flow in Prismatic Channels}
+\label{sec:macdonald-1}
 
 \cite{macdonald97:_analytic} presented analytic solutions to a set of
-gradually and rapidly open channel flow problems.  
+gradually and rapidly open channel flow problems.  MASS1 was
+configured to simulate the two problems involving subcritical flow: problems
+1 and 3. 
 
+For test problem 1, MASS1 was configured to simulate a
+rectangular channel 1000~m (3281~ft) long and 10~m (3.281~ft) wide
+having a slope computed according to
+\begin{equation}
+  S_{o}\left( x \right) ~ = ~ \left[ 1 - \frac{4}{g d^{3}(x)} \right]
+  d'\left( x \right) 
+  + ~ 0.36 \frac{\left[ 2 d(x) + 10 \right]^{4 \slash 3}}{\left[10
+  d(x) \right]^{10 \slash 3}} \nonumber  
+\end{equation}
+where slope, $S_{o}$, and depth, $d$, are functions of distance along
+the channel, $x$, and $g$ is gravitational acceleration.  The depth
+and its derivative is given by
+\begin{equation}
+  \label{eq:macdonald-1-depth}
+  d \left( x \right) ~ = ~ \left( \frac{4}{g} \right)^{1 \slash 3} \left\{ 1 +
+  \frac{1}{2} \exp \left[ -16 \left( \frac{x}{1000} - \frac{1}{2}
+  \right)^{2} \right] \right\} 
+\end{equation}
+and 
+\begin{equation}
+  d' \left( x \right) ~ = ~ - \left( \frac{4}{g} \right)^{1 \slash
+  3} \frac{2}{125} \left(  \frac{x}{1000} - \frac{1}{2} \right) \exp
+  \left[ -16 \left( \frac{x}{1000} - \frac{1}{2} 
+  \right)^{2} \right] \nonumber
+\end{equation}
+A single link with 101 cross sections was used resulting in a cross
+section spacing of 10~m (3.281~ft).  MASS1 was started with stage of
+7.62~m (25~ft). A discharge of 20~m$^{3}$/sec (707.3~cfs) was imposed
+at the upstream boundary and a stage of 0.748~m (2.45~ft) was imposed
+at the downstream boundary. The simulated steady-state depth was very
+close to the expected, as shown in Figure~\ref{fig:macdonald-1}.
 
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=3.0in]{../flow/MacDonald-1/plot-elev.eps}
+  \includegraphics[width=3.0in]{../flow/MacDonald-1/plot-depth.eps}
+  \caption{Simulated water surface elevation and depth compared with the
+    analytic solution to problem~3 of \cite{macdonald97:_analytic}.}
+  \label{fig:macdonald-1}
+\end{figure}
 
-
-\subsection{Varied Flow in a Trapezoidal Channel}
-\label{sec:grad-vari-flow}
-
-\cite{macdonald97:_analytic} presented analytic solutions to a set of
-gradually and rapidly open channel flow problems.  Their test
-problem~3 considered subcritical flow in a channel with a varying
-bottom slope.  The channel was 5~km (3.1~miles) long with a Manning
-roughness coefficient of 0.030 and a trapezoidal section with a base
-width of 10~m (32.8~ft) and a 1:2 side slope.  The channel discharge
-was 20~m$^{3}$/sec (707.3~cfs) and the downstream depth was 1.125~m
-(3.69~ft).  The bottom slope was given by
+For test problem 3, MASS1 was configured to simulate a channel 5~km
+(3.1~miles) long having a Manning roughness coefficient of 0.030 and a
+trapezoidal section with a base width of 10~m (32.8~ft) and a 1:2 side
+slope.  The channel discharge was 20~m$^{3}$/sec (707.3~cfs) and the
+downstream depth was 1.125~m (3.69~ft).  The bottom slope was given by
 \begin{equation}
   S_{o} ~ = ~ \left\{ 1 - { { 400 \left[ 10 + 4d(x) \right] } \over { g
   \left[ 10 + 2d(x) \right]^{3} d(x)^{3} } } \right\} d'(x)
   ~ + ~ 0.36 { { \left[ 10 + 2d(x)\sqrt{5} \right]^{4 \slash 3} } \over {
   \left[ 10 + 2d(x) \right]^{10 \slash 3} d(x)^{10 \slash 3} } } \nonumber
 \end{equation}
-where slope, $S_{o}$, and hydraulic depth, $d(x)$, are functions of
-distance along the channel, $x$, and $g$ is gravitational
-acceleration.  The depth and its derivative is given by
+where 
 \begin{equation}
   \label{eq:mac-3-d}
   d(x) ~ = ~ \frac{9}{8} + \frac{1}{4} \sin \left(\frac{\pi x}{500}\right)
@@ -203,19 +224,11 @@ and
   d'(x) ~ = ~ \frac{\pi}{2000} \cos \left(\frac{\pi x}{500}\right) \nonumber
 \end{equation}
 The solution to the problem is given by equation~\ref{eq:mac-3-d}.
-MASS2 was configured to simulate this problem using a 2500 by 24 cell
-grid that was 18~m (59.1~ft) wide.  This grid would allow depths up to
-2~m without exceeding the top of trapezoidal section. The dry and
-rewetting depths used were very small: $1.52 \times 10^{-3}$~m
-(0.005~ft) and $1.83 \times 10^{-3}$~m (0.006~ft), respectively.
+A single link with a cross section spacing of 25~m (82.0~ft) was
+used.  An initial stage of 
 
-Depths simulated by MASS2 were consistent with, but slightly lower
-than, the analytic solution (Figure~\ref{fig:macdonald-3-results}).
-This is probably due to the representation of friction in MASS2.
-MASS2 friction is based on the bed area projected to a horizontal
-plane, whereas the analytic solution uses the wetted perimeter.
-Consequently, friction on the sides of the trapezoidal section was
-slightly underestimated.
+Depths simulated by MASS1 were consistent with the analytic solution
+(Figure~\ref{fig:macdonald-3-results}).  
 
 \begin{figure}[hbtp]
   \centering
@@ -387,8 +400,6 @@ number, the pulse becomes smoothed due to numerical diffusion.
   \end{center}
 \end{figure}
 
-% \clearpage{}
-
 
 \subsection{Advective Diffusion}
 \label{sec:test-advection-diffusion-1-link}
@@ -421,8 +432,8 @@ times, and compares it to (\ref{eq:2}).
 
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[width=4.5in]{../transport/advection-diffusion-1-segment/plot-Cn=1.0.eps}
-    \includegraphics[width=4.5in]{../transport/advection-diffusion-1-segment/plot-Cn=0.1.eps}
+    \includegraphics[width=3.0in]{../transport/advection-diffusion-1-segment/plot-Cn=1.0.eps}
+    \includegraphics[width=3.0in]{../transport/advection-diffusion-1-segment/plot-Cn=0.1.eps}
     \caption{Results for the test of advective diffusion through a single link;
       simulated concentration is compared to an analytical solution.}
     \label{fig:test-advection-diffusion-1-results}

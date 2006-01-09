@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October 15, 2003 by William A. Perkins
-# Last Change: Thu Jan  5 20:13:06 2006 by William A. Perkins <perk@mcperktop.local>
+# Last Change: Sun Jan  8 09:07:46 2006 by William A. Perkins <perk@mcperktop.local>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -30,7 +30,7 @@ my $SS = 0.5;
 my $D = 2.0;
 my $W = $B + 2*$D/$SS;
 my $Z0 = 15.0;
-my $dx = 25.0;
+my $dx = 10.0;
 my $dy = 0.25;
 
 my $pi = atan2(1.0,1.0)*4.0;

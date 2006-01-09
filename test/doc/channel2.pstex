@@ -1,10 +1,10 @@
 %!PS-Adobe-2.0 EPSF-2.0
-%%Title: channel2.pstex
-%%Creator: fig2dev Version 3.2 Patchlevel 3d
-%%CreationDate: Fri Jan  2 12:40:53 2004
-%%For: perk@leechong ( William A. Perkins )
-%%BoundingBox: 0 0 208 120
-%%Magnification: 0.2200
+%%Title: channel2.fig
+%%Creator: fig2dev Version 3.2 Patchlevel 5-alpha5
+%%CreationDate: Sun Jan  8 15:36:48 2006
+%%For: perk@mcperktop.local (Bill Perkins)
+%%BoundingBox: 0 0 210 104
+%Magnification: 0.1900
 %%EndComments
 /MyAppDict 100 dict dup begin def
 /$F2psDict 200 dict def
@@ -46,8 +46,8 @@ $F2psDict /mtrx matrix put
 
 end
 save
-newpath 0 120 moveto 0 0 lineto 208 0 lineto 208 120 lineto closepath clip newpath
--30.7 150.5 translate
+newpath 0 104 moveto 0 0 lineto 210 0 lineto 210 104 lineto closepath clip newpath
+-8.6 130.1 translate
 1 -1 scale
 
 % This junk string is used by the show operators
@@ -137,7 +137,7 @@ newpath 0 120 moveto 0 0 lineto 208 0 lineto 208 120 lineto closepath clip newpa
   0 1 4 index length 2 sub {
 				% string proc char idx
     % Find the n+1th character in the string
-    3 index exch 1 add get	% string proe char char+1
+    3 index exch 1 add get	% string proc char char+1
     exch 2 copy			% strinq proc char+1 char char+1 char
     % Now show the nth character
     PATsstr dup 0 4 -1 roll put	% string proc chr+1 chr chr+1 (chr)
@@ -373,13 +373,10 @@ false PATredef
 /Multi 2 def
 /PaintData [
   { clippath } bind
-  { 32 32 true [ 32 0 0 -32 0 32 ]
-	{<808080804040404020202020101010100808080804040404
-	020202020101010180808080404040402020202010101010
-	080808080404040402020202010101018080808040404040
-	202020201010101008080808040404040202020201010101
-	808080804040404020202020101010100808080804040404
-	0202020201010101>}
+  { 20 20 true [ 20 0 0 -20 0 20 ]
+	{<8020004010002008001004000802000401000200
+	8001004000802000401080200040100020080010
+	0400080200040100020080010040008020004010>}
      imagemask } bind
 ] def
 /PaintProc {
@@ -421,70 +418,36 @@ end
   bind def
 /shd {dup dup currentrgbcolor 4 -2 roll mul 4 -2 roll mul
   4 -2 roll mul srgb} bind def
-/reencdict 12 dict def /ReEncode { reencdict begin
-/newcodesandnames exch def /newfontname exch def /basefontname exch def
-/basefontdict basefontname findfont def /newfont basefontdict maxlength dict def
-basefontdict { exch dup /FID ne { dup /Encoding eq
-{ exch dup length array copy newfont 3 1 roll put }
-{ exch newfont 3 1 roll put } ifelse } { pop pop } ifelse } forall
-newfont /FontName newfontname put newcodesandnames aload pop
-128 1 255 { newfont /Encoding get exch /.notdef put } for
-newcodesandnames length 2 idiv { newfont /Encoding get 3 1 roll put } repeat
-newfontname newfont definefont pop end } def
-/isovec [
-8#055 /minus 8#200 /grave 8#201 /acute 8#202 /circumflex 8#203 /tilde
-8#204 /macron 8#205 /breve 8#206 /dotaccent 8#207 /dieresis
-8#210 /ring 8#211 /cedilla 8#212 /hungarumlaut 8#213 /ogonek 8#214 /caron
-8#220 /dotlessi 8#230 /oe 8#231 /OE
-8#240 /space 8#241 /exclamdown 8#242 /cent 8#243 /sterling
-8#244 /currency 8#245 /yen 8#246 /brokenbar 8#247 /section 8#250 /dieresis
-8#251 /copyright 8#252 /ordfeminine 8#253 /guillemotleft 8#254 /logicalnot
-8#255 /hyphen 8#256 /registered 8#257 /macron 8#260 /degree 8#261 /plusminus
-8#262 /twosuperior 8#263 /threesuperior 8#264 /acute 8#265 /mu 8#266 /paragraph
-8#267 /periodcentered 8#270 /cedilla 8#271 /onesuperior 8#272 /ordmasculine
-8#273 /guillemotright 8#274 /onequarter 8#275 /onehalf
-8#276 /threequarters 8#277 /questiondown 8#300 /Agrave 8#301 /Aacute
-8#302 /Acircumflex 8#303 /Atilde 8#304 /Adieresis 8#305 /Aring
-8#306 /AE 8#307 /Ccedilla 8#310 /Egrave 8#311 /Eacute
-8#312 /Ecircumflex 8#313 /Edieresis 8#314 /Igrave 8#315 /Iacute
-8#316 /Icircumflex 8#317 /Idieresis 8#320 /Eth 8#321 /Ntilde 8#322 /Ograve
-8#323 /Oacute 8#324 /Ocircumflex 8#325 /Otilde 8#326 /Odieresis 8#327 /multiply
-8#330 /Oslash 8#331 /Ugrave 8#332 /Uacute 8#333 /Ucircumflex
-8#334 /Udieresis 8#335 /Yacute 8#336 /Thorn 8#337 /germandbls 8#340 /agrave
-8#341 /aacute 8#342 /acircumflex 8#343 /atilde 8#344 /adieresis 8#345 /aring
-8#346 /ae 8#347 /ccedilla 8#350 /egrave 8#351 /eacute
-8#352 /ecircumflex 8#353 /edieresis 8#354 /igrave 8#355 /iacute
-8#356 /icircumflex 8#357 /idieresis 8#360 /eth 8#361 /ntilde 8#362 /ograve
-8#363 /oacute 8#364 /ocircumflex 8#365 /otilde 8#366 /odieresis 8#367 /divide
-8#370 /oslash 8#371 /ugrave 8#372 /uacute 8#373 /ucircumflex
-8#374 /udieresis 8#375 /yacute 8#376 /thorn 8#377 /ydieresis] def
-/Times-Roman /Times-Roman-iso isovec ReEncode
 /$F2psBegin {$F2psDict begin /$F2psEnteredState save def} def
 /$F2psEnd {$F2psEnteredState restore end} def
 
 $F2psBegin
 10 setmiterlimit
- 0.01320 0.01320 sc
+0 slj 0 slc
+ 0.01140 0.01140 sc
 %
 % Fig objects follow
 %
+% 
+% here starts figure with depth 110
 % Polyline
-n 17400 10500 m 10200 9300 l 10200 9600 l 17400 10800 l
- cp gs /PC [[1.00 1.00 1.00] [0.00 0.00 0.00]] def
-15.00 15.00 sc P4 [16 0 0 -16 680.00 620.00] PATmp PATsp ef gr PATusp 
-% Polyline
+0 slj
+0 slc
+0.000 slw
 n 10202 9288 m 3000 3300 l 3000 3600 l 10202 9588 l
  cp gs /PC [[1.00 1.00 1.00] [0.00 0.00 0.00]] def
 15.00 15.00 sc P4 [16 0 0 -16 200.00 220.00] PATmp PATsp ef gr PATusp 
 % Polyline
-15.000 slw
-n 17400 10500 m
- 10200 9300 l gs col0 s gr 
+n 17400 10500 m 10200 9300 l 10200 9600 l 17400 10800 l
+ cp gs /PC [[1.00 1.00 1.00] [0.00 0.00 0.00]] def
+15.00 15.00 sc P4 [16 0 0 -16 680.00 620.00] PATmp PATsp ef gr PATusp 
+% here ends figure;
+% 
+% here starts figure with depth 100
 % Polyline
+0 slj
+0 slc
 7.500 slw
-n 16500 10500 m
- 2400 10500 l gs col0 s gr 
-% Polyline
 n 17400 10650 m
  17400 11100 l gs col0 s gr 
 % Polyline
@@ -492,16 +455,16 @@ n 10200 9450 m
  10200 11100 l gs col0 s gr 
 % Polyline
 gs  clippath
-10185 10980 m 10185 11070 l 10429 11070 l 10219 11025 l 10429 10980 l cp
-17415 11070 m 17415 10980 l 17171 10980 l 17381 11025 l 17171 11070 l cp
+10448 10980 m 10185 10980 l 10185 11070 l 10448 11070 l 10448 11070 l 10238 11025 l 10448 10980 l cp
+17152 11070 m 17415 11070 l 17415 10980 l 17152 10980 l 17152 10980 l 17362 11025 l 17152 11070 l cp
 eoclip
 n 17400 11025 m
  10200 11025 l gs col0 s gr gr
 
 % arrowhead
-n 17171 11070 m 17381 11025 l 17171 10980 l  col0 s
+n 17152 11070 m 17362 11025 l 17152 10980 l  col0 s
 % arrowhead
-n 10429 10980 m 10219 11025 l 10429 11070 l  col0 s
+n 10448 10980 m 10238 11025 l 10448 11070 l  col0 s
 % Polyline
 15.000 slw
 n 10200 9300 m
@@ -511,13 +474,13 @@ n 10200 8400 m
  3000 2400 l gs col0 s gr 
 % Polyline
 gs  clippath
-6780 6079 m 6892 5939 l 6435 5572 l 6789 5971 l 6322 5713 l cp
+6286 5684 m 6780 6079 l 6892 5939 l 6399 5543 l 6399 5543 l 6753 5942 l 6286 5684 l cp
 eoclip
 n 6825 6000 m
  5700 5100 l gs col0 s gr gr
 
 % arrowhead
-n 6322 5713 m 6789 5971 l 6435 5572 l 6461 5708 l 6322 5713 l 
+n 6286 5684 m 6753 5942 l 6399 5543 l 6425 5679 l 6286 5684 l 
  cp gs 0.00 setgray ef gr  col0 s
 % Polyline
 7.500 slw
@@ -528,16 +491,16 @@ n 18000 8400 m
  17550 8400 l gs col0 s gr 
 % Polyline
 gs  clippath
-17805 10515 m 17895 10515 l 17895 10271 l 17850 10481 l 17805 10271 l cp
-17895 8385 m 17805 8385 l 17805 8629 l 17850 8419 l 17895 8629 l cp
+17805 10252 m 17805 10515 l 17895 10515 l 17895 10252 l 17895 10252 l 17850 10462 l 17805 10252 l cp
+17895 8648 m 17895 8385 l 17805 8385 l 17805 8648 l 17805 8648 l 17850 8438 l 17895 8648 l cp
 eoclip
 n 17850 8400 m
  17850 10500 l gs col0 s gr gr
 
 % arrowhead
-n 17895 8629 m 17850 8419 l 17805 8629 l  col0 s
+n 17895 8648 m 17850 8438 l 17805 8648 l  col0 s
 % arrowhead
-n 17805 10271 m 17850 10481 l 17895 10271 l  col0 s
+n 17805 10252 m 17850 10462 l 17895 10252 l  col0 s
 % Polyline
 n 18000 10500 m
  17550 10500 l gs col0 s gr 
@@ -552,50 +515,50 @@ n 3000 3450 m
  3000 11100 l gs col0 s gr 
 % Polyline
 gs  clippath
-2505 10515 m 2595 10515 l 2595 10271 l 2550 10481 l 2505 10271 l cp
-2595 9285 m 2505 9285 l 2505 9529 l 2550 9319 l 2595 9529 l cp
+2505 10252 m 2505 10515 l 2595 10515 l 2595 10252 l 2595 10252 l 2550 10462 l 2505 10252 l cp
+2595 9548 m 2595 9285 l 2505 9285 l 2505 9548 l 2505 9548 l 2550 9338 l 2595 9548 l cp
 eoclip
 n 2550 9300 m
  2550 10500 l gs col0 s gr gr
 
 % arrowhead
-n 2595 9529 m 2550 9319 l 2505 9529 l  col0 s
+n 2595 9548 m 2550 9338 l 2505 9548 l  col0 s
 % arrowhead
-n 2505 10271 m 2550 10481 l 2595 10271 l  col0 s
+n 2505 10252 m 2550 10462 l 2595 10252 l  col0 s
 % Polyline
 gs  clippath
-2505 3315 m 2595 3315 l 2595 3071 l 2550 3281 l 2505 3071 l cp
-2595 2385 m 2505 2385 l 2505 2629 l 2550 2419 l 2595 2629 l cp
+2505 3052 m 2505 3315 l 2595 3315 l 2595 3052 l 2595 3052 l 2550 3262 l 2505 3052 l cp
+2595 2648 m 2595 2385 l 2505 2385 l 2505 2648 l 2505 2648 l 2550 2438 l 2595 2648 l cp
 eoclip
 n 2550 2400 m
  2550 3300 l gs col0 s gr gr
 
 % arrowhead
-n 2595 2629 m 2550 2419 l 2505 2629 l  col0 s
+n 2595 2648 m 2550 2438 l 2505 2648 l  col0 s
 % arrowhead
-n 2505 3071 m 2550 3281 l 2595 3071 l  col0 s
+n 2505 3052 m 2550 3262 l 2595 3052 l  col0 s
 % Polyline
 gs  clippath
-2505 9315 m 2595 9315 l 2595 9071 l 2550 9281 l 2505 9071 l cp
-2595 3285 m 2505 3285 l 2505 3529 l 2550 3319 l 2595 3529 l cp
+2505 9052 m 2505 9315 l 2595 9315 l 2595 9052 l 2595 9052 l 2550 9262 l 2505 9052 l cp
+2595 3548 m 2595 3285 l 2505 3285 l 2505 3548 l 2505 3548 l 2550 3338 l 2595 3548 l cp
 eoclip
 n 2550 3300 m
  2550 9300 l gs col0 s gr gr
 
 % arrowhead
-n 2595 3529 m 2550 3319 l 2505 3529 l  col0 s
+n 2595 3548 m 2550 3338 l 2505 3548 l  col0 s
 % arrowhead
-n 2505 9071 m 2550 9281 l 2595 9071 l  col0 s
+n 2505 9052 m 2550 9262 l 2595 9052 l  col0 s
 % Polyline
 15.000 slw
 gs  clippath
-14994 9052 m 15023 8874 l 14445 8777 l 14949 8953 l 14416 8955 l cp
+14370 8948 m 14994 9052 l 15023 8874 l 14399 8770 l 14399 8770 l 14903 8946 l 14370 8948 l cp
 eoclip
 n 14994 8961 m
  14094 8811 l gs col0 s gr gr
 
 % arrowhead
-n 14416 8955 m 14949 8953 l 14445 8777 l 14534 8883 l 14416 8955 l 
+n 14370 8948 m 14903 8946 l 14399 8770 l 14488 8876 l 14370 8948 l 
  cp gs 0.00 setgray ef gr  col0 s
 % Polyline
 7.500 slw
@@ -606,32 +569,43 @@ n 15525 10125 m 14625 9975 l 15525 9975 l
  cp gs col0 s gr 
 % Polyline
 gs  clippath
-2985 10980 m 2985 11070 l 3229 11070 l 3019 11025 l 3229 10980 l cp
-10215 11070 m 10215 10980 l 9971 10980 l 10181 11025 l 9971 11070 l cp
+3248 10980 m 2985 10980 l 2985 11070 l 3248 11070 l 3248 11070 l 3038 11025 l 3248 10980 l cp
+9952 11070 m 10215 11070 l 10215 10980 l 9952 10980 l 9952 10980 l 10162 11025 l 9952 11070 l cp
 eoclip
 n 10200 11025 m
  3000 11025 l gs col0 s gr gr
 
 % arrowhead
-n 9971 11070 m 10181 11025 l 9971 10980 l  col0 s
+n 9952 11070 m 10162 11025 l 9952 10980 l  col0 s
 % arrowhead
-n 3229 10980 m 3019 11025 l 3229 11070 l  col0 s
+n 3248 10980 m 3038 11025 l 3248 11070 l  col0 s
 % Polyline
 15.000 slw
 n 17400 8400 m
  10200 7200 l gs col0 s gr 
-/Times-Roman-iso ff 450.00 scf sf
+/Times-Roman ff 500.00 scf sf
 14700 7800 m
 gs 1 -1 sc  351.0 rot (Normal Depth Line) dup sw pop neg 0 rm  col0 sh gr
-/Times-Roman-iso ff 450.00 scf sf
+/Times-Roman ff 500.00 scf sf
 13800 8775 m
 gs 1 -1 sc  353.0 rot (velocity = 2.0 fps) dup sw pop neg 0 rm  col0 sh gr
-/Times-Roman-iso ff 450.00 scf sf
+/Times-Roman ff 500.00 scf sf
 6900 5400 m
 gs 1 -1 sc  322.0 rot (Normal Depth Line) dup sw pop neg 0 rm  col0 sh gr
-/Times-Roman-iso ff 450.00 scf sf
+/Times-Roman ff 500.00 scf sf
 5475 5025 m
 gs 1 -1 sc  322.0 rot (velocity = 4.0 fps) dup sw pop neg 0 rm  col0 sh gr
+% Polyline
+n 17400 10500 m
+ 10200 9300 l gs col0 s gr 
+% Polyline
+7.500 slw
+n 16500 10500 m
+ 2400 10500 l gs col0 s gr 
+% here ends figure;
 $F2psEnd
 rs
 end
+showpage
+%%Trailer
+%EOF
