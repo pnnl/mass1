@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created July  2, 1999 by William A. Perkins
-# Last Change: Wed Mar  8 09:36:34 2000 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Mon Jan  9 07:00:36 2006 by William A. Perkins <perk@McPerk.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -20,7 +20,7 @@ set -e
 TRAP_FPE='INVALID=ABORT(1);UNDERFL=ZERO;OVERFL=ABORT(1);INT_OVERFL=ABORT(1);DIVZERO=ABORT(1);DEBUG'
 export TRAP_FPE
 
-model=${MODEL-../../../mass1_v084}
+model=${MODEL-../../../mass1}
 
 rm -f mass1.cfg
 ln -f -s mass1-inflow.cfg mass1.cfg
@@ -38,7 +38,7 @@ mv -f profile1.out profile1.outflow.out
     load \"plot.gp\"\; ) | \
         gnuplot > plot.ps
 (echo \
-    set terminal postscript eps color solid \"Helvetica\" 14\; \
+    set terminal postscript eps color solid \"Helvetica\" 22\; \
     load \"plot.gp\"\; ) | \
         gnuplot > plot.eps
 

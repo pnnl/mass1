@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Fri Jan  6 14:04:13 2006 by William A. Perkins <perk@McPerk.pnl.gov>
+# Last Change: Mon Jan  9 07:01:05 2006 by William A. Perkins <perk@McPerk.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -20,7 +20,7 @@ set -e
 TRAP_FPE='INVALID=ABORT(1);UNDERFL=ZERO;OVERFL=ABORT(1);INT_OVERFL=ABORT(1);DIVZERO=ABORT(1);DEBUG'
 export TRAP_FPE
 
-model=${MODEL-../../../mass1_v084}
+model=${MODEL-../../../mass1}
 
 $model
 

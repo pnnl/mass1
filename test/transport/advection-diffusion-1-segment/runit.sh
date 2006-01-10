@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Tue Dec 14 16:10:11 1999 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Mon Jan  9 07:07:53 2006 by William A. Perkins <perk@McPerk.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -20,7 +20,7 @@ set -e
 TRAP_FPE='INVALID=ABORT(1);UNDERFL=ZERO;OVERFL=ABORT(1);INT_OVERFL=ABORT(1);DIVZERO=ABORT(1);DEBUG'
 export TRAP_FPE
 
-model=${MODEL-../../../mass1_v084}
+model=${MODEL-../../../mass1}
 
 rm -f mass1.cfg
 ln -f -s mass1-warmup.cfg mass1.cfg
@@ -87,7 +87,7 @@ rm -f mass1.cfg
     load \"plot-2.gp\"\; ) | \
         gnuplot > plot-Cn=1.0-2.ps
 (echo \
-    set terminal postscript eps color solid \"Helvetica\" 14\; \
+    set terminal postscript eps color solid \"Helvetica\" 22\; \
     set title \"Advective Diffusion Analytic Solution: Courant Number = 1.0 \(D = 70\)\"\; \
     load \"plot-2.gp\"\; ) | \
         gnuplot > plot-Cn=1.0-2.eps

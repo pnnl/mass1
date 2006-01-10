@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created July  2, 1999 by William A. Perkins
-# Last Change: Thu Mar 16 08:57:49 2000 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Mon Jan  9 07:01:55 2006 by William A. Perkins <perk@McPerk.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -20,7 +20,7 @@ set -e
 TRAP_FPE='INVALID=ABORT(1);UNDERFL=ZERO;OVERFL=ABORT(1);INT_OVERFL=ABORT(1);DIVZERO=ABORT(1);DEBUG'
 export TRAP_FPE
 
-model=${MODEL-../../../mass1_v084}
+model=${MODEL-../../../mass1}
 
                                 # run warmup with stage BC's
 
@@ -50,7 +50,7 @@ gawk -f profile-storage.gawk profile1-flowbc.out > storage-flowbc.out
 ) | gnuplot > plot-flowbc.ps
 ( \
     echo \
-        set terminal postscript eps color solid \"Helvetica\" 14\; ; \
+        set terminal postscript eps color solid \"Helvetica\" 22\; ; \
     sed -e 's/@CASE@/flowbc/' plot.gp \
 ) | gnuplot > plot-flowbc.eps
 
@@ -62,7 +62,7 @@ gawk -f profile-storage.gawk profile1-flowbc.out > storage-flowbc.out
 ) | gnuplot > plot-flowbc-stage.ps
 ( \
     echo \
-        set terminal postscript eps color solid \"Helvetica\" 14\; ; \
+        set terminal postscript eps color solid \"Helvetica\" 22\; ; \
     sed -e 's/@CASE@/flowbc/' plot-stage.gp \
 ) | gnuplot > plot-flowbc-stage.eps
 
@@ -89,7 +89,7 @@ gawk -f profile-storage.gawk profile1-lateral.out > storage-lateral.out
 ) | gnuplot > plot-lateral.ps
 ( \
     echo \
-        set terminal postscript eps color solid \"Helvetica\" 14\; ; \
+        set terminal postscript eps color solid \"Helvetica\" 22\; ; \
     sed -e 's/@CASE@/lateral/' plot.gp \
 ) | gnuplot > plot-lateral.eps
 
@@ -101,6 +101,6 @@ gawk -f profile-storage.gawk profile1-lateral.out > storage-lateral.out
 ) | gnuplot > plot-lateral-stage.ps
 ( \
     echo \
-        set terminal postscript eps color solid \"Helvetica\" 14\; ; \
+        set terminal postscript eps color solid \"Helvetica\" 22\; ; \
     sed -e 's/@CASE@/lateral/' plot-stage.gp \
 ) | gnuplot > plot-lateral-stage.eps

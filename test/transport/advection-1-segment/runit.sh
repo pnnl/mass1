@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Fri Jan  6 14:27:26 2006 by William A. Perkins <perk@McPerk.pnl.gov>
+# Last Change: Mon Jan  9 07:07:06 2006 by William A. Perkins <perk@McPerk.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -23,6 +23,8 @@ export TRAP_FPE
 model=${MODEL-../../../mass1}
 
 touch nolatinflow
+
+gnuplot bcplot.gp
 
 rm -f mass1.cfg
 ln -f -s mass1-warmup.cfg mass1.cfg

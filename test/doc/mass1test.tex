@@ -7,7 +7,7 @@
 % -------------------------------------------------------------
 % -------------------------------------------------------------
 % Created December 13, 1999 by William A. Perkins
-% Last Change: Sun Jan  8 15:43:13 2006 by William A. Perkins <perk@mcperktop.local>
+% Last Change: Mon Jan  9 07:33:54 2006 by William A. Perkins <perk@McPerk.pnl.gov>
 % -------------------------------------------------------------
 \documentclass[12pt,dvips,letterpaper]{article}
 
@@ -389,16 +389,16 @@ number, the pulse becomes smoothed due to numerical diffusion.
   \end{center}
 \end{figure}
 
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=3.0in]{../transport/advection-2-segment/plot-Cn=1.0.eps}
-    \includegraphics[width=3.0in]{../transport/advection-2-segment/plot-Cn=0.1.eps}
-    \caption{Results for the test of advection through multiple links;
-      simulated concentration is compared to translations of the upstream
-      boundary condition.}
-    \label{fig:test-advection-2-results}
-  \end{center}
-\end{figure}
+%% \begin{figure}[htbp]
+%%   \begin{center}
+%%     \includegraphics[width=3.0in]{../transport/advection-2-segment/plot-Cn=1.0.eps}
+%%     \includegraphics[width=3.0in]{../transport/advection-2-segment/plot-Cn=0.1.eps}
+%%     \caption{Results for the test of advection through multiple links;
+%%       simulated concentration is compared to translations of the upstream
+%%       boundary condition.}
+%%     \label{fig:test-advection-2-results}
+%%   \end{center}
+%% \end{figure}
 
 
 \subsection{Advective Diffusion}
@@ -441,59 +441,59 @@ times, and compares it to (\ref{eq:2}).
 \end{figure}
 
 
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=4.5in]{../transport/advection-diffusion-2-segment/plot-Cn=1.0.eps}
-    \includegraphics[width=4.5in]{../transport/advection-diffusion-2-segment/plot-Cn=0.1.eps}
-    \caption{Results for the test of advective diffusion through multiple links;
-      simulated concentration is compared to an analytical solution.}
-    \label{fig:test-advection-diffusion-2-results}
-  \end{center}
-\end{figure}
+%% \begin{figure}[htbp]
+%%   \begin{center}
+%%     \includegraphics[width=3.0in]{../transport/advection-diffusion-2-segment/plot-Cn=1.0.eps}
+%%     \includegraphics[width=3.0in]{../transport/advection-diffusion-2-segment/plot-Cn=0.1.eps}
+%%     \caption{Results for the test of advective diffusion through multiple links;
+%%       simulated concentration is compared to an analytical solution.}
+%%     \label{fig:test-advection-diffusion-2-results}
+%%   \end{center}
+%% \end{figure}
 
 
-\subsection{Transport with Lateral Inflow/Outflow}
-\label{sec:test-transport-lateral}
+%% \subsection{Transport with Lateral Inflow/Outflow}
+%% \label{sec:test-transport-lateral}
 
-In the current MASS1 version, lateral inflow is considered to have the
-same gas concentration and temperature as the water in the main
-channel.  This will probably change, so that concentrations and
-temperatures of lateral inflow can be specified.  This test is used to
-verify that when there is lateral inflow/outflow, it does not affect
-the simulated channel concentrations.  
+%% In the current MASS1 version, lateral inflow is considered to have the
+%% same gas concentration and temperature as the water in the main
+%% channel.  This will probably change, so that concentrations and
+%% temperatures of lateral inflow can be specified.  This test is used to
+%% verify that when there is lateral inflow/outflow, it does not affect
+%% the simulated channel concentrations.  
 
-Using the channel configuration of
-Section~\ref{sec:test-advection-1-link}, a lateral inflow of 500 cfs
-was applied along the entire length of channel ($4.692 \times 10^{-2}
-cfs/ft$), and a constant inflow concentration (10.0) was applied
-upstream.  This was allowed to come to steady state, with the
-expectation that the concentration would remain at 10.0 throughout the
-channel.  The results are shown in
-Figure~\ref{fig:test-tranport-lateral-inflow}, which show that the
-concentration did indeed remain constant. 
+%% Using the channel configuration of
+%% Section~\ref{sec:test-advection-1-link}, a lateral inflow of 500 cfs
+%% was applied along the entire length of channel ($4.692 \times 10^{-2}
+%% cfs/ft$), and a constant inflow concentration (10.0) was applied
+%% upstream.  This was allowed to come to steady state, with the
+%% expectation that the concentration would remain at 10.0 throughout the
+%% channel.  The results are shown in
+%% Figure~\ref{fig:test-tranport-lateral-inflow}, which show that the
+%% concentration did indeed remain constant. 
 
-A similar simulation was performed with a lateral \textit{outflow} of
-500 cfs applied along the entire length of channel.  The results of
-this simulation are shown in
-Figure~\ref{fig:test-tranport-lateral-outflow}.
+%% A similar simulation was performed with a lateral \textit{outflow} of
+%% 500 cfs applied along the entire length of channel.  The results of
+%% this simulation are shown in
+%% Figure~\ref{fig:test-tranport-lateral-outflow}.
 
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=5in]{../transport/lateral-inflow/plot-inflow.eps}
-    \caption{Results for test of transport with lateral inflow;
-      concentration remains constant because the concentration of
-      lateral inflow is assumed to be that in the channel.} 
-    \label{fig:test-tranport-lateral-inflow}
-  \end{center}
-\end{figure}
+%% \begin{figure}[htbp]
+%%   \begin{center}
+%%     \includegraphics[width=5in]{../transport/lateral-inflow/plot-inflow.eps}
+%%     \caption{Results for test of transport with lateral inflow;
+%%       concentration remains constant because the concentration of
+%%       lateral inflow is assumed to be that in the channel.} 
+%%     \label{fig:test-tranport-lateral-inflow}
+%%   \end{center}
+%% \end{figure}
 
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=4.5in]{../transport/lateral-inflow/plot-outflow.eps}
-    \caption{Results for test of transport with lateral outflow.} 
-    \label{fig:test-tranport-lateral-outflow}
-  \end{center}
-\end{figure}
+%% \begin{figure}[htbp]
+%%   \begin{center}
+%%     \includegraphics[width=4.5in]{../transport/lateral-inflow/plot-outflow.eps}
+%%     \caption{Results for test of transport with lateral outflow.} 
+%%     \label{fig:test-tranport-lateral-outflow}
+%%   \end{center}
+%% \end{figure}
 
 % \begin{figure}[htbp]
 %   \begin{center}

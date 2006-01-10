@@ -7,10 +7,10 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 29, 2001 by William A. Perkins
-# Last Change: Fri Apr 13 09:19:56 2001 by William A. Perkins <perk@gehenna.pnl.gov>
+# Last Change: Mon Jan  9 07:02:39 2006 by William A. Perkins <perk@McPerk.pnl.gov>
 # -------------------------------------------------------------
 
-set term postscript eps color dashed "Helvetica" 14
+set term postscript eps color dashed "Helvetica" 22
 set xdata time
 set timefmt '%m-%d-%Y %H:%M:%S'
 
