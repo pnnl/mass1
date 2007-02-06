@@ -34,12 +34,20 @@ USE point_vars
 USE file_vars
 USE transport_vars
 USE scalars
+USE utility
 
 IMPLICIT NONE
 
 INTEGER :: link,point
+INTEGER :: status
 
-OPEN(fileunit(13),file=filename(13),form='unformatted')
+OPEN(fileunit(13),file=filename(13),form='unformatted', iostat=status)
+
+IF (status .EQ. 0) THEN
+   CALL status_message('Writing hot start to ' // TRIM(filename(13)))
+ELSE 
+   CALL error_message(TRIM(filename(13)) // ': cannot open for writing', fatal=.TRUE.)
+END IF
 
 DO link=1,maxlinks
 DO point=1,maxpoints(link)
