@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October 25, 2001 by William A. Perkins
-# Last Change: Fri Jul 15 13:54:30 2005 by William A. Perkins <perk@McPerk.pnl.gov>
+# Last Change: Fri Oct 26 13:44:09 2007 by William A. Perkins <perk@bearflag.pnl.gov>
 # -------------------------------------------------------------
 
 set -x
@@ -160,7 +160,7 @@ for code in $fblist; do
         -e "s;@VAR@;wselev;g" \
         -e "s;@STATSFILE@;$statfile;g" \
         -e "s;@OUTPS@;$dir/$code-scatter-FBE.eps;g" \
-        -e "s;@DATA@;\"Forebay Stage, feet\";g" \
+        -e "s;@DATA@;Forebay Stage, feet;g" \
         -e "s;@TAG@;$code FBE;g" \
         -e "s;@NAME@;$name;g" \
         -e "s;@FACTOR@;1.0;g" compare.R  > tmp.R 
@@ -171,7 +171,7 @@ for code in $fblist; do
         -e "s;@VAR@;discharge;g" \
         -e "s;@STATSFILE@;$statfile;g" \
         -e "s;@OUTPS@;$dir/$code-scatter-QTL.eps;g" \
-        -e "s;@DATA@;\"Discharge, cfs\";g" \
+        -e "s;@DATA@;Discharge, cfs;g" \
         -e "s;@TAG@;$code QTL;g" \
         -e "s;@NAME@;$name;g" \
         -e "s;offset=0;offset=0.5/24;g"  \
