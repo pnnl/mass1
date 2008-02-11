@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December  3, 2007 by William A. Perkins
-# Last Change: Tue Dec  4 12:15:35 2007 by William A. Perkins <perk@bearflag.pnl.gov>
+# Last Change: Mon Feb 11 15:19:48 2008 by William A. Perkins <d3g096@mcperk.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -19,6 +19,7 @@ import fileinput
 from optparse import OptionParser
 import numarray
 import CGNS
+import mx.DateTime
 
 # -------------------------------------------------------------
 # striptitle
@@ -53,7 +54,7 @@ def thesign(i):
 # direction.  Returns the zone id.
 # -------------------------------------------------------------
 def buildzone(file, baseidx, x1d):
-    width = 100.0
+    width = 120.0
     isize = x1d.shape[0]
     isize -= 1
     jsize = 1
@@ -107,6 +108,8 @@ def writefield(file, baseidx, zoneixd, solidx, vname, value):
 # variable initialization
 # -------------------------------------------------------------
 
+basedate = None
+
 # -------------------------------------------------------------
 # handle command line
 # -------------------------------------------------------------
@@ -121,7 +124,8 @@ parser.add_option("-e", "--end", type="int", dest="pend",
 parser.add_option("-u", "--units", type="choice", dest="dunits",
                   choices=("mile", "foot"), default="mile", metavar="mile|foot",
                   help="specify the units of the profile distance column")
-
+parser.add_option("-B", "--base-date", type="string", metavar="date", dest="basedate",
+                  help="Date/time representing time = 0s")
 parser.set_usage("usage: %prog [options] profile.dat output.cgns") 
 
 (options, args) = parser.parse_args()
@@ -137,12 +141,19 @@ else:
 if (options.pstart > options.pend):
     options.pend = options.pstart
 
-if (len(args) < 2):
+if (options.basedate):
+    try:
+        basedate = mx.DateTime.strptime(options.basedate, "%m-%d-%Y %H:%M:%S")
+    except:
+        parser.error("specified base date (%s) not understood\n" % options.basedate)
+        
+if (len(args) < 3):
     parser.error("input and/or output not specified")
 
 
 profilename = args[0]
 cgnsname = args[1]
+sollistname = args[2]
 
 # -------------------------------------------------------------
 # main program
@@ -150,6 +161,8 @@ cgnsname = args[1]
 
 cgns = CGNS.pyCGNS(cgnsname, CGNS.MODE_WRITE)
 baseidx = cgns.basewrite("FromMASS1", 3, 3)
+
+sollist = open(sollistname, "w")
 
 ip = 0
 ipt = 0
@@ -176,6 +189,17 @@ for line in fileinput.input(args[0]):
             v *= 0.0
             writefield(cgns, baseidx, zoneidx, solidx, CGNS.VelocityY, v)
             writefield(cgns, baseidx, zoneidx, solidx, CGNS.VelocityZ, v)
+            datetime = mx.DateTime.strptime(zname, "%m-%d-%Y %H:%M:%S")
+            delta = None
+            if (basedate):
+                delta = datetime - basedate
+            else:
+                delta = datetime - DateTime(datetime.year, 1, 1)
+            (d, s) = delta.absvalues()
+            
+            sollist.write("%12.0f %s %10d # %s\n" %
+                          ( (d*86400 + s), cgnsname, solidx, zname))
+            
         
         ip += 1
         if (ip > options.pend):
@@ -189,7 +213,7 @@ for line in fileinput.input(args[0]):
             v = numarray.array(numarray.zeros((num,), numarray.Float))
             t = numarray.array(numarray.zeros((num,), numarray.Float))
             c = numarray.array(numarray.zeros((num,), numarray.Float))
-            print zname, num
+            # print zname, num
             ipt = 0
         else:
             found1 = None
