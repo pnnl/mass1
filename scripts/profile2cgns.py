@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December  3, 2007 by William A. Perkins
-# Last Change: Mon Feb 11 15:19:48 2008 by William A. Perkins <d3g096@mcperk.pnl.gov>
+# Last Change: Tue Feb 12 07:40:13 2008 by William A. Perkins <d3g096@mcperk.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -36,6 +36,21 @@ def striptitle(line):
     return (date, time, num)
 
 # -------------------------------------------------------------
+# adjustx
+#
+# This takes the list of x coordinates and adjusts it so that there
+# are no zero length segments.  
+# -------------------------------------------------------------
+def adjustx(x1d, fudge):
+    x1dnew = numarray.array(x1d)
+    x1dnew[0] = x1d[0];
+    for i in range(1, x1d.shape[0]):
+        x1dnew[i] = x1d[i]
+        if (x1d[i] == x1d[i-1]):
+            x1dnew[i] += fudge
+    return x1dnew
+
+# -------------------------------------------------------------
 # thesign
 #
 # If i is zero, returns -1, otherwise returns 1
@@ -59,6 +74,12 @@ def buildzone(file, baseidx, x1d):
     isize -= 1
     jsize = 1
     ksize = 1
+
+    dy = width/float(jsize)
+    dz = width/float(ksize)
+
+    yorig = -width/2.0
+    zorig = -width/2.0
 
     size = range(9)
 
@@ -84,22 +105,24 @@ def buildzone(file, baseidx, x1d):
         for j in range(jsize+1):
             for i in range(isize+1):
                 x3d[k,j,i] = x1d[i]
-                y3d[k,j,i] = thesign(j)*width*0.5
-                z3d[k,j,i] = thesign(k)*width*0.5
+                y3d[k,j,i] = yorig + j*dy
+                z3d[k,j,i] = zorig + k*dz
 
     file.coordwrite(baseidx, zoneidx, CGNS.RealDouble, CGNS.CoordinateX, x3d)
     file.coordwrite(baseidx, zoneidx, CGNS.RealDouble, CGNS.CoordinateY, y3d)
     file.coordwrite(baseidx, zoneidx, CGNS.RealDouble, CGNS.CoordinateZ, z3d)
-    return zoneidx
+    return (zoneidx, isize, jsize, ksize)
 
 # -------------------------------------------------------------
 # writefield
 # -------------------------------------------------------------
-def writefield(file, baseidx, zoneixd, solidx, vname, value):
-    n = value.shape[0]
-    vout = numarray.array(numarray.ones((n-1,), numarray.Float))
-    for i in range(n-1):
-        vout[i] = 0.5*(value[i] + value[i+1])
+def writefield(file, baseidx, zoneixd, solidx, vname, value, nx, ny, nz):
+    vout = numarray.array(numarray.zeros((nz, ny, value.shape[0]-1), numarray.Float))
+    
+    for k in range(nz):
+        for j in range(ny):
+            for i in range(value.shape[0] - 1):
+                vout[k,j,i] = 0.5*(value[i] + value[i+1])
     fidx = file.fieldwrite(baseidx, zoneidx, solidx, CGNS.RealDouble, vname, vout)
     return fidx
 
@@ -109,6 +132,7 @@ def writefield(file, baseidx, zoneixd, solidx, vname, value):
 # -------------------------------------------------------------
 
 basedate = None
+fudge = 5.0
 
 # -------------------------------------------------------------
 # handle command line
@@ -126,7 +150,9 @@ parser.add_option("-u", "--units", type="choice", dest="dunits",
                   help="specify the units of the profile distance column")
 parser.add_option("-B", "--base-date", type="string", metavar="date", dest="basedate",
                   help="Date/time representing time = 0s")
-parser.set_usage("usage: %prog [options] profile.dat output.cgns") 
+parser.add_option("-f", "--fudge", type="float", metavar="factor", dest="fudge",
+                  help="Amount to move cross sections in zero length segments, m")
+parser.set_usage("usage: %prog [options] profile.dat output.cgns output.list") 
 
 (options, args) = parser.parse_args()
 
@@ -146,6 +172,9 @@ if (options.basedate):
         basedate = mx.DateTime.strptime(options.basedate, "%m-%d-%Y %H:%M:%S")
     except:
         parser.error("specified base date (%s) not understood\n" % options.basedate)
+
+if (options.fudge):
+    fudge = options.fudge
         
 if (len(args) < 3):
     parser.error("input and/or output not specified")
@@ -177,7 +206,8 @@ for line in fileinput.input(args[0]):
 
         if (found1):
             if (first):
-                zoneidx = buildzone(cgns, baseidx, x)
+                x = adjustx(x, fudge)
+                (zoneidx, ni, nj, nk) = buildzone(cgns, baseidx, x)
                 first = None
             solidx = cgns.solwrite(baseidx, zoneidx, zname, CGNS.CellCenter)
 
@@ -185,10 +215,10 @@ for line in fileinput.input(args[0]):
             # velocity should be negative
             
             v *= -1.0
-            writefield(cgns, baseidx, zoneidx, solidx, CGNS.VelocityX, v)
+            writefield(cgns, baseidx, zoneidx, solidx, CGNS.VelocityX, v, ni, nj, nk)
             v *= 0.0
-            writefield(cgns, baseidx, zoneidx, solidx, CGNS.VelocityY, v)
-            writefield(cgns, baseidx, zoneidx, solidx, CGNS.VelocityZ, v)
+            writefield(cgns, baseidx, zoneidx, solidx, CGNS.VelocityY, v, ni, nj, nk)
+            writefield(cgns, baseidx, zoneidx, solidx, CGNS.VelocityZ, v, ni, nj, nk)
             datetime = mx.DateTime.strptime(zname, "%m-%d-%Y %H:%M:%S")
             delta = None
             if (basedate):
