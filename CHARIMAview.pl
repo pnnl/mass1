@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 23, 2005 by William A. Perkins
-# Last Change: Thu Mar 24 07:01:18 2005 by William A. Perkins <perk@leechong.pnl.gov>
+# Last Change: Thu Dec  3 07:22:56 2009 by William A. Perkins <d3g096@PE10900.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -94,7 +94,7 @@ my @rmlist = sort {$a <=> $b} keys %{$xsect[0]};
 
 printf(STDERR "$program: info: using PGPLOT device \"%s\"\n", $device);
 
-my $plot = PDL::Graphics::PGPLOT::Window->new({Dev=>$device});
+my $plot = PDL::Graphics::PGPLOT::Window->new({Dev=>$device, font=>1, HardFont=>1});
 
 my $junk = sprintf("%s", $plot->info('CURSOR'));
 my $havecursor = undef;
