@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- mode: python; py-which-shell: "python";-*-
+# -*- mode: python; -*-
 # -------------------------------------------------------------
 # file: profile2cgns.py
 # -------------------------------------------------------------
@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December  3, 2007 by William A. Perkins
-# Last Change: Tue Feb 12 07:40:13 2008 by William A. Perkins <d3g096@mcperk.pnl.gov>
+# Last Change: Tue Aug 31 11:11:04 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -133,12 +133,17 @@ def writefield(file, baseidx, zoneixd, solidx, vname, value, nx, ny, nz):
 
 basedate = None
 fudge = 5.0
+verbose = False
 
 # -------------------------------------------------------------
 # handle command line
 # -------------------------------------------------------------
+program = os.path.basename(sys.argv[0])
+
 parser = OptionParser()
 
+parser.add_option("-v", "--verbose", action="store_true", dest="verbose",
+                  help="spew lots of messages while processing")
 parser.add_option("-s", "--start", type="int", dest="pstart",
                   default=1, metavar="n",
                   help="start with the nth profile in the input")
@@ -175,6 +180,9 @@ if (options.basedate):
 
 if (options.fudge):
     fudge = options.fudge
+
+if (options.verbose):
+    verbose = options.verbose
         
 if (len(args) < 3):
     parser.error("input and/or output not specified")
@@ -208,6 +216,9 @@ for line in fileinput.input(args[0]):
             if (first):
                 x = adjustx(x, fudge)
                 (zoneidx, ni, nj, nk) = buildzone(cgns, baseidx, x)
+                if (verbose):
+                    sys.stderr.write("%s: %s: wrote zone\n" %
+                                     (program, cgnsname))
                 first = None
             solidx = cgns.solwrite(baseidx, zoneidx, zname, CGNS.CellCenter)
 
@@ -219,6 +230,8 @@ for line in fileinput.input(args[0]):
             v *= 0.0
             writefield(cgns, baseidx, zoneidx, solidx, CGNS.VelocityY, v, ni, nj, nk)
             writefield(cgns, baseidx, zoneidx, solidx, CGNS.VelocityZ, v, ni, nj, nk)
+            writefield(cgns, baseidx, zoneidx, solidx, "Discharge", q, ni, nj, nk)
+            writefield(cgns, baseidx, zoneidx, solidx, "Stage", e, ni, nj, nk)
             datetime = mx.DateTime.strptime(zname, "%m-%d-%Y %H:%M:%S")
             delta = None
             if (basedate):
@@ -229,9 +242,16 @@ for line in fileinput.input(args[0]):
             
             sollist.write("%12.0f %s %10d # %s\n" %
                           ( (d*86400 + s), cgnsname, solidx, zname))
+            if (verbose):
+                sys.stderr.write("%s: %s: wrote solution %d, \"%s\"\n" %
+                                 (program, cgnsname, solidx, zname))
             
         
         ip += 1
+
+        if (verbose):
+            sys.stderr.write("%s: %s: found profile record %d\n" % (program, args[0], ip))
+            
         if (ip > options.pend):
             break
         
@@ -243,6 +263,8 @@ for line in fileinput.input(args[0]):
             v = numarray.array(numarray.zeros((num,), numarray.Float))
             t = numarray.array(numarray.zeros((num,), numarray.Float))
             c = numarray.array(numarray.zeros((num,), numarray.Float))
+            q = numarray.array(numarray.zeros((num,), numarray.Float))
+            e = numarray.array(numarray.zeros((num,), numarray.Float))
             # print zname, num
             ipt = 0
         else:
@@ -259,6 +281,8 @@ for line in fileinput.input(args[0]):
         v[ipt] = float(fld[6])*0.3048   # convert to m/s
         c[ipt] = float(fld[8])          # units unchanged
         t[ipt] = float(fld[9])          # units unchanged
+        q[ipt] = float(fld[5])*0.0283168# convert to m^3/s
+        e[ipt] = float(fld[4])*0.3048   # convert stage to m
         ipt += 1
     
 cgns.close()
