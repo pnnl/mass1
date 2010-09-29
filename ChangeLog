@@ -1,3 +1,11 @@
+2010-09-29  William A. Perkins  <william.perkins@pnl.gov>
+
+	* scripts/profile2cgns.py: add verbosity option; extract stage and
+	discharge too
+
+	* scripts/mass1bc.in: add -S and -E options to extract only a
+	given date/time range
+
 2008-02-22  William A. Perkins  <william.perkins@pnl.gov>
 
 	* scripts/profile2cgns.py: adjust zero-length segments
