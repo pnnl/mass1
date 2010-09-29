@@ -13,7 +13,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October  4, 1999 by William A. Perkins
-# Last Change: Thu Jun 23 07:09:45 2005 by William A. Perkins <perk@McPerk.local>
+# Last Change: Wed Mar  3 13:44:45 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -108,7 +108,7 @@ William A. Perkins
 my $program;
 ($program = $0) =~ s/.*\///;
 my $usage = 
-  "usage: $program -f field [-0|-O offset] [-o output] [file]\n" . 
+  "usage: $program -f field [-0|-O offset] [-o output] [-S start] [-E end] [file]\n" . 
   "       $program -l";
 
                                 # fields that can be used for BC files
@@ -136,12 +136,14 @@ Date::Manip::Date_Init("TZ=PST");
 my $field = undef;
 my $offset = undef;
 my $title = undef;
+my $start = Date::Manip::ParseDate("01/01/1800 00:00:00");
+my $end = Date::Manip::ParseDate("01/01/3800 00:00:00");
 
 # -------------------------------------------------------------
 # handle command line
 # -------------------------------------------------------------
 my %opts = ();
-die "$usage\n" unless getopts("f:o:O:t:l0", \%opts);
+die "$usage\n" unless getopts("f:o:O:t:l0S:E:", \%opts);
 
 if ($opts{l}) {
   printf(STDERR "The following \"field\"s are recognized:\n");
@@ -175,6 +177,24 @@ if ($opts{O}) {
 } elsif ($opts{0}) {
   $offset = Date::Manip::ParseDateDelta("0 hour");
 }
+
+if ($opts{S}) {
+  $start = Date::Manip::ParseDate($opts{S});
+  unless ($start) {
+    printf(STDERR "$program: error: start date/time \"%s\" not understood\n", $opts{S});
+    die "$usage\n";
+  }
+} 
+
+if ($opts{E}) {
+  $end = Date::Manip::ParseDate($opts{E});
+  unless ($end) {
+    printf(STDERR "$program: error: end date/time \"%s\" not understood\n", $opts{E});
+    die "$usage\n";
+  }
+} 
+
+
 
 if ($opts{o}) {
   my $name = $opts{o};
@@ -213,14 +233,15 @@ while (<>) {
     $datestr =~ s/-/\//g;
     my $date = Date::Manip::ParseDate($datestr);
 
-    
-
     die "$program: error: line ${line}: date not understood\n" unless ($date);
 
     my $value = $fld[$fldno - 1];
 
     $date = Date::Manip::DateCalc($date, $offset) if ($offset);
     
+    next if ($date < $start);
+    next if ($date > $end);
+
     printf(OUTPUT "%s   %15.3f  /\n", Date::Manip::UnixDate($date, '%m-%d-%Y %H:%M:%S'), $value);
   }
 }
