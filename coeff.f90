@@ -3,7 +3,7 @@
 !            Pacific Northwest National Laboratory
 !***************************************************************
 !
-! NAME:	fluvial_coeff
+! NAME: fluvial_coeff
 !
 ! VERSION and DATE: MASS1 v0.75 3/25/98
 !
@@ -27,65 +27,61 @@
 
 SUBROUTINE fluvial_coeff(link,a,b,c,d,g,ap,bp,cp,dp,gp,dx,dt,gr,latq_old,latq_new)
 
+  USE fluvial_coeffs
+  USE general_vars
+
+  IMPLICIT NONE
+
+  DOUBLE PRECISION :: a,b,c,d,g,ap,bp,cp,dp,gp
+  DOUBLE PRECISION :: gp1,gp2,gp3,gp4
+  DOUBLE PRECISION :: dx,gr
+  DOUBLE PRECISION :: latq_old,latq_new
+  DOUBLE PRECISION :: dt
+  INTEGER :: link
 
 
-USE	fluvial_coeffs
-USE general_vars
+  ! Normal fluvial link
 
-IMPLICIT NONE
+  ! continuity equation coefficients      with lateral inflow     (flow per length of channel)
 
-REAL :: a,b,c,d,g,ap,bp,cp,dp,gp
-REAL :: gp1,gp2,gp3,gp4
-REAL :: dx,gr
-REAL :: latq_old,latq_new
-DOUBLE PRECISION :: dt
-INTEGER :: link
+  a = b2/2.0/dt
+  b = theta/dx
+  c = -b1/2.0/dt
+  d = b
+  g = (q1 - q2)/dx + theta*latq_new + (1 - theta)*latq_old
 
-
-! Normal fluvial link
-
-! continuity equation coefficients	with lateral inflow	(flow per length of channel)
-
-      a = b2/2.0/dt
-      b = theta/dx
-      c = -b1/2.0/dt
-      d = b
-      g = (q1 - q2)/dx + theta*latq_new + (1 - theta)*latq_old
-
-!--------------------------------------------------------
-! momemtum equation coefficients
-
-      ap = alpha*theta*(-q2*b2*(q2-q1)/dx/a2**2		  &
+  !--------------------------------------------------------
+  ! momemtum equation coefficients
+  
+  ap = alpha*theta*(-q2*b2*(q2-q1)/dx/a2**2           &
        + b2*(q2/a2**2)*(a2-a1)*(q2/a2+q1/a1)/dx/2.0   &
-       - b2*(q2/a2 + q1/a1)**2/dx/4.0)				  &
-       + gr*theta*(b2*(y2-y1)/dx/2.0 + (a2+a1)/2.0/dx	&
-       + b2*(beta*q1*abs(q1)/k1**2 + (1.0 - beta)*q2	&
-       *abs(q2)/k2**2)/2.0								&
+       - b2*(q2/a2 + q1/a1)**2/dx/4.0)                            &
+       + gr*theta*(b2*(y2-y1)/dx/2.0 + (a2+a1)/2.0/dx   &
+       + b2*(beta*q1*abs(q1)/k1**2 + (1.0 - beta)*q2    &
+       *abs(q2)/k2**2)/2.0                                                              &
        -(1.0 - beta)*q2*abs(q2)*(ky2/k2**3)*(a2+a1))
-
-      cp = alpha*theta*(b1*q1*(q2-q1)/dx/a1**2       &
+  
+  cp = alpha*theta*(b1*q1*(q2-q1)/dx/a1**2       &
        - b1*(q1/a1**2)*(a2-a1)*(q2/a2+q1/a1)/dx/2.0  &
-       - b1*(q2/a2+q1/a1)**2/dx/4.0)				 &
-       + gr*theta*(-b1*(y2-y1)/dx/2.0 + (a2+a1)/2.0/dx	&
-       - b1*(beta*q1*abs(q1)/k1**2+(1.0-beta)*q2		&
-       *abs(q2)/k2**2)/2.0								&
+       - b1*(q2/a2+q1/a1)**2/dx/4.0)                             &
+       + gr*theta*(-b1*(y2-y1)/dx/2.0 + (a2+a1)/2.0/dx  &
+       - b1*(beta*q1*abs(q1)/k1**2+(1.0-beta)*q2                &
+       *abs(q2)/k2**2)/2.0                                                              &
        + beta*q1*abs(q1)*(ky1/k1**3)*(a2+a1))
 
-      bp = 1.0/2.0/dt+alpha*theta*(2.0*q2/a2+q1*(1.0/a1-1.0/a2)	&
-        -0.5*(1.0-a1/a2)*(q2/a2+q1/a1))/dx						&
-        +gr*theta*(1.0- beta)*abs(q2)*(a2+a1)/k2**2
-
-      dp = -1.0/2.0/dt-alpha*theta*(-2.0*q1/a1+q2*(1.0/a1-1.0/a2) &
-        -0.5*(a2/a1-1.0)*(q2/a2 + q1/a1))/dx					  &
-        -gr*theta*beta*(a2+a1)*abs(q1)/k1**2
-
-      gp1 = -alpha*(q2/a2+q1/a1)*(q2-q1)/dx			 
-      gp2 = alpha*((q2/a2+q1/a1)**2)*(a2-a1)/dx/4.0
-      gp3 = -gr*(a2+a1)*(y2-y1)/2.0/dx
-      gp4 = -gr*(a2+a1)*(beta*q1*abs(q1)/k1**2+(1.0-beta)*q2  &
-            *abs(q2)/k2**2)/2.0
-      gp = gp1+gp2+gp3+gp4
-
-
+  bp = 1.0/2.0/dt+alpha*theta*(2.0*q2/a2+q1*(1.0/a1-1.0/a2) &
+       -0.5*(1.0-a1/a2)*(q2/a2+q1/a1))/dx                                              &
+       +gr*theta*(1.0- beta)*abs(q2)*(a2+a1)/k2**2
+  
+  dp = -1.0/2.0/dt-alpha*theta*(-2.0*q1/a1+q2*(1.0/a1-1.0/a2) &
+       -0.5*(a2/a1-1.0)*(q2/a2 + q1/a1))/dx                                      &
+       -gr*theta*beta*(a2+a1)*abs(q1)/k1**2
+  
+  gp1 = -alpha*(q2/a2+q1/a1)*(q2-q1)/dx                      
+  gp2 = alpha*((q2/a2+q1/a1)**2)*(a2-a1)/dx/4.0
+  gp3 = -gr*(a2+a1)*(y2-y1)/2.0/dx
+  gp4 = -gr*(a2+a1)*(beta*q1*abs(q1)/k1**2+(1.0-beta)*q2  &
+       *abs(q2)/k2**2)/2.0
+  gp = gp1+gp2+gp3+gp4
 
 END SUBROUTINE fluvial_coeff

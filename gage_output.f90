@@ -48,7 +48,7 @@ IMPLICIT NONE
 CHARACTER(LEN=80), SAVE :: RCS_ID = "$Id$"
 
 
-REAL :: depth, tdg_sat, tdg_press
+DOUBLE PRECISION :: depth, tdg_sat, tdg_press
 DOUBLE PRECISION :: salinity = 0.0
 INTEGER :: i,link,point,count=0
 INTEGER, SAVE :: num_gages
@@ -104,15 +104,16 @@ IF(time == time_begin )THEN
 ENDIF
 
 DO i=1,num_gages
-count = 50 + i
+   count = 50 + i
 
-link = gage_link(i)
-point = gage_point(i)
-depth = accum_var%y%sum(link,point) - thalweg(link,point)
-IF( (do_temp .AND. temp_exchange) .OR. (do_gas .AND. gas_exchange) ) &
-     &CALL update_met_data(time, met_zone(link))
-tdg_sat =   TDGasSaturation( DBLE(species(1)%conc(link,point)), DBLE(species(2)%conc(link,point)), salinity, baro_press)
-tdg_press = TDGasPress( DBLE(species(1)%conc(link,point)), DBLE(species(2)%conc(link,point)), salinity)
+   link = gage_link(i)
+   point = gage_point(i)
+   depth = accum_var%y%sum(link,point) - thalweg(link,point)
+   IF( (do_temp .AND. temp_exchange) .OR. (do_gas .AND. gas_exchange) ) &
+        &CALL update_met_data(time, met_zone(link))
+   tdg_sat = TDGasSaturation(species(1)%conc(link,point), species(2)%conc(link,point), &
+        &salinity, baro_press)
+   tdg_press = TDGasPress(species(1)%conc(link,point), species(2)%conc(link,point), salinity)
 
 CALL decimal_to_date(accum_time, date_string, time_string)
 

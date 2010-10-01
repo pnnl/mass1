@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created November  2, 1999 by William A. Perkins
-! Last Change: Fri Dec 10 09:43:19 1999 by William A. Perkins <perk@mack.pnl.gov>
+! Last Change: Wed Sep 29 14:38:21 2010 by William A. Perkins <d3g096@bearflag.pnl.gov>
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -29,7 +29,7 @@ MODULE hydro_output_module
 
   TYPE(hydro_specs_struct), ALLOCATABLE :: hydro_specs(:)
 
-  REAL, DIMENSION(:), ALLOCATABLE :: hydro_spill, hydro_gen, hydro_disch, &
+  DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE :: hydro_spill, hydro_gen, hydro_disch, &
        &hydro_conc, hydro_sat, hydro_temp, hydro_baro
 
 CONTAINS
@@ -133,7 +133,7 @@ CONTAINS
     DO i = 1, hydro_links
        link = hydro_specs(i)%link
 
-       press = TDGasPress( DBLE(hydro_conc(link)), DBLE(hydro_temp(link)), DBLE(0.0));
+       press = TDGasPress(hydro_conc(link), hydro_temp(link), DBLE(0.0));
        deltap = press - hydro_baro(link)
        WRITE(iobase + i, 100) date, time, hydro_disch(link), hydro_spill(link),&
             &hydro_gen(link), hydro_temp(link), hydro_conc(link), hydro_sat(link), &

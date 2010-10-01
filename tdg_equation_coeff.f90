@@ -33,7 +33,7 @@ MODULE tdg_equation_coeff
 IMPLICIT NONE
 
 INTEGER, ALLOCATABLE, DIMENSION(:) :: gas_eqn_type
-REAL, ALLOCATABLE, DIMENSION(:)    :: a_gas, b_gas, c_gas, qgen_frac
+DOUBLE PRECISION, ALLOCATABLE, DIMENSION(:)    :: a_gas, b_gas, c_gas, qgen_frac
 
 CONTAINS
 

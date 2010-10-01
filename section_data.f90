@@ -40,7 +40,7 @@ SUBROUTINE section_data
         IMPLICIT NONE
 
         INTEGER :: i,j,num_pairs,io_unit
-		REAL :: xy(2*maxpairs)
+		DOUBLE PRECISION :: xy(2*maxpairs)
         
         CALL open_existing(filename(4), fileunit(4), fatal=.TRUE.)
 

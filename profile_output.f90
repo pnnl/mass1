@@ -49,7 +49,7 @@ MODULE profile_output_module
   INTEGER, SAVE, PRIVATE :: num_profiles
   INTEGER, SAVE, PRIVATE :: profile_max_points(maxpro)
   INTEGER, SAVE, PRIVATE :: profile(maxpro,100)
-  REAL, ALLOCATABLE, SAVE, DIMENSION(:,:), PRIVATE :: x_profile
+  DOUBLE PRECISION, ALLOCATABLE, SAVE, DIMENSION(:,:), PRIVATE :: x_profile
   INTEGER,ALLOCATABLE,SAVE, DIMENSION(:,:), PRIVATE :: profile_link, profile_point
 
 CONTAINS
@@ -63,7 +63,7 @@ CONTAINS
 
     INTEGER :: count, i, j
     INTEGER :: link, point
-    REAL :: x_pro_start(maxpro)
+    DOUBLE PRECISION :: x_pro_start(maxpro)
     INTEGER :: profile_num_links(maxpro), profile_max
     CHARACTER*4 profile_x_units(maxpro)
 
@@ -179,8 +179,8 @@ CONTAINS
 
     IMPLICIT NONE
 
-    REAL :: depth
-    REAL :: tdg_press, tdg_sat
+    DOUBLE PRECISION :: depth
+    DOUBLE PRECISION :: tdg_press, tdg_sat
     DOUBLE PRECISION :: salinity = 0.0
 
     INTEGER :: i,j,link,lastlink,point

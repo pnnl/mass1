@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October 10, 2001 by William A. Perkins
-! Last Change: Thu Jun  9 15:35:06 2005 by William A. Perkins <perk@McPerk.pnl.gov>
+! Last Change: Wed Sep 29 14:01:38 2010 by William A. Perkins <d3g096@bearflag.pnl.gov>
 ! ----------------------------------------------------------------
 
 
@@ -42,14 +42,14 @@ MODULE pidlink
                                 ! flow from (point 1) and lag is the
                                 ! lag time (days)
      INTEGER :: link 
-     REAL :: lag
+     DOUBLE PRECISION :: lag
 
                                 ! this is used to keep the lagged
                                 ! flows in an FIFO queue, only the
                                 ! number needed are saved
                                 ! (lag/time_step)
      INTEGER :: nlag
-     REAL, POINTER :: flow(:)
+     DOUBLE PRECISION, POINTER :: flow(:)
   END TYPE pidlink_lag_rec
 
   TYPE pidlink_rec
@@ -58,9 +58,9 @@ MODULE pidlink
      LOGICAL :: followflow
 
      INTEGER :: link            ! the link number
-     REAL :: kc, ti, tr         ! constant coefficients
-     REAL :: errsum             ! integral term
-     REAL :: oldsetpt
+     DOUBLE PRECISION :: kc, ti, tr         ! constant coefficients
+     DOUBLE PRECISION :: errsum             ! integral term
+     DOUBLE PRECISION :: oldsetpt
 
                                 ! this is a list of flows to be lagged
      INTEGER :: numflows
@@ -87,8 +87,8 @@ CONTAINS
 
     INTEGER :: l, link, count, laglink, i
     LOGICAL :: file_exist
-    REAL :: kc, ti, tr, lagvalues(2*maxlags)
-    REAL :: lagtime
+    DOUBLE PRECISION :: kc, ti, tr, lagvalues(2*maxlags)
+    DOUBLE PRECISION :: lagtime
     CHARACTER (LEN=256) :: fname
     INTEGER :: iounit
 
@@ -287,7 +287,7 @@ CONTAINS
     INTEGER :: i, j, k
 
     EXTERNAL table_interp
-    REAL :: table_interp
+    DOUBLE PRECISION :: table_interp
     INTEGER :: table_type
 
     IF (.NOT. ASSOCIATED(piddata)) RETURN
@@ -340,7 +340,7 @@ CONTAINS
     INTEGER :: i, j, link
 
     EXTERNAL table_interp
-    REAL :: table_interp
+    DOUBLE PRECISION :: table_interp
     INTEGER :: table_type
 
     IF (.NOT. ASSOCIATED(piddata)) RETURN
@@ -380,10 +380,10 @@ CONTAINS
   END SUBROUTINE pidlink_initialize
 
   ! ----------------------------------------------------------------
-  ! REAL FUNCTION pidlink_lagged_flow
+  ! DOUBLE PRECISION FUNCTION pidlink_lagged_flow
   ! This just adds up the lagged flows in the list
   ! ----------------------------------------------------------------
-  REAL FUNCTION pidlink_lagged_flow(rec)
+  DOUBLE PRECISION FUNCTION pidlink_lagged_flow(rec)
 
     IMPLICIT NONE
     TYPE (pidlink_rec) :: rec
@@ -411,14 +411,14 @@ CONTAINS
 
     IMPLICIT NONE
     INTEGER, INTENT(IN) :: link, point
-    REAL, INTENT(IN) :: setpt
-    REAL, INTENT(OUT) ::  a, b, c, d, g, ap, bp, cp, dp, gp
+    DOUBLE PRECISION, INTENT(IN) :: setpt
+    DOUBLE PRECISION, INTENT(OUT) ::  a, b, c, d, g, ap, bp, cp, dp, gp
     TYPE (pidlink_rec), POINTER :: rec
 
     INTEGER :: table_type
 
     EXTERNAL table_interp
-    REAL :: table_interp, lag, eval, lval
+    DOUBLE PRECISION :: table_interp, lag, eval, lval
 
     rec => piddata(linkidmap(link))
 

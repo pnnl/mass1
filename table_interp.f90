@@ -26,7 +26,7 @@
 !***************************************************************
 !
 
-REAL FUNCTION table_interp(time,table_type,column, time_mult)
+DOUBLE PRECISION FUNCTION table_interp(time,table_type,column, time_mult)
         
   USE linkbc_vars
   USE general_vars, ONLY : maxtimes,debug_print

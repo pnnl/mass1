@@ -42,9 +42,9 @@ IMPLICIT NONE
 INTEGER :: i,j,count
 INTEGER :: sec_id,num_pairs,num_levels
 INTEGER :: iperm(num_pairs)
-REAL :: linear_interp
-REAL :: del_y,xy(2*maxpairs),x(num_pairs),y(num_pairs),y_new(num_pairs)
-REAL :: width(num_pairs),width_new(num_pairs),level,x_inter,max_elv,min_elv
+DOUBLE PRECISION :: linear_interp
+DOUBLE PRECISION :: del_y,xy(2*maxpairs),x(num_pairs),y(num_pairs),y_new(num_pairs)
+DOUBLE PRECISION :: width(num_pairs),width_new(num_pairs),level,x_inter,max_elv,min_elv
 LOGICAL :: last_point_wet, unique, nonmono
 
 ! divide xy vector into x,y pairs

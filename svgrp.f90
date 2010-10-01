@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created November 17, 1998 by William A. Perkins
-! Last Change: Mon Dec 21 11:31:34 1998 by William A. Perkins <perk@erebus.pnl.gov>
+! Last Change: Wed Sep 29 14:02:54 2010 by William A. Perkins <d3g096@bearflag.pnl.gov>
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -17,9 +17,9 @@
 SUBROUTINE SVRGP(n, xin, xout, iperm)
 
   INTEGER :: n
-  REAL :: xin(n), xout(n)
+  DOUBLE PRECISION :: xin(n), xout(n)
   INTEGER :: iperm(n)
-  REAL :: xtmp
+  DOUBLE PRECISION :: xtmp
   INTEGER :: itmp, i, j
 
   xout(1:n) = xin(1:n)

@@ -7,13 +7,13 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created December 21, 1998 by William A. Perkins
-! Last Change: Mon Dec 21 11:27:26 1998 by William A. Perkins <perk@erebus.pnl.gov>
+! Last Change: Wed Sep 29 14:04:56 2010 by William A. Perkins <d3g096@bearflag.pnl.gov>
 ! ----------------------------------------------------------------
 
 PROGRAM svgrp_test
 
   PARAMETER  (N=10)
-  REAL       RA(N), RB(N)
+  DOUBLE PRECISION       RA(N), RB(N)
   INTEGER    IPERM(N)
   ! Set values for  RA and IPERM 
   DATA RA/10.0, -9.0, 8.0, -7.0, 6.0, 5.0, 4.0, -3.0, -2.0, -1.0/

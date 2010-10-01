@@ -39,7 +39,7 @@ SUBROUTINE initial_cond
 
 
         INTEGER :: link,point, i
-        REAL :: junk3,depth,junk2,junk4
+        DOUBLE PRECISION :: junk3,depth,junk2,junk4
 
         CALL open_existing(filename(6), fileunit(6))
         

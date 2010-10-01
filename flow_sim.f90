@@ -38,11 +38,11 @@ USE logicals , ONLY : do_latflow
 
 IMPLICIT NONE
 
-REAL :: a,b,c,d,g,ap,bp,cp,dp,gp,denom
-REAL :: latq_old,latq_new
-REAL :: depth,area_temp,width,conveyance,dkdy,hydrad
-REAL :: sum,sum2,bcval,dy,dq,y_new_time, q_new_time
-REAL :: table_interp, temp
+DOUBLE PRECISION :: a,b,c,d,g,ap,bp,cp,dp,gp,denom
+DOUBLE PRECISION :: latq_old,latq_new
+DOUBLE PRECISION :: depth,area_temp,width,conveyance,dkdy,hydrad
+DOUBLE PRECISION :: sum,sum2,bcval,dy,dq,y_new_time, q_new_time
+DOUBLE PRECISION :: table_interp, temp
 
 INTEGER :: i,j,point_num,link,point,table_type
 

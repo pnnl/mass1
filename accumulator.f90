@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created November  6, 2000 by William A. Perkins
-! Last Change: Mon Nov 13 22:21:11 2000 by William A. Perkins <perk@localhost>
+! Last Change: Wed Sep 29 14:43:06 2010 by William A. Perkins <d3g096@bearflag.pnl.gov>
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE accumulator
@@ -22,12 +22,12 @@ MODULE accumulator
   IMPLICIT NONE
   
   CHARACTER(LEN=80), SAVE, PRIVATE :: RCS_ID = "$Id$"
-  REAL, PARAMETER, PRIVATE :: realbig = 1.0e+10, realsmall = 1.0e-10
+  DOUBLE PRECISION, PARAMETER, PRIVATE :: realbig = 1.0e+10, realsmall = 1.0e-10
 
   TYPE accum_var_rec
-     REAL, POINTER :: max(:,:)
-     REAL, POINTER :: min(:,:)
-     REAL, POINTER :: sum(:,:)
+     DOUBLE PRECISION, POINTER :: max(:,:)
+     DOUBLE PRECISION, POINTER :: min(:,:)
+     DOUBLE PRECISION, POINTER :: sum(:,:)
   END TYPE accum_var_rec
   
   TYPE accum_tdg_rec
@@ -174,7 +174,7 @@ CONTAINS
 
     IMPLICIT NONE 
 
-    REAL, INTENT(IN) :: val(:,:)
+    DOUBLE PRECISION, INTENT(IN) :: val(:,:)
     TYPE (accum_var_rec) :: rec
 
     WHERE (val .GT. rec%max) rec%max = val
@@ -203,16 +203,15 @@ CONTAINS
        IF ((do_temp .AND. temp_exchange) .OR. (do_gas .AND. gas_exchange) ) &
                &CALL update_met_data(time, met_zone(link))
       DO point = 1, maxpoints(link)
-         tdg_press = TDGasPress( DBLE(species(1)%conc(link,point)), &
-              &DBLE(species(2)%conc(link,point)), salinity)
+         tdg_press = TDGasPress(species(1)%conc(link,point), species(2)%conc(link,point), salinity)
          IF (tdg_press .GT. tdg%press%max(link, point)) &
               &tdg%press%max(link, point) = tdg_press
          IF (tdg_press .LT. tdg%press%min(link, point)) &
               &tdg%press%min(link, point) = tdg_press
          tdg%press%sum(link, point) = tdg%press%sum(link, point) + tdg_press
 
-         tdg_sat = TDGasSaturation( DBLE(species(1)%conc(link,point)), &
-              &DBLE(species(2)%conc(link,point)), salinity, baro_press)
+         tdg_sat = TDGasSaturation(species(1)%conc(link,point), species(2)%conc(link,point), &
+              &salinity, baro_press)
          IF (tdg_sat .GT. tdg%sat%max(link, point)) &
               &tdg%sat%max(link, point) = tdg_sat
          IF (tdg_sat .LT. tdg%sat%min(link, point)) &

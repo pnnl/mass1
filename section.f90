@@ -38,8 +38,7 @@ SUBROUTINE section(link,point,depth,area_temp,width,conveyance,dkdy,hydrad)
         IMPLICIT NONE
 
         INTEGER :: i,j,link,point
-        REAL :: area_temp,depth,width,perm,hydrad,dpdy,dkdy,conveyance
-		REAL :: factor
+        DOUBLE PRECISION :: area_temp,depth,width,perm,hydrad,dpdy,dkdy,conveyance, factor
 !NOTE: y is DEPTH here NOT STAGE as in flow sim
 ! match section number to the right section info given
 ! the link and point we are at
