@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Thu Apr 19 12:39:51 2001 by William A. Perkins <perk@gehenna.pnl.gov>
+# Last Change: Thu Sep 30 08:27:39 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -20,7 +20,7 @@ set -e
 TRAP_FPE='INVALID=ABORT(1);UNDERFL=ZERO;OVERFL=ABORT(1);INT_OVERFL=ABORT(1);DIVZERO=ABORT(1);DEBUG'
 export TRAP_FPE
 
-model=${MODEL-../../../mass1_v084}
+model=${MODEL-../../../mass1}
 
                                 # downstream stage boundary condition
 
