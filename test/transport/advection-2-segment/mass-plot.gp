@@ -7,14 +7,12 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 16, 2000 by William A. Perkins
-# Last Change: Thu Mar 16 08:13:49 2000 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Thu Sep 30 11:53:18 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
 set xdata time
 set timefmt '%m-%d-%Y %H:%M:%S'
-
-set data style lines
 
 set format x '%H:%M'
 set xlabel 'Simulation Time'
@@ -24,7 +22,7 @@ set ylabel 'Contaminant Mass'
 
 set key bottom
 
-plot 7200000 notitle with lines 0, \
-     "<awk '$0 !~ /^#/ {sum=sum+$4*$8*144; print $1, $2, sum; }' ts11.out" using 1:3 title 'Inflow' with lines 1, \
-     "<awk '$0 !~ /^#/ {sum=sum+$4*$8*144; print $1, $2, sum; }' ts275.out" using 1:3 title 'Outflow' with lines 3
+plot 7200000 notitle with lines lt 0, \
+     "<awk '$0 !~ /^#/ {sum=sum+$4*$8*144; print $1, $2, sum; }' ts11.out" using 1:3 title 'Inflow' with lines lt 1, \
+     "<awk '$0 !~ /^#/ {sum=sum+$4*$8*144; print $1, $2, sum; }' ts275.out" using 1:3 title 'Outflow' with lines lt 3
      

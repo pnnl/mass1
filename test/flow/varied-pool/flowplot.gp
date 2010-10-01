@@ -41,7 +41,6 @@ set key title ""
 set key below
 set nolabel
 set noarrow
-set nolinestyle
 set nologscale
 set offsets 0, 0, 0, 0
 set pointsize 1
@@ -62,15 +61,12 @@ set cntrparam levels auto 5
 set cntrparam points 5
 set size ratio 0 1,1
 set origin 0,0
-set data style points
-set function style lines
 set xzeroaxis lt -2 lw 1.000
 set x2zeroaxis lt -2 lw 1.000
 set yzeroaxis lt -2 lw 1.000
 set y2zeroaxis lt -2 lw 1.000
 set tics in
 set ticslevel 0.5
-set ticscale 1 0.5
 set mxtics default
 set mytics default
 set mx2tics default
@@ -80,21 +76,21 @@ set ytics border mirror norotate autofreq
 set ztics border nomirror norotate autofreq 
 set nox2tics
 set noy2tics
-set title "MASS1 - {/Symbol D}t = @TIMESTEP@" 0.000000,0.000000  ""
-set timestamp "" bottom norotate 0.000000,0.000000  ""
+set title "MASS1 - {/Symbol D}t = @TIMESTEP@" 
+set timestamp "" bottom norotate 
 set rrange [ * : * ] noreverse nowriteback  # (currently [-0.00000:10.0000] )
 set trange [ * : * ] noreverse nowriteback  # (currently ["12-31-1999 23:59:55":"01-01-2000 00:00:05"] )
 set urange [ * : * ] noreverse nowriteback  # (currently ["12-31-1999 23:59:55":"01-01-2000 00:00:05"] )
 set vrange [ * : * ] noreverse nowriteback  # (currently [-5.00000:5.00000] )
-set xlabel "" 0.000000,0.000000  ""
-set x2label "" 0.000000,0.000000  ""
+set xlabel "" 
+set x2label "" 
 set timefmt "%m-%d-%Y %H:%M:%S"
 set xrange [ '05-31-1997 00:00:00' : '06-04-1997 00:00:00' ] noreverse nowriteback  # (currently ["12-31-1999 23:59:50":"01-01-2000 00:00:10"] )
 set x2range [ * : * ] noreverse nowriteback  # (currently [-10.0000:10.0000] )
-set y2label "" 0.000000,0.000000  ""
+set y2label "" 
 set yrange [ * : * ] noreverse nowriteback  # (currently [-10.0000:10.0000] )
 set y2range [ * : * ] noreverse nowriteback  # (currently [-10.0000:10.0000] )
-set zlabel "" 0.000000,0.000000  ""
+set zlabel "" 
 set zrange [ * : * ] noreverse nowriteback  # (currently [-10.0000:10.0000] )
 set zero 1e-08
 set lmargin -1
@@ -102,12 +98,12 @@ set bmargin -1
 set rmargin -1
 set tmargin -1
 set locale "C"
-set ylabel "Discharge, cfs" 0.000000,0.000000  ""
+set ylabel "Discharge, cfs" 
 plot 'ts11.out' using 1:4 title 'Upstream Boundary' with lines, \
      'ts1101.out' using 1:4 title '50 miles Downstream' with lines, \
      'ts1201.out' using 1:4 title '100 miles Downstream' with lines, \
      'ts1301.out' using 1:4 title 'Downstream Boundary' with lines
-set ylabel "Stage, feet" 0.000000,0.000000  ""
+set ylabel "Stage, feet" 
 plot 'ts11.out' using 1:3 title 'Upstream Boundary' with lines, \
      'ts1101.out' using 1:3 title '50 miles Downstream' with lines, \
      'ts1201.out' using 1:3 title '100 miles Downstream' with lines, \

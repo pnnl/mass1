@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January  2, 2004 by William A. Perkins
-# Last Change: Sun Jan  8 09:49:44 2006 by William A. Perkins <perk@mcperktop.local>
+# Last Change: Thu Sep 30 07:18:08 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -21,10 +21,10 @@ set key below
 # d(x) = (9./8. + 1./4.*sin(3.141569*x*0.3048/500.))/0.3048
 d(x) = (9./8. + 1./4.*sin(pi*x/500.))
 
-plot "<head -506 profile1.out" using ($4*0.3048):($5*0.3048) title "Initial Conditions" with linespoints 1, \
-     "<tail -506 profile1.out" using ($4*0.3048):($5*0.3048) title "Steady State" with points 7, \
-     "<tail -506 profile1.out" using ($4*0.3048):($13*0.3048 + (9./8. + 1./4.*sin(pi*($4*0.3048-1500)/500.))) title "Analytic Solution" with lines 3, \
-     "<tail -506 profile1.out" using ($4*0.3048):($13*0.3048) title "Bottom" with lines 7
+plot "<head -506 profile1.out" using ($4*0.3048):($5*0.3048) title "Initial Conditions" with linespoints lt 1, \
+     "<tail -506 profile1.out" using ($4*0.3048):($5*0.3048) title "Steady State" with points lt 7, \
+     "<tail -506 profile1.out" using ($4*0.3048):($13*0.3048 + (9./8. + 1./4.*sin(pi*($4*0.3048-1500)/500.))) title "Analytic Solution" with lines lt 3, \
+     "<tail -506 profile1.out" using ($4*0.3048):($13*0.3048) title "Bottom" with lines lt 7
 
      
      

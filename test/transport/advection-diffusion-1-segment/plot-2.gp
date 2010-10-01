@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 22, 1999 by William A. Perkins
-# Last Change: Tue Dec 14 16:11:15 1999 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Thu Sep 30 11:46:59 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -34,6 +34,6 @@ set key below
 plot C(x, 24*60) title "Analytic: t = 24.0 min", \
      C(x, 48*60) title "Analytic: t = 48.0 min", \
      C(x, 72*60) title "Analytic: t = 72.0 min", \
-     'profile1.out' using (10584 - $4):10 title 'MASS1 Simulated' with points 7
+     'profile1.out' using (10584 - $4):10 title 'MASS1 Simulated' with points lt 7
 
 

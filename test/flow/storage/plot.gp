@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created July 13, 1999 by William A. Perkins
-# Last Change: Wed Mar  8 10:43:25 2000 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Thu Sep 30 08:06:26 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -23,7 +23,7 @@ set yrange [0:2000]
 set pointsize 0.4
 set key below
 
-plot 'ts11-@CASE@.out' using 1:4 axes x1y1 title 'Inflow' with linespoints 1, \
-     'ts1149-@CASE@.out' using 1:4 axes x1y1 title 'Ouflow' with lines 3, \
-     'storage-@CASE@.out' using 1:3 axes x1y2 title 'Channel Storage' with lines 4
+plot 'ts11-@CASE@.out' using 1:4 axes x1y1 title 'Inflow' with linespoints lt 1, \
+     'ts1149-@CASE@.out' using 1:4 axes x1y1 title 'Ouflow' with lines lt 3, \
+     'storage-@CASE@.out' using 1:3 axes x1y2 title 'Channel Storage' with lines lt 4
      

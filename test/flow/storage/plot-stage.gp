@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created July 13, 1999 by William A. Perkins
-# Last Change: Wed Mar  8 11:01:50 2000 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Thu Sep 30 08:06:17 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -20,5 +20,5 @@ set ylabel 'Elevation, feet'
 set pointsize 0.4
 # set key below
 
-plot 'ts1149-@CASE@.out' using 1:3 axes x1y1 title "Downstream Stage" with linespoints 1
+plot 'ts1149-@CASE@.out' using 1:3 axes x1y1 title "Downstream Stage" with linespoints lt 1
      
