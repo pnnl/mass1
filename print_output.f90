@@ -3,7 +3,7 @@
 !            Pacific Northwest National Laboratory
 !***************************************************************
 !
-! NAME:	print_output
+! NAME: print_output
 !
 ! VERSION and DATE: MASS1 v0.70 12/10/1997
 !
@@ -15,7 +15,7 @@
 !
 ! LOCAL VARIABLES:
 !
-! COMMENTS:	needs alot more stuff
+! COMMENTS:     needs alot more stuff
 !
 !
 ! MOD HISTORY: 0.61 version adds more output; 0.70 enhanced output
@@ -44,8 +44,8 @@ USE date_time
 IMPLICIT NONE
 
 
-REAL :: depth
-REAL :: tdg_press, tdg_sat
+DOUBLE PRECISION :: depth
+DOUBLE PRECISION :: tdg_press, tdg_sat
 DOUBLE PRECISION :: salinity = 0.0
 INTEGER :: link,point, iounit1
 CHARACTER (LEN=6) :: option
@@ -54,27 +54,27 @@ SELECT CASE(option)
 
 CASE("HEADER")        
   
-	iounit1 = fileunit(7)
-	OPEN(fileunit(7),file=filename(7))
+        iounit1 = fileunit(7)
+        OPEN(fileunit(7),file=filename(7))
     WRITE(99,*)'general output file ', filename(7),' opened'
 
-	 WRITE(iounit1,1026)
+         WRITE(iounit1,1026)
 1026 FORMAT(5x,'Modular Aquatic Simulation System 1D (MASS1)'/)
 
-	 WRITE(iounit1,1025)
+         WRITE(iounit1,1025)
 1025 FORMAT(5x,'One-Dimensional River Simulation Model'//)
 
-	 WRITE(iounit1,1030)version
+         WRITE(iounit1,1030)version
 1030 FORMAT(5x,a120/)
-	 WRITE(iounit1,1040)
+         WRITE(iounit1,1040)
 1040 FORMAT(5x,'Pacific Northwest National Laboratory')
-	 WRITE(iounit1,1050)
+         WRITE(iounit1,1050)
 1050 FORMAT(5x,'Hydrology Group')
-	 WRITE(iounit1,1060)
+         WRITE(iounit1,1060)
 1060 FORMAT(5x,'Richland, WA 99352'/)
-	 WRITE(iounit1,1070)
+         WRITE(iounit1,1070)
 1070 FORMAT(5x,'Contact:'/)
-	 WRITE(iounit1,1080)
+         WRITE(iounit1,1080)
 1080 FORMAT(5x,'Dr. Marshall C. Richmond')
      WRITE(iounit1,1090)
 1090 FORMAT(5x,'509-372-6241')
@@ -84,9 +84,9 @@ CASE("HEADER")
 
 CASE("CONFIG")
 
-	 WRITE(iounit1,1120)date_run_begins,time_run_begins
+         WRITE(iounit1,1120)date_run_begins,time_run_begins
 1120 FORMAT('Simulation Starts on Date: ',a10,'  Time: ',a8/)
-	 WRITE(iounit1,1130)date_run_ends,time_run_ends
+         WRITE(iounit1,1130)date_run_ends,time_run_ends
 1130 FORMAT('Simulation Ends on Date: ',a10,'  Time: ',a8/)
 
 
@@ -152,8 +152,8 @@ WRITE(fileunit(7),1020)date_string,time_string
 WRITE(fileunit(7),1010)
 1010 FORMAT('link',2x,'point',2x,'distance',2x,'water elev',3x,'discharge',5x,'vel',5x,'depth', &
      7x,'conc',6x,'temp',2x,'%Sat',3x,'TDG P', &
-		 2x,'thalweg el',2x,'area ',2x,'top width',2x,'hyd rad',2x,'Fr #',2x,'frict slope', &
-	 2x,'bed shear')
+                 2x,'thalweg el',2x,'area ',2x,'top width',2x,'hyd rad',2x,'Fr #',2x,'frict slope', &
+         2x,'bed shear')
 
 WRITE(fileunit(7),1110)
 
@@ -162,27 +162,27 @@ WRITE(fileunit(7),1110)
 
 
 DO link=1,maxlinks
-DO point=1,maxpoints(link)
-depth = y(link,point) - thalweg(link,point)
-tdg_sat =   TDGasSaturation( DBLE(species(1)%conc(link,point)), DBLE(species(2)%conc(link,point)), salinity, baro_press)
-tdg_press = TDGasPress( DBLE(species(1)%conc(link,point)), DBLE(species(2)%conc(link,point)), salinity)
+   DO point=1,maxpoints(link)
+      depth = y(link,point) - thalweg(link,point)
+      tdg_sat = TDGasSaturation(species(1)%conc(link,point), species(2)%conc(link,point), salinity, baro_press)
+      tdg_press = TDGasPress(species(1)%conc(link,point), species(2)%conc(link,point), salinity)
 
 
 WRITE(fileunit(7),1000)link,point,x(link,point)/5280.0,y(link,point),q(link,point),vel(link,point),depth, &
      species(1)%conc(link,point),species(2)%conc(link,point),tdg_sat,tdg_press, &
-		 thalweg(link,point),area(link,point),top_width(link,point),hyd_radius(link,point), &
-	 froude_num(link,point),friction_slope(link,point),bed_shear(link,point)
+                 thalweg(link,point),area(link,point),top_width(link,point),hyd_radius(link,point), &
+         froude_num(link,point),friction_slope(link,point),bed_shear(link,point)
 
 
 END DO
 END DO
 !1000   FORMAT(i5,i5,6(f10.2,2x),11(f12.6,1x))
 1000 FORMAT(i5,2x,i5,2x,f8.2,2x,f8.2,2x,f12.2,2x,f6.2,2x,f7.2,2x,f10.2,2x,f6.2,2x,f6.2,2x,f6.1, &
-		2x,f8.2,2x,es10.2,2x, &
+                2x,f8.2,2x,es10.2,2x, &
    f8.2,2x,f6.2,f6.2,es10.2,2x,es10.2)
 
 IF(time >= time_end)THEN
-	CLOSE(fileunit(7))
+        CLOSE(fileunit(7))
 ENDIF
 
 END SELECT
