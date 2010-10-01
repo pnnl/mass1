@@ -1,3 +1,47 @@
+2010-10-01  William A. Perkins  <william.perkins@pnl.gov>
+
+	* tdg_equation_coeff.f90: use double precision everywhere
+
+	* table_interp.f90: use double precision everywhere
+
+	* svgrp.f90: use double precision everywhere
+
+	* svgrp-test.f90: use double precision everywhere
+
+	* section_table.f90: use double precision everywhere
+
+	* section_data.f90: use double precision everywhere
+
+	* section.f90: use double precision everywhere
+
+	* scalars_module.f90: use double precision everywhere
+
+	* profile_output.f90: use double precision everywhere
+
+	* print_output.f90: use double precision everywhere; reformat 
+
+	* point_data.f90: use double precision everywhere
+
+	* pidlink.f90: use double precision everywhere
+
+	* nonfluvial_coeff.f90: use double precision everywhere; reformat 
+
+	* modules.f90: use double precision everywhere; reformat 
+
+	* linear_interp.f90: use double precision everywhere
+
+	* initial_cond.f90: use double precision everywhere
+
+	* hydro_output.f90: use double precision everywhere
+
+	* gage_output.f90: use double precision everywhere
+
+	* flow_sim.f90: use double precision everywhere
+
+	* coeff.f90: use double precision everywhere; reformat
+
+	* accumulator.f90: use double precision everywhere 
+
 2010-09-29  William A. Perkins  <william.perkins@pnl.gov>
 
 	* scripts/profile2cgns.py: add verbosity option; extract stage and
