@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 22, 1999 by William A. Perkins
-# Last Change: Thu Apr  1 10:16:15 1999 by William A. Perkins <perk@tophet>
+# Last Change: Tue Nov 30 13:36:28 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -39,6 +39,6 @@ set arrow from 5328.0,0.0 to 5328.0,10.0 nohead lt 0
 plot C(x, 24*60) title "Analytic: t = 24.0 min", \
      C(x, 48*60) title "Analytic: t = 48.0 min", \
      C(x, 72*60) title "Analytic: t = 72.0 min", \
-     'profile1.out' using (10656 - $4):10 title 'MASS1 Simulated' with linespoints 7
+     'profile1.out' using (10656 - $4):10 title 'MASS1 Simulated' with linespoints lt 7
 
 

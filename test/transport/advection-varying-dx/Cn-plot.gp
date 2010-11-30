@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 16, 2000 by William A. Perkins
-# Last Change: Thu Mar 16 14:25:17 2000 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Tue Nov 30 13:37:33 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -20,5 +20,5 @@ set y2tics nomirror
 
 set pointsize 0.5
 
-plot 'courant.dat' using (10656 - $1):2 axes x1y1 title 'Spacing' with linespoints 1, \
-     'courant.dat' using (10656 - $1):3 axes x1y2 title 'Courant Number' with linespoints 7
+plot 'courant.dat' using (10656 - $1):2 axes x1y1 title 'Spacing' with linespoints lt 1, \
+     'courant.dat' using (10656 - $1):3 axes x1y2 title 'Courant Number' with linespoints lt 7
