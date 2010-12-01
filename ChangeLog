@@ -1,5 +1,7 @@
 2010-12-01  William A. Perkins  <william.perkins@pnl.gov>
 
+	* bctable.f90 (bc_table_interpolate): add some id error checks
+
 	* test/transport/lateral-inflow/lateral-t.dat: add lateral
 	inflow temperature
 
