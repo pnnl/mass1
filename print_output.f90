@@ -32,7 +32,6 @@ USE point_vars
 USE file_vars
 USE transport_vars
 USE date_vars
-USE linkbc_vars
 USE section_vars
 USE logicals
 
