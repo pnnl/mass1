@@ -200,8 +200,9 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
   USE link_vars, ONLY : maxpoints, comporder, linktype, num_con_links, con_links,&
        &linkbc_table, met_zone, tempbc_table, transbc_table
   USE point_vars, ONLY: x, hy=>y, k_diff, thalweg
-  USE linkbc_vars
   USE logicals
+  USE bctable
+
   
   USE met_data_module
   USE energy_flux
@@ -215,9 +216,9 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
   INTEGER :: status_iounit, error_iounit
   DOUBLE PRECISION :: c(:,0:), c_old(:,0:)
 
-  INTEGER :: i,j,link,point,table_type
+  INTEGER :: i,j,link,point
   DOUBLE PRECISION :: velave,sum,cflx,s,corr,tmp,phi,dtdx,ave_vel
-  DOUBLE PRECISION :: f(maxpoint),table_interp
+  DOUBLE PRECISION :: f(maxpoint)
   DOUBLE PRECISION :: k_e,k_w,area_e,area_w,flux_e,flux_w
   DOUBLE PRECISION :: qspill,qgen 
   DOUBLE PRECISION :: energy_source, depth, transfer_coeff
@@ -267,12 +268,10 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
 !!$        END DO
         
         IF((linktype(i) == 6) .AND. (species_num == 1))THEN
-           table_type = 3 !generation flow
-           qgen = table_interp(time,table_type,linkbc_table(link),time_mult)
            
-           table_type = 4 !spill flow
-           qspill = table_interp(time,table_type,linkbc_table(link),time_mult)
-
+           call bc_table_interpolate(hydrobc, linkbc_table(link), time/time_mult)
+           qgen = bc_table_current(hydrobc, linkbc_table(link), 1)
+           qspill = bc_table_current(hydrobc, linkbc_table(link), 2)
            
            IF(do_temp .AND. temp_exchange) CALL update_met_data(time, met_zone(link))
            IF(do_temp) t_water = species(2)%conc(link,2)
@@ -365,8 +364,8 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
            IF(do_temp .AND. temp_exchange) CALL update_met_data(time, met_zone(link))
            IF(do_temp)THEN
               IF((num_con_links(link) == 0) .AND. (tempbc_table(link) /= 0))THEN
-                 table_type = 6
-                 t_water = table_interp(time,table_type,tempbc_table(link),time_mult)
+                 call bc_table_interpolate(tempbc, tempbc_table(link), time/time_mult)
+                 t_water = bc_table_current(tempbc, tempbc_table(link), 1)
               ELSE
                  t_water = species(2)%conc(link,1)
               ENDIF
@@ -375,22 +374,20 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
            IF((num_con_links(link) == 0) .AND. (transbc_table(link) /= 0))THEN
               SELECT CASE(linktype(link))
               CASE(1)
-                 table_type = 2
-                 c(link,point) = table_interp(time,table_type,transbc_table(link),time_mult)
-                 
+                 call bc_table_interpolate(transbc, transbc_table(link), time/time_mult)
+                 c(link,point) = bc_table_current(transbc, transbc_table(link), 1)
+
               CASE(20) ! %TDG Saturation is specified
-                 table_type = 2
-                 upstream_c = table_interp(time,table_type,transbc_table(link),time_mult)
+                 call bc_table_interpolate(transbc, transbc_table(link), time/time_mult)
+                 upstream_c = bc_table_current(transbc, transbc_table(link), 1)
                  c(link,point) = TDGasConcfromSat(upstream_c, t_water, salinity, baro_press)
                  
                  
                  !-------------------------------------------------------------------
               CASE(21) ! Hydro project inflow link
-                 table_type = 3 !generation flow
-                 qgen = table_interp(time,table_type,linkbc_table(link),time_mult)
-                 
-                 table_type = 4 !spill flow
-                 qspill = table_interp(time,table_type,linkbc_table(link),time_mult)
+                 call bc_table_interpolate(hydrobc, linkbc_table(link), time/time_mult)
+                 qgen = bc_table_current(hydrobc, linkbc_table(link), 1)
+                 qspill = bc_table_current(hydrobc, linkbc_table(link), 2)
 
                  IF(qspill > 0.0)THEN
                     
@@ -436,8 +433,8 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                  hydro_spill(link) = qspill
                  hydro_disch(link) = q(link, 1)
 
-                 table_type = 2
-                 upstream_c = table_interp(time,table_type,transbc_table(link),time_mult)
+                 call bc_table_interpolate(transbc, transbc_table(link), time/time_mult)
+                 upstream_c = bc_table_current(transbc, transbc_table(link), 1)
                  upstream_c = TDGasConcfromSat(upstream_c, t_water, salinity, baro_press)
                  
                  IF (qspill + qgen .gt. 0.0) THEN
@@ -465,20 +462,18 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
               
               SELECT CASE(linktype(link))
               CASE(1) ! % internal C (mg/L) specified
-                 table_type = 2
-                 c(link,point) = table_interp(time,table_type,transbc_table(link),time_mult)
+                 call bc_table_interpolate(transbc, transbc_table(link), time/time_mult)
+                 c(link,point) = bc_table_current(transbc, transbc_table(link), 1)
                  
               CASE(20) ! internal %TDG Saturation is specified
-                 table_type = 2
-                 upstream_c = table_interp(time,table_type,transbc_table(link),time_mult)
+                 call bc_table_interpolate(transbc, transbc_table(link), time/time_mult)
+                 upstream_c = bc_table_current(transbc, transbc_table(link), 1)
                  c(link,point) = TDGasConcfromSat(upstream_c, t_water, salinity, baro_press)
                               
               CASE(21) ! Hydro project inflow for an internal link
-                 table_type = 3 !generation flow
-                 qgen = table_interp(time,table_type,linkbc_table(link),time_mult)
-                 
-                 table_type = 4 !spill flow
-                 qspill = table_interp(time,table_type,linkbc_table(link),time_mult)
+                 call bc_table_interpolate(hydrobc, linkbc_table(link), time/time_mult)
+                 qgen = bc_table_current(hydrobc, linkbc_table(link), 1)
+                 qspill = bc_table_current(hydrobc, linkbc_table(link), 2)
                  
                  IF(qspill > 0.0)THEN
                     
@@ -500,14 +495,13 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                     
                     SELECT CASE(gas_eqn_type(link))
                     CASE(0)
-                       table_type = 2
-                       c(link,point) = table_interp(time,table_type,transbc_table(link),time_mult)
+                       call bc_table_interpolate(transbc, transbc_table(link), time/time_mult)
+                       c(link,point) = bc_table_current(transbc, transbc_table(link), 1)
                        hydro_conc(link) = c(link,point)
                        hydro_sat(link) = TDGasSaturation(hydro_conc(link), t_water, salinity, baro_press)
                     CASE(1)
-                       table_type = 2
-                       tdg_saturation = table_interp(time,table_type,transbc_table(link),time_mult)
-                       c(link,point) = TDGasConcfromSat(tdg_saturation, t_water, salinity, baro_press)
+                       call bc_table_interpolate(transbc, transbc_table(link), time/time_mult)
+                       tdg_saturation = bc_table_current(transbc, transbc_table(link), 1)
                        hydro_conc(link) = c(link,point)
                        hydro_sat(link) = tdg_saturation
                     CASE(2)
@@ -566,8 +560,8 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
            
         CASE(2) ! temperature species
            IF((num_con_links(link) == 0) .AND. (tempbc_table(link) /= 0))THEN
-              table_type = 6
-              c(link,point) = table_interp(time,table_type,tempbc_table(link),time_mult)
+              call bc_table_interpolate(tempbc, tempbc_table(link), time/time_mult)
+              c(link,point) = bc_table_current(tempbc, tempbc_table(link), 1)
            ELSE IF((num_con_links(link) /= 0) .AND. (tempbc_table(link) == 0)) THEN! internal link
               sum = 0.0
               DO j=1,num_con_links(link)
@@ -575,8 +569,8 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                  c(link,point) = sum/q(link,point)
               END DO
            ELSE IF((num_con_links(link) /= 0) .AND. (tempbc_table(link) /= 0)) THEN! internal link with table spec
-              table_type = 6
-              c(link,point) = table_interp(time,table_type,tempbc_table(link),time_mult)
+              call bc_table_interpolate(tempbc, tempbc_table(link), time/time_mult)
+              c(link,point) = bc_table_current(tempbc, tempbc_table(link), 1)
            ELSE 
               WRITE(*,*)'no temp BC specification for link',link,' -- ABORT'
               WRITE(99,*)'no temp BC specification for link',link,' -- ABORT'
@@ -652,7 +646,8 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
            !area = q(link,point)/vel(link,point)           
            dtdx = delta_t/(dxx(link,point))
            
-           c(link,point)=c(link,point)*area_old(link,point)/area(link,point) - dtdx*(f(point) - f(point-1))/area(link,point)
+           c(link,point)=c(link,point)*area_old(link,point)/area(link,point) - &
+                &dtdx*(f(point) - f(point-1))/area(link,point)
            c_old(link,point) = c(link,point)                    
         END DO
         
