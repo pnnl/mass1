@@ -1,5 +1,11 @@
 2010-12-01  William A. Perkins  <william.perkins@pnl.gov>
 
+	* test/transport/lateral-inflow/lateral-t.dat: add lateral
+	inflow temperature
+
+	* test/transport/lateral-inflow/temp-bc-files.dat: add lateral
+	inflow temperature
+
 	* test/transport/lateral-inflow/plot.gp: change temperature axis
 	range to show the whole range
 
