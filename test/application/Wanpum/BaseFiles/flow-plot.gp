@@ -41,7 +41,6 @@ set key title ""
 set key right below Right noreverse box linetype -2 linewidth 1.000 samplen 4 spacing 1 width 0
 set nolabel
 set noarrow
-set nolinestyle
 set nologscale
 set offsets 0, 0, 0, 0
 set pointsize 0.5
@@ -62,15 +61,14 @@ set cntrparam levels auto 5
 set cntrparam points 5
 set size ratio 0 1,1
 set origin 0,0
-set data style points
-set function style lines
+set style data points
+set style function lines
 set xzeroaxis lt -2 lw 1.000
 set x2zeroaxis lt -2 lw 1.000
 set yzeroaxis lt -2 lw 1.000
 set y2zeroaxis lt -2 lw 1.000
 set tics in
 set ticslevel 0.5
-set ticscale 1 0.5
 set mxtics default
 set mytics default
 set mx2tics default
@@ -80,22 +78,22 @@ set ytics border mirror norotate autofreq
 set ztics border nomirror norotate autofreq 
 set nox2tics
 set noy2tics
-set title "" 0.000000,0.000000  ""
-set timestamp "" bottom norotate 0.000000,0.000000  ""
+set title "" 
+set timestamp "" bottom norotate 
 set rrange [ * : * ] noreverse nowriteback  # (currently [-0.00000:10.0000] )
 set trange [ * : * ] noreverse nowriteback  # (currently ["12-31-1999 23:59:55":"01-01-2000 00:00:05"] )
 set urange [ * : * ] noreverse nowriteback  # (currently ["12-31-1999 23:59:55":"01-01-2000 00:00:05"] )
 set vrange [ * : * ] noreverse nowriteback  # (currently [-5.00000:5.00000] )
-set xlabel "" 0.000000,0.000000  ""
-set x2label "" 0.000000,0.000000  ""
+set xlabel "" 
+set x2label "" 
 set timefmt "%m-%d-%Y %H:%M:%S"
 set xrange [ "07-16-2000 00:00:00" : "07-23-2000 00:00:00" ] noreverse nowriteback
 set x2range [ * : * ] noreverse nowriteback  # (currently [-10.0000:10.0000] )
-set ylabel "Discharge, cfs" 0.000000,0.000000  ""
-set y2label "" 0.000000,0.000000  ""
+set ylabel "Discharge, cfs" 
+set y2label "" 
 set yrange [ 0.00000 : 220000. ] noreverse nowriteback
 set y2range [ * : * ] noreverse nowriteback  # (currently [-10.0000:10.0000] )
-set zlabel "" 0.000000,0.000000  ""
+set zlabel "" 
 set zrange [ * : * ] noreverse nowriteback  # (currently [-10.0000:10.0000] )
 set zero 1e-08
 set lmargin -1
@@ -103,6 +101,6 @@ set bmargin -1
 set rmargin -1
 set tmargin -1
 set locale "C"
-plot '../BCFiles/WAN-Flow.dat' using 1:3 title 'Observed' with linespoints 1,\
-     'ts182.out' using 1:4 title 'Simulated' with lines 3
+plot '../BCFiles/WAN-Flow.dat' using 1:3 title 'Observed' with linespoints lt 1,\
+     'ts182.out' using 1:4 title 'Simulated' with lines lt 3
 #    EOF
