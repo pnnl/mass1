@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October 10, 2001 by William A. Perkins
-! Last Change: Wed Sep 29 14:01:38 2010 by William A. Perkins <d3g096@bearflag.pnl.gov>
+! Last Change: Tue Nov 30 12:53:35 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 ! ----------------------------------------------------------------
 
 
@@ -281,13 +281,12 @@ CONTAINS
     USE general_vars, ONLY: time, time_step, time_mult
     USE point_vars, ONLY: q
     USE link_vars, ONLY: linkbc_table
+    USE bctable
     IMPLICIT NONE
     TYPE (pidlink_rec), POINTER :: rec
 
     INTEGER :: i, j, k
 
-    EXTERNAL table_interp
-    DOUBLE PRECISION :: table_interp
     INTEGER :: table_type
 
     IF (.NOT. ASSOCIATED(piddata)) RETURN
@@ -310,9 +309,8 @@ CONTAINS
                                 ! BC's
 
           IF (rec%lagged(i)%usebc) THEN
-             table_type = 1
-             rec%lagged(i)%flow = &
-                  &table_interp(time,table_type,rec%lagged(i)%link,time_mult)
+             call bc_table_interpolate(linkbc, rec%lagged(i)%link, time/time_mult)
+             rec%lagged(i)%flow = bc_table_current(linkbc, rec%lagged(i)%link, 1)
           ELSE
              rec%lagged(i)%flow(rec%lagged(i)%nlag) = q(rec%lagged(i)%link, 1)
           END IF
@@ -333,14 +331,13 @@ CONTAINS
     USE general_vars, ONLY: time_begin, time_mult, time_step
     USE link_vars, ONLY: linkbc_table
     USE point_vars, ONLY: q
+    USE bctable
 
     IMPLICIT NONE
 
     TYPE (pidlink_rec), POINTER :: rec
     INTEGER :: i, j, link
 
-    EXTERNAL table_interp
-    DOUBLE PRECISION :: table_interp
     INTEGER :: table_type
 
     IF (.NOT. ASSOCIATED(piddata)) RETURN
@@ -349,9 +346,9 @@ CONTAINS
        rec => piddata(j)
        link = rec%link
        rec%errsum = 0.0
-       table_type = 1
-       rec%oldsetpt = table_interp(time_begin,table_type,linkbc_table(link),time_mult)
-    
+       call bc_table_interpolate(linkbc, linkbc_table(link), time_begin/time_mult)
+       rec%oldsetpt = bc_table_current(linkbc, linkbc_table(link), 1)
+       
        DO i = 1, rec%numflows
 
                                 ! allocate a queue and make it just
@@ -367,9 +364,8 @@ CONTAINS
                                 ! that stages were specified as BC's)
 
           IF (rec%lagged(i)%usebc) THEN
-             table_type = 1
-             rec%lagged(i)%flow = &
-                  &table_interp(time_begin,table_type,rec%lagged(i)%link,time_mult)
+             call bc_table_interpolate(linkbc, rec%lagged(i)%link, time_begin/time_mult)
+             rec%lagged(i)%flow = bc_table_current(linkbc, rec%lagged(i)%link, 1)
           ELSE
              rec%lagged(i)%flow = q(rec%lagged(i)%link, 1)
           END IF
@@ -417,8 +413,7 @@ CONTAINS
 
     INTEGER :: table_type
 
-    EXTERNAL table_interp
-    DOUBLE PRECISION :: table_interp, lag, eval, lval
+    DOUBLE PRECISION :: lag, eval, lval
 
     rec => piddata(linkidmap(link))
 
