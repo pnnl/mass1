@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 21, 2001 by William A. Perkins
-# Last Change: Fri Dec 21 10:59:52 2001 by William A. Perkins <perk@gehenna.pnl.gov>
+# Last Change: Wed Dec  1 08:50:24 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 # -------------------------------------------------------------
 
 # This script runs all specific cases for the Wanapum pool test
@@ -17,7 +17,7 @@
 # links.  Each of the cases use observed from July 2000.  
 
 pwd=`pwd`
-model=${MODEL-$pwd/../../mass1_v084}
+model=${MODEL-$pwd/../../../mass1}
 
 subdir=" \
     Rampdown \
@@ -35,14 +35,14 @@ for dir in $subdir; do
 
     case $dir in
         StageBC)
-            gnuplot ../BaseFiles/flow-plot.gp
+            gnuplot < ../BaseFiles/flow-plot.gp
             ;;
         FlowBC)
-            gnuplot ../BaseFiles/stage-plot.gp
+            gnuplot < ../BaseFiles/stage-plot.gp
             ;;
         *PID*)
-            gnuplot ../BaseFiles/flow-plot.gp
-            gnuplot ../BaseFiles/stage-plot.gp
+            gnuplot < ../BaseFiles/flow-plot.gp
+            gnuplot < ../BaseFiles/stage-plot.gp
             ;;
         *)
             
