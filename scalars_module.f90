@@ -198,7 +198,8 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
   USE transport_vars , ONLY : k_surf, dxx
   USE general_vars, ONLY : maxlinks, maxpoint, time_mult, time_begin
   USE link_vars, ONLY : maxpoints, comporder, linktype, num_con_links, con_links,&
-       &linkbc_table, met_zone, tempbc_table, transbc_table
+       &linkbc_table, met_zone, tempbc_table, transbc_table, &
+       &lattempbc_table, lattransbc_table
   USE point_vars, ONLY: x, hy=>y, k_diff, thalweg
   USE logicals
   USE bctable
@@ -694,16 +695,28 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
 
 
                                 ! Correction for lateral inflow -- the
-                                ! concentration of lateral inflow
-                                ! (either incoming or outgoing) is the
-                                ! same as the current concentration
+                                ! concentration of for outgoing
+                                ! lateral inflow is the same as the
+                                ! current concentration
 
         IF (do_latflow) THEN
            DO point=2,maxpoints(link)-1
               avg_area = (area(link,point) + area_old(link,point))/2.0
               avg_latq = (latq(link,point) + latq_old(link,point))/2.0
-              c(link,point) = c(link,point)* (avg_area + avg_latq*delta_t)/avg_area
-              IF(c(link,point) < 0.0) c(link,point) = 0.0
+              IF (avg_latq < 0.0) THEN
+                 upstream_c = c(link,point)
+              ELSE IF (species_num .EQ. 1 .AND. lattransbc_table(link) .GT. 0) THEN ! tdg
+                 call bc_table_interpolate(transbc, lattransbc_table(link), time/time_mult)
+                 upstream_c = bc_table_current(transbc, lattransbc_table(link), 1);
+              ELSE IF (species_num .EQ. 2 .AND. lattempbc_table(link) .GT. 0) THEN ! temperature
+                 call bc_table_interpolate(tempbc, lattempbc_table(link), time/time_mult)
+                 upstream_c = bc_table_current(tempbc, lattempbc_table(link), 1);
+              ELSE 
+                 upstream_c = c(link,point)
+                 ! FIXME: should this be reported as an error?
+              END IF
+              c(link,point) = (c(link,point)*avg_area + upstream_c*avg_latq*delta_t)/avg_area
+              ! IF(c(link,point) < 0.0) c(link,point) = 0.0
            END DO
            c(link,maxpoints(link)) = c(link,maxpoints(link)-1)
         END IF
