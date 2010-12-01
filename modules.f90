@@ -27,7 +27,7 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Wed Sep 29 13:57:25 2010 by William A. Perkins <d3g096@bearflag.pnl.gov>
+! Last Change: Tue Nov 30 14:00:43 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 !----------------------------------------------------------
 MODULE general_vars
 
@@ -79,30 +79,12 @@ END MODULE file_vars
 
 !-----------------------------------------------------
 
-MODULE linkbc_vars
-
-  DOUBLE PRECISION, ALLOCATABLE,SAVE :: linkbc_time(:,:),transbc_time(:,:),tempbc_time(:,:),latflowbc_time(:,:)
-  DOUBLE PRECISION, ALLOCATABLE,SAVE :: linkbc(:,:),transbc(:,:),tempbc(:,:),latflowbc(:,:)
-  INTEGER, ALLOCATABLE, SAVE :: linkbc_start(:), transbc_start(:), tempbc_start(:), latflowbc_start(:)
-  DOUBLE PRECISION, ALLOCATABLE, SAVE :: gen_time(:,:),spill_time(:,:)
-  DOUBLE PRECISION, ALLOCATABLE, SAVE :: gen_flow(:,:),spill_flow(:,:)
-  INTEGER, ALLOCATABLE, SAVE :: gen_start(:), spill_start(:)
-  
-  CHARACTER(LEN=100), ALLOCATABLE :: linkbc_header(:),transbc_header(:),tempbc_header(:),latflowbc_header(:)
-  CHARACTER(LEN=100), ALLOCATABLE :: hydrobc_header(:)
-
-  !REAL, ALLOCATABLE,SAVE :: inflow_time(maxtimes),inflow(maxtimes,maxtables)
-  !REAL, SAVE :: contam_inflow(maxtimes,maxtables),contam_inflow_time(maxtimes)
-  !REAL, SAVE :: sedi_inflow_time(maxtimes),sedi_inflow(maxtimes,maxtables,2)
-
-END MODULE linkbc_vars
-
 !----------------------------------------------------------
 MODULE link_vars
 
   INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: maxpoints,linkname,linkorder,comporder,linktype,input_option
   INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: linkbc_table,num_con_links,ds_conlink,&
-       & dsbc_table,transbc_table,tempbc_table,latflowbc_table
+       & dsbc_table,transbc_table,tempbc_table,latflowbc_table,lattransbc_table,lattempbc_table
   INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: met_zone
   INTEGER, DIMENSION(:,:),ALLOCATABLE, SAVE :: con_links
   !INTEGER, SAVE ::  maxpoints(lmax),linkorder(lmax)
