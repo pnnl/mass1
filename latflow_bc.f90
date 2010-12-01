@@ -27,77 +27,26 @@
 
 SUBROUTINE latflow_bc
 
-USE utility
-USE date_time
-USE linkbc_vars
-USE link_vars
-USE file_vars
-USE general_vars, ONLY: units,maxlinks
-USE date_vars
-USE logicals, ONLY : file_exist
+  USE utility
+  USE bctable
+  USE general_vars, ONLY: maxlinks
+  USE link_vars, ONLY: linktype
+  USE file_vars, ONLY: filename
+  USE date_vars, ONLY: time_option
+  
+  IMPLICIT NONE
 
-IMPLICIT NONE
+  SELECT CASE(time_option)
 
-INTEGER :: i,count, latflowbc_num
-CHARACTER(LEN=100) :: latflowbc_filename
-INTEGER :: iounit1 = 50, iounit2 = 51
+  CASE(1) ! time units are sec,hours,minutes, or days in file
 
-! read in general lateral inlfow for link-related boundary condition table
-CALL open_existing(filename(16), fileunit(16), fatal=.TRUE.)
-  iounit2 = fileunit(16)
+     CALL error_message("Time option not supported in link_bc", .TRUE.)
 
-  count = 0
+  CASE(2) ! date/time format is used mm:dd:yyyy hh:mm:ss converted to decimal julian day
 
-	SELECT CASE(time_option)
+     latflowbc => bc_table_read(filename(16), 1)
 
-		!CASE(1) ! time units are sec,hours,minutes, or days in file
-
-    !DO WHILE(.NOT. EOF(fileunit(16)))
-    !count = count + 1
-    !     READ(fileunit(16),*)latflowbc_time(count),latflowbc(count,:)
-
-		 !SELECT CASE(units)
-		! CASE(2)
-		!  latflowbc(count,:) = latflowbc(count,:)
-		 !END SELECT
-
-     !   END DO
-
-CASE(2) ! date/time format is used mm:dd:yyyy hh:mm:ss converted to decimal julian day
-
-		DO WHILE(.TRUE.)
-			READ(iounit2,*,END=200)latflowbc_num,latflowbc_filename
-
-			INQUIRE(FILE=latflowbc_filename,EXIST=file_exist)
-            IF(file_exist)THEN
-               OPEN(iounit1, file = latflowbc_filename)
-               WRITE(99,*)'lateral inflow BC file opened: ',latflowbc_filename
-			ELSE
-               WRITE(*,*)'lateral inflow BC file does not exist - ABORT: ',latflowbc_filename
-               WRITE(99,*)'lateral inflow BC file does not exist - ABORT: ',latflowbc_filename
-               CALL EXIT(1)
-            ENDIF
-
-            READ(iounit1,*,END=100)latflowbc_header(latflowbc_num)
-			count = 0
-			DO WHILE(.TRUE.)
-				count = count + 1
-				READ(iounit1,*,END=100)date_string,time_string,latflowbc(count,latflowbc_num)
-				latflowbc_time(count,latflowbc_num) = date_to_decimal(date_string, time_string)
-				
-			END DO
-100		CLOSE(iounit1)
-		END DO
-
-		!SELECT CASE(units)
-		!CASE(2)
-		!   linkbc(count,:) = linkbc(count,:)
-		! END SELECT
-
-200 CLOSE(iounit2)
-
-END SELECT
-
-
+  END SELECT
 
 END SUBROUTINE latflow_bc
+
