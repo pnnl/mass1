@@ -23,13 +23,12 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Thu Jun  9 14:47:50 2005 by William A. Perkins <perk@McPerk.pnl.gov>
+! Last Change: Tue Nov 30 14:01:29 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 !
 
 SUBROUTINE array_dealloc
 
 USE flow_coeffs
-USE linkbc_vars
 USE link_vars
 USE point_vars
 USE section_vars
@@ -44,26 +43,13 @@ IMPLICIT NONE
 DEALLOCATE(e,f,l,m,n)
 
 !----------------------------------------------------------
-!MODULE linkbc_vars
-	
-DEALLOCATE(linkbc_time,linkbc)
-DEALLOCATE(transbc_time,transbc)
-DEALLOCATE(gen_time,gen_flow)
-DEALLOCATE(spill_time,spill_flow)
-DEALLOCATE(latflowbc_time,latflowbc)
-DEALLOCATE(tempbc_time,tempbc)
-DEALLOCATE(linkbc_header, transbc_header,tempbc_header)
-DEALLOCATE(hydrobc_header,latflowbc_header)
-DEALLOCATE(linkbc_start, transbc_start, tempbc_start, &
-     &latflowbc_start, gen_start, spill_start)
-
-!----------------------------------------------------------
 !module link_vars
 
 DEALLOCATE(maxpoints,linkname,linkorder,linktype,input_option)
 DEALLOCATE(linkbc_table,num_con_links,con_links,ds_conlink)
 DEALLOCATE(comporder,dsbc_table,transbc_table,tempbc_table)
 DEALLOCATE(latflowbc_table, met_zone)
+DEALLOCATE(lattransbc_table, lattempbc_table)
 DEALLOCATE(crest)
 
 !-----------------------------------------------------------

@@ -1,4 +1,3 @@
-
 !***************************************************************
 !            Pacific Northwest National Laboratory
 !***************************************************************
@@ -23,7 +22,7 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Tue May  1 13:15:18 2001 by William A. Perkins <perk@gehenna.pnl.gov>
+! Last Change: Wed Dec  1 09:21:29 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 ! 
 
 SUBROUTINE array_alloc
@@ -31,7 +30,6 @@ SUBROUTINE array_alloc
 ! $DEBUG
 
 USE flow_coeffs
-USE linkbc_vars
 USE link_vars
 USE point_vars
 USE section_vars
@@ -53,36 +51,18 @@ ALLOCATE(e(maxlinks,maxpoint),f(maxlinks,maxpoint),l(maxlinks,maxpoint),&
      & m(maxlinks,maxpoint),n(maxlinks,maxpoint))
 
 !----------------------------------------------------------
-!MODULE linkbc_vars
-	
-ALLOCATE(linkbc_time(maxtimes,maxtable),linkbc(maxtimes,maxtable))
-ALLOCATE(transbc_time(maxtimes,maxtable),transbc(maxtimes,maxtable))
-ALLOCATE(gen_time(maxtimes,maxtable),gen_flow(maxtimes,maxtable))
-ALLOCATE(spill_time(maxtimes,maxtable),spill_flow(maxtimes,maxtable))
-ALLOCATE(latflowbc_time(maxtimes,maxtable),latflowbc(maxtimes,maxtable))
-ALLOCATE(tempbc_time(maxtimes,maxtable),tempbc(maxtimes,maxtable))
-ALLOCATE(linkbc_header(maxtable),transbc_header(maxtable),tempbc_header(maxtable))
-ALLOCATE(hydrobc_header(maxtable),latflowbc_header(maxtable))
-
-                                ! allocate and initialize search start index
-
-ALLOCATE(linkbc_start(maxtable), transbc_start(maxtable), tempbc_start(maxtable),&
-     & latflowbc_start(maxtable), gen_start(maxtable), spill_start(maxtable))
-
-linkbc_start = 0
-transbc_start = 0
-tempbc_start = 0
-latflowbc_start = 0
-gen_start = 0
-spill_start = 0
-
-!----------------------------------------------------------
 !module link_vars
 
 ALLOCATE(maxpoints(maxlinks),linkname(maxlinks),linkorder(maxlinks),linktype(maxlinks),input_option(maxlinks))
 ALLOCATE(linkbc_table(maxlinks),num_con_links(maxlinks),con_links(maxlinks,5),ds_conlink(maxlinks))
 ALLOCATE(comporder(maxlinks),dsbc_table(maxlinks),transbc_table(maxlinks),tempbc_table(maxlinks))
 ALLOCATE(latflowbc_table(maxlinks), met_zone(maxlinks))
+latflowbc_table = 0
+met_zone = 0
+ALLOCATE(lattransbc_table(maxlinks), lattempbc_table(maxlinks))
+lattransbc_table = 0
+lattempbc_table = 0
+
 ALLOCATE(crest(maxlinks))
 
 crest = -999.0
