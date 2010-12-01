@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created November 30, 2010 by William A. Perkins
-! Last Change: Tue Nov 30 14:06:36 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+! Last Change: Wed Dec  1 14:26:47 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 ! ----------------------------------------------------------------
   
 ! RCS ID: $Id$ Battelle PNL
@@ -36,6 +36,7 @@ MODULE bctable
   ! TYPE bc_table
   ! ----------------------------------------------------------------
   TYPE bc_table
+     CHARACTER(LEN=1024) :: fname
      INTEGER :: nbc
      INTEGER :: maxid
      INTEGER :: nfld
@@ -86,6 +87,7 @@ CONTAINS
 100 CONTINUE
 
     ALLOCATE(tbl)
+    tbl%fname = filename
     tbl%nbc = count
     tbl%maxid = maxid
     tbl%nfld = nfields
@@ -112,7 +114,6 @@ CONTAINS
     CALL error_message("Error reading BC table" // TRIM(filename), .TRUE.)
   END FUNCTION bc_table_read
 
-
   ! ----------------------------------------------------------------
   ! SUBROUTINE bc_table_interpolate
   ! ----------------------------------------------------------------
@@ -126,10 +127,17 @@ CONTAINS
 
     INTEGER :: idx
 
-    idx = tbl%idlookup(id)
+    CHARACTER(LEN=1024) :: msg
+
+    IF (id .LE. tbl%maxid) THEN
+       idx = tbl%idlookup(id)
+    ELSE 
+       idx = 0
+    END IF
 
     IF (idx .LE. 0) THEN
-       CALL error_message("Nonexistent BC table index", .TRUE.)
+       WRITE(msg, *) TRIM(tbl%fname), ": looking for bad BC id: ", id
+       CALL error_message(msg, .TRUE.)
     END IF
     
     CALL time_series_interp(tbl%bc(idx)%bc, datetime)
