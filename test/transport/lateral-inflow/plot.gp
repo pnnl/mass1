@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created July  2, 1999 by William A. Perkins
-# Last Change: Thu Mar  9 11:05:04 2000 by William A. Perkins <perk@mack.pnl.gov>
+# Last Change: Wed Dec  1 13:49:04 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -37,7 +37,7 @@ set title ''
 
 set xlabel "Distince Along Channel, feet"
 set ylabel "Simulated Temperature, C"
-set yrange [12:13]
+set yrange [12:18]
 set grid
 
 
