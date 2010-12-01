@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created June 23, 2005 by William A. Perkins
-# Last Change: Wed Dec  1 09:21:13 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+# Last Change: Wed Dec  1 12:24:39 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 # -------------------------------------------------------------
 # RCS ID: $Id$
 
@@ -88,7 +88,7 @@ print_output.$(OBJEXT): modules.$(OBJEXT) scalars_module.$(OBJEXT)  met_data_mod
 profile_output.$(OBJEXT): modules.$(OBJEXT)  scalars_module.$(OBJEXT)  met_data_module.$(OBJEXT) gas_functions_module.$(OBJEXT) accumulator.$(OBJEXT) 
 read_config.$(OBJEXT): modules.$(OBJEXT)
 read_hotstart.$(OBJEXT):  modules.$(OBJEXT) scalars_module.$(OBJEXT)
-scalars_module.$(OBJEXT): modules.$(OBJEXT) met_data_module.$(OBJEXT) energy_flux_module.$(OBJEXT) tdg_equation_coeff.$(OBJEXT) gas_functions_module.$(OBJEXT)  hydro_output.$(OBJEXT)
+scalars_module.$(OBJEXT): modules.$(OBJEXT) bctable.$(OBJEXT) met_data_module.$(OBJEXT) energy_flux_module.$(OBJEXT) tdg_equation_coeff.$(OBJEXT) gas_functions_module.$(OBJEXT)  hydro_output.$(OBJEXT) 
 section.$(OBJEXT): modules.$(OBJEXT)
 section_data.$(OBJEXT): modules.$(OBJEXT)
 temp_sim.$(OBJEXT):  modules.$(OBJEXT)
