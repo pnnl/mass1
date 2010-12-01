@@ -1,5 +1,18 @@
 2010-12-01  William A. Perkins  <william.perkins@pnl.gov>
 
+	* test/transport/lateral-inflow/plot.gp: change temperature axis
+	range to show the whole range
+
+	* test/transport/lateral-inflow/link.dat: add lateral inflow
+	temperature 
+
+	* scalars_module.f90 (tvd_transport): use specified lateral inflow
+	concentrations, if any.
+
+	* link_data.f90 (link_data): spit out a warning if lateral inflow
+	is specified but lateral concentration is not when gas or temp is
+	enabled; indent nicely
+
 	* test/application/HanfordReach/Rampdown/BCFiles/Yakima-Flow.dat:
 	fixed date problem
 
