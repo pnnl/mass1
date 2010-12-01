@@ -1,3 +1,86 @@
+2010-12-01  William A. Perkins  <william.perkins@pnl.gov>
+
+	* test/application/HanfordReach/Rampdown/BCFiles/Yakima-Flow.dat:
+	fixed date problem
+
+	* print_output.f90 (print_output): remove unUSEd modules
+
+	* Makefile.am (mass1_SOURCES): add bctable.f90 remove those no
+	longer used
+
+	* array_alloc.f90 (array_alloc): variables in linkbc_vars
+	module no longer exist
+
+	* array_dealloc.f90 (array_dealloc): variables in linkbc_vars
+	module no longer exist
+
+	* flow_sim.f90 (flow_sim): use bc_table type in lieu of
+	table_interp()
+
+	* latflow_bc.f90 (latflow_bc): use bc_table to read lateral inflow
+
+	* mass1.f90 (mass1): need to call time_series_module_init() here 
+
+	* modules.f90 (module linkbc_vars): no longer necessary
+
+	* pidlink.f90 (pidlink_assemble_lagged, pidlink_initialize)
+	(pidlink_coeff): use bc_table type in lieu of
+	table_interp()
+
+	* scalars_module.f90 (tvd_transport): use bc_table type in lieu of
+	table_interp()
+
+	* trans_bc.f90 (transport_bc): use bc_table to read gas and temp
+	BC's 
+
+	* link_data.f90 (link_data): add BC numbers for gas and temp from
+	lateral inflow to link file
+
+	* link_bc.f90 (link_bc): use bc_table to read link and hydro BC's
+
+	* bctable.f90: new type to deal with BC's that uses the
+	time_series code
+
+	* test/application/Wanpum/BaseFiles/stage-plot.gp: make work with
+	newer gnuplot versions
+
+	* test/application/Wanpum/BaseFiles/flow-plot.gp: make work with
+	newer gnuplot versions 
+
+	* test/application/Wanpum/runit.sh: make it work again
+
+	* test/flow/runem.sh: automate running tests
+
+	* test/transport/runem.sh: automate running tests
+
+	* test/flow/varied-pid/runit.sh: make quiet; gnuplot not defined
+	correctly 
+
+	* test/flow/lateral/plot.gp: make work with newer gnuplot versions
+
+	* test/flow/varied-pid/plot.gp: make work with newer gnuplot versions
+
+	* table_interp.f90: no longer needed
+
+2010-11-30  William A. Perkins  <william.perkins@pnl.gov>
+
+	* test/transport/advection-diffusion-2-segment/plot.gp: modify for
+	multiple gnuplot versions
+
+	* test/transport/advection-varying-dx/Cn-plot.gp: modify for multiple
+	gnuplot versions
+
+	* test/transport/advection-varying-dx/mass-plot.gp: modify for multiple
+	gnuplot versions
+
+	* test/transport/advection-varying-dx/plot.gp: modify for multiple
+	gnuplot versions
+
+	* test/transport/variable-flow/plot.gp: modify for multiple
+	gnuplot versions
+
+	* hydro_bc.f90: no longer needed
+
 2010-10-01  William A. Perkins  <william.perkins@pnl.gov>
 
 	* tdg_equation_coeff.f90: use double precision everywhere

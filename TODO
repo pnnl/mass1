@@ -9,7 +9,7 @@ Pacific Northwest Laboratory
 -------------------------------------------------------------
 -------------------------------------------------------------
 Created November  1, 1999 by William A. Perkins
-Last Change: Thu Dec 29 07:39:38 2005 by William A. Perkins <perk@mcperktop.pnl.gov>
+Last Change: Tue Nov 30 13:25:15 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 -------------------------------------------------------------
 
 $Id$
@@ -39,3 +39,9 @@ Low Priority:
     * when atmospheric exchange is on met data are repeatedly
       reinterpolated; we need to recode it so that the met data is
       interpolated once for each zone and time step
+
+    * Hydro bc tests
+
+    * dissolved gas tests 
+
+    * temperature test (cooling, e.g.)
