@@ -31,6 +31,7 @@ SUBROUTINE flow_sim
 
 USE general_vars
 USE link_vars
+USE bctable
 USE point_vars
 USE fluvial_coeffs
 USE flow_coeffs
@@ -42,7 +43,7 @@ DOUBLE PRECISION :: a,b,c,d,g,ap,bp,cp,dp,gp,denom
 DOUBLE PRECISION :: latq_old,latq_new
 DOUBLE PRECISION :: depth,area_temp,width,conveyance,dkdy,hydrad
 DOUBLE PRECISION :: sum,sum2,bcval,dy,dq,y_new_time, q_new_time
-DOUBLE PRECISION :: table_interp, temp
+DOUBLE PRECISION :: temp
 
 INTEGER :: i,j,point_num,link,point,table_type
 
@@ -69,21 +70,18 @@ point = 1
 IF(num_con_links(link) == 0)THEN  ! must be an upstream most link
 
 SELECT CASE(linktype(link))
-	CASE(1,20)
-	table_type = 1
-	bcval = table_interp(time,table_type,linkbc_table(link),time_mult)
-	CASE(21)
-	table_type = 3 !generation flow
-	temp = table_interp(time,table_type,linkbc_table(link),time_mult)
-
-	table_type = 4 !spill flow
-	bcval = table_interp(time,table_type,linkbc_table(link),time_mult)
-
-	bcval = bcval + temp ! total flow rate at the dam
+CASE(1,20)
+   call bc_table_interpolate(linkbc, linkbc_table(link), time/time_mult)
+   bcval = bc_table_current(linkbc, linkbc_table(link), 1)
+CASE(21)
+   call bc_table_interpolate(hydrobc, linkbc_table(link), time/time_mult)
+   temp = bc_table_current(hydrobc, linkbc_table(link), 1)
+   bcval = bc_table_current(hydrobc, linkbc_table(link), 2)
+   bcval = bcval + temp ! total flow rate at the dam
 END SELECT
-	q1 = q(link,point)
-	e(link,point) = 0.0
-	f(link,point) = bcval - q1
+q1 = q(link,point)
+e(link,point) = 0.0
+f(link,point) = bcval - q1
 
 ELSE
 	sum = 0.0
@@ -145,8 +143,8 @@ IF(do_latflow)THEN
 	IF(latflowbc_table(link) /= 0)THEN
 	  latq_old = lateral_inflow(link,point) 
       lateral_inflow_old(link,point) = latq_old
-	  table_type = 5 !lateral inflow
-	  lateral_inflow(link,point) = table_interp(time,table_type,latflowbc_table(link),time_mult)
+      call bc_table_interpolate(latflowbc, latflowbc_table(link), time/time_mult)
+      lateral_inflow(link,point) = bc_table_current(latflowbc, latflowbc_table(link), 1)
       latq_new = lateral_inflow(link,point)
 	ELSE
 	  latq_old = 0.0
@@ -168,17 +166,14 @@ ELSE
 
    
 	IF(linktype(link) == 6)THEN	  ! hydropower plant
-	table_type = 3 !generation flow
-	temp = table_interp(time,table_type,linkbc_table(link),time_mult)
-
-	table_type = 4 !spill flow
-	bcval = table_interp(time,table_type,linkbc_table(link),time_mult)
-
-	bcval = bcval + temp ! total flow rate at the dam
+    call bc_table_interpolate(hydrobc, linkbc_table(link), time/time_mult)
+    temp = bc_table_current(hydrobc, linkbc_table(link), 1)
+    bcval = bc_table_current(hydrobc, linkbc_table(link), 2)
+    bcval = bcval + temp ! total flow rate at the dam
 
 	ELSE ! other non-fluvial links
-	table_type = 1
-	bcval = table_interp(time,table_type,linkbc_table(link),time_mult)
+    call bc_table_interpolate(linkbc, linkbc_table(link), time/time_mult)
+    bcval = bc_table_current(linkbc, linkbc_table(link), 1)
 	ENDIF
 
 	CALL nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
@@ -217,19 +212,20 @@ IF(ds_conlink(link) == 0)THEN
 SELECT CASE(dsbc_type)
 CASE(1)
 ! given downstream stage y(t)
-	table_type = 1
-	y1 = y(link,point)
-	y_new_time = table_interp(time,table_type,dsbc_table(link),time_mult)
+   
+   y1 = y(link,point)
+   call bc_table_interpolate(linkbc, dsbc_table(link), time/time_mult)
+   y_new_time = bc_table_current(linkbc, dsbc_table(link), 1)
 
 	dy = y_new_time - y1
 	dq = e(link,point)*dy + f(link,point)
 CASE(2)
 ! given Q(t)
-	table_type = 1
-	q1 = q(link,point)
-	q_new_time = table_interp(time,table_type,dsbc_table(link),time_mult)
-	dq = q_new_time - q1
-	dy = (dq - f(link,point))/e(link,point)
+   q1 = q(link,point)
+   call bc_table_interpolate(linkbc, dsbc_table(link), time/time_mult)
+   q_new_time = bc_table_current(linkbc, dsbc_table(link), 1)
+   dq = q_new_time - q1
+   dy = (dq - f(link,point))/e(link,point)
 END SELECT
 
 !update stage and discharge at last point on the link
@@ -248,20 +244,17 @@ END IF
 DO point=maxpoints(link)-1,1,-1
 
 IF(linktype(link) == 2)THEN
-    table_type = 1
-	bcval = table_interp(time,table_type,linkbc_table(link),time_mult)
+   call bc_table_interpolate(linkbc, linkbc_table(link), time/time_mult)
+   bcval = bc_table_current(linkbc, linkbc_table(link), 1)
 	dq = bcval - q(link,point)
 	dy = (dq - f(link,point))/e(link,point)
 
 ELSEIF(linktype(link) == 6)THEN
 
-  table_type = 3 !generation flow
-  temp = table_interp(time,table_type,linkbc_table(link),time_mult)
-
-  table_type = 4 !spill flow
-  bcval = table_interp(time,table_type,linkbc_table(link),time_mult)
-
-  bcval = bcval + temp ! total flow rate at the dam
+   call bc_table_interpolate(hydrobc, linkbc_table(link), time/time_mult)
+   temp = bc_table_current(hydrobc, linkbc_table(link), 1)
+   bcval = bc_table_current(hydrobc, linkbc_table(link), 2)
+   bcval = bcval + temp ! total flow rate at the dam
 
   dq = bcval - q(link,point)
   dy = (dq - f(link,point))/e(link,point)
