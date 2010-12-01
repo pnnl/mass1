@@ -31,6 +31,7 @@ PROGRAM mass1
 
 USE utility
 USE date_time
+USE time_series
 USE general_vars
 USE date_vars
 USE file_vars
@@ -54,6 +55,7 @@ INTEGER :: link
 LOGICAL run
 
 CALL date_time_flags()
+CALL time_series_module_init()
 utility_error_iounit = 11
 utility_status_iounit = 99
 
