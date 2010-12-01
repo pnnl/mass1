@@ -60,12 +60,14 @@ DO i=1,maxlinks
 
    READ(fileunit(2),*)junk,input_option(link),maxpoints(link),linkorder(link),&
         & linktype(link),num_con_links(link),linkbc_table(link),dsbc_table(link), &
-        & transbc_table(link),tempbc_table(link),met_zone(link),latflowbc_table(link)
+        & transbc_table(link),tempbc_table(link),met_zone(link),latflowbc_table(link), &
+        & lattransbc_table(link),lattempbc_table(link)
    READ(fileunit(2),*)ds_conlink(link),con_links(link,:)
 
    WRITE(io_unit,*)link,input_option(link),maxpoints(link),linkorder(link),&
         & linktype(link),num_con_links(link),linkbc_table(link),dsbc_table(link), &
-        & transbc_table(link),tempbc_table(link),met_zone(link),latflowbc_table(link)
+        & transbc_table(link),tempbc_table(link),met_zone(link),latflowbc_table(link), &
+        & lattransbc_table(link),lattempbc_table(link)
    WRITE(io_unit,*)ds_conlink(link),con_links(link,:)
         
 END DO
