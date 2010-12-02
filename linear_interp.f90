@@ -57,12 +57,28 @@ DOUBLE PRECISION FUNCTION dlinear_interp(x0,y0,x1,y1,y)
   ! y - y0 = slope*(x - x0)
 
   DOUBLE PRECISION :: x0,y0,x1,y1,slope,y
+  DOUBLE PRECISION :: dx, rdx
+
+  dx = x1 - x0
+
+  IF (ABS(dx) .LT. 1.0D-250) dx = 0.0
+
+
+  IF (x0 .NE. 0.0) THEN
+     rdx = ABS(dx/x0)
+  ELSE IF (x1 .NE. 0.0) THEN
+     rdx = ABS(dx/x1)
+  ELSE
+     rdx = 0.0
+  END IF
   
-  ! check for a vertical line
-  IF(x0 == x1)THEN
+  ! the relative difference of x1 and x0 is 10 orders of magnitude
+  ! lower than x1 and x0 themselves; let's just make that zero
+
+  IF (rdx .LT. 1.0e-10) THEN
      dlinear_interp = x0
   ELSE
-     slope = (y1 - y0)/(x1 - x0)
+     slope = (y1 - y0)/dx
      IF(slope /= 0.0)THEN
         dlinear_interp = x0 + (y - y0)/slope
      ELSE
