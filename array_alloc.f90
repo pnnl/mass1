@@ -22,7 +22,7 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Wed Dec  1 09:21:29 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+! Last Change: Thu Dec  2 08:31:19 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 ! 
 
 SUBROUTINE array_alloc
@@ -34,12 +34,11 @@ USE link_vars
 USE point_vars
 USE section_vars
 USE transport_vars
-USE general_vars, ONLY : maxlinks,maxpoint,maxtable,maxtimes
+USE general_vars, ONLY : maxlinks,maxpoint
 USE hydro_output_module
 
 IMPLICIT NONE
 
-!INTEGER :: maxsections,maxlinks,maxpoint,maxtable,maxtimes
 INTEGER :: maxsections
 
 maxsections = total_sections
