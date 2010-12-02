@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created June 23, 2005 by William A. Perkins
-# Last Change: Wed Dec  1 12:24:39 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+# Last Change: Thu Dec  2 08:45:38 2010 by William A. Perkins <d3g096@bearflag.pnl.gov>
 # -------------------------------------------------------------
 # RCS ID: $Id$
 
@@ -74,7 +74,7 @@ gage_output.$(OBJEXT): 	modules.$(OBJEXT) scalars_module.$(OBJEXT) met_data_modu
 gas_functions_module.$(OBJEXT): gas_coeffs_module.$(OBJEXT) 
 gas_sim.$(OBJEXT): modules.$(OBJEXT) 
 hydro_output.$(OBJEXT): modules.$(OBJEXT) gas_functions_module.$(OBJEXT)
-initial_cond.$(OBJEXT): modules.$(OBJEXT) 
+initial_cond.$(OBJEXT): modules.$(OBJEXT) scalars_module.$(OBJEXT)
 kick_off.$(OBJEXT): modules.$(OBJEXT) pidlink.$(OBJEXT)
 latflow_bc.$(OBJEXT): modules.$(OBJEXT) 
 link_bc.$(OBJEXT): modules.$(OBJEXT) bctable.$(OBJEXT)
