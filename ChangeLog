@@ -1,5 +1,9 @@
 2010-12-02  William A. Perkins  <william.perkins@pnl.gov>
 
+	* Makefile.am (initial_cond.$(OBJEXT)): fixed dependency
+
+	* bctable.f90 (bc_table_index): fixed local variable declaration
+
 	* print_output.f90 (print_output):no need to report maxtimes or
 	maxtable anymore
 
