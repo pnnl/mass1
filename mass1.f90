@@ -168,7 +168,7 @@ IF(do_temp)THEN
 	species_num = 2
 	CALL transport_bc(species_num)
 	IF(temp_exchange)&
-             & CALL read_met_data(filename(18), maxtimes, utility_status_iounit, utility_error_iounit)
+             & CALL read_met_data(filename(18))
 	IF(debug_print == 1) WRITE(11,*)'done reading temp transport table'
 ENDIF
 
