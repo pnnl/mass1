@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created November 30, 2010 by William A. Perkins
-! Last Change: Wed Dec  1 14:26:47 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+! Last Change: Thu Dec  2 08:25:12 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 ! ----------------------------------------------------------------
   
 ! RCS ID: $Id$ Battelle PNL
@@ -115,19 +115,38 @@ CONTAINS
   END FUNCTION bc_table_read
 
   ! ----------------------------------------------------------------
-  ! SUBROUTINE bc_table_interpolate
+  ! LOGICAL FUNCTION bc_table_id_ok
   ! ----------------------------------------------------------------
-  SUBROUTINE bc_table_interpolate(tbl, id, datetime)
+  LOGICAL FUNCTION bc_table_id_ok(tbl, id)
+
+    IMPLICIT NONE
+    TYPE (bc_table), INTENT(IN) :: tbl
+    INTEGER, INTENT(IN) :: id
+    
+    INTEGER :: idx
+
+    idx = 0
+    IF (id .LE. tbl%maxid) THEN
+       idx = tbl%idlookup(id)
+    END IF
+
+    bc_table_id_ok = (idx .GT. 0)
+
+  END FUNCTION bc_table_id_ok
+
+
+  ! ----------------------------------------------------------------
+  ! INTEGER FUNCTION bc_table_index
+  ! ----------------------------------------------------------------
+  INTEGER FUNCTION bc_table_index(tbl, id) RESULT(idx)
 
     IMPLICIT NONE
 
     TYPE (bc_table), INTENT(IN) :: tbl
     INTEGER, INTENT(IN) :: id
-    DOUBLE PRECISION, INTENT(IN) :: datetime
-
-    INTEGER :: idx
 
     CHARACTER(LEN=1024) :: msg
+    INTEGER :: idx
 
     IF (id .LE. tbl%maxid) THEN
        idx = tbl%idlookup(id)
@@ -139,7 +158,24 @@ CONTAINS
        WRITE(msg, *) TRIM(tbl%fname), ": looking for bad BC id: ", id
        CALL error_message(msg, .TRUE.)
     END IF
-    
+
+  END FUNCTION bc_table_index
+
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE bc_table_interpolate
+  ! ----------------------------------------------------------------
+  SUBROUTINE bc_table_interpolate(tbl, id, datetime)
+
+    IMPLICIT NONE
+
+    TYPE (bc_table), INTENT(IN) :: tbl
+    INTEGER, INTENT(IN) :: id
+    DOUBLE PRECISION, INTENT(IN) :: datetime
+
+    INTEGER :: idx
+    idx = bc_table_index(tbl, id)
+
     CALL time_series_interp(tbl%bc(idx)%bc, datetime)
 
   END SUBROUTINE bc_table_interpolate
@@ -157,7 +193,8 @@ CONTAINS
 
     INTEGER idx
 
-    idx = tbl%idlookup(id)
+    idx = bc_table_index(tbl, id)
+
     bc_table_current = tbl%bc(idx)%bc%current(fld)
   END FUNCTION bc_table_current
 
