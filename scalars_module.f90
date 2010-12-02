@@ -226,6 +226,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
   DOUBLE PRECISION :: tdg_saturation = 100.0, upstream_c
   DOUBLE PRECISION :: avg_area, avg_latq
   DOUBLE PRECISION :: salinity = 0.0, ccstar
+  DOUBLE PRECISION :: met_coeff(met_ncoeff)
 
   LOGICAL :: diffusion, fluvial, nonfluvial
 
@@ -747,7 +748,8 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
               CALL update_met_data(time, met_zone(link))
               t_water = c(link,point)
               depth = y(link,point) - thalweg(link,point)
-              energy_source = net_heat_flux(met_data(met_zone(link))%coeff,&
+              call met_zone_coeff(met_zone(link), met_coeff)
+              energy_source = net_heat_flux(met_coeff,&
                    &net_solar, t_water, t_air, t_dew, windspeed) &
                    /(1000.0*4186.0/3.2808) ! rho*specifc heat*depth in feet
               
