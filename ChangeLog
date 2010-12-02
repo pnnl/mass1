@@ -1,3 +1,14 @@
+2010-12-02  William A. Perkins  <william.perkins@pnl.gov>
+
+	* read_config.f90 (read_config): add some error checking
+
+	* scalars_module.f90 (tvd_transport): rework the way met
+	coefficients are used
+
+	* mass1.f90 (mass1): update call to read_met_data()
+
+	* met_data_module.f90: rewrite to use time_series 
+
 2010-12-01  William A. Perkins  <william.perkins@pnl.gov>
 
 	* bctable.f90 (bc_table_interpolate): add some id error checks
