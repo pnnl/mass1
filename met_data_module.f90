@@ -25,6 +25,7 @@ MODULE met_data_module
      TYPE (time_series_rec), POINTER :: met
   END type met_zone_rec
 
+  INTEGER, PRIVATE :: met_maxid
   INTEGER, ALLOCATABLE, PRIVATE :: met_idx_lookup(:)
   TYPE (met_zone_rec), ALLOCATABLE, PRIVATE :: met_zones(:)
 
@@ -50,7 +51,11 @@ CONTAINS
     INTEGER, INTENT(IN) :: met_zone
     CHARACTER(LEN=1024) :: msg
 
-    idx = met_idx_lookup(met_zone)
+    idx = 0
+    IF (met_zone .LE. met_maxid) THEN
+       idx = met_idx_lookup(met_zone)
+    END IF
+
     IF (idx .LE. 0) THEN
        WRITE(msg, *) 'unknown met zone id: ', met_zone
        CALL error_message(msg, .TRUE.)
@@ -120,6 +125,7 @@ CONTAINS
        CALL error_message('memory allocation error in read_met_data', .TRUE.)
     END IF
     met_idx_lookup = 0
+    met_maxid = maxid
 
     REWIND(iounit1)
 
