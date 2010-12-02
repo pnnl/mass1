@@ -1,5 +1,20 @@
 2010-12-02  William A. Perkins  <william.perkins@pnl.gov>
 
+	* print_output.f90 (print_output):no need to report maxtimes or
+	maxtable anymore
+
+	* pidlink.f90 (read_pidlink_info): better check of link BC ids;
+	use error_message() to report errors
+
+	* met_data_module.f90 (met_zone_index): safer valid zone id check
+
+	* bctable.f90 (bc_table_id_ok): be able to check a table BC id
+	without crashing
+	(bc_table_index): add common way to get and check a table BC id
+
+	* array_alloc.f90 (array_alloc): no need to use maxtimes or
+	maxtable anymore
+
 	* read_config.f90 (read_config): add some error checking
 
 	* scalars_module.f90 (tvd_transport): rework the way met
