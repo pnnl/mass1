@@ -9,16 +9,12 @@ Pacific Northwest Laboratory
 -------------------------------------------------------------
 -------------------------------------------------------------
 Created November  1, 1999 by William A. Perkins
-Last Change: Tue Nov 30 13:25:15 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+Last Change: Thu Dec  2 10:07:40 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 -------------------------------------------------------------
 
 $Id$
 
 High Priority:
-
-    * BC and other tables: either (1) make sure that the beginning and
-      ending dates are within the simulation, and crash if not, or (2)
-      just use the first/last values before/after table start/end.
 
     * Check transport at downstream boundary and at junctions under
       reverse flow conditions.  
@@ -26,8 +22,6 @@ High Priority:
 Low Priority:
 
     * use an formatted hotstart as with MASS2
-
-    * recode the transport so all calculations are DOUBLE PRECISION.
 
     * eliminate the use of link id's as array indices -- be able to
       give links nonconsecutive, but unique id's, and generate array
