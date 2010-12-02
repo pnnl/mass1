@@ -216,10 +216,10 @@ SUBROUTINE read_config
   READ(10,*,ERR=110)maxpoint
   line = line + 1
 
-  READ(10,*,ERR=110)maxtable
+  READ(10,*,ERR=110)maxtable    ! not used anymore
   line = line + 1
 
-  READ(10,*,ERR=110)maxtimes
+  READ(10,*,ERR=110)maxtimes    ! not used anymore
   line = line + 1
 
   READ(10,*,ERR=110)total_sections
