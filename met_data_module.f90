@@ -6,163 +6,186 @@
 !-----------------------------------------------------------------------------
 
 MODULE met_data_module
+  
+  USE utility
+  USE time_series
+  USE date_time
+  USE date_vars
+  USE logicals, ONLY : file_exist
 
-USE utility
-USE date_time
-USE date_vars
-USE logicals, ONLY : file_exist
+  IMPLICIT NONE
 
-IMPLICIT NONE
-INTEGER, PARAMETER  :: max_cell_values = 5
+  INTEGER, PARAMETER, PRIVATE :: met_nfields = 5
+  INTEGER, PARAMETER, PUBLIC :: met_ncoeff = 4
 
-TYPE table_entry_struct
-	TYPE(datetime_struct) :: datetime
-	DOUBLE PRECISION :: value(max_cell_values)
-END TYPE table_entry_struct
+  TYPE met_zone_rec
+     INTEGER :: id
+     ! coefficients: 1,2 wind function, 3 conduction, 4 brunt
+     DOUBLE PRECISION :: coeff(met_ncoeff) 
+     TYPE (time_series_rec), POINTER :: met
+  END type met_zone_rec
 
-TYPE table_bc_struct
-	CHARACTER (LEN=100) :: file_name
-	CHARACTER (LEN=10) :: table_type
-    DOUBLE PRECISION :: coeff(4) ! coefficients: 1,2 wind function, 3 conduction, 4 brunt
-	INTEGER :: max_entries
-        INTEGER :: start_entry
+  INTEGER, ALLOCATABLE, PRIVATE :: met_idx_lookup(:)
+  TYPE (met_zone_rec), ALLOCATABLE, PRIVATE :: met_zones(:)
 
-	TYPE(table_entry_struct), POINTER :: table_entry(:)
-END TYPE table_bc_struct
+  ! This is where the current met data for the current met zone is
+  ! stored.  This needs to be different.
 
-DOUBLE PRECISION :: net_solar = 0.0  ! net incoming solar radiation W/m2
-DOUBLE PRECISION :: t_air			= 10.0 ! air temperature deg. C
-DOUBLE PRECISION :: t_dew			= 0.0  !	dewpoint temperature deg. C
-DOUBLE PRECISION :: t_water		= 10.0 ! water temperature deg. C (from model simulation)
-DOUBLE PRECISION :: windspeed	= 0.0  ! wind speed m/s
-DOUBLE PRECISION :: baro_press  = 760 ! barometric pressure mm Hg
-
-! TYPE(table_bc_struct), ALLOCATABLE :: met_data(:)
-TYPE(table_bc_struct), ALLOCATABLE :: met_data(:)
+  DOUBLE PRECISION, PUBLIC :: net_solar = 0.0  ! net incoming solar radiation W/m2
+  DOUBLE PRECISION, PUBLIC :: t_air     = 10.0 ! air temperature deg. C
+  DOUBLE PRECISION, PUBLIC :: t_dew     = 0.0  ! dewpoint temperature deg. C
+  DOUBLE PRECISION, PUBLIC :: t_water   = 10.0 ! water temperature deg. C (from model simulation)
+  DOUBLE PRECISION, PUBLIC :: windspeed	= 0.0  ! wind speed m/s
+  DOUBLE PRECISION, PUBLIC :: baro_press= 760  ! barometric pressure mm Hg
 
 CONTAINS
 
-!##################################################################################################
-SUBROUTINE read_met_data(met_files, max_times, status_iounit, error_iounit)
-  IMPLICIT NONE
-  CHARACTER(LEN=100) :: met_files, weather_filename
-  INTEGER :: max_zones, max_times, status_iounit, error_iounit, alloc_stat
-  INTEGER :: iounit1 = 50, iounit2 = 51, i, j = 0, met_zone
+  ! ----------------------------------------------------------------
+  ! INTEGER FUNCTION met_zone_index
+  ! ----------------------------------------------------------------
+  INTEGER FUNCTION met_zone_index(met_zone) RESULT(idx)
 
-  CALL open_existing(met_files, iounit2, fatal=.TRUE.)
+    IMPLICIT NONE
 
-  max_zones = 0
-  DO WHILE(.TRUE.)
-     max_zones = max_zones + 1
-     READ (iounit2,*,END=50) met_zone, weather_filename
-  END DO
-50 REWIND (iounit2)
+    INTEGER, INTENT(IN) :: met_zone
+    CHARACTER(LEN=1024) :: msg
 
-  max_zones = max_zones - 1
-
-  IF (max_zones <= 0) THEN
-     WRITE (error_iounit,*) 'no met zones specified in ', met_files
-     CALL EXIT(2)
-  ELSE 
-     WRITE (status_iounit,*) 'allocating ', max_zones, ' met zones ...'
-  END IF
-
-  ALLOCATE(met_data(max_zones), STAT = alloc_stat)
-  IF (alloc_stat /= 0) THEN
-     WRITE (error_iounit,*) 'allocation failed for met data zones'
-     CALL EXIT(2)
-  ELSE
-     WRITE (status_iounit,*) 'allocation successful for met zones'
-  END IF
-
-  DO i = 1, max_zones
-                                ! default wind function coefficients
-
-     met_data(i)%coeff(1) = 0.46 ! wind function multiplier
-     met_data(i)%coeff(2) = 9.2  ! wind function offset
-     met_data(i)%coeff(3) = 0.47 ! conduction coefficient
-     met_data(i)%coeff(4) = 0.65 ! "brunt" coefficient for lw atm radiation
-
-     ALLOCATE(met_data(i)%table_entry(max_times), STAT = alloc_stat)
-     IF (alloc_stat /= 0) THEN
-        WRITE (error_iounit,*) 'allocation failed for met zone table ', i
-        CALL EXIT(2)
-     ELSE
-        WRITE (status_iounit,*) 'allocation successful for met zone table ', i
-     END IF
-  END DO
-	
-  DO WHILE(.TRUE.)
-     READ(iounit2,*,END=200)met_zone, weather_filename, met_data(met_zone)%coeff
-     met_data(met_zone)%start_entry = 0
-     met_data(met_zone)%max_entries = 0
-     
-     WRITE (status_iounit, *) 'Coefficients for weather zone ', met_zone
-     WRITE (status_iounit, *) '        Wind a = ' , met_data(met_zone)%coeff(1)
-     WRITE (status_iounit, *) '        Wind b = ' , met_data(met_zone)%coeff(2)
-     WRITE (status_iounit, *) '    Conduction = ' , met_data(met_zone)%coeff(3)
-     WRITE (status_iounit, *) '         Brunt = ' , met_data(met_zone)%coeff(4)
-		
-     CALL open_existing(weather_filename, iounit1, fatal=.TRUE.)
-
-     j = 0
-     DO WHILE(.TRUE.)
-       j = j + 1
-       READ(iounit1,*,END=100)met_data(met_zone)%table_entry(j)%datetime%date_string,&
-          & met_data(met_zone)%table_entry(j)%datetime%time_string,met_data(met_zone)%table_entry(j)%value(:)
-       met_data(met_zone)%max_entries = met_data(met_zone)%max_entries + 1
-			 date_string = met_data(met_zone)%table_entry(j)%datetime%date_string
-			 time_string = met_data(met_zone)%table_entry(j)%datetime%time_string
-       met_data(met_zone)%table_entry(j)%datetime%time = date_to_decimal(date_string, time_string)
-
-		END DO
-100		CLOSE(iounit1)
-		END DO
-200 CLOSE(iounit2)
+    idx = met_idx_lookup(met_zone)
+    IF (idx .LE. 0) THEN
+       WRITE(msg, *) 'unknown met zone id: ', met_zone
+       CALL error_message(msg, .TRUE.)
+    END IF
+  END FUNCTION met_zone_index
 
 
-END SUBROUTINE read_met_data
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE met_zone_coeff
+  ! ----------------------------------------------------------------
+  SUBROUTINE met_zone_coeff(met_zone, coeff)
 
-!#####################################################################################################
-SUBROUTINE update_met_data(time, met_zone)
-  USE logicals, ONLY: do_gas
-	IMPLICIT NONE
-	DOUBLE PRECISION :: interp(5)
-	DOUBLE PRECISION :: time
-	INTEGER ::  i, j, num_values = 5, met_zone, jstart
-	DOUBLE PRECISION :: factor
+    IMPLICIT NONE
+    
+    INTEGER, INTENT(IN) :: met_zone
+    DOUBLE PRECISION, INTENT(OUT) :: coeff(:)
 
-        jstart = MAX(met_data(met_zone)%start_entry, 1)
-	DO j=jstart,met_data(met_zone)%max_entries-1
+    INTEGER :: idx
 
-           IF((time >= met_data(met_zone)%table_entry(j)%datetime%time)&
-                & .AND. (time <= met_data(met_zone)%table_entry(j+1)%datetime%time)) EXIT
+    idx = met_zone_index(met_zone)
 
-	END DO
-        met_data(met_zone)%start_entry =&
-             & MAX(MIN(j - 1, met_data(met_zone)%max_entries - 2), 0)
-        factor = (time - met_data(met_zone)%table_entry(j)%datetime%time)/ &
-             (met_data(met_zone)%table_entry(j+1)%datetime%time - met_data(met_zone)%table_entry(j)%datetime%time)
+    coeff = met_zones(idx)%coeff
 
-	interp(1:num_values) = met_data(met_zone)%table_entry(j)%value(1:num_values) +&
-             & factor*(met_data(met_zone)%table_entry(j+1)%value(1:num_values) -&
-             & met_data(met_zone)%table_entry(j)%value(1:num_values) )
-	
-	t_air = interp(1)
-	t_dew = interp(2)
-	windspeed = interp(3)
+  END SUBROUTINE met_zone_coeff
 
-                                ! let's ignore the barometric pressure
-                                ! if we are not doing gas
 
-    IF (do_gas) THEN
-       baro_press = interp(4)
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE read_met_data
+  ! ----------------------------------------------------------------
+  SUBROUTINE read_met_data(met_files)
+
+    IMPLICIT NONE
+
+    CHARACTER(LEN=*), INTENT(IN) :: met_files
+
+    CHARACTER(LEN=1024) :: msg
+    INTEGER, PARAMETER :: iounit1 = 50, iounit2 = 51
+    INTEGER :: istat
+    INTEGER :: count, maxid, i
+    INTEGER :: zoneid
+    CHARACTER(LEN=1024) :: zonefile
+    DOUBLE PRECISION :: coeff(4)
+
+    CALL open_existing(met_files, iounit1, fatal=.TRUE.)
+
+    count = 0
+    maxid = -1
+    DO WHILE(.TRUE.)
+       READ (iounit1,*,END=100) zoneid, zonefile
+       count = count + 1
+       IF (zoneid .GT. maxid) maxid = zoneid
+    END DO
+100 CONTINUE
+
+    IF (count .LE. 0) THEN
+       WRITE(msg, *) 'no met zones specified in ', TRIM(met_files)
+       CALL error_message(msg, .TRUE.)
     END IF
 
-	net_solar = interp(5)
+    ALLOCATE(met_zones(count), STAT=istat)
+    IF (istat .NE. 0) THEN
+       CALL error_message('memory allocation error in read_met_data', .TRUE.)
+    END IF
 
+    ALLOCATE(met_idx_lookup(maxid), STAT=istat)
+    IF (istat .NE. 0) THEN
+       CALL error_message('memory allocation error in read_met_data', .TRUE.)
+    END IF
+    met_idx_lookup = 0
 
-END SUBROUTINE update_met_data
+    REWIND(iounit1)
 
+    i = 0
+    DO WHILE(.TRUE.)
+
+       ! Default coefficients for this met zone
+
+       coeff(1) = 0.46 ! wind function multiplier
+       coeff(2) = 9.2  ! wind function offset
+       coeff(3) = 0.47 ! conduction coefficient
+       coeff(4) = 0.65 ! "brunt" coefficient for lw atm radiation
+
+       READ(iounit1,*,END=200) zoneid, zonefile, coeff
+       i = i + 1
+       met_idx_lookup(zoneid) = i
+       met_zones(i)%id = zoneid
+       met_zones(i)%coeff = coeff
+       met_zones(i)%met => time_series_read(zonefile, met_nfields, iounit2)
+
+       WRITE (msg, *) 'Coefficients for weather zone ', zoneid
+       CALL status_message(msg)
+       WRITE (msg, *) '        Wind a = ' , met_zones(i)%coeff(1)
+       CALL status_message(msg)
+       WRITE (msg, *) '        Wind b = ' , met_zones(i)%coeff(2)
+       CALL status_message(msg)
+       WRITE (msg, *) '    Conduction = ' , met_zones(i)%coeff(3)
+       CALL status_message(msg)
+       WRITE (msg, *) '         Brunt = ' , met_zones(i)%coeff(4)
+       CALL status_message(msg)
+    END DO
+
+    CLOSE(iounit1)
+
+200 CONTINUE
+
+  END SUBROUTINE read_met_data
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE update_met_data
+  ! ----------------------------------------------------------------
+  SUBROUTINE update_met_data(time, met_zone)
+
+    USE logicals, ONLY: do_gas
+
+    IMPLICIT NONE
+
+    DOUBLE PRECISION, INTENT(IN) :: time
+    INTEGER, INTENT(IN) :: met_zone
+
+    CHARACTER(LEN=1024) :: msg
+    INTEGER :: idx
+
+    idx = met_zone_index(met_zone)
+
+    CALL time_series_interp(met_zones(idx)%met, time)
+    t_air = met_zones(idx)%met%current(1)
+    t_dew = met_zones(idx)%met%current(2)
+    windspeed = met_zones(idx)%met%current(3)
+    IF (do_gas) THEN
+       baro_press = met_zones(idx)%met%current(4)
+    ELSE 
+       baro_press = 760         ! a standard atmosphere
+    END IF
+    net_solar = met_zones(idx)%met%current(5)
+
+  END SUBROUTINE update_met_data
 
 END MODULE met_data_module
