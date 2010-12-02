@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October 10, 2001 by William A. Perkins
-! Last Change: Tue Nov 30 12:53:35 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+! Last Change: Thu Dec  2 08:30:39 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 ! ----------------------------------------------------------------
 
 
@@ -79,8 +79,9 @@ CONTAINS
   SUBROUTINE read_pidlink_info()
 
     USE utility
-    USE general_vars, ONLY: maxlinks, maxtable
+    USE general_vars, ONLY: maxlinks
     USE link_vars, ONLY: linktype
+    USE bctable
 
     IMPLICIT NONE
 
@@ -91,6 +92,7 @@ CONTAINS
     DOUBLE PRECISION :: lagtime
     CHARACTER (LEN=256) :: fname
     INTEGER :: iounit
+    CHARACTER (LEN=1024) :: msg
 
     fname = default_filename
     iounit = 33
@@ -128,13 +130,10 @@ CONTAINS
        lagvalues = -999.0
        READ (iounit, *, END=100) link, kc, ti, tr, lagvalues
        IF (linkidmap(link) .EQ. 0) THEN
-          WRITE (99,*) 'ABORT: error reading pidlink coefficient file ', fname
-          WRITE (99,*) 'record ', l, ' is for link ', link, &
+          WRITE(msg, *) 'error reading pidlink coefficient file ', fname, &
+               &' record ', l, ' is for link ', link, &
                &', but link ', link, ' is not the correct type'
-          WRITE (*,*) 'ABORT: error reading pidlink coefficient file ', fname
-          WRITE (*,*) 'record ', l, ' is for link ', link, &
-               &', but link ', link, ' is not the correct type'
-          CALL EXIT(1)
+          CALL error_message(msg, fatal=.TRUE.)
        END IF
 
        piddata(l)%followflow = (linktype(link) .EQ. 12)
@@ -163,17 +162,13 @@ CONTAINS
        piddata(l)%numflows = i - 1
 
        IF (piddata(l)%numflows .LE. 0) THEN
-          WRITE (99,*) 'ABORT: error reading pidlink coefficient file ', TRIM(fname)
-          WRITE (99,*) 'no lagged flows specified for link ', link
-          WRITE (*,*) 'ABORT: error reading pidlink coefficient file ', TRIM(fname)
-          WRITE (*,*) 'no lagged flows specified for link ', link
-          CALL EXIT(1)
+          WRITE(msg,*) 'error reading pidlink coefficient file ', TRIM(fname), &
+               &' no lagged flows specified for link ', link
+          CALL error_message(msg, fatal=.TRUE.)
        ELSE IF (piddata(l)%followflow .AND. piddata(l)%numflows .GT. 1) THEN
-          WRITE (99,*) 'ABORT: error reading pidlink coefficient file ', TRIM(fname)
-          WRITE (99,*) 'too many lagged stages specified for link ', link
-          WRITE (*,*) 'ABORT: error reading pidlink coefficient file ', TRIM(fname)
-          WRITE (*,*) 'too many lagged stages specified for link ', link
-          CALL EXIT(1)
+          WRITE(msg,*) 'error reading pidlink coefficient file ', TRIM(fname), &
+               &' too many lagged stages specified for link ', link
+          CALL error_message(msg, fatal=.TRUE.)
        END IF
 
                                 ! make a list of the important
@@ -196,30 +191,21 @@ CONTAINS
           IF (laglink .LT. 0) THEN
              laglink = -laglink
              piddata(l)%lagged(i)%usebc = .TRUE.
-             IF (laglink .GT. maxtable) THEN
-                WRITE (99,*) 'ABORT: error reading pidlink coefficient file ', TRIM(fname)
-                WRITE (99,*) 'link ', link, 'uses lagged flow from link BC ', laglink, &
-                     &', which exceeds maximum '
-                WRITE (*,*) 'ABORT: error reading pidlink coefficient file ', TRIM(fname)
-                WRITE (*,*) 'link ', link, 'uses lagged flow from link BC ', laglink, &
-                     &', which exceeds maximum '
-                CALL EXIT(1)
+             IF (.NOT. bc_table_id_ok(linkbc, laglink)) THEN
+                WRITE(msg, *) 'error reading pidlink coefficient file ', TRIM(fname), &
+                     &': link ', link, 'uses lagged flow from invalid link BC ', laglink
+                CALL error_message(msg, fatal=.TRUE.)
              END IF
           ELSE IF (piddata(l)%followflow) THEN
-             WRITE (99,*) 'ABORT: error reading pidlink coefficient file ', TRIM(fname)
-             WRITE (99,*) 'link ', link, ' must use lagged stage from link BC'
-             WRITE (*,*) 'ABORT: error reading pidlink coefficient file ', TRIM(fname)
-             WRITE (*,*) 'link ', link, ' must use lagged stage from link BC'
-             CALL EXIT(1)
+             WRITE(msg, *) 'error reading pidlink coefficient file ', TRIM(fname), &
+                  &' link ', link, ' must specify lagged stage link BC'
+             CALL error_message(msg, fatal=.TRUE.)
           ELSE
              IF (laglink .EQ. 0  .OR. laglink .GT. maxlinks) THEN
-                WRITE (99,*) 'ABORT: error reading pidlink coefficient file ', TRIM(fname)
-                WRITE (99,*) 'link ', link, 'uses lagged flow from link ', laglink, &
+                WRITE(msg, *) 'error reading pidlink coefficient file ', TRIM(fname), &
+                     &' link ', link, 'uses lagged flow from link ', laglink, &
                      &', which is not a valid link '
-                WRITE (*,*) 'ABORT: error reading pidlink coefficient file ', TRIM(fname)
-                WRITE (*,*) 'link ', link, 'uses lagged flow from link ', laglink, &
-                     &', which is not a valid link '
-                CALL EXIT(1)
+                CALL error_message(msg, fatal=.TRUE.)
              END IF
           END IF
           piddata(l)%lagged(i)%link = laglink
