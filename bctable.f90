@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created November 30, 2010 by William A. Perkins
-! Last Change: Thu Dec  2 08:25:12 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+! Last Change: Thu Dec  2 08:40:42 2010 by William A. Perkins <d3g096@bearflag.pnl.gov>
 ! ----------------------------------------------------------------
   
 ! RCS ID: $Id$ Battelle PNL
@@ -146,7 +146,6 @@ CONTAINS
     INTEGER, INTENT(IN) :: id
 
     CHARACTER(LEN=1024) :: msg
-    INTEGER :: idx
 
     IF (id .LE. tbl%maxid) THEN
        idx = tbl%idlookup(id)
