@@ -199,7 +199,7 @@ CONTAINS
        WRITE(count,1005)
 1005   FORMAT('#link',8x,'point',2x,'distance',2x,'water elev',3x,'discharge',5x,'vel',2x,'depth', &
             6x,'conc',6x,'temp' ,2x,'%Sat',3x,'TDG P', &
-            5x,'thalweg el',2x,'area ',2x,'top width',2x,'hyd rad',2x,'Fr #',2x,'frict slope', &
+            5x,'thalweg el',2x,'area ',2x,'top width',2x,'hyd rad',2x,'Fr #',2x,'Cr #',2x,'D #',2x,'frict slope', &
             2x,'bed shear')
        WRITE(count,1110)
        
@@ -220,6 +220,8 @@ CONTAINS
                &accum_var%top_width%sum(link,point),&
                &accum_var%hyd_radius%sum(link,point),&
                &accum_var%froude_num%sum(link,point),&
+               &accum_var%courant_num%sum(link,point),&
+               &accum_var%diffuse_num%sum(link,point),&
                &accum_var%friction_slope%sum(link,point),&
                &accum_var%bed_shear%sum(link,point)
 
@@ -228,7 +230,7 @@ CONTAINS
 
 1000      FORMAT(i5,1x,i5,1x,i5,1x,f9.3,1x,f8.2,2x,f12.2,2x,f6.2,2x,f7.2,2x,f10.2,2x,f6.2,2x,f6.2,2x,f6.1,2x, &
                f8.2,2x,es10.2,2x, &
-               f8.2,2x,f6.2,f6.2,es10.2,2x,es10.2)
+               f8.2,2x,f6.2,f6.2,f6.2,f6.2,es10.2,2x,es10.2)
           
           lastlink=link
           
