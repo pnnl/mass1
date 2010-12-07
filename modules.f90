@@ -27,7 +27,7 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Tue Nov 30 14:00:43 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+! Last Change: Tue Dec  7 09:12:27 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 !----------------------------------------------------------
 MODULE general_vars
 
@@ -101,12 +101,7 @@ MODULE point_vars
   DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: area, area_old, q_old,y_old,k_diff
   DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: top_width, hyd_radius, froude_num, friction_slope, bed_shear
   DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: lateral_inflow, lateral_inflow_old
-  !INTEGER, DIMENSION(:,:),ALLOCATABLE, SAVE ::	
-
-  !REAL, SAVE :: x(lmax,pmax), q(lmax,pmax),qold(lmax,pmax)
-  !REAL, SAVE :: thalweg(lmax,pmax),y(lmax,pmax),manning(lmax,pmax), v(lmax,pmax)
-  !REAL, SAVE :: kstrick(lmax,pmax)
-  !INTEGER, SAVE :: lat_q_table(lmax,pmax)
+  DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: courant_num, diffuse_num
 
 END MODULE point_vars
 
