@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created November  6, 2000 by William A. Perkins
-! Last Change: Wed Sep 29 14:43:06 2010 by William A. Perkins <d3g096@bearflag.pnl.gov>
+! Last Change: Tue Dec  7 09:38:11 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE accumulator
@@ -15,6 +15,7 @@
 MODULE accumulator
 
   USE general_vars
+  USE logicals
   USE link_vars
   USE point_vars
   USE scalars
@@ -36,7 +37,8 @@ MODULE accumulator
 
   TYPE accum_rec
      TYPE (accum_var_rec) :: y, q, vel, area, top_width, hyd_radius
-     TYPE (accum_var_rec) :: froude_num, friction_slope, bed_shear
+     TYPE (accum_var_rec) :: froude_num, courant_num, diffuse_num
+     TYPE (accum_var_rec) :: friction_slope, bed_shear
      TYPE (accum_var_rec), POINTER :: conc(:)
      TYPE (accum_tdg_rec) :: tdg
   END TYPE accum_rec
@@ -93,6 +95,8 @@ CONTAINS
     CALL accum_init_var(maxlinks, maxpoint, accum_var%top_width)
     CALL accum_init_var(maxlinks, maxpoint, accum_var%hyd_radius)
     CALL accum_init_var(maxlinks, maxpoint, accum_var%froude_num)
+    CALL accum_init_var(maxlinks, maxpoint, accum_var%courant_num)
+    CALL accum_init_var(maxlinks, maxpoint, accum_var%diffuse_num)
     CALL accum_init_var(maxlinks, maxpoint, accum_var%friction_slope)
     CALL accum_init_var(maxlinks, maxpoint, accum_var%bed_shear)
 
@@ -153,6 +157,8 @@ CONTAINS
     CALL accum_reset_var(accum_var%top_width)
     CALL accum_reset_var(accum_var%hyd_radius)
     CALL accum_reset_var(accum_var%froude_num)
+    CALL accum_reset_var(accum_var%courant_num)
+    CALL accum_reset_var(accum_var%diffuse_num)
     CALL accum_reset_var(accum_var%friction_slope)
     CALL accum_reset_var(accum_var%bed_shear)
 
@@ -246,6 +252,8 @@ CONTAINS
     CALL accumulate_var(top_width, accum_var%top_width)
     CALL accumulate_var(hyd_radius, accum_var%hyd_radius)
     CALL accumulate_var(froude_num, accum_var%froude_num)
+    CALL accumulate_var(courant_num, accum_var%courant_num)
+    CALL accumulate_var(diffuse_num, accum_var%diffuse_num)
     CALL accumulate_var(friction_slope, accum_var%friction_slope)
     CALL accumulate_var(bed_shear, accum_var%bed_shear)
 
@@ -253,7 +261,7 @@ CONTAINS
        call accumulate_var(species(ispec)%conc(:,1:maxpoint), accum_var%conc(ispec))
     END DO
 
-    CALL accumulate_tdg(accum_var%tdg)
+    IF (do_gas) CALL accumulate_tdg(accum_var%tdg)
     
     accum_count = accum_count + 1
 
@@ -306,6 +314,8 @@ CONTAINS
     CALL accum_calc_var(accum_var%top_width)
     CALL accum_calc_var(accum_var%hyd_radius)
     CALL accum_calc_var(accum_var%froude_num)
+    CALL accum_calc_var(accum_var%courant_num)
+    CALL accum_calc_var(accum_var%diffuse_num)
     CALL accum_calc_var(accum_var%friction_slope)
     CALL accum_calc_var(accum_var%bed_shear)
 
@@ -313,7 +323,7 @@ CONTAINS
        CALL accum_calc_var(accum_var%conc(ispec))
     END DO
 
-    CALL accum_calc_tdg(accum_var%tdg)
+    IF (do_gas) CALL accum_calc_tdg(accum_var%tdg)
 
     accum_time = (accum_time + model_time)/2.0
     
