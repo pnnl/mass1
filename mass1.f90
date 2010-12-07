@@ -52,6 +52,7 @@ DOUBLE PRECISION  model_time
 INTEGER, SAVE :: time_step_count = 0
 INTEGER :: species_num, i
 INTEGER :: link
+INTEGER :: tsteps
 LOGICAL run
 
 CALL date_time_flags()
@@ -179,7 +180,6 @@ ENDIF
 
 model_time = time_begin
 time = model_time/time_mult
-scalar_delta_t = delta_t/DBLE(scalar_steps)
 
 IF(model_time <= time_end) run = .true.
 
@@ -214,8 +214,16 @@ DO WHILE(run)
     IF (do_gas .OR. do_temp) THEN
 
        scalar_time = model_time
+       IF (scalar_steps .GT. 0) THEN
+          tsteps = scalar_steps
+       ELSE
+          tsteps = tvd_steps(delta_t)
+          WRITE(*, '("Using ", I3, " transport steps")') tsteps
+       END IF
 
-       DO i = 1, scalar_steps
+       scalar_delta_t = delta_t/DBLE(tsteps)
+
+       DO i = 1, tsteps
 
           IF((debug_print == 1))THEN
              WRITE(11,*)'transport sub loop in mass1'
@@ -237,7 +245,7 @@ DO WHILE(run)
                   & , utility_status_iounit, utility_error_iounit)
           END IF
 
-          scalar_time = model_time + DBLE(i)/DBLE(scalar_steps)*time_step
+          scalar_time = model_time + DBLE(i)/DBLE(tsteps)*time_step
 
        END DO
 
