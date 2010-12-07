@@ -23,7 +23,7 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Tue Nov 30 14:01:29 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+! Last Change: Tue Dec  7 09:19:47 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 !
 
 SUBROUTINE array_dealloc
@@ -61,6 +61,7 @@ DEALLOCATE(kstrick, area, area_old)
 DEALLOCATE(k_diff)
 DEALLOCATE(top_width,hyd_radius,froude_num,friction_slope,bed_shear)
 DEALLOCATE(lateral_inflow, lateral_inflow_old)
+DEALLOCATE(courant_num, diffuse_num)
 
 !-----------------------------------------------------------
 !module sections_vars
