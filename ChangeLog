@@ -1,3 +1,28 @@
+2010-12-07  William A. Perkins  <william.perkins@pnl.gov>
+
+	* accumulator.f90 (accum_initialize, accum_reset, accumulate)
+	(accum_calc): add accumulators for computed Courant and
+	diffusion criteria
+
+	* mass1.f90 (mass1): use computed transport time step if called for
+
+	* profile_output.f90 (profile_output): output computed Courant and
+	diffusion criteria
+
+	* scalars_module.f90 (tvd_steps): compute transport time step
+
+	* array_dealloc.f90 (array_dealloc): deallocate variables for automatic
+	transport time stepping
+
+	* array_alloc.f90 (array_alloc): allocate variables for automatic
+	transport time stepping
+
+	* flow_sim.f90 (flow_sim): compute criteria for automatic
+	transport time stepping; re-indent
+
+	* modules.f90 (point_vars): add variables for automatic transport
+	time stepping: Courant number and diffusion criteria
+
 2010-12-02  William A. Perkins  <william.perkins@pnl.gov>
 
 	* linear_interp.f90 (dlinear_interp): better checking of double
