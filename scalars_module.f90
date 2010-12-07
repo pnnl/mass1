@@ -46,6 +46,9 @@ DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE, PRIVATE :: latq, latq_old
 ! air-water gas exchange coefficient parameters
 DOUBLE PRECISION :: gasx_a = 0.0, gasx_b = 0.0 , gasx_c = 0.0, gasx_d = 0.0
 
+DOUBLE PRECISION, PRIVATE, PARAMETER :: max_courant = 0.99
+DOUBLE PRECISION, PRIVATE, PARAMETER :: max_diffuse = 0.99
+
 CONTAINS
 !#####################################################################################################
 
@@ -113,6 +116,50 @@ SUBROUTINE allocate_species(error_iounit,status_iounit)
 
 
 END SUBROUTINE allocate_species
+
+! ----------------------------------------------------------------
+! INTEGER FUNCTION tvd_steps
+!
+! This computes the number of transport steps that should be taken in
+! this hydrodynamic time step (delta_t) in order satisfy Courant
+! number constraints.  The maximum courant number is used to
+! determine.  The transport time step is computed so that the maximum
+! Courant number is reduced to an exceptable target.
+!
+! The transport time step is also adjusted for diffusion stability.
+! ----------------------------------------------------------------
+INTEGER FUNCTION tvd_steps(delta_t)
+
+  USE point_vars, ONLY: courant_num, diffuse_num
+
+  IMPLICIT NONE
+
+  DOUBLE PRECISION, INTENT(IN) :: delta_t
+  DOUBLE PRECISION :: cmax, dmax, a_transdt, d_transdt
+
+  cmax = MAXVAL(courant_num)
+
+  IF (cmax .GT. max_courant) THEN 
+     a_transdt = max_courant/cmax*delta_t
+  ELSE 
+     a_transdt = delta_t
+  END IF
+
+  dmax = MAXVAL(diffuse_num) 
+  IF (dmax .GT. max_diffuse) THEN 
+     d_transdt = max_diffuse/dmax*delta_t
+  ELSE 
+     d_transdt = delta_t
+  END IF
+
+  a_transdt = MIN(a_transdt, d_transdt)
+  
+  tvd_steps = FLOOR(delta_t/a_transdt)
+
+  IF (FRACTION(delta_t/a_transdt) .GT. EPSILON(a_transdt)) &
+       &tvd_steps = tvd_steps + 1
+END FUNCTION tvd_steps
+
 
 ! ----------------------------------------------------------------
 ! SUBROUTINE tvd_interp
