@@ -1,3 +1,8 @@
+2010-12-10  William A. Perkins  <william.perkins@pnl.gov>
+
+	* scalars_module.f90 (tvd_steps): make sure there is at least 1
+	transport time step
+
 2010-12-07  William A. Perkins  <william.perkins@pnl.gov>
 
 	* accumulator.f90 (accum_initialize, accum_reset, accumulate)
