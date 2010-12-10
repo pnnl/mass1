@@ -158,6 +158,9 @@ INTEGER FUNCTION tvd_steps(delta_t)
 
   IF (FRACTION(delta_t/a_transdt) .GT. EPSILON(a_transdt)) &
        &tvd_steps = tvd_steps + 1
+
+  tvd_steps = MAX(tvd_steps, 1)
+
 END FUNCTION tvd_steps
 
 
