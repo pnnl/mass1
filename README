@@ -7,7 +7,7 @@ Pacific Northwest Laboratory
 -------------------------------------------------------------
 -------------------------------------------------------------
 Created June 10, 2005 by William A. Perkins
-Last Change: Fri Jun 10 09:04:58 2005 by William A. Perkins <perk@McPerk.pnl.gov>
+Last Change: Fri Dec 17 06:59:58 2010 by William A. Perkins <d3g096@bearflag.pnl.gov>
 -------------------------------------------------------------
 
 -------------------------------------------------------------
@@ -117,3 +117,13 @@ This will make a gzip'd tar file named something like
 mass1-0.30.tar.gz.  It contains the MASS1 distribution and should have
 all the necessary files to build MASS1. 
 
+Configuration examples:
+
+PE10900: 
+
+    configure --with-f90=gfortran-mp-4.4 --enable-f90-debug \
+              --with-extra-f90flags=-ffpe-trap=invalid,zero,overflow
+
+Bearflag w/Intel Fortran:
+
+    configure --with-f90=ifort --with-extra-f90flags="-O -fpe0"
