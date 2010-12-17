@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 25, 2003 by William A. Perkins
-# Last Change: Thu Jun 23 07:41:31 2005 by William A. Perkins <perk@McPerk.local>
+# Last Change: Fri Dec 10 08:40:56 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -20,7 +20,7 @@ AM_INIT_AUTOMAKE(MASS1,0.80)
 # -------------------------------------------------------------
 # Stuff to include subdirectories
 # -------------------------------------------------------------
-SUBDIRS="time_series . scripts"
+SUBDIRS="gastemp time_series . scripts"
 AC_SUBST(SUBDIRS)
 
 # -------------------------------------------------------------
@@ -34,6 +34,7 @@ AC_PROG_RANLIB()
 AC_PROG_INSTALL()
 AC_PROG_LN_S()
 AC_PROG_MAKE_SET()
+AC_PROG_FC()
 AC_PROG_F90()
 
 # -------------------------------------------------------------
@@ -64,11 +65,15 @@ AC_LANG(Fortran)
                                 # search for modules in the
                                 # time_series directory
 
-FCFLAGS="$FCFLAGS  ${F90MODPATH}time_series"
+FCFLAGS="$FCFLAGS"
 FFLAGS="$FCFLAGS"
 LIBS="$LIBS $F90LIBS"
 
 AC_CONFIG_SUBDIRS(time_series)
-AC_OUTPUT(Makefile)
-AC_OUTPUT(scripts/Makefile)
+AC_CONFIG_FILES([
+    Makefile
+    gastemp/Makefile
+    scripts/Makefile
+])
+AC_OUTPUT()
 
