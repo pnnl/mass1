@@ -222,7 +222,7 @@ SUBROUTINE read_config
   READ(10,*,ERR=110)maxtimes    ! not used anymore
   line = line + 1
 
-  READ(10,*,ERR=110)total_sections
+  READ(10,*,ERR=110)total_sections ! overwritten by section_data_count()
   line = line + 1
 
   READ(10,*,ERR=110)scalar_steps
