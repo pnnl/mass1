@@ -27,7 +27,7 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Tue Dec  7 09:12:27 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+! Last Change: Mon Feb 21 11:54:55 2011 by William A. Perkins <d3g096@PE10900.pnl.gov>
 !----------------------------------------------------------
 MODULE general_vars
 
@@ -102,6 +102,7 @@ MODULE point_vars
   DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: top_width, hyd_radius, froude_num, friction_slope, bed_shear
   DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: lateral_inflow, lateral_inflow_old
   DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: courant_num, diffuse_num
+  INTEGER, DIMENSION(:,:),ALLOCATABLE, SAVE :: section_number
 
 END MODULE point_vars
 
@@ -113,7 +114,6 @@ MODULE section_vars
   INTEGER, PARAMETER :: maxpairs=1000,maxlevels=3500
   INTEGER, SAVE :: total_sections
   INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: section_id,section_type
-  INTEGER, DIMENSION(:,:),ALLOCATABLE, SAVE :: section_number
   DOUBLE PRECISION, DIMENSION(:),ALLOCATABLE, SAVE :: bottom_width,bottom_width_flood,depth_main
   DOUBLE PRECISION, DIMENSION(:),ALLOCATABLE, SAVE :: delta_y,sect_levels
 
@@ -125,6 +125,37 @@ MODULE section_vars
 
   !REAL, SAVE :: bottom_width(maxsections),bottom_width_flood(maxsections)
   !REAL, SAVE :: depth_main(maxsections)
+
+CONTAINS
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE allocate_section_vars
+  ! ----------------------------------------------------------------
+  SUBROUTINE allocate_section_vars()
+
+    IMPLICIT NONE
+
+    INTEGER :: maxsections
+
+    maxsections = total_sections
+
+    ALLOCATE(section_id(maxsections))
+    ALLOCATE(section_type(maxsections))
+    ALLOCATE(delta_y(maxsections))
+    ALLOCATE(sect_levels(maxsections))
+    ALLOCATE(bottom_width(maxsections))
+    ALLOCATE(bottom_width_flood(maxsections))
+    ALLOCATE(depth_main(maxsections))
+    ALLOCATE(sect_area(maxsections,maxlevels))
+    ALLOCATE(sect_hydradius(maxsections,maxlevels))
+    ALLOCATE(sect_depth(maxsections,maxlevels))
+    ALLOCATE(sect_width(maxsections,maxlevels))
+    ALLOCATE(sect_convey(maxsections,maxlevels))
+    ALLOCATE(sect_perm(maxsections,maxlevels))
+    
+
+  END SUBROUTINE allocate_section_vars
+
 
 END MODULE section_vars
 
