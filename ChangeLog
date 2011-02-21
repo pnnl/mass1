@@ -1,5 +1,20 @@
 2011-02-21  William A. Perkins  <william.perkins@pnl.gov>
 
+	* test/application/LowerSnakeColumbia/BaseFiles/gage_control.dat:
+	add some estuary gage locations
+
+	* test/application/LowerSnakeColumbia/BaseFiles/profile_control.dat:
+	add a profile just for the estuary
+
+	* test/application/LowerSnakeColumbia/BaseFiles/colpoint-1.prn: added
+	new Columbia River estuary cross sections
+
+	* test/application/LowerSnakeColumbia/BaseFiles/collink-1.prn: added
+	new Columbia River estuary cross sections
+
+	* test/application/LowerSnakeColumbia/BaseFiles/xcolum.dat: added
+	new Columbia River estuary cross sections
+
 	* array_alloc.f90 (array_alloc): allocate cross section variables
 	elsewhere 
 
