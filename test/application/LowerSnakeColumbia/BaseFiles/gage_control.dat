@@ -10,7 +10,6 @@
   8  65 /   Snake RM 107.5 - LWG FBE
  10   1 /   Snake RM 107.5 - LWG TWE
  10   4 /   Snake RM 106.75 - LGNW Fixed Monitor
- 10  32 /   Snake RM  97.0 - Short Grid Downstream Boundary
  10  85 /   Snake RM  70.1 - LGS FBE
  12   1 /   Snake RM  70.1 - LGS TWE
  12   4 /   Snake RM  69.5 - LGSW Fixed Monitor
@@ -22,7 +21,6 @@
  18  75 /   Snake RM   9.5 - IHR FBE
  20   1 /   Snake RM   9.5 - IHR TWE
  20  15 /   Snake RM   6.0 - IDSW Fixed Monitor
- 20  27 /   Snake Rm   1.5 - Short Grid Downstream Boundary
   1   1 /   Columbia RM 396.76 - PRD TWE
   1   2 /   Columbia RM 396.76 - PRD TWE
   1   3 /   Columbia RM 396.76 - PRD TWE
@@ -31,19 +29,21 @@
  23  45 /   Columbia RM 292.50 - MCN FBE
  25   1 /   Columbia RM 292.50 - MCN TWE
  25   9 /   Columbia RM 290.50 - MCPW Fixed Monitor
- 27  17 /   Columbia RM 282.5 - Short Grid Downstream Boundary
  29   8 /   Columbia RM 215.75 - JDA FBE
  31   1 /   Columbia RM 215.75 - JDA TWE
  31   5 /   Columbia RM 214.75 - JHAW Fixed Monitor
- 31  26 /   Columbia RM 207.50 - Short Grid Downstream Boundary
  33  28 /   Columbia RM 191.50 - TDA FBE
  35   1 /   Columbia RM 191.50 - TDA TWE
  35  11 /   Columbia RM 189.00 - TDDO Fixed Monitor
- 35  29 /   Columbia RM 182.50 - Short Grid Downstream Boundary
  43  17 /   Columbia RM 146.50 - BON FBE
  45   1 /   Columbia RM 146.50 - BON TWE
  45  21 /   Columbia RM 140.50 - WRNO/SKAW Fixed Monitor
- 45  30 /   Columbia RM 136.00 - Short Grid Downstream Boundary
  45  58 /   Columbia RM 122.00 - CWMW Fixed Monitor
+ 47  33 /   Columbia RM 105.12 - NOAA Station 9440083 "Vancouver, WA"
  51  11 /   Columbia RM  76.00 - KLAW Fixed Monitor
+ 53   3 /   Columbia RM  66.00 - NOAA Station 9440422 "Longview, WA"
+ 53  17 /   Columbia RM  53.50 - USGS Gage 14246900 "COLUMBIA RIVER @ BEAVER ARMY TERMINAL NR QUINCY,OR"
  55   9 /   Columbia RM  42.00 - WANO Fixed Monitor
+ 55  18 /   Columbia RM  33.70 - NOAA Station 9440569 "Skamokawa, WA"
+ 55  35 /   Columbia RM  17.40 - NOAA Station 9439040 "Astoria, OR"
+ 55  52 /   Columbia RM   1.50 - NOAA Station 9440574 "North Jetty, WA"
