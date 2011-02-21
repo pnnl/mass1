@@ -118,6 +118,7 @@ CALL link_data
 CALL point_data
 	IF(debug_print == 1)WRITE(11,*)'done with point data'
 
+CALL section_data_count
 CALL section_data
 	IF(debug_print == 1)WRITE(11,*)'done with section data'
 
