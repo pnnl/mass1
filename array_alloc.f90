@@ -22,7 +22,7 @@
 !
 !***************************************************************
 ! CVS ID: $Id$
-! Last Change: Tue Dec  7 09:14:30 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+! Last Change: Mon Feb 21 11:54:50 2011 by William A. Perkins <d3g096@PE10900.pnl.gov>
 ! 
 
 SUBROUTINE array_alloc
@@ -78,17 +78,18 @@ ALLOCATE(top_width(maxlinks,maxpoint),hyd_radius(maxlinks,maxpoint),&
      & bed_shear(maxlinks,maxpoint))
 ALLOCATE(lateral_inflow(maxlinks,maxpoint), lateral_inflow_old(maxlinks,maxpoint))
 ALLOCATE(courant_num(maxlinks,maxpoint), diffuse_num(maxlinks,maxpoint))
+ALLOCATE(section_number(maxlinks,maxpoint))
 ALLOCATE(y_old(maxlinks,maxpoint))
+
 !-----------------------------------------------------------
 !module sections_vars
 
-ALLOCATE(section_id(maxsections),section_type(maxsections),delta_y(maxsections),sect_levels(maxsections))
-ALLOCATE(section_number(maxlinks,maxpoint))
- 
-ALLOCATE(bottom_width(maxsections),bottom_width_flood(maxsections))
-ALLOCATE(depth_main(maxsections))
-ALLOCATE(sect_area(maxsections,maxlevels),sect_hydradius(maxsections,maxlevels),sect_depth(maxsections,maxlevels))
-ALLOCATE(sect_width(maxsections,maxlevels),sect_convey(maxsections,maxlevels),sect_perm(maxsections,maxlevels))
+!!$ALLOCATE(section_id(maxsections),section_type(maxsections),delta_y(maxsections),sect_levels(maxsections))
+!!$ 
+!!$ALLOCATE(bottom_width(maxsections),bottom_width_flood(maxsections))
+!!$ALLOCATE(depth_main(maxsections))
+!!$ALLOCATE(sect_area(maxsections,maxlevels),sect_hydradius(maxsections,maxlevels),sect_depth(maxsections,maxlevels))
+!!$ALLOCATE(sect_width(maxsections,maxlevels),sect_convey(maxsections,maxlevels),sect_perm(maxsections,maxlevels))
 
 !----------------------------------------------------------
 !MODULE transport_vars
