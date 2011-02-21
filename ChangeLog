@@ -1,5 +1,7 @@
 2011-02-21  William A. Perkins  <william.perkins@pnl.gov>
 
+	* point_data.f90 (point_data): section_vars should not be USEd here
+
 	* test/application/LowerSnakeColumbia/BaseFiles/gage_control.dat:
 	add some estuary gage locations
 
