@@ -35,7 +35,6 @@ SUBROUTINE point_data
   USE utility
   USE point_vars
   USE link_vars
-  USE section_vars, ONLY : section_number
   USE file_vars
   USE general_vars, ONLY : units,channel_length_units
   USE transport_vars, ONLY : k_surf
