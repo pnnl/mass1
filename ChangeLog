@@ -1,3 +1,28 @@
+2011-02-21  William A. Perkins  <william.perkins@pnl.gov>
+
+	* test/application/HanfordReach/Forecast/: completely rework;
+	working now
+
+	* section.f90 (section): if a section cannot be found by its id, a
+	fatal error is generated
+
+	* test/application/HanfordReach/Forecast/BCFiles/: no longer needed
+
+	* test/application/HanfordReach/Profiles/mass1.cfg: resize for new
+	cross sections
+
+	* test/application/HanfordReach/Rampdown/mass1.cfg: resize for new
+	cross sections
+
+	* test/application/HanfordReach/BaseFiles/prd2mcn.point: add cross
+	sections from 2011 Hanford Reach LIDAR surface
+
+	* test/application/HanfordReach/BaseFiles/prd2mcn.link: add cross
+	sections from 2011 Hanford Reach LIDAR surface
+
+	* test/application/HanfordReach/BaseFiles/CAN2MCN.dat: add cross
+	sections from 2011 Hanford Reach LIDAR surface
+
 2010-12-17  William A. Perkins  <william.perkins@pnl.gov>
 
 	* Makefile.am (AM_FCFLAGS): add gastemp to include path
