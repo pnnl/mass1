@@ -1,5 +1,21 @@
 2011-02-21  William A. Perkins  <william.perkins@pnl.gov>
 
+	* array_alloc.f90 (array_alloc): allocate cross section variables
+	elsewhere 
+
+	* mass1.f90 (mass1): count cross sections before reading them
+
+	* modules.f90 (point_vars): section_number needs to be declared
+	here 
+	(allocate_section_vars): add separate routine to allocate cross
+	section variables
+
+	* read_config.f90 (read_config): total_sections read, but is
+	overwritten later (comment)
+
+	* section_data.f90 (section_data, section_data_count): make a pass
+	to just count the sections
+
 	* test/application/HanfordReach/Forecast/: completely rework;
 	working now
 
