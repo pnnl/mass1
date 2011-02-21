@@ -30,15 +30,17 @@
 SUBROUTINE section(link,point,depth,area_temp,width,conveyance,dkdy,hydrad)
 
 !
-        USE section_vars
-		USE general_vars
-		USE point_vars
+  USE utility
+  USE section_vars
+  USE general_vars
+  USE point_vars
 
 !
         IMPLICIT NONE
 
         INTEGER :: i,j,link,point
         DOUBLE PRECISION :: area_temp,depth,width,perm,hydrad,dpdy,dkdy,conveyance, factor
+        CHARACTER (LEN=1024) :: msg
 !NOTE: y is DEPTH here NOT STAGE as in flow sim
 ! match section number to the right section info given
 ! the link and point we are at
@@ -46,6 +48,13 @@ SUBROUTINE section(link,point,depth,area_temp,width,conveyance,dkdy,hydrad)
         DO i=1,total_sections
           IF(section_id(i) == section_number(link,point)) EXIT
         END DO
+
+        IF (i .GT. total_sections) THEN
+           WRITE(*,msg) 'Cannot find section id ', section_number(link, point),&
+                &' for link ', link, ', point ', point
+           CALL error_message(msg, fatal=.TRUE.)
+        END IF
+           
                   
         SELECT CASE(section_type(i))
 
