@@ -1,3 +1,11 @@
+2011-02-23  William A. Perkins  <william.perkins@pnl.gov>
+
+	* mass1.f90: changes to comments only
+
+	* point_data.f90 (point_data_scan): add
+
+	* link_data.f90 (link_data): put in some error checking
+
 2011-02-21  William A. Perkins  <william.perkins@pnl.gov>
 
 	* point_data.f90 (point_data): section_vars should not be USEd here
