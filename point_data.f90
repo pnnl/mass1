@@ -25,6 +25,83 @@
 !***************************************************************
 !
 
+! ----------------------------------------------------------------
+! SUBROUTINE point_data_scan
+!
+! The purpose of this routine is to count the number of links and
+! points in the configuration
+!
+! NOTE: DO NOT USE THIS. IT IS NOT CORRECT.  IT DOES NOT WORK IF LINKS
+! WITH OPTION 2 HAVE MORE POINTS THAN WITH OPTION 1.  The link file
+! should probably be the definitive description of the network.
+! Something like this might be used to verify that the correct number
+! of points have been supplied.
+! ----------------------------------------------------------------
+SUBROUTINE point_data_scan()
+  
+  USE utility
+  USE file_vars
+  USE general_vars
+
+  IMPLICIT NONE
+
+  INTEGER :: iunit
+  INTEGER :: link, point
+  INTEGER :: lmax
+  INTEGER, ALLOCATABLE :: numpt(:)
+  CHARACTER (LEN=1024) :: msg
+
+  iunit = fileunit(3)
+
+  CALL open_existing(filename(3), iunit, fatal=.TRUE.)
+  
+  ! First, scan the file to find the maximum link id
+
+  lmax = 0
+  DO WHILE(.TRUE.)
+     READ(iunit,*,END=100)link, point
+     IF (link .GT. lmax) lmax = link
+  END DO
+100 CONTINUE
+  IF (lmax .LE. 0) THEN
+     CALL error_message('No links identified in point file "' // &
+          &TRIM(filename(3)) // '"', fatal = .TRUE.)
+  END IF
+  ALLOCATE(numpt(lmax))
+
+
+  ! Then, count the number of points for each link id
+
+  REWIND(iunit)
+  numpt = 0
+  DO WHILE(.TRUE.)
+     READ(iunit,*,END=200) link, point
+     numpt(link) = numpt(link) + 1
+  END DO
+200 CONTINUE
+
+  CLOSE(iunit)
+
+  ! set global limits accordingly
+
+  maxlinks = lmax
+  maxpoint = MAXVAL(numpt) + 1
+
+  DEALLOCATE(numpt)
+
+  IF (maxpoint .LE. 0) THEN
+     CALL error_message('Unable to scan point file "' //&
+          &TRIM(filename(3)) // '"', fatal = .TRUE.)
+  END IF
+
+  WRITE(msg, *) TRIM(filename(3)) // ": found ", maxlinks, &
+       &" links with a maximum points of ", maxpoint
+  CALL status_message(msg)
+
+
+END SUBROUTINE point_data_scan
+
+
 SUBROUTINE point_data
 
   ! read in point-related input data
