@@ -104,7 +104,8 @@ ENDIF
 
 !-----------------------------------------------------------------------
 ! call startup routines 
-    
+
+! CALL point_data_scan   ! or something to determine maxlinks and maxpoint prior to allocation
 CALL array_alloc
 CALL allocate_species(utility_error_iounit, utility_status_iounit)
 DO i=1,max_species
