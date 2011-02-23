@@ -52,7 +52,7 @@ SUBROUTINE link_data
 
   DO i=1,maxlinks
 
-     READ(fileunit(2),*)link
+     READ(fileunit(2),*,END=100,ERR=200)link
      BACKSPACE(fileunit(2))
 
      linkname(link) = link   
@@ -60,11 +60,11 @@ SUBROUTINE link_data
 
      WRITE(io_unit,*)'link number -',link
 
-     READ(fileunit(2),*)junk,input_option(link),maxpoints(link),linkorder(link),&
+     READ(fileunit(2),*,ERR=200)junk,input_option(link),maxpoints(link),linkorder(link),&
           & linktype(link),num_con_links(link),linkbc_table(link),dsbc_table(link), &
           & transbc_table(link),tempbc_table(link),met_zone(link),latflowbc_table(link), &
           & lattransbc_table(link),lattempbc_table(link)
-     READ(fileunit(2),*)ds_conlink(link),con_links(link,:)
+     READ(fileunit(2),*,ERR=200)ds_conlink(link),con_links(link,:)
 
      WRITE(io_unit,*)link,input_option(link),maxpoints(link),linkorder(link),&
           & linktype(link),num_con_links(link),linkbc_table(link),dsbc_table(link), &
@@ -85,6 +85,15 @@ SUBROUTINE link_data
      END IF
   END DO
 
+100 CONTINUE
+
   CLOSE(fileunit(2))
+
+  RETURN
+
+200 CONTINUE
+
+  WRITE(msg, *) TRIM(filename(2)) // ': error in or near link record ', link, ' of ', maxlinks
+  CALL error_message(msg, fatal=.TRUE.)
 
 END SUBROUTINE link_data
