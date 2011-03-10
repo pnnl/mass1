@@ -1,3 +1,15 @@
+2011-03-09  William A. Perkins  <william.perkins@pnl.gov>
+
+	* test/application/HanfordReach/Forecast/runmass1.py: have options
+	to disable some steps; prepare graphs of all quadrants; work
+	towards specifying an arbitrary "now"
+
+	* test/application/HanfordReach/Forecast/plotall.gp: added
+
+	* test/application/HanfordReach/Forecast/plot1quad.gp: added
+
+	* test/application/HanfordReach/Forecast/gcpud.py: added
+
 2011-02-23  William A. Perkins  <william.perkins@pnl.gov>
 
 	* mass1.f90: changes to comments only
