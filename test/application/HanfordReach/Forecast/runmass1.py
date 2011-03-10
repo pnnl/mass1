@@ -9,12 +9,13 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 26, 2011 by William A. Perkins
-# Last Change: Mon Feb 21 10:24:36 2011 by William A. Perkins <d3g096@PE10900.pnl.gov>
+# Last Change: Wed Mar  9 16:13:54 2011 by William A. Perkins <d3g096@bearflag.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
 
-import getopt, sys, os
+import sys, os
+from optparse import OptionParser
 from operator import itemgetter
 import urllib
 import urllib2
@@ -26,17 +27,83 @@ import shutil
 thefmt = "%m-%d-%Y %H:%M:%S"
 
 # -------------------------------------------------------------
+# flatline
+#
+# reads the specified BC file and flatlines from the end for a year,
+# if needed.  The last "real" date and value are extracted and
+# returned.
+# -------------------------------------------------------------
+def flatline(bcname):
+
+    sys.stderr.write("%s: flat lining ...\n" % (bcname))
+    
+    bcfile = open(bcname, "r")
+    lastdate = []
+    lastz = []
+    line = 0
+    for l in bcfile:
+        l.rstrip()
+        line += 1
+
+        if (line == 1):
+            continue
+        if (len(l) <= 0):
+            continue
+
+        fld = l.split()
+        dstr = fld[0] + " " + fld[1]
+        lt = strptime(dstr, thefmt)
+        thedate = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday,
+                           hour=lt.tm_hour, minute=lt.tm_min, second=lt.tm_sec)
+
+        lastdate.append(thedate)
+
+        z = float(fld[2])
+        lastz.append(z)
+
+        if (len(lastdate) > 2):
+            lastdate.pop(0)
+            lastz.pop(0)
+            
+    bcfile.close()
+
+    if (len(lastdate) > 1):
+        sys.stderr.write("%s: last date found: %s\n" %
+                         ( bcname, lastdate[1].strftime(thefmt)))
+
+        onemonth =  timedelta(days=30)
+        dt = lastdate[1] - lastdate[0]
+        if (dt < onemonth):
+            d = lastdate[1] + timedelta(days=365)
+            z = lastz[1]
+            bcfile = open(bcname, "a")
+            sys.stderr.write("%s: flat lining to: %s\n" %
+                             ( bcname, d.strftime(thefmt)))
+            bcfile.write("%s %.2f /\n" % (d.strftime(thefmt), z))
+            lastdate.pop(0)
+            lastz.pop(0)
+        else:
+            d = lastdate[1]
+            sys.stderr.write("%s: already flat lined to: %s\n" %
+                             ( bcname, d.strftime(thefmt)))
+            
+    else:
+        return Null, Null
+    return (lastdate[0], lastz[0])
+    
+
+# -------------------------------------------------------------
 # download_usgs_recent
 #
 # Just discharge
 # -------------------------------------------------------------
-def download_usgs_recent(gage, outname):
+def download_usgs_recent(now, gage, outname):
 
     urlbase = "http://nwis.waterdata.usgs.gov/nwis/uv"
 
     qdata = {'cb_00060' : "on",
              'format' : "rdb",
-             'period' : "10",
+             'period' : "30",
              'site_no' : gage }
 
     params = urllib.urlencode(qdata)
@@ -78,14 +145,12 @@ def download_usgs_recent(gage, outname):
 
             outf.write("%s %.2f /\n" % (thedate.strftime(thefmt), z))
 
-    if (lastdate):
-        d = lastdate + timedelta(days=365)
-        outf.write("%s %.2f /\n" % (d.strftime(thefmt), z))
-
-
     f.close()
     outf.close()
-    return lastdate
+    if (lastdate):
+        (lastdate, lastz) = flatline(outname)
+
+    return (lastdate, lastz)
 
 # -------------------------------------------------------------
 # download_wmd_recent
@@ -179,21 +244,76 @@ def download_wmd_recent(code, fld, outname):
 
         f.close()
 
-    d = lastdate + timedelta(days=365)
-    outf.write("%s %.2f /\n" % (d.strftime(thefmt), lastz))
     outf.close()
+    if (lastdate):
+        (lastdate, lastz) = flatline(outname)
 
-        # return the last available date, data
+    # return the last available date, data
     return (lastdate, lastz)
+
+# -------------------------------------------------------------
+# download_prdq_recent
+#
+# Gets PRD discharge directly from GCPUD.  Usually current through
+# midnight the previous day.
+# -------------------------------------------------------------
+def download_prdq_recent(now, outname):
+    urlbase = "http://www.gcpud.org/data/water/fixed/%Y/csvform/%m%d%y.csv"
+    m = now.month
+    d = now.day
+    y = now.year
+
+    offset = timedelta(minutes=30)
+
+    start = datetime(y, m, d, 0, 0)
+    start -= timedelta(days=10)
+
+    outf = open(outname, "w")
+    outf.write("# Priest Rapids Discharge, retrieved %s from www.gcpud.org\n" %
+           (datetime.today().strftime("%m/%d/%Y %H:%M:%S %Z%z")))
+    
+
+    while (start <= now):
+        url = start.strftime(urlbase)
+        sys.stderr.write("Trying URL: %s\n" % (url))
+        start += timedelta(1)
+        try:
+            f = urllib2.urlopen(url)
+        except:
+            sys.stderr.write("unable to get URL: %s\n" % (url))
+            continue
+
+        thedate = None
+        lnum = 0
+        for l in f:
+            l.rstrip()
+            lnum += 1
+            fld = l.split(",")
+            if (fld[1].find("/") > 0):
+                lt = strptime(fld[1] + " " + fld[2], "%m/%d/%Y %H%M")
+                d = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday,
+                             hour=lt.tm_hour, minute=lt.tm_min, second=lt.tm_sec)
+                q = float(fld[19])*1000.0
+                if (d <= now):
+                    d -= offset
+                    outf.write("%s %9.1f /\n" % (d.strftime(thefmt), q))
+        f.close()
+    outf.close()
+    return
 
 # -------------------------------------------------------------
 # prep_boundary_conditions
 # -------------------------------------------------------------
-def prep_boundary_conditions():
-    download_usgs_recent("12510500", "Yakima-Flow.dat")
-    download_wmd_recent("mcn", "fb", "MCN-FBE.dat")
+def prep_boundary_conditions(now):
+    today = datetime.now()
+    delta = now - datetime.now()
+    #if (delta > timedelta(days=2)):
     (lastdate, lastq) = download_wmd_recent("prd", "q",  "PRD-Qtotal.dat")
+    download_wmd_recent("mcn", "fb", "MCN-FBE.dat")
     download_wmd_recent("ihr", "q",  "Snake-Flow.dat")
+    #else:
+    # (lastdate, lastq) = download_prdq_recent(now, "PRD-Qtotal.dat")
+    download_usgs_recent(now, "12510500", "Yakima-Flow.dat")
     return lastdate, lastq
 
 # -------------------------------------------------------------
@@ -241,6 +361,10 @@ def do_plots(now):
     os.system(cmd % (pltstart.strftime(thefmt), pltend.strftime(thefmt),
                      now.strftime(thefmt)))
     os.system("gnuplot discharge.gp")
+
+    cmd = "sed -e \"s/@PSTART@/%s/g\" -e \"s/@PEND@/%s/g\" -e \"s/@NOW@/%s/g\" plotall.gp | gnuplot"
+    os.system(cmd % (pltstart.strftime(thefmt), pltend.strftime(thefmt),
+                     now.strftime(thefmt)))
 
 
 # -------------------------------------------------------------
@@ -414,53 +538,87 @@ def format_profiles(now, lastprddate, lastprdq, outname):
 program = os.path.basename(sys.argv[0])
 usage = "usage: " + program
 
-download = 1
+dodownload = 1
+dorun = 1
+doplot = 1
 
 # -------------------------------------------------------------
 # handle command line
 # -------------------------------------------------------------
-try:
-    opts, args = getopt.getopt(sys.argv[1:], "h?n")
-except getopt.GetoptError:
-    sys.stderr.write(usage + "[-n] \n")
-    sys.exit(2)
+usage = "Usage: %prog [options]"
+parser = OptionParser()
+parser.add_option("-d", "--dry-run",
+                  action="store_false", dest="upload", default=True,
+                  help="do everything, but don't upload the results")
+parser.add_option("-r", "--disable-run",
+                  action="store_false", dest="run", default=True,
+                  help="do not run")
+parser.add_option("-b", "--disable-bc",
+                  action="store_false", dest="download", default=True,
+                  help="use existing bc files, do not download")
+parser.add_option("-p", "--disable-plots",
+                  action="store_false", dest="plot", default=True,
+                  help="do not make any plots")
+parser.add_option("-N", "--now", dest="now", action="store", 
+                  help="set the \"now\" time (MM/DD/YYYY HH:MM)")
+parser.add_option("-v", "--verbose",
+                  dest="verbose", action="store_true", default=False,
+                  help="show what's going on")
+(options, args) = parser.parse_args()
 
-for o, a in opts:
-    if (o == "-h" or o == "-?"):
-        sys.stderr.write(usage + "\n")
-        sys.exit(0)
-    if (o == "-n"):
-        download = None
+now = datetime.now()
+if (options.now):
+    try:
+        lt = strptime(options.now, "%B %d, %Y %H")
+        now = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday, lt.tm_hour, lt.tm_min, 0, 0)
+    except:
+        sys.stderr.write("Error parsing --now argument (%s)\n" % (options.now))
+        sys.exit(3)
+
+doverbose = options.verbose
+dodownload = options.download
+dorun = options.run
+doplot = options.plot
+doupload = options.upload
 
 # -------------------------------------------------------------
 # main program
 # -------------------------------------------------------------
 
-now = datetime.now()
-
-if (download):
-    try:
-        lastprddate, lastprdq = prep_boundary_conditions()
-    except:
-        sys.stderr.write("Error setting boundary conditions\n")
-        sys.exit(3)
+#try:
+if (dodownload):
+    lastprddate, lastprdq = prep_boundary_conditions(now)
+else:
+    lastprddate, lastprdq = flatline("PRD-Qtotal.dat")
+    flatline("Yakima-Flow.dat")
+    flatline("Snake-Flow.dat")
+    flatline("MCN-FBE.dat")
+    sys.stderr.write("Last PRD Q = %.1f kcfs @ %s\n" %
+                     (lastprdq, lastprddate.strftime(thefmt)))
+#except:
+    #sys.stderr.write("Error setting boundary conditions\n")
+    #sys.exit(3)
 
 try:
-    sys.stderr.write("Running MASS1... \n")
-    notok = run_mass1(now)
-    if (notok):
-        sys.stderr.write("Error running MASS1\n")
-        sys.exit(3)
+    if (dorun):
+        sys.stderr.write("Running MASS1... \n")
+        notok = run_mass1(now)
+        if (notok):
+            sys.stderr.write("Error running MASS1\n")
+            sys.exit(3)
 except:
     sys.stderr.write("Error running MASS1\n")
     sys.exit(3)
 
-#try:
-sys.stderr.write("Formatting output...\n")
-format_profiles(now, lastprddate, lastprdq, "results.txt")
-do_plots(lastprddate)
-#except:
-#    sys.stderr.write("Error formatting output\n")
-#    sys.exit(3)
 
-shutil.copy("results.txt", "/projects/hanford_forecast/current/mass1-current.csv")
+try:
+    sys.stderr.write("Formatting output...\n")
+    format_profiles(now, lastprddate, lastprdq, "results.txt")
+    if (doplot):
+        do_plots(lastprddate)
+except:
+    sys.stderr.write("Error formatting output\n")
+    sys.exit(3)
+
+if (doupload):
+    shutil.copy("results.txt", "/projects/hanford_forecast/current/mass1-current.csv")
