@@ -11,7 +11,7 @@ set grid
 set timestamp
 set format x "%d%b%y\n%H:%M"
 
-quad = 1
+quad = 0
 
 load 'plot1quad.gp'
 
