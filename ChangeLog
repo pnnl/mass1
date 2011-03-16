@@ -1,3 +1,21 @@
+2011-03-15  William A. Perkins  <william.perkins@pnl.gov>
+
+	* test/application/HanfordReach/Forecast/runmass1.py: make a
+	forecast for any date 
+
+	* test/application/HanfordReach/Forecast/gcpud.py: complete
+	prototype
+	
+	* test/application/HanfordReach/Forecast/plotall.gp: start at
+	quad 1 
+
+	* test/application/HanfordReach/Forecast/wmd.py: added
+
+	* test/application/HanfordReach/Profiles/BCFiles/PRD-Qtotal.dat:
+	start at 400 kcfs 
+
+	* scripts/profile_extract.py: added
+
 2011-03-09  William A. Perkins  <william.perkins@pnl.gov>
 
 	* test/application/HanfordReach/Forecast/runmass1.py: have options
