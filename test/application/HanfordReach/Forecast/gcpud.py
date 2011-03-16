@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March  9, 2011 by William A. Perkins
-# Last Change: Wed Mar  9 15:18:45 2011 by William A. Perkins <d3g096@bearflag.pnl.gov>
+# Last Change: Fri Mar 11 08:11:23 2011 by William A. Perkins <d3g096@bearflag.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -41,7 +41,7 @@ def download_prdq_recent(now, outname):
 
     outf = open(outname, "w")
     outf.write("# Priest Rapids Discharge, retrieved %s from www.gcpud.org\n" %
-           (datetime.today().strftime("%m/%d/%Y %H:%M:%S %Z%z")))
+           (datetime.now().strftime("%m/%d/%Y %H:%M:%S %Z%z")))
     
 
     while (start <= now):
@@ -60,14 +60,27 @@ def download_prdq_recent(now, outname):
             l.rstrip()
             lnum += 1
             fld = l.split(",")
+            if (len(fld) < 20):
+                continue
+
+            if (l.find("/") < 0):
+                continue
+            
             if (fld[1].find("/") > 0):
-                lt = strptime(fld[1] + " " + fld[2], "%m/%d/%Y %H%M")
-                d = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday,
-                             hour=lt.tm_hour, minute=lt.tm_min, second=lt.tm_sec)
-                q = float(fld[19])*1000.0
-                if (d <= now):
-                    d -= offset
-                    outf.write("%s %9.1f /\n" % (d.strftime(thefmt), q))
+                ioff = 0
+            elif (fld[0].find("/") > 0):
+                ioff = 1
+            else:
+                sys.stderr.write("%s: %d: not in proper column\n" % (url, lnum))
+
+            dstr = "%s %04d" % (fld[1-ioff], int(fld[2-ioff]))
+            lt = strptime(dstr, "%m/%d/%Y %H%M")
+            d = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday,
+                         hour=lt.tm_hour, minute=lt.tm_min, second=lt.tm_sec)
+            q = float(fld[19-ioff])*1000.0
+            if (d <= now):
+                d -= offset
+                outf.write("%s %9.1f /\n" % (d.strftime(thefmt), q))
         f.close()
     outf.close()
     return
@@ -98,4 +111,5 @@ for o, a in opts:
 # -------------------------------------------------------------
 
 now = datetime.today() - timedelta(30)
+now = datetime(2011, 3, 1, 8, 0)
 download_prdq_recent(now, "PRD-Qtotal.dat")
