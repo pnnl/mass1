@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 26, 2011 by William A. Perkins
-# Last Change: Wed Mar  9 16:13:54 2011 by William A. Perkins <d3g096@bearflag.pnl.gov>
+# Last Change: Fri Mar 11 08:15:56 2011 by William A. Perkins <d3g096@bearflag.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -99,11 +99,14 @@ def flatline(bcname):
 # -------------------------------------------------------------
 def download_usgs_recent(now, gage, outname):
 
+    today = datetime.now()
+    days = (today - now).days + 10
+
     urlbase = "http://nwis.waterdata.usgs.gov/nwis/uv"
 
     qdata = {'cb_00060' : "on",
              'format' : "rdb",
-             'period' : "30",
+             'period' : days,
              'site_no' : gage }
 
     params = urllib.urlencode(qdata)
@@ -117,7 +120,7 @@ def download_usgs_recent(now, gage, outname):
 
     outf = open(outname, "w")
     outf.write("# USGS Recent Data (%s): obtained %s\n" %
-           (gage, datetime.today().strftime("%m/%d/%Y %H:%M:%S %Z%z")))
+           (gage, today.strftime("%m/%d/%Y %H:%M:%S %Z%z")))
 
     for l in f:
         l.rstrip()
@@ -187,7 +190,7 @@ def download_wmd_recent(code, fld, outname):
     outf = open(outname, "w")
     
     outf.write("# WMD Recent Data (%s, %s): obtained %s\n" %
-           (code.lower(), fld.lower(), datetime.today().strftime("%m/%d/%Y %H:%M:%S %Z%z")))
+           (code.lower(), fld.lower(), datetime.now().strftime("%m/%d/%Y %H:%M:%S %Z%z")))
     for d in daysback:
 
         url = ( urlbase % ( code.lower(), d ))
@@ -252,6 +255,83 @@ def download_wmd_recent(code, fld, outname):
     return (lastdate, lastz)
 
 # -------------------------------------------------------------
+# download_wmd_old
+# -------------------------------------------------------------
+def download_wmd_old(now, code, fld, outname):
+
+    urlbase = "http://www.nwd-wc.usace.army.mil/perl/dataquery.pl"
+    
+    today = datetime.now()
+    start = now - timedelta(days=10)
+    end = now + timedelta(days=1)
+
+    scale = 1.0
+    offset = timedelta(minutes=0)
+    if (fld.lower() == "q"):
+        query = "id:%s+record://%s/qr//ir-month/hrxzzazd/" % (code,code)
+        offset = timedelta(minutes=30)
+        scale = 1000.0
+    elif (fld.lower() == "fb"):
+        query = "id:%s+record://%s/hf//ir-month/irxzzazd/" % (code,code)
+    elif (fld.lower() == "tw"):
+        query = "id:%s+record://%s/ht//ir-month/irxzzazd/" % (code,code)
+
+    qdata = { "k" : query,
+              "sd" : start.day,
+              "sm" : start.month,
+              "sy" : start.year,
+              "ed" : end.day,
+              "em" : end.month,
+              "ey" : end.year,
+              "of" : "Text+Space-Delimited",
+              "et" : "Screen",
+              "dc" : "One+Column" }
+
+    params = urllib.urlencode(qdata)
+    url = "%s?%s" % ( urlbase, params )
+    sys.stderr.write("Trying WMD for %s, url: \"%s\"\n" % (code, url))
+    f = urllib2.urlopen(url)
+
+    lnum = 0
+
+    outf = open(outname, "w")
+    outf.write("# WMD Historic Data (%s): obtained %s\n" %
+           (query, today.strftime("%m/%d/%Y %H:%M:%S %Z%z")))
+
+    found = None
+    for l in f:
+        l.rstrip()
+        lnum += 1
+
+        fld = l.split()
+        # print "%05d: %s" % (lnum, l)
+        if (l.find("Date      Time  Data") >= 0):
+            found = 1
+            continue
+
+        if (not found):
+            continue
+
+        fld = l.split()
+        if (len(fld) < 3):
+            continue
+        dstr = fld[0]
+        lt = strptime(dstr.lower(), "%d%b%Y")
+        d = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday,
+                     hour=0, minute=0)
+        (hr, mn) = fld[1].split(":")
+        hr = int(hr)
+        mn = int(mn)
+        d += timedelta(hours=hr, minutes=mn)
+        q = float(fld[2])*scale
+        d -= offset
+        outf.write("%s %9.3f /\n" % (d.strftime(thefmt), q))
+
+    f.close()
+    outf.close()
+    return flatline(outname)
+
+# -------------------------------------------------------------
 # download_prdq_recent
 #
 # Gets PRD discharge directly from GCPUD.  Usually current through
@@ -270,7 +350,7 @@ def download_prdq_recent(now, outname):
 
     outf = open(outname, "w")
     outf.write("# Priest Rapids Discharge, retrieved %s from www.gcpud.org\n" %
-           (datetime.today().strftime("%m/%d/%Y %H:%M:%S %Z%z")))
+           (datetime.now().strftime("%m/%d/%Y %H:%M:%S %Z%z")))
     
 
     while (start <= now):
@@ -289,32 +369,31 @@ def download_prdq_recent(now, outname):
             l.rstrip()
             lnum += 1
             fld = l.split(",")
+            if (len(fld) < 20):
+                continue
+
+            if (l.find("/") < 0):
+                continue
+            
             if (fld[1].find("/") > 0):
-                lt = strptime(fld[1] + " " + fld[2], "%m/%d/%Y %H%M")
-                d = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday,
-                             hour=lt.tm_hour, minute=lt.tm_min, second=lt.tm_sec)
-                q = float(fld[19])*1000.0
-                if (d <= now):
-                    d -= offset
-                    outf.write("%s %9.1f /\n" % (d.strftime(thefmt), q))
+                ioff = 0
+            elif (fld[0].find("/") > 0):
+                ioff = 1
+            else:
+                sys.stderr.write("%s: %d: not in proper column\n" % (url, lnum))
+
+            dstr = "%s %04d" % (fld[1-ioff], int(fld[2-ioff]))
+            lt = strptime(dstr, "%m/%d/%Y %H%M")
+            d = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday,
+                         hour=lt.tm_hour, minute=lt.tm_min, second=lt.tm_sec)
+            q = float(fld[19-ioff])*1000.0
+            if (d <= now):
+                d -= offset
+                outf.write("%s %9.1f /\n" % (d.strftime(thefmt), q))
         f.close()
     outf.close()
-    return
+    return flatline(outname)
 
-# -------------------------------------------------------------
-# prep_boundary_conditions
-# -------------------------------------------------------------
-def prep_boundary_conditions(now):
-    today = datetime.now()
-    delta = now - datetime.now()
-    #if (delta > timedelta(days=2)):
-    (lastdate, lastq) = download_wmd_recent("prd", "q",  "PRD-Qtotal.dat")
-    download_wmd_recent("mcn", "fb", "MCN-FBE.dat")
-    download_wmd_recent("ihr", "q",  "Snake-Flow.dat")
-    #else:
-    # (lastdate, lastq) = download_prdq_recent(now, "PRD-Qtotal.dat")
-    download_usgs_recent(now, "12510500", "Yakima-Flow.dat")
-    return lastdate, lastq
 
 # -------------------------------------------------------------
 # run_mass1
@@ -566,11 +645,15 @@ parser.add_option("-v", "--verbose",
                   help="show what's going on")
 (options, args) = parser.parse_args()
 
-now = datetime.now()
+today = datetime.now()
+now = today
 if (options.now):
     try:
-        lt = strptime(options.now, "%B %d, %Y %H")
+        lt = strptime(options.now, "%m/%d/%Y %H:%M")
         now = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday, lt.tm_hour, lt.tm_min, 0, 0)
+        if (now > today):
+            sys.stderr.write("Error: --now argument (%s) in future\n" % (options.now))
+            sys.exit(3)
     except:
         sys.stderr.write("Error parsing --now argument (%s)\n" % (options.now))
         sys.exit(3)
@@ -585,19 +668,28 @@ doupload = options.upload
 # main program
 # -------------------------------------------------------------
 
-#try:
-if (dodownload):
-    lastprddate, lastprdq = prep_boundary_conditions(now)
-else:
-    lastprddate, lastprdq = flatline("PRD-Qtotal.dat")
-    flatline("Yakima-Flow.dat")
-    flatline("Snake-Flow.dat")
-    flatline("MCN-FBE.dat")
+try:
+    if (dodownload):
+        delta = datetime.now() - now
+        if (delta.days < 2):
+            (lastprddate, lastprdq) = download_wmd_recent("prd", "q",  "PRD-Qtotal.dat")
+            download_wmd_recent("mcn", "fb", "MCN-FBE.dat")
+            download_wmd_recent("ihr", "q",  "Snake-Flow.dat")
+        else:
+            (lastprddate, lastprdq) = download_prdq_recent(now, "PRD-Qtotal.dat")
+            download_wmd_old(now, "ihr", "q", "Snake-Flow.dat")
+            download_wmd_old(now, "mcn", "fb", "MCN-FBE.dat")
+        download_usgs_recent(now, "12510500", "Yakima-Flow.dat")
+    else:
+        lastprddate, lastprdq = flatline("PRD-Qtotal.dat")
+        flatline("Yakima-Flow.dat")
+        flatline("Snake-Flow.dat")
+        flatline("MCN-FBE.dat")
     sys.stderr.write("Last PRD Q = %.1f kcfs @ %s\n" %
                      (lastprdq, lastprddate.strftime(thefmt)))
-#except:
-    #sys.stderr.write("Error setting boundary conditions\n")
-    #sys.exit(3)
+except:
+    sys.stderr.write("Error setting boundary conditions\n")
+    sys.exit(3)
 
 try:
     if (dorun):
@@ -622,3 +714,5 @@ except:
 
 if (doupload):
     shutil.copy("results.txt", "/projects/hanford_forecast/current/mass1-current.csv")
+    shutil.copy("q???.png", "/projects/hanford_forecast/current/mass1-current.csv")
+    shutil.copy("e???.png", "/projects/hanford_forecast/current/mass1-current.csv")
