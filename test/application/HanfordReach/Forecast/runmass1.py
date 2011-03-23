@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 26, 2011 by William A. Perkins
-# Last Change: Fri Mar 11 08:15:56 2011 by William A. Perkins <d3g096@bearflag.pnl.gov>
+# Last Change: Wed Mar 23 09:42:14 2011 by William A. Perkins <d3g096@bearflag.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -158,7 +158,7 @@ def download_usgs_recent(now, gage, outname):
 # -------------------------------------------------------------
 # download_wmd_recent
 # -------------------------------------------------------------
-def download_wmd_recent(code, fld, outname):
+def download_wmd_recent(now, code, fld, outname):
 
     urlbase = "http://www.nwd-wc.usace.army.mil/ftppub/project_data/hourly/%s_%ddaysback.txt"
 
@@ -243,7 +243,8 @@ def download_wmd_recent(code, fld, outname):
                 lastdate = thedate + dt
                 d = lastdate + outdt
                 lastz = z
-                outf.write("%s %.2f /\n" % (d.strftime(thefmt), z));
+                if (d <= now):
+                    outf.write("%s %.2f /\n" % (d.strftime(thefmt), z));
 
         f.close()
 
@@ -386,10 +387,13 @@ def download_prdq_recent(now, outname):
             lt = strptime(dstr, "%m/%d/%Y %H%M")
             d = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday,
                          hour=lt.tm_hour, minute=lt.tm_min, second=lt.tm_sec)
-            q = float(fld[19-ioff])*1000.0
-            if (d <= now):
-                d -= offset
-                outf.write("%s %9.1f /\n" % (d.strftime(thefmt), q))
+            qfld = fld[19-ioff]
+            qfld.rstrip()
+            if (len(qfld) > 0):
+                q = float(qfld)*1000.0
+                if (d <= now):
+                    d -= offset
+                    outf.write("%s %9.1f /\n" % (d.strftime(thefmt), q))
         f.close()
     outf.close()
     return flatline(outname)
@@ -672,9 +676,9 @@ try:
     if (dodownload):
         delta = datetime.now() - now
         if (delta.days < 2):
-            (lastprddate, lastprdq) = download_wmd_recent("prd", "q",  "PRD-Qtotal.dat")
-            download_wmd_recent("mcn", "fb", "MCN-FBE.dat")
-            download_wmd_recent("ihr", "q",  "Snake-Flow.dat")
+            (lastprddate, lastprdq) = download_wmd_recent(now, "prd", "q",  "PRD-Qtotal.dat")
+            download_wmd_recent(now, "mcn", "fb", "MCN-FBE.dat")
+            download_wmd_recent(now, "ihr", "q",  "Snake-Flow.dat")
         else:
             (lastprddate, lastprdq) = download_prdq_recent(now, "PRD-Qtotal.dat")
             download_wmd_old(now, "ihr", "q", "Snake-Flow.dat")
@@ -712,7 +716,3 @@ except:
     sys.stderr.write("Error formatting output\n")
     sys.exit(3)
 
-if (doupload):
-    shutil.copy("results.txt", "/projects/hanford_forecast/current/mass1-current.csv")
-    shutil.copy("q???.png", "/projects/hanford_forecast/current/mass1-current.csv")
-    shutil.copy("e???.png", "/projects/hanford_forecast/current/mass1-current.csv")
