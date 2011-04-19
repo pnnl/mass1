@@ -220,7 +220,7 @@ DO WHILE(run)
           tsteps = scalar_steps
        ELSE
           tsteps = tvd_steps(delta_t)
-          WRITE(*, '("Using ", I3, " transport steps")') tsteps
+          WRITE(*, '(" Using ", I5, " transport steps")') tsteps
        END IF
 
        scalar_delta_t = delta_t/DBLE(tsteps)
