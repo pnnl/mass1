@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 15, 2011 by William A. Perkins
-# Last Change: Fri Apr 22 12:41:17 2011 by William A. Perkins <d3g096@bearflag.pnl.gov>
+# Last Change: Fri Apr 22 12:49:59 2011 by William A. Perkins <d3g096@bearflag.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -130,7 +130,13 @@ profilename = args[1]
 quads = []
 quads.append( (1, rm) )
 
-pfile = open(profilename, "r")
+try:
+    pfile = open(profilename, "r")
+except IOError:
+    sys.stderr.write("%s: error: cannot open %s\n" %
+                     (program, profilename))
+    sys.exit(3)
+
 pdata = []
 while (True):
     (pdatetime, profile) = read_next_profile(pfile)
