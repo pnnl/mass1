@@ -9,12 +9,13 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 15, 2011 by William A. Perkins
-# Last Change: Tue Mar 15 08:17:56 2011 by William A. Perkins <d3g096@bearflag.pnl.gov>
+# Last Change: Fri Apr 22 12:41:17 2011 by William A. Perkins <d3g096@bearflag.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
 
 import sys, os
+from optparse import OptionParser
 from operator import itemgetter
 import re
 from datetime import *
@@ -93,27 +94,43 @@ def read_next_profile(profile):
 
     return (pdatetime, theprofile)
 
+
 # -------------------------------------------------------------
 # variable initialization
 # -------------------------------------------------------------
 program = os.path.basename(sys.argv[0])
-usage = "usage: " + program
-
-
 
 # -------------------------------------------------------------
 # handle command line
 # -------------------------------------------------------------
+usage = "Usage: %prog rm profile"
+parser = OptionParser()
+(options, args) = parser.parse_args()
+
+rm = 0.0
+
+if (len(args) != 2):
+    sys.stderr.write("%s\n" % usage)
+    sys.exit(3)
+    
+try:
+    rm = float(args[0])
+except ValueError:
+        sys.stderr.write("%s: error: specified rivermile (%s) not understood\n" %
+                         (program, args[0]))
+        sys.exit(3)
+
+profilename = args[1]
+
 
 # -------------------------------------------------------------
 # main program
 # -------------------------------------------------------------
 
 quads = []
-quads.append( (1, 392.66) )
-quads.append( (2, 373.59) )
+quads.append( (1, rm) )
 
-pfile = open("profile1.out", "r")
+pfile = open(profilename, "r")
 pdata = []
 while (True):
     (pdatetime, profile) = read_next_profile(pfile)
@@ -133,8 +150,8 @@ pdata.sort(key=itemgetter(1,0), reverse=False)
 
 for p in pdata:
     (pdatetime, box, rm, e, q) = p
-    sys.stdout.write("%s, %d, %.2f, %.2f, %.2f\n" %
+    sys.stdout.write("%s, %.2f, %.2f, %.2f\n" %
                 (pdatetime.strftime("%m/%d/%Y %H:%M:%S"),
-                 box, rm, e, q))
+                 rm, e, q))
 
 
