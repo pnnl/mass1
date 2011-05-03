@@ -291,8 +291,27 @@ SUBROUTINE read_config
   READ(10,*,ERR=110)time_run_ends
   line = line + 1
 
-  READ(10,*,ERR=110)delta_t
+  msg = ""
+  READ(10,*,ERR=110) delta_t, msg
   line = line + 1
+
+  ! make sure delta_t is in hours
+
+  IF (LEN(TRIM(msg)) .EQ. 0) THEN
+     ! assume it's in hours
+  ELSE IF (msg(1:2) .EQ. 'hr') THEN
+     ! assume it's in hours
+  ELSE IF (msg(1:3) .EQ. 'min') THEN
+     delta_t = delta_t / 60.0
+  ELSE IF (msg(1:3) .EQ. 'day') THEN
+     delta_t = delta_t * 24.0
+  ELSE IF (msg(1:3) .EQ. 'sec') THEN
+     delta_t = delta_t / 3600.0
+  ELSE
+     WRITE(msg, *) 'time step units (', TRIM(msg), ') not understood'
+     CALL error_message(msg, fatal=.FALSE.)
+     GOTO 110
+  END IF
 
   READ(10,*,ERR=110)print_freq
   line = line + 1
