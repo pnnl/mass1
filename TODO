@@ -9,10 +9,16 @@ Pacific Northwest Laboratory
 -------------------------------------------------------------
 -------------------------------------------------------------
 Created November  1, 1999 by William A. Perkins
-Last Change: Thu Dec  2 10:07:40 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+Last Change: Thu May 26 09:41:47 2011 by William A. Perkins <d3g096@PE10900.pnl.gov>
 -------------------------------------------------------------
 
 $Id$
+
+Bugs:
+
+    * There is some problem with section interpolation when the depth
+      is smaller than the depth step. Negative areas are produced even
+      if the section is prismatic
 
 High Priority:
 
