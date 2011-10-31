@@ -56,6 +56,13 @@ SUBROUTINE section(link,point,depth,area_temp,width,conveyance,dkdy,hydrad)
         END IF
            
                   
+        IF (depth .LE. 0.0) THEN
+           WRITE(msg, '("section: non-positive depth (", G12.6, "): link ", I3, ", point ", I3)')&
+                &depth, link, point
+           CALL error_message(msg, fatal=.TRUE.)
+           STOP
+        END IF
+
         SELECT CASE(section_type(i))
 
         CASE(1) ! rectangular channel
@@ -99,22 +106,20 @@ SUBROUTINE section(link,point,depth,area_temp,width,conveyance,dkdy,hydrad)
 		! figure out where to interpolate in the table
 		! interpolate past first and last levels in the table
 
-		j = AINT(depth/delta_y(i))
+		j = AINT(depth/delta_y(i)) + 1
 
 		IF(j < 1) j=1
 		IF(j >= sect_levels(i)) j=sect_levels(i) - 1
 
-		factor = (depth - delta_y(i)*j)/delta_y(i)
+		factor = (depth - delta_y(i)*(j-1))/delta_y(i)
 
 		area_temp = factor*(sect_area(i,j+1)-sect_area(i,j))+sect_area(i,j) 
-        perm = 	factor*(sect_perm(i,j+1)-sect_perm(i,j))+sect_perm(i,j)
-        width = factor*(sect_width(i,j+1)-sect_width(i,j))+sect_width(i,j)
-        hydrad = factor*(sect_hydradius(i,j+1)-sect_hydradius(i,j))+sect_hydradius(i,j) 
+                perm = 	factor*(sect_perm(i,j+1)-sect_perm(i,j))+sect_perm(i,j)
+                width = factor*(sect_width(i,j+1)-sect_width(i,j))+sect_width(i,j)
+                hydrad = factor*(sect_hydradius(i,j+1)-sect_hydradius(i,j))+sect_hydradius(i,j) 
         !dpdy = 2.0
 		conveyance = res_coeff*kstrick(link,point)*(factor*(sect_convey(i,j+1)-sect_convey(i,j))+sect_convey(i,j))
 		dkdy = res_coeff*kstrick(link,point)*(sect_convey(i,j+1) - sect_convey(i,j))/delta_y(i)
-
-
 
         END SELECT
 
