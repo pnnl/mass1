@@ -129,7 +129,7 @@ IF(y_new(i) < min_elv) min_elv = y_new(i)
 IF(y_new(i) >= max_elv) max_elv = y_new(i)
 END DO
 
-num_levels = AINT((max_elv - min_elv)/del_y)
+num_levels = AINT((max_elv - min_elv)/del_y) + 1
 
 sect_levels(sec_id) = num_levels
 
@@ -137,37 +137,35 @@ sect_levels(sec_id) = num_levels
 ! at each depth level
 
 sect_depth(sec_id,1) = 0.0
-
-DO i=1,num_levels
-IF(i == 1)THEN 
-	sect_depth(sec_id,i) = del_y
-ELSE
-	sect_depth(sec_id,i) = sect_depth(sec_id,i-1) + del_y
-END IF
-level = min_elv + sect_depth(sec_id,i)
-
-! figure out where the level is in the level-width table
-DO j = 1,count-1
-  IF((level >= y_new(j)) .AND. (level <= y_new(j+1))) EXIT
-END DO
-sect_width(sec_id,i) = linear_interp(width_new(j),y_new(j),width_new(j+1),y_new(j+1),level)
-
-IF(i == 1)THEN
-	sect_area(sec_id,i) = del_y*0.5*(width_new(1)+sect_width(sec_id,i))
-	sect_perm(sec_id,i) = width_new(1) + SQRT(4*del_y**2 + (sect_width(sec_id,i) - width_new(1))**2)
-	
-ELSE
-	sect_area(sec_id,i) = del_y*0.5*(sect_width(sec_id,i)+sect_width(sec_id,i-1)) &
-	                      + sect_area(sec_id,i-1)
-	sect_perm(sec_id,i) = sect_perm(sec_id,i-1) &
-	                           + SQRT(4*del_y**2 + (sect_width(sec_id,i) - sect_width(sec_id,i-1))**2)
-ENDIF
-sect_hydradius(sec_id,i) = sect_area(sec_id,i)/sect_perm(sec_id,i)
-
-! geo-conveyance
-
-sect_convey(sec_id,i) = sect_area(sec_id,i)*sect_hydradius(sec_id,i)**(2.0/3.0)
-
+sect_width(sec_id,1) = 0.0
+sect_area(sec_id,1) = 0.0
+sect_perm(sec_id,1) = 0.0
+sect_hydradius(sec_id,1) = 0.0
+DO i = 2, num_levels
+   sect_depth(sec_id,i) = sect_depth(sec_id,i-1) + del_y
+   level = min_elv + sect_depth(sec_id,i)
+   
+   ! figure out where the level is in the level-width table
+   DO j = 1,count-1
+      IF((level >= y_new(j)) .AND. (level <= y_new(j+1))) EXIT
+   END DO
+   sect_width(sec_id,i) = linear_interp(width_new(j),y_new(j),width_new(j+1),y_new(j+1),level)
+   
+   IF(i == 1)THEN
+      sect_area(sec_id,i) = del_y*0.5*(width_new(1)+sect_width(sec_id,i))
+      sect_perm(sec_id,i) = width_new(1) + SQRT(4*del_y**2 + (sect_width(sec_id,i) - width_new(1))**2)
+      
+   ELSE
+      sect_area(sec_id,i) = del_y*0.5*(sect_width(sec_id,i)+sect_width(sec_id,i-1)) &
+           + sect_area(sec_id,i-1)
+      sect_perm(sec_id,i) = sect_perm(sec_id,i-1) &
+           + SQRT(4*del_y**2 + (sect_width(sec_id,i) - sect_width(sec_id,i-1))**2)
+   ENDIF
+   sect_hydradius(sec_id,i) = sect_area(sec_id,i)/sect_perm(sec_id,i)
+   
+   ! geo-conveyance
+   
+   sect_convey(sec_id,i) = sect_area(sec_id,i)*sect_hydradius(sec_id,i)**(2.0/3.0)
 
 END DO
 
