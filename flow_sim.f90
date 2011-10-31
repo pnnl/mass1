@@ -49,6 +49,8 @@ SUBROUTINE flow_sim
 
   LOGICAL :: fluvial
 
+  CHARACTER (LEN=1024) :: msg
+
   ! run through links top down according to computational order
 
 
@@ -301,6 +303,11 @@ SUBROUTINE flow_sim
            hyd_radius(link,point) = hydrad
            froude_num(link,point) = &
                 &SQRT((q(link,point)**2*width)/(grav*area_temp**3))
+
+           IF (froude_num(link, point) .GE. 1.0) THEN
+              WRITE (msg, '("warning: supercritial (Fr=", F5.1, ") indicated at link ", I3, ", point ", I3)')&
+                   &froude_num(link, point), link, point
+           END IF
 
            friction_slope(link,point) =&
                 & ((q(link,point)*manning(link,point))/&
