@@ -1,3 +1,21 @@
+2011-10-31  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* flow_sim.f90 (flow_sim): add a warning for super critical flow 
+
+	* section.f90 (section): crash when depth is zero or less
+
+	* section_table.f90 (section_table): build the table such that
+	depth=0 is in the table; avoids getting unreasonable values when
+	the depth is less than deltay
+
+	* network-generation/yakima: add an example
+
+	* network-generation: add some scripts to make MASS1
+	configurations from specific information
+
+	* test/application/LowerSnakeColumbia/Rampdown/mass1.cfg: print
+	section geometry
+
 2011-05-03  William A. Perkins  <william.perkins@pnl.gov>
 
 	* read_config.f90 (read_config): add the ability to specify time
