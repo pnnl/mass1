@@ -10,5 +10,6 @@ python ../generate.py \
     --downstream-depth=10.0 \
     --basin-discharge=3500.0 \
     --mannings=0.0325 \
+    --gage-output \
     Yakima_network_info.dat
 ../../mass1
