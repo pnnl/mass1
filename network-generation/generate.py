@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October 24, 2011 by William A. Perkins
-# Last Change: Mon Oct 31 14:59:33 2011 by William A. Perkins <d3g096@flophouse>
+# Last Change: Tue Nov  1 09:08:13 2011 by William A. Perkins <d3g096@flophouse>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -116,6 +116,7 @@ linkbc_file = "link_bc.dat"
 lateralq_file = "lateral_inflow.dat"
 upstreamq_file = "upstreamq.dat"
 downstreambc_file = "downstream.dat"
+gage_file = "gage-control.dat"
 
 # -------------------------------------------------------------
 # handle command line
@@ -150,6 +151,10 @@ parser.add_option("-n", "--mannings", type=float,
                   dest="n", action="store", default=mannings,
                   help="Manning's coefficient used for all links")
 
+parser.add_option("-g", "--gage-output",
+                  dest="gage", action="store_true", default=False,
+                  help="generate a gage control file for all link outlets and turn gage output on")
+
 
 (options, args) = parser.parse_args()
 
@@ -160,6 +165,7 @@ if (len(args) < 1):
 netfilename = args[0]
 
 doverbose = options.verbose
+dogage = options.gage
 notchw = options.notchw
 notchd = options.notchd
 upq = options.upq
@@ -215,6 +221,13 @@ confout = confout.replace("@SECTF@", sections_file)
 confout = confout.replace("@LINKBCF@", linkbc_file)
 confout = confout.replace("@INITF@", initial_file)
 confout = confout.replace("@LATFLOWF@", lateralq_file)
+
+if dogage:
+    confout = confout.replace("@GFLG@", "1")
+    confout = confout.replace("@GAGEF@", gage_file)
+    MASS1.write_gage_control(gage_file, links)
+else:
+    confout = confout.replace("@GFLG@", "0")
 
 conf = open("mass1.cfg", mode="w")
 conf.write(confout)
