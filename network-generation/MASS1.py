@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October 24, 2011 by William A. Perkins
-# Last Change: Mon Oct 31 14:32:23 2011 by William A. Perkins <d3g096@flophouse>
+# Last Change: Tue Nov  1 09:01:10 2011 by William A. Perkins <d3g096@flophouse>
 # -------------------------------------------------------------
 
 from inspect import *
@@ -254,8 +254,9 @@ class Link(object):
         tempbc = 0
         lattransbc = 0
         lattempbc = 0
+        metzone = 1
 
-        outfd.write("%8d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d /\n" %
+        outfd.write("%8d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d /\n" %
                     (self.id,
                      ptopt,
                      self.npoints,
@@ -266,6 +267,7 @@ class Link(object):
                      dsbc,
                      transbc,
                      tempbc,
+                     metzone,
                      latbc,
                      lattransbc,
                      lattempbc))
@@ -415,6 +417,15 @@ def write_initial_conditions(name, links, z0):
                   (l.id, 0.0, z0, 35.0, 5.0))
     out.close()
         
+
+# -------------------------------------------------------------
+# write_gage_control
+# -------------------------------------------------------------
+def write_gage_control(name, links):
+    out = open(name, mode="w")
+    for l in links:
+        out.write("%8d %5d / \n" % (l.id, l.npoints))
+    out.close()
     
 
 configuration_base = """MASS1 Configuration File
@@ -423,7 +434,7 @@ configuration_base = """MASS1 Configuration File
 0       / Do Gas
 0       / Do Temp
 0       / Do Printout
-0       / Do Gage Printout
+@GFLG@       / Do Gage Printout
 0       / Do Profile Printout
 0       / Do Gas Dispersion
 0       / Do Gas Air/Water Exchange
@@ -437,7 +448,7 @@ configuration_base = """MASS1 Configuration File
 0       / units option
 1       / time option
 2       / time units
-1       / channel length units
+0       / channel length units
 0       / downstream bc type
 @NLINK@      / max links
 @NPT@     / max points on a link
@@ -459,13 +470,13 @@ no-hydropower           / hydropower file name
 no-tdgcoeff             / TDG Coeff file name
 no-restart-file         / Read Hotstart file name
 \"restart.dat\"           / Write restart file name
-no-gage-control-file    / gage control file name
-\"profile_control.dat\"   / profile file name
+\"@GAGEF@\"    / gage control file name
+\"profile-control.dat\"   / profile file name
 \"@LATFLOWF@\"    / lateral inflow bs file name
 01-31-2000              / date run begins
 00:00:00                / time run begins
 07-31-2000              / date run ends
 23:59:59                / time run ends
 0.50000                / delta t in hours (4*36s=144s)
-120                     / printout frequency
+2                     / printout frequency
 """
