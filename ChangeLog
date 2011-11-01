@@ -1,3 +1,17 @@
+2011-11-01  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* network-generation/yakima/runme.sh: use --gage-output
+
+	* network-generation/yakima/Yakima_network_info.dat: reduce some
+	slopes more because of channel units change
+
+	* network-generation/MASS1.py (Link.write): metzone was not listed 
+	(write_gage_control): added
+	(configuration_base): add stuff for gage output; channel units
+	were wrong
+
+	* network-generation/generate.py: add --gage-output option
+
 2011-10-31  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* flow_sim.f90 (flow_sim): add a warning for super critical flow 
