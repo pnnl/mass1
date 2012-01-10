@@ -9,12 +9,18 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 26, 2011 by William A. Perkins
-# Last Change: Wed Mar 23 09:42:14 2011 by William A. Perkins <d3g096@bearflag.pnl.gov>
+# Last Change: Tue Jan 10 09:37:17 2012 by William A. Perkins <d3g096@flophouse>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
 
 import sys, os
+
+# because we run this on stupid Redhat systems, we need to make sure
+# the Python is from this century
+if sys.version_info < (2, 5):
+    raise "must use python 2.5 or greater"
+
 from optparse import OptionParser
 from operator import itemgetter
 import urllib
@@ -492,18 +498,20 @@ def interpolate_profile(prof, qprof):
         while (rm < prof[idx][0]):
             idx = idx + 1
 
-        (prm1, pq1, pe1) = prof[idx-1]
-        (prm0, pq0, pe0) = prof[idx]
+        (prm1, pq1, pe1, ptw1) = prof[idx-1]
+        (prm0, pq0, pe0, ptw0) = prof[idx]
         
         if (rm == prm0):
             q = pq0
             e = pe0
+            tw = ptw0
         else:
             f = (rm - prm0)/(prm1-prm0)
             q = f*(pq1 - pq0) + pq0
             e = f*(pe1 - pe0) + pe0
+            tw = f*(ptw1 - ptw0) + ptw0
 
-        t = (box, rm, q, e)
+        t = (box, rm, q, e, tw)
         qtemp.append(t)
     return qtemp
         
@@ -513,7 +521,7 @@ def interpolate_profile(prof, qprof):
 # profile is an open MASS1 profile output file
 # after is a date time which is the earliest date to extract from profile
 #
-# the date of the profile read and a list of tuples (rm, wsel, q) is returned
+# the date of the profile read and a list of tuples (rm, wsel, q, topw) is returned
 # -------------------------------------------------------------
 def read_next_profile(profile, first):
 
@@ -549,7 +557,7 @@ def read_next_profile(profile, first):
         
         if (found and rdataline.match(l)):
             fld = l.split()
-            thetuple = (float(fld[3]), float(fld[4]), float(fld[5]))
+            thetuple = (float(fld[3]), float(fld[4]), float(fld[5]), float(fld[14]))
             theprofile.append(thetuple)
             continue
 
@@ -574,8 +582,8 @@ def format_profiles(now, lastprddate, lastprdq, outname):
         if (pdatetime):
             qtemp = interpolate_profile(profile, quads)
             for t in qtemp:
-                (box, rm, e, q) = t
-                t = (pdatetime, box, rm, e, q)
+                (box, rm, e, q, tw) = t
+                t = (pdatetime, box, rm, e, q, tw)
                 pdata.append(t)
         else:
             break
@@ -586,7 +594,7 @@ def format_profiles(now, lastprddate, lastprdq, outname):
 
     pout = []
     for p in pdata:
-        (pdatetime, box, rm, e, q) = p
+        (pdatetime, box, rm, e, q, tw) = p
 
         if (now < pdatetime):
             if (abs(q - lastprdq)/lastprdq < 0.00005 ):
@@ -607,10 +615,10 @@ def format_profiles(now, lastprddate, lastprdq, outname):
     ofile.write("# Last PRD Q Date: %s\n" % (lastprddate.strftime(thefmt)))
     ofile.write("# Last PRD Q: %.1f\n" % (lastprdq))
     for p in pout:
-        (pdatetime, box, rm, e, q) = p
-        ofile.write("%s, %d, %.2f, %.2f, %.2f\n" %
+        (pdatetime, box, rm, e, q, tw) = p
+        ofile.write("%s, %d, %.2f, %.2f, %.2f, %.2f\n" %
                     (pdatetime.strftime(thefmt),
-                     box, rm, e, q))
+                     box, rm, e, q, tw))
 
     ofile.close()
     return
@@ -642,6 +650,9 @@ parser.add_option("-b", "--disable-bc",
 parser.add_option("-p", "--disable-plots",
                   action="store_false", dest="plot", default=True,
                   help="do not make any plots")
+parser.add_option("-f", "--disable-flatline", 
+                  action="store_false", dest="flatline", default=True,
+                  help="do not flat line bc files")
 parser.add_option("-N", "--now", dest="now", action="store", 
                   help="set the \"now\" time (MM/DD/YYYY HH:MM)")
 parser.add_option("-v", "--verbose",
@@ -667,6 +678,7 @@ dodownload = options.download
 dorun = options.run
 doplot = options.plot
 doupload = options.upload
+doflatline = options.flatline
 
 # -------------------------------------------------------------
 # main program
@@ -685,12 +697,13 @@ try:
             download_wmd_old(now, "mcn", "fb", "MCN-FBE.dat")
         download_usgs_recent(now, "12510500", "Yakima-Flow.dat")
     else:
-        lastprddate, lastprdq = flatline("PRD-Qtotal.dat")
-        flatline("Yakima-Flow.dat")
-        flatline("Snake-Flow.dat")
-        flatline("MCN-FBE.dat")
-    sys.stderr.write("Last PRD Q = %.1f kcfs @ %s\n" %
-                     (lastprdq, lastprddate.strftime(thefmt)))
+        if (doflatline):
+            lastprddate, lastprdq = flatline("PRD-Qtotal.dat")
+            flatline("Yakima-Flow.dat")
+            flatline("Snake-Flow.dat")
+            flatline("MCN-FBE.dat")
+            sys.stderr.write("Last PRD Q = %.1f kcfs @ %s\n" %
+                             (lastprdq, lastprddate.strftime(thefmt)))
 except:
     sys.stderr.write("Error setting boundary conditions\n")
     sys.exit(3)

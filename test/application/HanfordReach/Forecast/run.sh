@@ -8,8 +8,11 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 27, 2011 by William A. Perkins
-# Last Change: Wed Mar 23 11:19:45 2011 by William A. Perkins <d3g096@bearflag.pnl.gov>
+# Last Change: Tue Jan 10 09:35:17 2012 by William A. Perkins <d3g096@flophouse>
 # -------------------------------------------------------------
+
+# ONLY on BEARFLAG!
+
 set -ue
 
 PATH=/usr/local/bin:$PATH
@@ -22,5 +25,5 @@ MODEL="../../../../mass1"
 export MODEL
 /usr/local/python2.5/bin/python ./runmass1.py 2>&1
 cp results.txt /projects/hanford_forecast/current/mass1-current.csv
-cp q???.png e???.png /projects/hanford_forecast/current
+cp q???.png e???.png tw???.png /projects/hanford_forecast/current
 

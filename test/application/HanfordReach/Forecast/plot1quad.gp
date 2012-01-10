@@ -1,6 +1,6 @@
 quad = quad + 1
 quadrm = real(system(sprintf("awk -F'|' '$1 + 0 == %d { print $4 } {next}' quadrm.txt", quad)))
-pcmd = sprintf("<awk -F',' '$2 == %d {print $1, $4, $5}' %s", quad, thefile)
+pcmd = sprintf("<awk -F',' '$2 == %d {print $1, $4, $5, $6}' %s", quad, thefile)
 thetitle = sprintf("Quandrant %d, RM %.2f", quad, quadrm)
 
 set title thetitle
@@ -13,6 +13,15 @@ set ytics mirror
 set format y "%.1f"
 plot pcmd using 1:($4/1000.0) title thetitle with linesp lt 1, \
      'ts11.out' using 1:($4/1000) title 'Priest Rapids Dam' with lines lt 3
+     
+
+set output sprintf("tw%03d.png", quad)
+set ylabel "Top Width, m"
+unset y2label
+unset y2tics
+set ytics mirror
+set format y "%.1f"
+plot pcmd using 1:($5*0.3048) title thetitle with linesp lt 1
      
 
 set y2label "Priest Rapids Elevation, m"

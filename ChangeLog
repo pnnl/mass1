@@ -1,3 +1,18 @@
+2012-01-10  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* test/application/HanfordReach/Forecast/runmass1.py (interpolate_profile) 
+	(read_next_profile, format_profiles): add top width to the
+	interpolated values
+	(main): add --disable-flatline option
+
+	* test/application/HanfordReach/Forecast/run.sh: copy top width
+	plots to the results directory
+
+	* test/application/HanfordReach/Forecast/plot1quad.gp: make a top
+	width plot
+
+	* gastemp/energy_flux_module.f90: re-indent only
+
 2011-11-30  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* gage_output.f90 (gage_output): rework so that an obituary number
