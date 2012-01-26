@@ -1,3 +1,7 @@
+2012-01-26  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* scripts/bcsteps.py: added
+
 2012-01-10  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* test/application/HanfordReach/Forecast/runmass1.py (interpolate_profile) 
