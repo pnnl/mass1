@@ -1,3 +1,11 @@
+2012-01-27  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* test/application/HanfordReach/Profiles/BCFiles/PRD-Qtotal.dat:  
+	make more steps
+	
+	* test/application/HanfordReach/Profiles/mass1.cfg: adjust run
+	time for new boundary conditions
+
 2012-01-26  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* scripts/bcsteps.py: added
