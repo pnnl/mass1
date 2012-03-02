@@ -1,0 +1,9 @@
+2012-03-02  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* runmass1.py (download_usgs_old): get daily USGS gage data when
+	"now" is too long ago
+
+	* run.sh: change to run on flophouse
+
+	* plotall.gp: change font location
+

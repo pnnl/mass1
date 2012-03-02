@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 26, 2011 by William A. Perkins
-# Last Change: Tue Jan 10 09:37:17 2012 by William A. Perkins <d3g096@flophouse>
+# Last Change: Fri Mar  2 10:50:46 2012 by William A. Perkins <d3g096@flophouse>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -145,6 +145,74 @@ def download_usgs_recent(now, gage, outname):
 
             dstr = fld[2] + " " + fld[3] + " " + fld[4]
             lt = strptime(dstr, "%Y-%m-%d %H:%M %Z")
+            thedate = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday,
+                               hour=lt.tm_hour, minute=lt.tm_min, second=lt.tm_sec)
+            lastdate = thedate
+            lastz = z
+
+            # FIXME: Daylight Savings Time
+
+            outf.write("%s %.2f /\n" % (thedate.strftime(thefmt), z))
+
+    f.close()
+    outf.close()
+    if (lastdate):
+        (lastdate, lastz) = flatline(outname)
+
+    return (lastdate, lastz)
+
+# -------------------------------------------------------------
+# download_usgs_old
+#
+# Just daily discharge, if now is more than 100 days in the past
+# -------------------------------------------------------------
+def download_usgs_old(now, gage, outname):
+
+    today = datetime.now()
+    start = now - timedelta(days=14)
+    end = now + timedelta(days=1)
+
+    urlbase = "http://nwis.waterdata.usgs.gov/nwis/dv"
+
+    qdata = {'cb_00060' : "on",
+             'format' : "rdb",
+             'site_no' : gage,
+             'begin_date' : start.strftime("%Y-%m-%d"),
+             'end_date' : end.strftime("%Y-%m-%d"),
+             'format' : 'rdb',
+             'referred_module' : 'sw'
+             }
+
+    params = urllib.urlencode(qdata)
+    url = "%s?%s" % ( urlbase, params )
+    sys.stderr.write("Trying USGS gage %s, url: \"%s\"\n" % (gage, url))
+    f = urllib2.urlopen(url)
+
+    lastdate = None
+    lastz = None
+    lnum = 0
+
+    outf = open(outname, "w")
+    outf.write("# USGS Historic Data (%s): obtained %s\n" %
+           (gage, today.strftime("%m/%d/%Y %H:%M:%S %Z%z")))
+
+    for l in f:
+        l.rstrip()
+        lnum += 1
+
+        if (len(l) <= 0):
+            continue
+
+        if (l.find("USGS") == 0):
+            fld = l.split()
+
+            if (len(fld) < 4):
+                continue
+
+            z = float(fld[3])
+
+            dstr = fld[2] + " 12:00"
+            lt = strptime(dstr, "%Y-%m-%d %H:%M")
             thedate = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday,
                                hour=lt.tm_hour, minute=lt.tm_min, second=lt.tm_sec)
             lastdate = thedate
@@ -387,7 +455,8 @@ def download_prdq_recent(now, outname):
             elif (fld[0].find("/") > 0):
                 ioff = 1
             else:
-                sys.stderr.write("%s: %d: not in proper column\n" % (url, lnum))
+                sys.stderr.write("%s: %d: date not in proper column\n" % (url, lnum))
+                continue
 
             dstr = "%s %04d" % (fld[1-ioff], int(fld[2-ioff]))
             lt = strptime(dstr, "%m/%d/%Y %H%M")
@@ -695,7 +764,10 @@ try:
             (lastprddate, lastprdq) = download_prdq_recent(now, "PRD-Qtotal.dat")
             download_wmd_old(now, "ihr", "q", "Snake-Flow.dat")
             download_wmd_old(now, "mcn", "fb", "MCN-FBE.dat")
-        download_usgs_recent(now, "12510500", "Yakima-Flow.dat")
+        if (delta.days > 90):
+            download_usgs_old(now, "12510500", "Yakima-Flow.dat")
+        else:
+            download_usgs_recent(now, "12510500", "Yakima-Flow.dat")
     else:
         if (doflatline):
             lastprddate, lastprdq = flatline("PRD-Qtotal.dat")
