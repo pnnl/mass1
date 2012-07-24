@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 15, 2011 by William A. Perkins
-# Last Change: Fri Apr 22 12:49:59 2011 by William A. Perkins <d3g096@bearflag.pnl.gov>
+# Last Change: Tue Jul 24 14:45:42 2012 by William A. Perkins <d3g096@pe10900.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -33,19 +33,21 @@ def interpolate_profile(prof, qprof):
         while (rm < prof[idx][0]):
             idx = idx + 1
 
-        (prm1, pq1, pe1) = prof[idx-1]
-        (prm0, pq0, pe0) = prof[idx]
+        (prm1, pq1, pe1, pt1) = prof[idx-1]
+        (prm0, pq0, pe0, pt0) = prof[idx]
         
         if (rm == prm0):
             q = pq0
             e = pe0
+            t = pt0
         else:
             f = (rm - prm0)/(prm1-prm0)
             q = f*(pq1 - pq0) + pq0
             e = f*(pe1 - pe0) + pe0
+            t = f*(pt1 - pt0) + pt0
 
-        t = (box, rm, q, e)
-        qtemp.append(t)
+        tpl = (box, rm, q, e, t)
+        qtemp.append(tpl)
     return qtemp
         
 # -------------------------------------------------------------
@@ -88,7 +90,7 @@ def read_next_profile(profile):
         
         if (found and rdataline.match(l)):
             fld = l.split()
-            thetuple = (float(fld[3]), float(fld[4]), float(fld[5]))
+            thetuple = (float(fld[3]), float(fld[4]), float(fld[5]), float(fld[9]))
             theprofile.append(thetuple)
             continue
 
@@ -100,12 +102,44 @@ def read_next_profile(profile):
 # -------------------------------------------------------------
 program = os.path.basename(sys.argv[0])
 
+dotemp = 1
+startdate = datetime(month=1, day=1, year=1900)
+enddate = datetime(month=1, day=1, year=3000)
+
 # -------------------------------------------------------------
 # handle command line
 # -------------------------------------------------------------
 usage = "Usage: %prog rm profile"
 parser = OptionParser()
+
+parser.add_option("-T", "--temperature",
+                  action="store_true", dest="temperature", default=False,
+                  help="include simulated temperature in output")
+
+parser.add_option("-S", "--start", dest="start", action="store", 
+                  help="starting output date/time (MM/DD/YYYY HH:MM)")
+
+parser.add_option("-E", "--end", dest="end", action="store", 
+                  help="ending output date/time (MM/DD/YYYY HH:MM)")
+
 (options, args) = parser.parse_args()
+
+dotemp = options.temperature
+if (options.start):
+    try:
+        lt = strptime(options.start, "%m/%d/%Y %H:%M")
+        startdate = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday, lt.tm_hour, lt.tm_min, 0, 0)
+    except:
+        sys.stderr.write("Error parsing --start argument (%s)\n" % (options.start))
+        sys.exit(3)
+
+if (options.end):
+    try:
+        lt = strptime(options.end, "%m/%d/%Y %H:%M")
+        enddate = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday, lt.tm_hour, lt.tm_min, 0, 0)
+    except:
+        sys.stderr.write("Error parsing --end argument (%s)\n" % (options.end))
+        sys.exit(3)
 
 rm = 0.0
 
@@ -142,11 +176,14 @@ while (True):
     (pdatetime, profile) = read_next_profile(pfile)
     profile.reverse()
     if (pdatetime):
-        qtemp = interpolate_profile(profile, quads)
-        for t in qtemp:
-            (box, rm, e, q) = t
-            t = (pdatetime, box, rm, e, q)
-            pdata.append(t)
+        if (pdatetime > enddate):
+            break
+        if (pdatetime >= startdate):
+            qtemp = interpolate_profile(profile, quads)
+            for tpl in qtemp:
+                (box, rm, e, q, t) = tpl
+                tpl = (pdatetime, box, rm, e, q, t)
+                pdata.append(tpl)
     else:
         break
         
@@ -155,9 +192,13 @@ pfile.close()
 pdata.sort(key=itemgetter(1,0), reverse=False)
 
 for p in pdata:
-    (pdatetime, box, rm, e, q) = p
-    sys.stdout.write("%s, %.2f, %.2f, %.2f\n" %
+    (pdatetime, box, rm, e, q, t) = p
+    sys.stdout.write("%s, %.2f, %.2f, %.2f" %
                 (pdatetime.strftime("%m/%d/%Y %H:%M:%S"),
                  rm, e, q))
+    if (dotemp):
+        sys.stdout.write(", %.2f" % (t));
+
+    sys.stdout.write("\n")
 
 

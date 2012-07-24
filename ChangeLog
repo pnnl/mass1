@@ -1,3 +1,18 @@
+2012-07-24  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* test/application/HanfordReach/Profiles/stage_discharge.gp: added
+
+	* test/application/HanfordReach/Profiles/README.txt: added
+
+	* test/application/HanfordReach/Profiles/stage_discharge.sh: add a
+	script to extract and make some stage/discharge plots
+
+	* test/application/HanfordReach/BaseFiles/gage-control.dat: add
+	gage at downstream end of MASS2 mesh
+
+	* scripts/profile_extract.py: extract temperature and report if
+	called for; add --temperature, --start, and --end options
+
 2012-01-27  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* test/application/HanfordReach/Profiles/BCFiles/PRD-Qtotal.dat:  
