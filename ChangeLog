@@ -1,3 +1,9 @@
+2012-09-04  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* scripts/profile_extract.py: parse the profile output into a dict
+	instead of tuple; allow optional output of tdg and section
+	properties
+
 2012-07-24  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* test/application/HanfordReach/Profiles/stage_discharge.gp: added
