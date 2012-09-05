@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 15, 2011 by William A. Perkins
-# Last Change: Wed Sep  5 08:48:56 2012 by William A. Perkins <d3g096@flophouse>
+# Last Change: Wed Sep  5 09:42:28 2012 by William A. Perkins <d3g096@flophouse>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -367,7 +367,7 @@ pfile.close()
 pdata.sort(key=itemgetter('id','date'), reverse=False)
 
 if (doheader):
-    if (theid >= 0):
+    if (rmlist[0][0] >= 0):
         sys.stdout.write("ID, ")
     sys.stdout.write("Date, Rivermile")
     for f in basic_fields:

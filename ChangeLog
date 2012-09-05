@@ -1,7 +1,8 @@
 2012-09-05  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* scripts/profile_extract.py: add ability to read several river
-	miles, with ID's, from a file
+	miles, with ID's, from a file; fix bug where ID column was not
+	identified in output header
 
 	* test/temperature/pond: several changes to make it work better
 
