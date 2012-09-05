@@ -98,7 +98,7 @@ set trange [ * : * ] noreverse nowriteback  # (currently ["31/12/99,23:59":"01/0
 set urange [ * : * ] noreverse nowriteback  # (currently ["31/12/99,23:59":"01/01/00,00:00"] )
 set vrange [ * : * ] noreverse nowriteback  # (currently ["31/12/99,23:59":"01/01/00,00:00"] )
 set xlabel "" 
-set xrange [ "01-01-1992 00:00:00" : "01-01-1993 00:00:00" ] noreverse nowriteback
+set xrange [ "01-01-1998 00:00:00" : "01-01-1999 00:00:00" ] noreverse nowriteback
 set x2range [ * : * ] noreverse nowriteback  # (currently [-10.0000:10.0000] )
 set ylabel "Temperature, C" 
 set y2label "" 
@@ -123,5 +123,5 @@ set loadpath
 set fontpath 
 set fit noerrorvariables
 plot "met.dat" using 1:3 title "Air" with lines lt 3, \
-     "ts150.out" using 1:8 title "Pond" with lines lt 1
+     "ts1500.out" using 1:8 title "Pond" with lines lt 1
 #    EOF

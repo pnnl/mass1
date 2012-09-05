@@ -1,3 +1,10 @@
+2012-09-05  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* scripts/profile_extract.py: add ability to read several river
+	miles, with ID's, from a file
+
+	* test/temperature/pond: several changes to make it work better
+
 2012-09-04  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* scripts/profile_extract.py: add --metric option

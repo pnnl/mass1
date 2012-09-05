@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 15, 2011 by William A. Perkins
-# Last Change: Tue Sep  4 15:20:41 2012 by William A. Perkins <d3g096@pe10900.pnl.gov>
+# Last Change: Wed Sep  5 08:48:56 2012 by William A. Perkins <d3g096@flophouse>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -202,6 +202,34 @@ def read_next_profile(profile, dometric):
 
 
 # -------------------------------------------------------------
+# read_rm_file
+# -------------------------------------------------------------
+def read_rm_file(rmname):
+    
+    sys.stderr.write("Attempting to open \"%s\"\n" % (rmname))
+    try:
+        f = open(rmname)
+    except:
+        sys.stderr.write("unable to open \"%s\"\n" % (rmname))
+
+    sys.stderr.write("\"%s\" successfully opened\n" % (rmname))
+    thermlist = []
+    for l in f:
+        l.rstrip()
+        fld = l.split()
+
+        try:
+            box = int(fld[0])
+            rm = float(fld[1])
+        except ValueError:
+            continue
+
+        t = (box, rm)
+        thermlist.append(t)
+    f.close()
+    return (thermlist)
+
+# -------------------------------------------------------------
 # variable initialization
 # -------------------------------------------------------------
 program = os.path.basename(sys.argv[0])
@@ -217,6 +245,9 @@ basic_fields = [ 'Stage', 'Discharge', 'Velocity' ]
 section_fields = [ 'Area', 'TopWidth', 'Depth', 'HydraulicRadius' ]
 temp_fields = [ 'Temperature' ]
 tdg_fields = [ 'TDGConcentration', 'TDGPressure', 'TDGSaturation' ]
+
+dfmt = "%m/%d/%Y %H:%M"
+rmlist = []
 
 # -------------------------------------------------------------
 # handle command line
@@ -250,6 +281,15 @@ parser.add_option("-S", "--start", dest="start", action="store",
 parser.add_option("-E", "--end", dest="end", action="store", 
                   help="ending output date/time (MM/DD/YYYY HH:MM)")
 
+
+parser.add_option("-r", "--river-mile", type="float",
+                  action="store", dest="rm",
+                  help="extract time series at one location (id = 1)")
+
+parser.add_option("-f", "--file",
+                  action="store", dest="rmfile",
+                  help="read id, rivermile from specified file")
+
 parser.add_option("-m", "--metric", dest="metric",
                   action="store_true", default=False,
                   help="convert English units to metric")
@@ -265,7 +305,7 @@ dometric=options.metric
 
 if (options.start):
     try:
-        lt = strptime(options.start, "%m/%d/%Y %H:%M")
+        lt = strptime(options.start, dfmt)
         startdate = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday, lt.tm_hour, lt.tm_min, 0, 0)
     except:
         sys.stderr.write("Error parsing --start argument (%s)\n" % (options.start))
@@ -273,34 +313,30 @@ if (options.start):
 
 if (options.end):
     try:
-        lt = strptime(options.end, "%m/%d/%Y %H:%M")
+        lt = strptime(options.end, dfmt)
         enddate = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday, lt.tm_hour, lt.tm_min, 0, 0)
     except:
         sys.stderr.write("Error parsing --end argument (%s)\n" % (options.end))
         sys.exit(3)
 
-rm = 0.0
+if options.rm:
+    rmlist.append( (theid, options.rm) )
+elif options.rmfile:
+    rmlist = read_rm_file(options.rmfile)
+else:
+    sys.stderr.write("%s: error: locations not specified with --rivermile or --file\n" %
+                     (program))
+    sys.exit(3)
 
-if (len(args) != 2):
+if (len(args) != 1):
     parser.print_help()
     sys.exit(3)
     
-try:
-    rm = float(args[0])
-except ValueError:
-        sys.stderr.write("%s: error: specified rivermile (%s) not understood\n" %
-                         (program, args[0]))
-        sys.exit(3)
-
-profilename = args[1]
-
+profilename = args[0]
 
 # -------------------------------------------------------------
 # main program
 # -------------------------------------------------------------
-
-quads = []
-quads.append( (theid, rm) )
 
 try:
     pfile = open(profilename, "r")
@@ -317,7 +353,7 @@ while (True):
         if (pdatetime > enddate):
             break
         if (pdatetime >= startdate):
-            qtemp = interpolate_profile(profile, quads)
+            qtemp = interpolate_profile(profile, rmlist)
             for tpl in qtemp:
                 tpl['date'] = pdatetime
                 #(box, rm, e, q, t) = tpl
