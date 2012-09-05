@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 15, 2011 by William A. Perkins
-# Last Change: Tue Sep  4 14:07:59 2012 by William A. Perkins <d3g096@pe10900.pnl.gov>
+# Last Change: Tue Sep  4 15:20:41 2012 by William A. Perkins <d3g096@pe10900.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -83,7 +83,7 @@ def interpolate_profile(prof, qprof):
 #
 # the date of the profile read and a list of tuples (rm, wsel, q) is returned
 # -------------------------------------------------------------
-def read_next_profile(profile):
+def read_next_profile(profile, dometric):
 
     fldname = (
         'link',
@@ -106,7 +106,7 @@ def read_next_profile(profile):
         'Courant',
         'D#',
         'friction_slope',
-        'bed_shear'
+        'BedShear'
         )
 
     fldidx = (
@@ -134,6 +134,18 @@ def read_next_profile(profile):
         184
         )
 
+    fldconv = {
+        'distance' : 1.0,
+        'Stage' : 0.3048,
+        'Discharge' : 0.028316847,
+        'Velocity' : 0.3048,
+        'Depth' : 0.3048,
+        'Thalweg' : 0.3048,
+        'Area' : 0.3048*0.3048,
+        'TopWidth' : 0.3048,
+        'HydraulicRadius' : 0.3048,     # ft --> m
+        'BedShear' : 4.8824276         # lb/ft^2 --> N
+        }
     rdatetime = re.compile(r'.*Date:\s+(\d\d)-(\d\d)-(\d\d\d\d)\s+Time:\s+(\d\d):(\d\d):(\d\d).*')
     rdataline = re.compile(r'^  *\d+')
     rcomline = re.compile(r'^#')
@@ -177,7 +189,13 @@ def read_next_profile(profile):
             # thetuple = (thedict['distance'], thedict['ws_elevation'],
             #             thedict['discharge'], thedict['temperature'])
             # theprofile.append(thetuple)
-            theprofile.append(thedict)
+            if (dometric):
+                mdict = thedict
+                for f in fldconv.keys():
+                    mdict[f] = mdict[f]*fldconv[f]
+                theprofile.append(mdict)
+            else:
+                theprofile.append(thedict)
             continue
 
     return (pdatetime, theprofile)
@@ -232,6 +250,10 @@ parser.add_option("-S", "--start", dest="start", action="store",
 parser.add_option("-E", "--end", dest="end", action="store", 
                   help="ending output date/time (MM/DD/YYYY HH:MM)")
 
+parser.add_option("-m", "--metric", dest="metric",
+                  action="store_true", default=False,
+                  help="convert English units to metric")
+
 (options, args) = parser.parse_args()
 
 dotemp = options.temperature
@@ -239,6 +261,8 @@ dotdg = options.tdg
 dosection = options.section
 doheader = options.column
 theid = options.id
+dometric=options.metric
+
 if (options.start):
     try:
         lt = strptime(options.start, "%m/%d/%Y %H:%M")
@@ -287,7 +311,7 @@ except IOError:
 
 pdata = []
 while (True):
-    (pdatetime, profile) = read_next_profile(pfile)
+    (pdatetime, profile) = read_next_profile(pfile, dometric)
     profile.reverse()
     if (pdatetime):
         if (pdatetime > enddate):

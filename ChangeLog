@@ -1,5 +1,7 @@
 2012-09-04  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* scripts/profile_extract.py: add --metric option
+
 	* scripts/profile_extract.py: parse the profile output into a dict
 	instead of tuple; allow optional output of tdg and section
 	properties
