@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 15, 2011 by William A. Perkins
-# Last Change: Wed Sep  5 09:42:28 2012 by William A. Perkins <d3g096@flophouse>
+# Last Change: Tue Oct 23 07:36:37 2012 by William A. Perkins <d3g096@flophouse>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -54,7 +54,15 @@ def interpolate_profile(prof, qprof):
         else:
             f = (rm - prm0)/(prm1-prm0)
             for k in tmpprof.keys():
-                tmpprof[k] = f*(prof[idx][k] - prof[idx-1][k]) + prof[idx-1][k]
+                # if any of the prof[] values are None, this will
+                # throw an exception; if that happens change the value
+                # to something obviously wrong
+
+                try:
+                    tmpprof[k] = f*(prof[idx][k] - prof[idx-1][k]) + prof[idx-1][k]
+                except TypeError:
+                    tmpprof[k] = -9999.0
+                    
         tmpprof['id'] = box
         
         # (prm1, pq1, pe1, pt1) = prof[idx-1]

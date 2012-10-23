@@ -1,3 +1,9 @@
+2012-10-23  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* scripts/profile_extract.py (interpolate_profile) 
+	(read_next_profile): deal with those times when some fields are
+	unintelligible (e.g., ***)
+
 2012-09-05  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* scripts/profile_extract.py: add ability to read several river
