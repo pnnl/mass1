@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 26, 2011 by William A. Perkins
-# Last Change: Fri Mar  2 10:50:46 2012 by William A. Perkins <d3g096@flophouse>
+# Last Change: Sun Nov  4 06:22:29 2012 by William A. Perkins <d3g096@flophouse>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -25,6 +25,7 @@ from optparse import OptionParser
 from operator import itemgetter
 import urllib
 import urllib2
+from HTMLParser import HTMLParser
 import re
 from datetime import *
 from time import *
@@ -103,7 +104,7 @@ def flatline(bcname):
 #
 # Just discharge
 # -------------------------------------------------------------
-def download_usgs_recent(now, gage, outname):
+def download_usgs_recent(now, gage, outname, defq):
 
     today = datetime.now()
     days = (today - now).days + 10
@@ -127,6 +128,8 @@ def download_usgs_recent(now, gage, outname):
     outf = open(outname, "w")
     outf.write("# USGS Recent Data (%s): obtained %s\n" %
            (gage, today.strftime("%m/%d/%Y %H:%M:%S %Z%z")))
+
+    rcount = 0
 
     for l in f:
         l.rstrip()
@@ -153,9 +156,16 @@ def download_usgs_recent(now, gage, outname):
             # FIXME: Daylight Savings Time
 
             outf.write("%s %.2f /\n" % (thedate.strftime(thefmt), z))
+            rcount += 1
 
     f.close()
+
+    if rcount <= 0:
+        outf.write("%s %.2f /\n" % ("01-01-1900 00:00:00", defq))
+        outf.write("%s %.2f /\n" % ("01-01-3000 00:00:00", defq))
+        
     outf.close()
+
     if (lastdate):
         (lastdate, lastz) = flatline(outname)
 
@@ -232,7 +242,7 @@ def download_usgs_old(now, gage, outname):
 # -------------------------------------------------------------
 # download_wmd_recent
 # -------------------------------------------------------------
-def download_wmd_recent(now, code, fld, outname):
+def download_wmd_recent(now, code, fld, outname, defvalue):
 
     urlbase = "http://www.nwd-wc.usace.army.mil/ftppub/project_data/hourly/%s_%ddaysback.txt"
 
@@ -265,6 +275,7 @@ def download_wmd_recent(now, code, fld, outname):
     
     outf.write("# WMD Recent Data (%s, %s): obtained %s\n" %
            (code.lower(), fld.lower(), datetime.now().strftime("%m/%d/%Y %H:%M:%S %Z%z")))
+    outf.write("%s %.2f /\n" % ("01-01-1900 00:00:00", defvalue))
     for d in daysback:
 
         url = ( urlbase % ( code.lower(), d ))
@@ -277,6 +288,7 @@ def download_wmd_recent(now, code, fld, outname):
 
         thedate = None
         lnum = 0
+        outlines = 0
         for l in f:
             l.rstrip()
             lnum += 1
@@ -315,13 +327,17 @@ def download_wmd_recent(now, code, fld, outname):
                 dt = timedelta(hours=hr)
                 # FIXME: Daylight Savings Time
                 lastdate = thedate + dt
-                d = lastdate + outdt
+                thedate = lastdate + outdt
                 lastz = z
-                if (d <= now):
-                    outf.write("%s %.2f /\n" % (d.strftime(thefmt), z));
+                if (thedate <= now):
+                    outf.write("%s %.2f /\n" % (thedate.strftime(thefmt), z));
+                    outlines += 1
 
         f.close()
-
+        if (outlines <= 0):
+            thedate = now - timedelta(days=d)
+            outf.write("%s %.2f /\n" % (thedate.strftime(thefmt), defvalue));
+        
     outf.close()
     if (lastdate):
         (lastdate, lastz) = flatline(outname)
@@ -407,6 +423,105 @@ def download_wmd_old(now, code, fld, outname):
     return flatline(outname)
 
 # -------------------------------------------------------------
+# class GCPUD_Recent_Parser
+# -------------------------------------------------------------
+class GCPUD_Recent_Parser(HTMLParser):
+    
+    def __init__(self, mindate):
+        HTMLParser.__init__(self)
+        self.mindate = mindate
+        # print type(self.mindate)
+        self.data_tbl_id = 'DataGrid1'
+        self.data_tbl_found = False
+        self.data_tbl_indata = False
+        self.data_tbl_field = 0
+        self.data_tbl = []
+        self.data_line = []
+        
+    def handle_starttag(self, tag, attrs):
+        if tag == 'table':
+            if (not self.data_tbl_found):
+                for name, value in attrs:
+                    if (name == 'id'):
+                        if (value == self.data_tbl_id):
+                            self.data_tbl_found = True
+                            # print "Found Table", value
+            else:
+                self.data_tbl_found = False
+
+        if tag == 'td' and self.data_tbl_found:
+            self.data_tbl_field += 1
+            self.data_tbl_indata = True
+
+
+    def handle_endtag(self, tag):
+        if tag == 'table' and self.data_tbl_found:
+            self.data_tbl_found = False
+            self.data_tbl_indata = False
+
+        if tag == 'tr' and self.data_tbl_found:
+            if (len(self.data_line) > 0):
+                if type(self.data_line[0]) is datetime:
+                    if (self.data_line[0] > self.mindate):
+                        self.data_tbl.append(self.data_line)
+            self.data_line = []
+            self.data_tbl_field = 0
+
+        if tag == 'td' and self.data_tbl_indata:
+            self.data_tbl_indata = False
+
+    def handle_data(self, data):
+        if self.data_tbl_indata:
+            if (self.data_tbl_field == 1):
+                try:
+                    lt = strptime(data, "%m/%d/%Y %H:%M")
+                    thedate = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday,
+                                       hour=lt.tm_hour, minute=lt.tm_min, second=lt.tm_sec)
+                    self.data_line.append(thedate)
+                except:
+                    self.data_line.append("#bogus")
+
+            if (self.data_tbl_field == 2):
+                try:
+                    q = float(data)*1000;
+                    self.data_line.append(q)
+                except:
+                    self.data_line.append(data)
+                    
+
+    def output(self, f):
+        l = self.data_tbl
+        l.reverse()
+        for r in l:
+            thedate = r[0] - timedelta(minutes=30)
+            f.write("%s %9.1f /\n" % (thedate.strftime(thefmt), r[1]))
+        return
+
+
+# -------------------------------------------------------------
+# download_prdq_current
+#
+
+# Gets PRD discharge directly from GCPUD "72 hour" data. Writes to an
+# open file.
+
+# -------------------------------------------------------------
+def download_prdq_current(lastdate, outfile):
+    urlbase = "http://gcpud.org/data/water/WQMInfo.php"
+    params = urllib.urlencode( { "SITE_PID" : 2,
+                                 "SITE_TITLE" : "Priest Rapids Tailrace" } )
+    url = "%s?%s" % ( urlbase, params )
+    sys.stderr.write("Trying GCPUD, url: \"%s\"\n" % (url))
+    f = urllib2.urlopen(url)
+    html = f.read()
+    f.close()
+    p = GCPUD_Recent_Parser(lastdate)
+    p.feed(html)
+    p.output(outfile)
+    return
+    
+
+# -------------------------------------------------------------
 # download_prdq_recent
 #
 # Gets PRD discharge directly from GCPUD.  Usually current through
@@ -427,7 +542,7 @@ def download_prdq_recent(now, outname):
     outf.write("# Priest Rapids Discharge, retrieved %s from www.gcpud.org\n" %
            (datetime.now().strftime("%m/%d/%Y %H:%M:%S %Z%z")))
     
-
+    lastdate = start
     while (start <= now):
         url = start.strftime(urlbase)
         sys.stderr.write("Trying URL: %s\n" % (url))
@@ -467,9 +582,14 @@ def download_prdq_recent(now, outname):
             if (len(qfld) > 0):
                 q = float(qfld)*1000.0
                 if (d <= now):
+                    lastdate = d
                     d -= offset
                     outf.write("%s %9.1f /\n" % (d.strftime(thefmt), q))
         f.close()
+
+    if (lastdate < now and
+        lastdate > now - timedelta(days=3)):
+        download_prdq_current(lastdate, outf)
     outf.close()
     return flatline(outname)
 
@@ -757,9 +877,9 @@ try:
     if (dodownload):
         delta = datetime.now() - now
         if (delta.days < 2):
-            (lastprddate, lastprdq) = download_wmd_recent(now, "prd", "q",  "PRD-Qtotal.dat")
-            download_wmd_recent(now, "mcn", "fb", "MCN-FBE.dat")
-            download_wmd_recent(now, "ihr", "q",  "Snake-Flow.dat")
+            (lastprddate, lastprdq) = download_prdq_recent(now, "PRD-Qtotal.dat")
+            download_wmd_recent(now, "mcn", "fb", "MCN-FBE.dat", 340.0)
+            download_wmd_recent(now, "ihr", "q",  "Snake-Flow.dat", 9500.0)
         else:
             (lastprddate, lastprdq) = download_prdq_recent(now, "PRD-Qtotal.dat")
             download_wmd_old(now, "ihr", "q", "Snake-Flow.dat")
@@ -767,7 +887,7 @@ try:
         if (delta.days > 90):
             download_usgs_old(now, "12510500", "Yakima-Flow.dat")
         else:
-            download_usgs_recent(now, "12510500", "Yakima-Flow.dat")
+            download_usgs_recent(now, "12510500", "Yakima-Flow.dat", 3000)
     else:
         if (doflatline):
             lastprddate, lastprdq = flatline("PRD-Qtotal.dat")

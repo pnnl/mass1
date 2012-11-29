@@ -1,3 +1,18 @@
+2012-11-29  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* gcpud.py: add a parser to get the "72 hour" data from GCPUD
+
+	* runmass1.py (download_usgs_recent): specify a default Q that is
+	used if no data is available
+	(download_wmd_recent): specify a default value that is used if no
+	data is available
+	(GCPUD_Recent_Parser, download_prdq_current): add
+	(download_prdq_recent): use download_prdq_current to get more data
+	if necessary
+	(main): do not get PRD discharge from the WMD, get it from the GCPUD
+
+	* gcpud_prd_recent.py: add another GCPUD scraper test
+
 2012-03-02  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* runmass1.py (download_usgs_old): get daily USGS gage data when
