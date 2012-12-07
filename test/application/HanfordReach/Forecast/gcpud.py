@@ -220,5 +220,5 @@ for o, a in opts:
 # -------------------------------------------------------------
 
 now = datetime.today()
-now = datetime(2011, 3, 1, 8, 0)
+# now = datetime(2011, 3, 1, 8, 0)
 lastdate = download_prdq_recent(now, "PRD-Qtotal.dat")

@@ -538,12 +538,20 @@ def download_prdq_recent(now, outname):
     start = datetime(y, m, d, 0, 0)
     start -= timedelta(days=10)
 
+    # Bad things happen if we try to get "fixed" data that is not
+    # there.  We need to use as much of the "72-hour" data as
+    # possible, so check to see if we can
+    
+    finish = datetime.now() - timedelta(days=2)
+    if (now < finish):
+        finish = now
+
     outf = open(outname, "w")
     outf.write("# Priest Rapids Discharge, retrieved %s from www.gcpud.org\n" %
            (datetime.now().strftime("%m/%d/%Y %H:%M:%S %Z%z")))
     
     lastdate = start
-    while (start <= now):
+    while (start <= finish):
         url = start.strftime(urlbase)
         sys.stderr.write("Trying URL: %s\n" % (url))
         start += timedelta(1)
