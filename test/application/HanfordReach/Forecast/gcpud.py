@@ -24,6 +24,22 @@ from HTMLParser import HTMLParser
 thefmt = "%m-%d-%Y %H:%M:%S"
 
 # -------------------------------------------------------------
+# class RedirectHandler
+# -------------------------------------------------------------
+class RedirectHandler(urllib2.HTTPRedirectHandler):
+    def http_error_301(self, req, fp, code, msg, headers):  
+        result = urllib2.HTTPRedirectHandler.http_error_301( 
+            self, req, fp, code, msg, headers)              
+        result.status = code                                 
+        raise Exception("Permanent Redirect: %s" % 301)
+
+    def http_error_302(self, req, fp, code, msg, headers):
+        result = urllib2.HTTPRedirectHandler.http_error_302(
+            self, req, fp, code, msg, headers)              
+        result.status = code                                
+        raise Exception("Temporary Redirect: %s" % 302)
+
+# -------------------------------------------------------------
 # class GCPUD_Recent_Parser
 # -------------------------------------------------------------
 class GCPUD_Recent_Parser(HTMLParser):
@@ -139,12 +155,21 @@ def download_prdq_recent(now, outname):
     start = datetime(y, m, d, 0, 0)
     start -= timedelta(days=10)
 
+    # Bad things happen if we try to get "fixed" data that is not
+    # there.  We need to use as much of the "72-hour" data as
+    # possible, so check to see if we can
+
+    ravail = datetime.now() - timedelta(hours=72)
+    finish = ravail
+    if (now < finish):
+        finish = now
+
     outf = open(outname, "w")
     outf.write("# Priest Rapids Discharge, retrieved %s from www.gcpud.org\n" %
            (datetime.now().strftime("%m/%d/%Y %H:%M:%S %Z%z")))
     
     lastdate = start
-    while (start <= now):
+    while (start <= finish):
         url = start.strftime(urlbase)
         sys.stderr.write("Trying URL: %s\n" % (url))
         start += timedelta(1)
@@ -187,9 +212,15 @@ def download_prdq_recent(now, outname):
                     d -= offset
                     outf.write("%s %9.1f /\n" % (d.strftime(thefmt), q))
         f.close()
+        print lastdate, now
 
-    if (lastdate < now and
-        lastdate > now - timedelta(days=3)):
+    # get the most recent if now is within 72 hours of the current
+    # time, but warn if there's a gap
+
+    if (now >= ravail):
+        if (lastdate < ravail):
+            sys.stderr.write("warning: PRD discharge data gap from %s to %s (approximate)\n" % 
+                             (lastdate, ravail))
         download_prdq_current(lastdate, outf)
     outf.close()
     return lastdate
@@ -221,4 +252,7 @@ for o, a in opts:
 
 now = datetime.today()
 # now = datetime(2011, 3, 1, 8, 0)
+opener = urllib2.build_opener(RedirectHandler)
+urllib2.install_opener(opener)
+
 lastdate = download_prdq_recent(now, "PRD-Qtotal.dat")

@@ -25,6 +25,7 @@ from optparse import OptionParser
 from operator import itemgetter
 import urllib
 import urllib2
+import httplib
 from HTMLParser import HTMLParser
 import re
 from datetime import *
@@ -119,46 +120,50 @@ def download_usgs_recent(now, gage, outname, defq):
     params = urllib.urlencode(qdata)
     url = "%s?%s" % ( urlbase, params )
     sys.stderr.write("Trying USGS gage %s, url: \"%s\"\n" % (gage, url))
-    f = urllib2.urlopen(url)
 
     lastdate = None
     lastz = None
     lnum = 0
-
-    outf = open(outname, "w")
-    outf.write("# USGS Recent Data (%s): obtained %s\n" %
-           (gage, today.strftime("%m/%d/%Y %H:%M:%S %Z%z")))
-
     rcount = 0
 
-    for l in f:
-        l.rstrip()
-        lnum += 1
+    outf = open(outname, "w")
+    try:
+        f = urllib2.urlopen(url)
 
-        if (len(l) <= 0):
-            continue
+        outf.write("# USGS Recent Data (%s): obtained %s\n" %
+                   (gage, today.strftime("%m/%d/%Y %H:%M:%S %Z%z")))
 
-        if (l.find("USGS") == 0):
-            fld = l.split()
+        for l in f:
+            l.rstrip()
+            lnum += 1
 
-            if (len(fld) < 5):
+            if (len(l) <= 0):
                 continue
 
-            z = float(fld[5])
+            if (l.find("USGS") == 0):
+                fld = l.split()
 
-            dstr = fld[2] + " " + fld[3] + " " + fld[4]
-            lt = strptime(dstr, "%Y-%m-%d %H:%M %Z")
-            thedate = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday,
-                               hour=lt.tm_hour, minute=lt.tm_min, second=lt.tm_sec)
-            lastdate = thedate
-            lastz = z
+                if (len(fld) < 5):
+                    continue
 
-            # FIXME: Daylight Savings Time
+                z = float(fld[5])
 
-            outf.write("%s %.2f /\n" % (thedate.strftime(thefmt), z))
-            rcount += 1
+                dstr = fld[2] + " " + fld[3] + " " + fld[4]
+                lt = strptime(dstr, "%Y-%m-%d %H:%M %Z")
+                thedate = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday,
+                                   hour=lt.tm_hour, minute=lt.tm_min, second=lt.tm_sec)
+                lastdate = thedate
+                lastz = z
 
-    f.close()
+                # FIXME: Daylight Savings Time
+
+                outf.write("%s %.2f /\n" % (thedate.strftime(thefmt), z))
+                rcount += 1
+
+        f.close()
+    except Exception, detail:
+        sys.stderr.write("USGS gage %s, reading url failed: %s\n" % 
+                         (gage, detail))
 
     if rcount <= 0:
         outf.write("%s %.2f /\n" % ("01-01-1900 00:00:00", defq))
@@ -423,6 +428,22 @@ def download_wmd_old(now, code, fld, outname):
     return flatline(outname)
 
 # -------------------------------------------------------------
+# class RedirectHandler
+# -------------------------------------------------------------
+class RedirectHandler(urllib2.HTTPRedirectHandler):
+    def http_error_301(self, req, fp, code, msg, headers):  
+        result = urllib2.HTTPRedirectHandler.http_error_301( 
+            self, req, fp, code, msg, headers)              
+        result.status = code                                 
+        raise Exception("Permanent Redirect: %s" % 301)
+
+    def http_error_302(self, req, fp, code, msg, headers):
+        result = urllib2.HTTPRedirectHandler.http_error_302(
+            self, req, fp, code, msg, headers)              
+        result.status = code                                
+        raise Exception("Temporary Redirect: %s" % 302)
+
+# -------------------------------------------------------------
 # class GCPUD_Recent_Parser
 # -------------------------------------------------------------
 class GCPUD_Recent_Parser(HTMLParser):
@@ -541,8 +562,9 @@ def download_prdq_recent(now, outname):
     # Bad things happen if we try to get "fixed" data that is not
     # there.  We need to use as much of the "72-hour" data as
     # possible, so check to see if we can
-    
-    finish = datetime.now() - timedelta(days=2)
+
+    ravail = datetime.now() - timedelta(hours=72)
+    finish = ravail
     if (now < finish):
         finish = now
 
@@ -594,9 +616,15 @@ def download_prdq_recent(now, outname):
                     d -= offset
                     outf.write("%s %9.1f /\n" % (d.strftime(thefmt), q))
         f.close()
+        print lastdate, now
 
-    if (lastdate < now and
-        lastdate > now - timedelta(days=3)):
+    # get the most recent if now is within 72 hours of the current
+    # time, but warn if there's a gap
+
+    if (now >= ravail):
+        if (lastdate < ravail):
+            sys.stderr.write("warning: PRD discharge data gap from %s to %s (approximate)\n" % 
+                             (lastdate, ravail))
         download_prdq_current(lastdate, outf)
     outf.close()
     return flatline(outname)
@@ -881,6 +909,9 @@ doflatline = options.flatline
 # main program
 # -------------------------------------------------------------
 
+opener = urllib2.build_opener(RedirectHandler)
+urllib2.install_opener(opener)
+
 try:
     if (dodownload):
         delta = datetime.now() - now
@@ -904,8 +935,9 @@ try:
             flatline("MCN-FBE.dat")
             sys.stderr.write("Last PRD Q = %.1f kcfs @ %s\n" %
                              (lastprdq, lastprddate.strftime(thefmt)))
-except:
-    sys.stderr.write("Error setting boundary conditions\n")
+except Exception, detail:
+    sys.stderr.write("Error setting boundary conditions:%s\n" %
+                     (detail))
     sys.exit(3)
 
 try:
