@@ -533,7 +533,7 @@ class GCPUD_Recent_Parser(HTMLParser):
 
 # -------------------------------------------------------------
 def download_prdq_current(lastdate, outfile):
-    urlbase = "http://gcpud.org/data/water/WQMInfo.php"
+    urlbase = "http://grantpud2.org/data/water/WQMInfo.php"
     params = urllib.urlencode( { "SITE_PID" : 2,
                                  "SITE_TITLE" : "Priest Rapids Tailrace" } )
     url = "%s?%s" % ( urlbase, params )
@@ -554,7 +554,7 @@ def download_prdq_current(lastdate, outfile):
 # midnight the previous day.
 # -------------------------------------------------------------
 def download_prdq_recent(now, outname):
-    urlbase = "http://www.gcpud.org/data/water/fixed/%Y/csvform/%m%d%y.csv"
+    urlbase = "http://grantpud2.org/data/water/fixed/%Y/csvform/%m%d%y.csv"
     m = now.month
     d = now.day
     y = now.year
@@ -921,8 +921,8 @@ try:
     if (dodownload):
         delta = datetime.now() - now
         if (delta.days < 2):
-            (lastprddate, lastprdq) = download_wmd_recent(now, "prd", "q", "PRD-Qtotal.dat", 40000.0)
-            # (lastprddate, lastprdq) = download_prdq_recent(now, "PRD-Qtotal.dat")
+            # (lastprddate, lastprdq) = download_wmd_recent(now, "prd", "q", "PRD-Qtotal.dat", 40000.0)
+            (lastprddate, lastprdq) = download_prdq_recent(now, "PRD-Qtotal.dat")
             download_wmd_recent(now, "mcn", "fb", "MCN-FBE.dat", 340.0)
             download_wmd_recent(now, "ihr", "q",  "Snake-Flow.dat", 9500.0)
         else:
