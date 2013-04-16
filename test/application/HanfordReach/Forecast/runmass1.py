@@ -247,23 +247,24 @@ def download_usgs_old(now, gage, outname):
 # -------------------------------------------------------------
 # download_wmd_recent
 # -------------------------------------------------------------
-def download_wmd_recent(now, code, fld, outname, defvalue):
+def download_wmd_recent(now, code, thefld, outname, defvalue):
 
     urlbase = "http://www.nwd-wc.usace.army.mil/ftppub/project_data/hourly/%s_%ddaysback.txt"
+    # urlbase = "http://www.nwd-wc.usace.army.mil/ftppub/project_data/hourly/%s_%ddaysback_cwms.txt"
 
     i0 = 0
     i1 = 0
     scale = 1.0
     outdt = timedelta(0)
-    if (fld.lower() == "q"):
+    if (thefld.lower() == "q"):
         i0 = 19
         i1 = 28
         scale = 1000.0
         outdt = timedelta(minutes=-30)
-    elif (fld.lower() == "fb"):
+    elif (thefld.lower() == "fb"):
         i0 = 43
         i1 = 52
-    elif (fld.lower() == "tw"):
+    elif (thefld.lower() == "tw"):
         i0 = 52
         i1 = 61
 
@@ -279,7 +280,7 @@ def download_wmd_recent(now, code, fld, outname, defvalue):
     outf = open(outname, "w")
     
     outf.write("# WMD Recent Data (%s, %s): obtained %s\n" %
-           (code.lower(), fld.lower(), datetime.now().strftime("%m/%d/%Y %H:%M:%S %Z%z")))
+           (code.lower(), thefld.lower(), datetime.now().strftime("%m/%d/%Y %H:%M:%S %Z%z")))
     outf.write("%s %.2f /\n" % ("01-01-1900 00:00:00", defvalue))
     for d in daysback:
 
@@ -327,15 +328,19 @@ def download_wmd_recent(now, code, fld, outname, defvalue):
                 except ValueError:
                     continue
 
+                if (thefld.lower() == "q" and z <= 0.0):
+                    continue
+
                 z = z * scale
 
                 dt = timedelta(hours=hr)
                 # FIXME: Daylight Savings Time
                 lastdate = thedate + dt
-                thedate = lastdate + outdt
+                outdate = lastdate + outdt
                 lastz = z
                 if (thedate <= now):
-                    outf.write("%s %.2f /\n" % (thedate.strftime(thefmt), z));
+                    #outf.write("%s\n" % (l))
+                    outf.write("%s %.2f /\n" % (outdate.strftime(thefmt), z));
                     outlines += 1
 
         f.close()
@@ -353,7 +358,7 @@ def download_wmd_recent(now, code, fld, outname, defvalue):
 # -------------------------------------------------------------
 # download_wmd_old
 # -------------------------------------------------------------
-def download_wmd_old(now, code, fld, outname):
+def download_wmd_old(now, code, thefld, outname):
 
     urlbase = "http://www.nwd-wc.usace.army.mil/perl/dataquery.pl"
     
@@ -363,13 +368,13 @@ def download_wmd_old(now, code, fld, outname):
 
     scale = 1.0
     offset = timedelta(minutes=0)
-    if (fld.lower() == "q"):
+    if (thefld.lower() == "q"):
         query = "id:%s+record://%s/qr//ir-month/hrxzzazd/" % (code,code)
         offset = timedelta(minutes=30)
         scale = 1000.0
-    elif (fld.lower() == "fb"):
+    elif (thefld.lower() == "fb"):
         query = "id:%s+record://%s/hf//ir-month/irxzzazd/" % (code,code)
-    elif (fld.lower() == "tw"):
+    elif (thefld.lower() == "tw"):
         query = "id:%s+record://%s/ht//ir-month/irxzzazd/" % (code,code)
 
     qdata = { "k" : query,
@@ -916,7 +921,8 @@ try:
     if (dodownload):
         delta = datetime.now() - now
         if (delta.days < 2):
-            (lastprddate, lastprdq) = download_prdq_recent(now, "PRD-Qtotal.dat")
+            (lastprddate, lastprdq) = download_wmd_recent(now, "prd", "q", "PRD-Qtotal.dat", 40000.0)
+            # (lastprddate, lastprdq) = download_prdq_recent(now, "PRD-Qtotal.dat")
             download_wmd_recent(now, "mcn", "fb", "MCN-FBE.dat", 340.0)
             download_wmd_recent(now, "ihr", "q",  "Snake-Flow.dat", 9500.0)
         else:
