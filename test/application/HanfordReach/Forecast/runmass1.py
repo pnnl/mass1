@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 26, 2011 by William A. Perkins
-# Last Change: Sun Nov  4 06:22:29 2012 by William A. Perkins <d3g096@flophouse>
+# Last Change: 2013-05-06 08:15:04 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -285,9 +285,12 @@ def download_wmd_recent(now, code, thefld, outname, defvalue):
     for d in daysback:
 
         url = ( urlbase % ( code.lower(), d ))
+        header = {"pragma-directive" : "no-cache"}
+        req = urllib2.Request(url, headers=header)
 
         try:
-            f = urllib2.urlopen(url)
+            f = urllib2.urlopen(req)
+            # print f.headers
         except:
             sys.stderr.write("unable to get URL: %s\n" % (url))
             continue
@@ -537,8 +540,13 @@ def download_prdq_current(lastdate, outfile):
     params = urllib.urlencode( { "SITE_PID" : 2,
                                  "SITE_TITLE" : "Priest Rapids Tailrace" } )
     url = "%s?%s" % ( urlbase, params )
+    header = {"pragma-directive" : "no-cache"}
+    req = urllib2.Request(url, headers=header)
+
     sys.stderr.write("Trying GCPUD, url: \"%s\"\n" % (url))
-    f = urllib2.urlopen(url)
+    
+    f = urllib2.urlopen(req)
+    # print f.headers
     html = f.read()
     f.close()
     p = GCPUD_Recent_Parser(lastdate)
