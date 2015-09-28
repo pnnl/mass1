@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 26, 2011 by William A. Perkins
-# Last Change: 2013-05-06 08:15:04 d3g096
+# Last Change: 2015-09-28 12:42:22 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -96,7 +96,7 @@ def flatline(bcname):
                              ( bcname, d.strftime(thefmt)))
             
     else:
-        return Null, Null
+        return None, None
     return (lastdate[0], lastz[0])
     
 
@@ -364,6 +364,7 @@ def download_wmd_recent(now, code, thefld, outname, defvalue):
 def download_wmd_old(now, code, thefld, outname):
 
     urlbase = "http://www.nwd-wc.usace.army.mil/perl/dataquery.pl"
+    urlbase = "http://www.nwd-wc.usace.army.mil/cgi-bin/dataquery.pl"
     
     today = datetime.now()
     start = now - timedelta(days=10)
@@ -407,29 +408,55 @@ def download_wmd_old(now, code, thefld, outname):
         l.rstrip()
         lnum += 1
 
-        fld = l.split()
-        # print "%05d: %s" % (lnum, l)
-        if (l.find("Date      Time  Data") >= 0):
-            found = 1
+        # skip blank lines
+        if (len(l) == 0):
             continue
 
-        if (not found):
+        if (l.find("Date") == 0):
+            found = True
             continue
 
-        fld = l.split()
-        if (len(fld) < 3):
-            continue
-        dstr = fld[0]
-        lt = strptime(dstr.lower(), "%d%b%Y")
-        d = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday,
-                     hour=0, minute=0)
-        (hr, mn) = fld[1].split(":")
-        hr = int(hr)
-        mn = int(mn)
-        d += timedelta(hours=hr, minutes=mn)
-        q = float(fld[2])*scale
-        d -= offset
-        outf.write("%s %9.3f /\n" % (d.strftime(thefmt), q))
+        # the data starts after the line that starts w/ "Date"
+        if (found):
+
+            # the dash line indicates the end of data
+            if (l.find("-----------------") >= 0):
+                break
+
+            # the data line should start with an interger (day number)
+            try:
+                hr = int(l[0:2])
+            except:
+                continue
+
+            fld = l.split();
+
+            # don't bother if there's no value
+            if (len(fld) != 3):
+                continue
+
+            # reformat the date
+            dstr = fld[0]
+            lt = strptime(dstr.lower(), "%d%b%Y")
+            d = datetime(lt.tm_year, lt.tm_mon, lt.tm_mday,
+                         hour=0, minute=0)
+            # have to do this because of "24:00" times
+            (hr, mn) = fld[1].split(":")
+            hr = int(hr)
+            mn = int(mn)
+            d += timedelta(hours=hr, minutes=mn)
+            d -= offset
+
+            try:
+                z = float(fld[2])
+            except ValueError:
+                continue
+
+            z = z * scale
+
+            rec = "%s %9.3f /\n" % (d.strftime(thefmt), z)
+            sys.stderr.write(rec);
+            outf.write(rec)
 
     f.close()
     outf.close()
@@ -674,7 +701,7 @@ def run_mass1(now):
 # do_plots
 # -------------------------------------------------------------
 def do_plots(now):
-    pltstart = now - timedelta(days=1, minutes=30)
+    pltstart = now - timedelta(days=1, hours=12)
     pltstart = pltstart.replace(minute=0, second=0)
     pltend = now + timedelta(hours=12, minutes=30)
     pltend = pltend.replace(minute=0, second=0)
@@ -931,8 +958,10 @@ try:
         if (delta.days < 2):
             # (lastprddate, lastprdq) = download_wmd_recent(now, "prd", "q", "PRD-Qtotal.dat", 40000.0)
             (lastprddate, lastprdq) = download_prdq_recent(now, "PRD-Qtotal.dat")
-            download_wmd_recent(now, "mcn", "fb", "MCN-FBE.dat", 340.0)
-            download_wmd_recent(now, "ihr", "q",  "Snake-Flow.dat", 9500.0)
+            download_wmd_old(now, "ihr", "q", "Snake-Flow.dat")
+            download_wmd_old(now, "mcn", "fb", "MCN-FBE.dat")
+            # download_wmd_recent(now, "mcn", "fb", "MCN-FBE.dat", 340.0)
+            # download_wmd_recent(now, "ihr", "q",  "Snake-Flow.dat", 9500.0)
         else:
             (lastprddate, lastprdq) = download_prdq_recent(now, "PRD-Qtotal.dat")
             download_wmd_old(now, "ihr", "q", "Snake-Flow.dat")
