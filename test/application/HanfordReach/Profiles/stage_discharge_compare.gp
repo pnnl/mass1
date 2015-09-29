@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created July 23, 2012 by William A. Perkins
-# Last Change: 2015-02-25 07:34:37 d3g096
+# Last Change: 2014-12-29 15:18:04 d3g096
 # -------------------------------------------------------------
 
 set terminal postscript eps enh color solid "Helvetica" 16
@@ -22,10 +22,6 @@ set format x "%.0f"
 set format x2 "%.0f"
 set xrange [0:14158.423]
 set x2range [0:500]
-set xrange [0:4500]
-set x2range [0:158.916]
-set xrange [0:16000]
-set x2range [0:565.03467]
 
 set ytics nomirror
 set y2tics nomirror
@@ -35,14 +31,15 @@ set format y "%.1f"
 set format y2 "%.0f"
 
 set dataf sep ','
-set key title "Columbia River kilometer @KM@"
+set key title "River kilometer 539"
 set key left
 
 set auto y
 set auto y2
 
 set output "/dev/null"
-plot "stage_discharge_@KM@.dat" using ($4/1000.0):($3) axes x2y2 notitle with lines lt 1
+plot "stage_discharge_539_max.dat" using ($4/1000.0):($3) axes x2y2 title "MCN @ 340.0 ft" with lines lt 1, \
+     "stage_discharge_539_min.dat" using ($4/1000.0):($3) axes x2y2 title "MCN @ 335.0 ft" with lines lt 3
 
 set output
 set y2range [GPVAL_Y2_MIN : GPVAL_Y2_MAX]
