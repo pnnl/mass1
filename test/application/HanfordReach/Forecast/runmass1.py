@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 26, 2011 by William A. Perkins
-# Last Change: 2015-09-28 12:42:22 d3g096
+# Last Change: 2015-09-29 09:04:20 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -455,7 +455,7 @@ def download_wmd_old(now, code, thefld, outname):
             z = z * scale
 
             rec = "%s %9.3f /\n" % (d.strftime(thefmt), z)
-            sys.stderr.write(rec);
+            # sys.stderr.write(rec);
             outf.write(rec)
 
     f.close()
@@ -701,7 +701,7 @@ def run_mass1(now):
 # do_plots
 # -------------------------------------------------------------
 def do_plots(now):
-    pltstart = now - timedelta(days=1, hours=12)
+    pltstart = now - timedelta(days=1, minutes=30)
     pltstart = pltstart.replace(minute=0, second=0)
     pltend = now + timedelta(hours=12, minutes=30)
     pltend = pltend.replace(minute=0, second=0)
@@ -837,7 +837,7 @@ def format_profiles(now, lastprddate, lastprdq, outname):
     quads = read_quads()
 
     pfile = open("profile1.out", "r")
-    pstart = now - timedelta(days=1, minutes=30)
+    pstart = now - timedelta(days=1, hours=12, minutes=30)
     pstart = pstart.replace(minute=0, second=0)
 
     pdata = []
