@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 26, 2011 by William A. Perkins
-# Last Change: 2015-09-29 09:04:20 d3g096
+# Last Change: 2015-10-06 14:27:05 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -566,6 +566,8 @@ def download_prdq_current(lastdate, outfile):
     urlbase = "http://grantpud2.org/data/water/WQMInfo.php"
     params = urllib.urlencode( { "SITE_PID" : 2,
                                  "SITE_TITLE" : "Priest Rapids Tailrace" } )
+    params = urllib.urlencode( { "SITE_PID" : 1,
+                                 "SITE_TITLE" : "Priest Rapids Forebay" } )
     url = "%s?%s" % ( urlbase, params )
     header = {"pragma-directive" : "no-cache"}
     req = urllib2.Request(url, headers=header)
