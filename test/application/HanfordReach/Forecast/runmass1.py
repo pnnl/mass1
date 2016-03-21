@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 26, 2011 by William A. Perkins
-# Last Change: 2015-10-06 14:27:05 d3g096
+# Last Change: 2016-03-21 13:00:36 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -765,20 +765,22 @@ def interpolate_profile(prof, qprof):
         while (rm < prof[idx][0]):
             idx = idx + 1
 
-        (prm1, pq1, pe1, ptw1) = prof[idx-1]
-        (prm0, pq0, pe0, ptw0) = prof[idx]
+        (prm1, pq1, pe1, ptw1, pv1) = prof[idx-1]
+        (prm0, pq0, pe0, ptw0, pv0) = prof[idx]
         
         if (rm == prm0):
             q = pq0
             e = pe0
             tw = ptw0
+            v = pv0
         else:
             f = (rm - prm0)/(prm1-prm0)
             q = f*(pq1 - pq0) + pq0
             e = f*(pe1 - pe0) + pe0
             tw = f*(ptw1 - ptw0) + ptw0
+            v = f*(pv1 - pv0) + pv0
 
-        t = (box, rm, q, e, tw)
+        t = (box, rm, q, e, tw, v)
         qtemp.append(t)
     return qtemp
         
@@ -824,7 +826,7 @@ def read_next_profile(profile, first):
         
         if (found and rdataline.match(l)):
             fld = l.split()
-            thetuple = (float(fld[3]), float(fld[4]), float(fld[5]), float(fld[14]))
+            thetuple = (float(fld[3]), float(fld[4]), float(fld[5]), float(fld[14]), float(fld[6]))
             theprofile.append(thetuple)
             continue
 
@@ -840,6 +842,7 @@ def format_profiles(now, lastprddate, lastprdq, outname):
 
     pfile = open("profile1.out", "r")
     pstart = now - timedelta(days=1, hours=12, minutes=30)
+    # pstart = now - timedelta(days=3)
     pstart = pstart.replace(minute=0, second=0)
 
     pdata = []
@@ -849,8 +852,8 @@ def format_profiles(now, lastprddate, lastprdq, outname):
         if (pdatetime):
             qtemp = interpolate_profile(profile, quads)
             for t in qtemp:
-                (box, rm, e, q, tw) = t
-                t = (pdatetime, box, rm, e, q, tw)
+                (box, rm, e, q, tw, v) = t
+                t = (pdatetime, box, rm, e, q, tw, v)
                 pdata.append(t)
         else:
             break
@@ -861,11 +864,12 @@ def format_profiles(now, lastprddate, lastprdq, outname):
 
     pout = []
     for p in pdata:
-        (pdatetime, box, rm, e, q, tw) = p
+        (pdatetime, box, rm, e, q, tw, v) = p
 
         if (now < pdatetime):
             if (abs(q - lastprdq)/lastprdq < 0.00005 ):
-                #sys.stdout.write("Skipping %d, %s, %.2f\n" % (box, pdatetime.strftime(thefmt), q))
+                if (doverbose):
+                    sys.stdout.write("Skipping %d, %s, %.2f\n" % (box, pdatetime.strftime(thefmt), q))
                 continue
             else:
                 pout.append(p)
@@ -882,10 +886,10 @@ def format_profiles(now, lastprddate, lastprdq, outname):
     ofile.write("# Last PRD Q Date: %s\n" % (lastprddate.strftime(thefmt)))
     ofile.write("# Last PRD Q: %.1f\n" % (lastprdq))
     for p in pout:
-        (pdatetime, box, rm, e, q, tw) = p
-        ofile.write("%s, %d, %.2f, %.2f, %.2f, %.2f\n" %
+        (pdatetime, box, rm, e, q, tw, v) = p
+        ofile.write("%s, %d, %.2f, %.2f, %.2f, %.2f, %.2f\n" %
                     (pdatetime.strftime(thefmt),
-                     box, rm, e, q, tw))
+                     box, rm, e, q, tw, v))
 
     ofile.close()
     return

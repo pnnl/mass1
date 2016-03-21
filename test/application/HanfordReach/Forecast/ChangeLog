@@ -1,3 +1,8 @@
+2016-03-21  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* runmass1.py (interpolate_profile, read_next_profile)
+	(format_profiles): add cross-section velocity to output
+
 2013-05-06  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* runmass1.py: place directives in URL requests to try to avoid
