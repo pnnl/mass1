@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 25, 2005 by William A. Perkins
-# Last Change: Fri Mar 25 12:02:42 2005 by William A. Perkins <perk@leechong.pnl.gov>
+# Last Change: Wed Mar  2 16:17:36 2011 by William A. Perkins <d3g096@bearflag.pnl.gov>
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -87,7 +87,7 @@ while (<INPUT>) {
     ($type, $rm, $lbdist, $cldist, $rbdist) = split(/,/, $data);
     # $rm *= $km2mi if ($metric);
     $rm = $rm0;
-    if (metric) {
+    if ($metric) {
       $rm0 -= $cldist*$m2ft/5280.0;
     } else {
       $rm0 -= $cldist/5280.0;
