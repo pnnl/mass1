@@ -1,5 +1,13 @@
 2016-06-01  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* BaseFiles/roosevelt.ods: add more sections below China Bend
+
+	* BaseFiles/roosevelt.link: add more sections below China Bend
+
+	* BaseFiles/roosevelt.point: add more sections below China Bend
+
+	* BaseFiles/roosevelt.section: add more sections below China Bend
+
 	* BaseFiles/roosevelt.point: adjust some thalweg elevations and
 	roughness to get it to run with GCL stage @ 1209.
 
