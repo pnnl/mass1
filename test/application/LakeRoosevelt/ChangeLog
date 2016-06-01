@@ -1,0 +1,7 @@
+2016-06-01  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* BaseFiles/roosevelt.point: adjust some thalweg elevations and
+	roughness to get it to run with GCL stage @ 1209.
+
+	* Rampdown/BCFiles/GCL-elev.dat: make final GCL stage 1209 feet.
+
