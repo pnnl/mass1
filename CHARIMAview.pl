@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 23, 2005 by William A. Perkins
-# Last Change: Thu Dec  3 07:22:56 2009 by William A. Perkins <d3g096@PE10900.pnl.gov>
+# Last Change: 2016-06-01 12:18:39 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -65,7 +65,7 @@ sub read_section_file {
 # handle command line
 # -------------------------------------------------------------
 my %opts;
-die "$usage" if (!getopts('d:', \%opts));
+die "$usage" if (!getopts('sd:', \%opts));
 
 $device = $opts{'d'} if (defined($opts{'d'}));
 
@@ -90,7 +90,9 @@ for ($i = 0; $i < scalar(@basefile); $i++) {
   @xsect[$i] = $xs;
 }
 
-my @rmlist = sort {$a <=> $b} keys %{$xsect[0]};
+my @rmlist;
+@rmlist = sort {$a <=> $b} keys %{$xsect[0]};
+
 
 printf(STDERR "$program: info: using PGPLOT device \"%s\"\n", $device);
 
@@ -142,12 +144,12 @@ while (not $done) {
         $y->set($sidx, $xsection->{points}->{$stn} + 0.0);
         $sidx += 1;
       }
-      $plot->points($x, $y, {COLOR => $i+1, SYMBOL => $i});
+      $plot->points($x, $y, {COLOR => $i+1, SYMBOL => $i, CHARSIZE => 1.0 });
       $plot->line($x, $y, {COLOR => $i+1});
       push(@{$leg->{Text}}, $basefile[$i]);
       push(@{$leg->{Colour}}, $i+1);
       push(@{$leg->{LineStyle}}, 'Solid');
-      # push(@{$leg->{Symbol}}, $i);
+      push(@{$leg->{Symbol}}, $i);
     }
   }
   $plot->label_axes("Station, ft", "Elevation, ft", $id, {COLOR=>'BLACK'});
