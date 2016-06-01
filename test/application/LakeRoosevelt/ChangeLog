@@ -1,5 +1,10 @@
 2016-06-01  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* BaseFiles/roosevelt.point: some thalweg adjustments Kettle Falls
+	and below China Bend
+
+	* BaseFiles/profile-control.dat: drop the link downstream of GCL
+
 	* BaseFiles/roosevelt.ods: add more sections below China Bend
 
 	* BaseFiles/roosevelt.link: add more sections below China Bend
