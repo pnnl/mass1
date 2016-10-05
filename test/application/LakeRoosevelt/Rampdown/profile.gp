@@ -150,5 +150,5 @@ set loadpath
 set fontpath 
 set fit noerrorvariables
 GNUTERM = "x11"
-plot "<tail -n 669 profile1.out" using 4:5 axes x1y1 title "Water Surface" with lines ls 1, "" using 4:13 axes x1y1 title "Thalweg" with lines ls 7, "" using 4:7 axes x1y2 title "Velocity" with lines ls 3
+plot "<tail -n 736 profile1.out" using 4:5 axes x1y1 title "Water Surface" with lines ls 1, "" using 4:13 axes x1y1 title "Thalweg" with lines ls 7, "" using 4:7 axes x1y2 title "Velocity" with lines ls 3
 #    EOF
