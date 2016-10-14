@@ -1,5 +1,15 @@
 2016-10-14  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* BaseFiles/roosevelt.truncated.point: some small adjustments on the
+	Spokane and Kettle to get a long term simulation to run
+
+	* LongTerm.truncated: add a long term simulation starting with CY
+	1976. 
+
+	* BaseFiles/roosevelt.truncated.point: make a small thalweg
+	adjustment at the head of the Spokane to get through the summer of
+	1990 
+
 	* Spring2016.truncated/stage.gp: add script to plot stage time
 	series comparisons
 
