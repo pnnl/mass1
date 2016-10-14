@@ -1,3 +1,26 @@
+2016-10-14  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* Spring2016.truncated/stage.gp: add script to plot stage time
+	series comparisons
+
+	* Spring2016.truncated/compare/compare.R: start a statistics script
+
+	* Spring2016.truncated/Observed: add observed stage from CCT and
+	USGS 
+
+	* Spring2016.truncated/BCFiles/getem.sh: document processing of
+	GCL forebay elevation datum
+
+	* Spring2016.truncated/BCFiles/GCL-Elev-NGVD29.dat: added
+
+	* Spring2016.truncated/BCFiles/GCL-Elev.dat: fix datum
+
+	* BaseFiles/gage-control.truncated.dat: add all of the CCT monitor
+	locations 
+
+	* BaseFiles/roosevelt.truncated.point: approximate Manning's n
+	calibration for Spring 2016
+
 2016-06-01  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* BaseFiles/roosevelt.point: some thalweg adjustments Kettle Falls
