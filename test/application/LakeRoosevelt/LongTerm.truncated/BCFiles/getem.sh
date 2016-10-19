@@ -25,3 +25,4 @@ $massbc -g -Q -O "-12 hour" -o Spokane-Discharge.dat 12433000 "$start" "$end"
 # This is actually the reverse: negative should be withdrawl via pump to Banks Lake.  
 $massbc -g -Q -O "-12 hour" -o 12435500 -x -1.0 -o BanksCanal-Discharge.dat 12435500 "$start" "$end"
 
+$massbc -q -0 -o CIBW-Temperature.dat CIBW "10/20/2001" "$end"

@@ -26,3 +26,25 @@ NR == 1 { print; next; }
 { printf("%s %s %.3f / %.3f\n", \$1, \$2, \$3 + 2.502, \$3 + 0.0); }
 EOF
 
+$massbc -q -0 -o CIBW-Temperature.dat CIBW "$start" "$end"
+
+
+python2.7 gen-temp.py --output Kettle-Temperature.dat  \
+    --title "Generated Kettle River Temperature" \
+    10.4 11.3 169 8.5 171 305
+
+python2.7 gen-temp.py --output Colville-Temperature.dat  \
+    --title "Generated Colville River Temperature" \
+    10.3  9.8 169.5 3.4 145 304
+
+python2.7 gen-temp.py --output Spokane-Temperature.dat  \
+    --title "Generated Spokane River Temperature" \
+    11.2  8.3  151.9  2  138  311
+
+python2.7 gen-temp.py --output Sanpoil-Temperature.dat  \
+    --title "Generated Sanpoil River Temperature" \
+    9.5 9.4 172.3 4.6 145 306
+
+python2.7 gen-temp.py --output BanksCanal-Temperature.dat  \
+    --title "Generated Banks Lake Canal Temperature" \
+    10.9 8.3 130 2.2 217 342

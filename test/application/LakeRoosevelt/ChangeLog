@@ -1,3 +1,22 @@
+2016-10-19  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* Spring2016.truncated/mass1.cfg: turn on atmospheric energy
+	exchange 
+
+	* Spring2016.truncated/weather_files.dat: added
+
+2016-10-18  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* Spring2016.truncated/mass1.cfg: turn on temperature, but not
+	atmospheric exchange
+
+	* Spring2016.truncated/temp_bc_files.dat: added
+
+	* Spring2016.truncated/BCFiles: add temperature BC files and the
+	scripts to generate them
+
+	* BaseFiles/gage-control.truncated.dat: add some more output locations
+
 2016-10-14  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* BaseFiles/roosevelt.truncated.point: some small adjustments on the
