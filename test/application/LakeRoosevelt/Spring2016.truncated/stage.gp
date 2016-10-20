@@ -115,7 +115,7 @@ set xlabel ""
 set xlabel  offset character 0, 0, 0 font "" textcolor lt -1 norotate
 set x2label "" 
 set x2label  offset character 0, 0, 0 font "" textcolor lt -1 norotate
-set xrange [ "05-01-2016 00:00:00" : "07-01-2016 00:00:00" ] noreverse nowriteback
+set xrange [ "05-01-2016 00:00:00" : "09-01-2016 00:00:00" ] noreverse nowriteback
 set x2range [ * : * ] noreverse nowriteback  # (currently [5.15376e+08:5.20646e+08] )
 set ylabel "Elevation, m NAVD88" 
 set ylabel  offset character 0, 0, 0 font "" textcolor lt -1 rotate by -270
@@ -147,7 +147,7 @@ set fontpath
 set fit noerrorvariables
 GNUTERM = "x11"
 set key title "Gifford RM 87.40"
-plot "Observed/stage/Gifford-Elev.prn" using 1:3 title "Oobserved" with lines ls 1, \
+plot "Observed/stage/Gifford-Elev.prn" using 1:3 title "Observed" with lines ls 1, \
      'ts595.out' using 1:($3*0.3048) title "Simulated" with lines ls 3
 set key title "French Rocks, RM 103.81"
 plot "Observed/stage/French_Rocks-Elev.prn" using 1:3 title "Observed" with lines ls 1, \
@@ -168,13 +168,13 @@ set key title "Deadmans, RM 151.71"
 plot "Observed/stage/Deadmans-Elev.prn" using 1:3 title "Observed" with lines ls 1, \
      'ts130.out' using 1:($3*0.3048) title "Simulated" with lines ls 3
 set key title "USGS 12399500 AUX, RM 156.75"
-plot "Observed/USGS_12399500_2016_fmt.csv" using 1:4 title "Observed" with lines ls 1, \
+plot "Observed/stage/USGS_12399500_AUX-Elev.prn" using 1:3 title "Observed" with lines ls 1, \
      'ts110.out' using 1:($3*0.3048) title "Simulated" with lines ls 3
 set key title "Border, RM 159.04"
 plot "Observed/stage/Border-Elev.prn" using 1:3 title "Observed" with lines ls 1, \
      'ts11.out' using 1:($3*0.3048) title "Simulated" with lines ls 3
 set key title "USGS 12399500, RM 159.10"
-plot "Observed/USGS_12399500_2016_fmt.csv" using 1:6 title "Observed" with lines ls 1, \
+plot "Observed/stage/USGS_12399500-Elev.prn" using 1:3 title "Observed" with lines ls 1, \
      'ts11.out' using 1:($3*0.3048) title "Simulated" with lines ls 3
 
 

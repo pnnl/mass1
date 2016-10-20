@@ -1,3 +1,18 @@
+2016-10-20  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* Spring2016.truncated/Observed/stage/USGS_12399500_AUX-Elev.prn: added
+
+	* Spring2016.truncated/Observed/stage/USGS_12399500-Elev.prn: added
+
+	* Spring2016.truncated/stage.gp: get USGS gage data from new files
+
+	* Spring2016.truncated/compare/compare.R: modify to process
+	elevation for all locations
+
+	* BaseFiles/roosevelt.truncated.point: modify n for 2016 calibration
+
+	* Spring2016.truncated/Observed/stage: update elevation data
+
 2016-10-19  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* Spring2016.truncated/mass1.cfg: turn on atmospheric energy
