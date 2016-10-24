@@ -1,3 +1,25 @@
+2016-10-24  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* Spring2016.truncated/stage.gp: write separate EPS files for each plot
+
+	* Spring2016.truncated/temperature.gp: added
+
+	* Spring2016.truncated/weather_files.dat: calibrated coefficients 
+
+	* Spring2016.truncated/compare/compare.R: modify to compare
+	temperature 
+
+	* LongTerm.truncated/BCFiles: add a temperature record for
+	upstream BC
+
+	* BaseFiles/roosevelt.truncated.point: increase diffusivity for
+	temperature calibration
+
+2016-10-21  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* Spring2016.truncated/Observed/temperature: add CCT temperature
+	monitor data 
+
 2016-10-20  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* Spring2016.truncated/Observed/stage/USGS_12399500_AUX-Elev.prn: added

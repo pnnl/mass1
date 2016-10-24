@@ -15,7 +15,7 @@
 #    	plot window:      hit 'h'
 # set terminal x11 
 # set output
-set term post landscape color solid "Helvetica" 20
+set term post eps enh color solid "Helvetica" 16
 unset clip points
 set clip one
 unset clip two
@@ -146,33 +146,43 @@ set loadpath
 set fontpath 
 set fit noerrorvariables
 GNUTERM = "x11"
+set output "Gifford-Elev-Series.eps"
 set key title "Gifford RM 87.40"
 plot "Observed/stage/Gifford-Elev.prn" using 1:3 title "Observed" with lines ls 1, \
      'ts595.out' using 1:($3*0.3048) title "Simulated" with lines ls 3
+set output "French_Rocks-Elev-Series.eps"
 set key title "French Rocks, RM 103.81"
 plot "Observed/stage/French_Rocks-Elev.prn" using 1:3 title "Observed" with lines ls 1, \
      'ts530.out' using 1:($3*0.3048) title "Simulated" with lines ls 3
+set output "Snag_Cove-Elev-Series.eps"
 set key title "Snag Cove, RM 126.39"
 plot "Observed/stage/Snag_Cove-Elev.prn" using 1:3 title "Observed" with lines ls 1, \
      'ts1155.out' using 1:($3*0.3048) title "Simulated" with lines ls 3
+set output "Flat_Creek-Elev-Series.eps"
 set key title "Flat Creek, RM 134.89"
 plot "Observed/stage/Flat_Creek-Elev.prn" using 1:3 title "Observed" with lines ls 1, \
      'ts1104.out' using 1:($3*0.3048) title "Simulated" with lines ls 3
+set output "Little_Dalles-Elev-Series.eps"
 set key title "Little Dalles, RM 142.15"
 plot "Observed/stage/Little_Dalles-Elev.prn" using 1:3 title "Observed" with lines ls 1, \
      'ts169.out' using 1:($3*0.3048) title "Simulated" with lines ls 3
+set output "Onion_Creek-Elev-Series.eps"
 set key title "Onion Creek, RM 144.07"
 plot "Observed/stage/Onion_Creek-Elev.prn" using 1:3 title "Observed" with lines ls 1, \
      'ts161.out' using 1:($3*0.3048) title "Simulated" with lines ls 3
+set output "Deadmans-Elev-Series.eps"
 set key title "Deadmans, RM 151.71"
 plot "Observed/stage/Deadmans-Elev.prn" using 1:3 title "Observed" with lines ls 1, \
      'ts130.out' using 1:($3*0.3048) title "Simulated" with lines ls 3
+set output "USGS_12399500_AUX-Elev-Series.eps"
 set key title "USGS 12399500 AUX, RM 156.75"
 plot "Observed/stage/USGS_12399500_AUX-Elev.prn" using 1:3 title "Observed" with lines ls 1, \
      'ts110.out' using 1:($3*0.3048) title "Simulated" with lines ls 3
+set output "Border-Elev-Series.eps"
 set key title "Border, RM 159.04"
 plot "Observed/stage/Border-Elev.prn" using 1:3 title "Observed" with lines ls 1, \
      'ts11.out' using 1:($3*0.3048) title "Simulated" with lines ls 3
+set output "USGS_12399500-Elev-Series.eps"
 set key title "USGS 12399500, RM 159.10"
 plot "Observed/stage/USGS_12399500-Elev.prn" using 1:3 title "Observed" with lines ls 1, \
      'ts11.out' using 1:($3*0.3048) title "Simulated" with lines ls 3
