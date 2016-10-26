@@ -115,7 +115,7 @@ set xlabel ""
 set xlabel  offset character 0, 0, 0 font "" textcolor lt -1 norotate
 set x2label "" 
 set x2label  offset character 0, 0, 0 font "" textcolor lt -1 norotate
-set xrange [ "05-01-2016 00:00:00" : "09-01-2016 00:00:00" ] noreverse nowriteback
+set xrange [ "04-01-2016 00:00:00" : "10-01-2016 00:00:00" ] noreverse nowriteback
 set x2range [ * : * ] noreverse nowriteback  # (currently [5.15376e+08:5.20646e+08] )
 set ylabel "Elevation, m NAVD88" 
 set ylabel  offset character 0, 0, 0 font "" textcolor lt -1 rotate by -270
