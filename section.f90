@@ -50,7 +50,7 @@ SUBROUTINE section(link,point,depth,area_temp,width,conveyance,dkdy,hydrad)
         END DO
 
         IF (i .GT. total_sections) THEN
-           WRITE(*,msg) 'Cannot find section id ', section_number(link, point),&
+           WRITE(msg,*) 'Cannot find section id ', section_number(link, point),&
                 &' for link ', link, ', point ', point
            CALL error_message(msg, fatal=.TRUE.)
         END IF
