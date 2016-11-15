@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created June 22, 2005 by William A. Perkins
-# Last Change: Thu Jun 23 07:54:19 2005 by William A. Perkins <perk@McPerk.local>
+# Last Change: 2016-11-15 07:16:50 d3g096
 # -------------------------------------------------------------
 # $Id$
 
@@ -48,9 +48,12 @@ perl_mans = \
 endif
 
 bin_SCRIPTS = \
-	$(perl_scripts)
+	$(perl_scripts) \
+	profile2cgns.py \
+	profile_extract.py
+
 man_MANS = \
 	$(perl_mans)
 
-CLEANFILES = $(bin_SCRIPTS) $(man_MANS)
+CLEANFILES = $(perl_scripts) $(man_MANS)
 EXTRA_DIST = $(man_MANS)

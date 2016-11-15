@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 15, 2011 by William A. Perkins
-# Last Change: Tue Oct 23 07:36:37 2012 by William A. Perkins <d3g096@flophouse>
+# Last Change: 2016-11-15 07:55:33 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -152,7 +152,7 @@ def read_next_profile(profile, dometric):
         'Area' : 0.3048*0.3048,
         'TopWidth' : 0.3048,
         'HydraulicRadius' : 0.3048,     # ft --> m
-        'BedShear' : 4.8824276         # lb/ft^2 --> N
+        'BedShear' : 47.880259         # lb/ft^2 --> Pa
         }
     rdatetime = re.compile(r'.*Date:\s+(\d\d)-(\d\d)-(\d\d\d\d)\s+Time:\s+(\d\d):(\d\d):(\d\d).*')
     rdataline = re.compile(r'^  *\d+')

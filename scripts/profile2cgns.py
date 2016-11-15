@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December  3, 2007 by William A. Perkins
-# Last Change: Tue Aug 31 11:11:04 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+# Last Change: 2016-11-15 08:12:39 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -225,13 +225,16 @@ for line in fileinput.input(args[0]):
             # assuming that X increases in the upstream direction,
             # velocity should be negative
             
-            v *= -1.0
-            writefield(cgns, baseidx, zoneidx, solidx, CGNS.VelocityX, v, ni, nj, nk)
-            v *= 0.0
-            writefield(cgns, baseidx, zoneidx, solidx, CGNS.VelocityY, v, ni, nj, nk)
-            writefield(cgns, baseidx, zoneidx, solidx, CGNS.VelocityZ, v, ni, nj, nk)
-            writefield(cgns, baseidx, zoneidx, solidx, "Discharge", q, ni, nj, nk)
-            writefield(cgns, baseidx, zoneidx, solidx, "Stage", e, ni, nj, nk)
+            V *= -1.0
+            writefield(cgns, baseidx, zoneidx, solidx, CGNS.VelocityX, V, ni, nj, nk)
+            V *= 0.0
+            writefield(cgns, baseidx, zoneidx, solidx, CGNS.VelocityY, V, ni, nj, nk)
+            writefield(cgns, baseidx, zoneidx, solidx, CGNS.VelocityZ, V, ni, nj, nk)
+            writefield(cgns, baseidx, zoneidx, solidx, "Discharge", Q, ni, nj, nk)
+            writefield(cgns, baseidx, zoneidx, solidx, "Stage", E, ni, nj, nk)
+            writefield(cgns, baseidx, zoneidx, solidx, "Depth", D, ni, nj, nk)
+            writefield(cgns, baseidx, zoneidx, solidx, "Temperature", T, ni, nj, nk)
+            writefield(cgns, baseidx, zoneidx, solidx, "ShearStress", S, ni, nj, nk)
             datetime = mx.DateTime.strptime(zname, "%m-%d-%Y %H:%M:%S")
             delta = None
             if (basedate):
@@ -260,11 +263,13 @@ for line in fileinput.input(args[0]):
             (date, time, num) = striptitle(line)
             zname = date + ' ' + time
             x = numarray.array(numarray.zeros((num,), numarray.Float))
-            v = numarray.array(numarray.zeros((num,), numarray.Float))
-            t = numarray.array(numarray.zeros((num,), numarray.Float))
-            c = numarray.array(numarray.zeros((num,), numarray.Float))
-            q = numarray.array(numarray.zeros((num,), numarray.Float))
-            e = numarray.array(numarray.zeros((num,), numarray.Float))
+            V = numarray.array(numarray.zeros((num,), numarray.Float))
+            T = numarray.array(numarray.zeros((num,), numarray.Float))
+            C = numarray.array(numarray.zeros((num,), numarray.Float))
+            Q = numarray.array(numarray.zeros((num,), numarray.Float))
+            E = numarray.array(numarray.zeros((num,), numarray.Float))
+            S = numarray.array(numarray.zeros((num,), numarray.Float))
+            D = numarray.array(numarray.zeros((num,), numarray.Float))
             # print zname, num
             ipt = 0
         else:
@@ -278,11 +283,13 @@ for line in fileinput.input(args[0]):
     if (found1):
         fld = line.split()
         x[ipt] = float(fld[3])*dtometer # convert to m
-        v[ipt] = float(fld[6])*0.3048   # convert to m/s
-        c[ipt] = float(fld[8])          # units unchanged
-        t[ipt] = float(fld[9])          # units unchanged
-        q[ipt] = float(fld[5])*0.0283168# convert to m^3/s
-        e[ipt] = float(fld[4])*0.3048   # convert stage to m
+        V[ipt] = float(fld[6])*0.3048   # convert to m/s
+        C[ipt] = float(fld[8])          # units unchanged
+        T[ipt] = float(fld[9])          # units unchanged
+        Q[ipt] = float(fld[5])*0.0283168# convert to m^3/s
+        E[ipt] = float(fld[4])*0.3048   # convert stage to m
+        D[ipt] = float(fld[7])*0.3048   # convert depth to m
+        S[ipt] = float(fld[20])*47.880259# convert stress to N
         ipt += 1
     
 cgns.close()
