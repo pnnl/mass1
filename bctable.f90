@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created November 30, 2010 by William A. Perkins
-! Last Change: Thu Dec  2 08:40:42 2010 by William A. Perkins <d3g096@bearflag.pnl.gov>
+! Last Change: 2016-11-16 06:38:43 d3g096
 ! ----------------------------------------------------------------
   
 ! RCS ID: $Id$ Battelle PNL
@@ -40,8 +40,8 @@ MODULE bctable
      INTEGER :: nbc
      INTEGER :: maxid
      INTEGER :: nfld
-     INTEGER, ALLOCATABLE :: idlookup(:)
-     TYPE (bc_table_entry), ALLOCATABLE :: bc(:)
+     INTEGER, POINTER :: idlookup(:)
+     TYPE (bc_table_entry), POINTER :: bc(:)
   END TYPE bc_table
 
 

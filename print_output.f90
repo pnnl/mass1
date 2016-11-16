@@ -49,11 +49,12 @@ DOUBLE PRECISION :: salinity = 0.0
 INTEGER :: link,point, iounit1
 CHARACTER (LEN=6) :: option
 
+iounit1 = fileunit(7)
+
 SELECT CASE(option)
 
 CASE("HEADER")        
   
-        iounit1 = fileunit(7)
         OPEN(fileunit(7),file=filename(7))
     WRITE(99,*)'general output file ', filename(7),' opened'
 
