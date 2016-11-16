@@ -1,3 +1,16 @@
+2016-11-15  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* LongTerm.truncated/run-by-year.sh: add script to run one year at
+	a time 
+
+	* LongTerm.truncated/temp_bc_files.dat: add
+
+	* LongTerm.truncated/weather_files.dat: add
+
+	* LongTerm.truncated/mass1-base.cfg: add
+
+	* LongTerm.truncated/BCFiles: add temperature BC and weather files 
+
 2016-10-26  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* Spring2016.truncated/temperature.gp: extend date range
