@@ -86,7 +86,7 @@ for (i in 1:nsite) {
   sim <- subset(sim, ((datetime >= substart) &
                       (datetime <= subend)))
 
-  if (0) {
+  if (1) {
     dataname <- "Water Surface Elevation, m"
     factor <- 0.3048
     obs <- Read.BC(site$obsstage[i], offset=0,skip=0)
@@ -99,7 +99,7 @@ for (i in 1:nsite) {
       printstats(as.character(site$tag[i]), tempobs, tempsim)
     }    
   }
-  if (1) {
+  if (0) {
     dataname <- "Temperature, C"
     factor <- 1.0
     obs <- Read.BC(site$obstemp[i], offset=0,skip=0)
