@@ -1,0 +1,79 @@
+# -------------------------------------------------------------
+# file: CMakeLists.txt
+# -------------------------------------------------------------
+# -------------------------------------------------------------
+# Battelle Memorial Institute
+# Pacific Northwest Laboratory
+# -------------------------------------------------------------
+# -------------------------------------------------------------
+# Created December 29, 2016 by William A. Perkins
+# Last Change: 2016-12-29 11:35:26 d3g096
+# -------------------------------------------------------------
+
+# -------------------------------------------------------------
+# General set up
+# -------------------------------------------------------------
+cmake_minimum_required (VERSION 2.8.12)
+
+project(MASS1)
+enable_language(Fortran)
+
+# -------------------------------------------------------------
+# subdirectories
+# -------------------------------------------------------------
+
+add_subdirectory(time_series)
+add_subdirectory(gastemp)
+
+include_directories(BEFORE 
+  ${CMAKE_CURRENT_BINARY_DIR}/gastemp
+  ${CMAKE_CURRENT_BINARY_DIR}/time_series
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+# -------------------------------------------------------------
+# mass1
+# -------------------------------------------------------------
+set(mass1src
+  accumulator.f90
+  array_alloc.f90
+  array_dealloc.f90
+  bctable.f90
+  coeff.f90
+  flow_sim.f90
+  gage_output.f90
+  hydro_output.f90
+  initial_cond.f90
+  kick_off.f90
+  latflow_bc.f90
+  linear_interp.f90
+  link_bc.f90
+  link_data.f90
+  mass1.f90
+  met_data_module.f90
+  modules.f90
+  nonfluvial_coeff.f90
+  pidlink.f90
+  point_data.f90
+  print_output.f90
+  profile_output.f90
+  read_config.f90
+  read_hotstart.f90
+  scalars_module.f90
+  section.f90
+  section_data.f90
+  section_table.f90
+  svgrp.f90
+  tdg_equation_coeff.f90
+  trans_bc.f90
+  write_restart.f90
+)
+
+add_executable(mass1 ${mass1src})
+target_link_libraries(mass1 gastemp ts)
+
+# -------------------------------------------------------------
+# svgrptest
+# -------------------------------------------------------------
+add_executable(svgrptest svgrp-test.f90 svgrp.f90)
