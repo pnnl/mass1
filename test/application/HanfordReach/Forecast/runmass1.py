@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 26, 2011 by William A. Perkins
-# Last Change: 2016-03-21 13:00:36 d3g096
+# Last Change: 2016-12-29 11:53:05 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -166,6 +166,7 @@ def download_usgs_recent(now, gage, outname, defq):
                          (gage, detail))
 
     if rcount <= 0:
+        outf.write("# Bogus Yakima discharge\n")
         outf.write("%s %.2f /\n" % ("01-01-1900 00:00:00", defq))
         outf.write("%s %.2f /\n" % ("01-01-3000 00:00:00", defq))
         
