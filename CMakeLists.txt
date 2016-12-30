@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2016-12-30 12:24:11 d3g096
+# Last Change: 2016-12-30 13:31:49 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -30,11 +30,17 @@ elseif (CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
 endif()
 
 # -------------------------------------------------------------
+# Perl - for scripts
+# -------------------------------------------------------------
+find_package(Perl)
+
+# -------------------------------------------------------------
 # subdirectories
 # -------------------------------------------------------------
 
 add_subdirectory(time_series)
 add_subdirectory(gastemp)
+add_subdirectory(scripts)
 
 include_directories(BEFORE 
   ${CMAKE_CURRENT_BINARY_DIR}/gastemp
@@ -83,6 +89,7 @@ set(mass1src
 
 add_executable(mass1 ${mass1src})
 target_link_libraries(mass1 gastemp ts)
+install(TARGETS mass1 DESTINATION bin)
 
 # -------------------------------------------------------------
 # svgrptest
