@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2016-12-30 11:03:35 d3g096
+# Last Change: 2016-12-30 12:24:11 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -16,6 +16,18 @@
 cmake_minimum_required (VERSION 2.8.12)
 
 project(MASS1 Fortran)
+
+# -------------------------------------------------------------
+# Compiler options
+# -------------------------------------------------------------
+
+if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
+  # trap floating point exceptions
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffpe-trap=invalid,zero,overflow")
+elseif (CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
+  # w/ Intel, build static binaries that trap floating point exceptions
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpe0 -static")
+endif()
 
 # -------------------------------------------------------------
 # subdirectories
