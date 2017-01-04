@@ -7,12 +7,14 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2017-01-04 13:32:50 d3g096
+! Last Change: 2017-01-04 14:57:00 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
 ! ----------------------------------------------------------------
 MODULE cross_section
+
+  USE utility
 
   IMPLICIT NONE
 
@@ -27,6 +29,7 @@ MODULE cross_section
      PROCEDURE (read_proc), DEFERRED :: read
      PROCEDURE (props_proc), DEFERRED :: props
      PROCEDURE (print_proc), DEFERRED :: print
+     PROCEDURE (destroy_proc), DEFERRED :: destroy
   END TYPE xsection_t
 
   ABSTRACT INTERFACE
@@ -53,6 +56,12 @@ MODULE cross_section
        INTEGER, INTENT(IN) :: iounit
        INTEGER, INTENT(OUT) :: ioerr
      END SUBROUTINE print_proc
+
+     SUBROUTINE destroy_proc(this)
+       IMPORT :: xsection_t
+       IMPLICIT NONE
+       CLASS(xsection_t), INTENT(INOUT) :: this
+     END SUBROUTINE destroy_proc
   END INTERFACE
 
   ! ----------------------------------------------------------------
@@ -64,6 +73,7 @@ MODULE cross_section
      PROCEDURE :: read => rectangular_read
      PROCEDURE :: props => rectangular_props
      PROCEDURE :: print => rectangular_print
+     PROCEDURE :: destroy => rectangular_destroy
   END type rectangular_section
 
   ! ----------------------------------------------------------------
@@ -113,6 +123,7 @@ MODULE cross_section
      PROCEDURE :: read => general_read
      PROCEDURE :: props => general_props
      PROCEDURE :: print => general_print
+     PROCEDURE :: destroy => general_destroy
   END type general_section
 
   DOUBLE PRECISION, PARAMETER, PRIVATE :: res_coeff = 1.49
@@ -166,6 +177,18 @@ CONTAINS
     conveyance = res_coeff*kstrick*(area**(5./3.))/(perm**(2./3.))
     dkdy =  conveyance*(5.0*this%bottom_width/area - 4.0/perm)/3.0
   END SUBROUTINE rectangular_props
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE rectangular_destroy
+  ! ----------------------------------------------------------------
+  SUBROUTINE rectangular_destroy(this)
+    IMPLICIT NONE
+    CLASS(rectangular_section), INTENT(INOUT) :: this
+
+    ! do nothing
+
+  END SUBROUTINE rectangular_destroy
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE rectangular_flood_read
@@ -242,8 +265,8 @@ CONTAINS
     ! save to print elsewhere, maybe
     this%npoint = count
     ALLOCATE(this%x_orig(count), this%y_orig(count))
-    this%x_orig(1:count) = x(count)
-    this%y_orig(1:count) = y(count)
+    this%x_orig(1:count) = x(1:count)
+    this%y_orig(1:count) = y(1:count)
     this%delta_y = delta_y
 
     ! transform x,y pairs to level-width pairs, can jump over this
@@ -478,15 +501,15 @@ CONTAINS
     WRITE(iounit, *, IOSTAT=ioerr)''
     WRITE(iounit, *, IOSTAT=ioerr)'*** level-width pairs computed ***'
     DO i=1,this%nwidth
-       WRITE(90,1000) this%ylevel(i), this%width(i)
+       WRITE(iounit,1000) this%ylevel(i), this%width(i)
     END DO
 
     WRITE(iounit, *, IOSTAT=ioerr)''
     WRITE(iounit, *, IOSTAT=ioerr)'------------------------------------------------------'
     WRITE(iounit, *, IOSTAT=ioerr)'           Computed Geometric Properties'
-    WRITE(90,1015)
+    WRITE(iounit,1015)
     DO i= 1, this%nlevel
-       WRITE(90, 1010, IOSTAT=ioerr) i, &
+       WRITE(iounit, 1010, IOSTAT=ioerr) i, &
             &this%prop(i)%depth, this%prop(i)%topwidth, this%prop(i)%area, &
             &this%prop(i)%wetperim, this%prop(i)%hydradius, this%prop(i)%conveyance
     END DO
@@ -498,5 +521,69 @@ CONTAINS
 
   END SUBROUTINE general_print
 
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE general_destroy
+  ! ----------------------------------------------------------------
+  SUBROUTINE general_destroy(this)
+
+    IMPLICIT NONE
+    CLASS(general_section), INTENT(INOUT) :: this
+    
+    DEALLOCATE(this%x_orig, this%y_orig)
+    DEALLOCATE(this%prop)
+    DEALLOCATE(this%ylevel, this%width)
+  END SUBROUTINE general_destroy
+
+
+
+  ! ----------------------------------------------------------------
+  ! FUNCTION read_cross_section
+  ! ----------------------------------------------------------------
+  FUNCTION read_cross_section(iounit)
+    IMPLICIT NONE
+    CLASS(xsection_t), POINTER :: read_cross_section
+    INTEGER, INTENT(in) :: iounit
+
+    INTEGER :: id
+    INTEGER :: section_type
+    INTEGER :: ioerr
+    CHARACTER(LEN=80) :: msg
+
+    NULLIFY(read_cross_section)
+
+    
+    
+    READ(iounit, *, END=100, ERR=200) id, section_type
+
+    SELECT CASE (section_type)
+    CASE (1)
+       ALLOCATE(rectangular_section :: read_cross_section)
+    CASE (2)
+       ALLOCATE(rectangular_flood_section :: read_cross_section)
+    CASE (50)
+       ALLOCATE(general_section :: read_cross_section)
+    CASE DEFAULT
+       WRITE(msg, *) 'Cross section ', id, ': unknown type: ', section_type
+       CALL error_message(msg)
+    END SELECT
+
+    read_cross_section%id = id
+    CALL read_cross_section%read(iounit, ioerr)
+
+    IF (ioerr .NE. 0) THEN
+       WRITE (msg, *) 'Cross section ', id, ', type ', section_type, ": error reading"
+       CALL error_message(msg)
+       CALL read_cross_section%destroy()
+       DEALLOCATE(read_cross_section)
+       NULLIFY(read_cross_section)
+       RETURN
+    END IF
+
+    RETURN
+100 CONTINUE
+    RETURN
+200 CALL error_message('Unknown error reading cross section')
+    RETURN
+  END FUNCTION read_cross_section
 
 END MODULE cross_section
