@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2016-12-30 14:30:47 d3g096
+# Last Change: 2017-01-03 14:24:17 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -67,6 +67,7 @@ set(mass1src
   array_dealloc.f90
   bctable.f90
   coeff.f90
+  cross_section.f90
   flow_sim.f90
   gage_output.f90
   hydro_output.f90
@@ -99,6 +100,14 @@ set(mass1src
 add_executable(mass1 ${mass1src})
 target_link_libraries(mass1 gastemp ts)
 install(TARGETS mass1 DESTINATION bin)
+
+# -------------------------------------------------------------
+# cross_section_test
+# -------------------------------------------------------------
+add_executable(cross_section_test 
+  cross_section_test.f90
+  cross_section.f90
+)
 
 # -------------------------------------------------------------
 # svgrptest
