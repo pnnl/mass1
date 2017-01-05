@@ -173,11 +173,12 @@ END FUNCTION tvd_steps
 SUBROUTINE tvd_interp(time, htime0, htime1)
 
   USE general_vars, ONLY: maxlinks, htime=>time, htime_begin=>time_begin
+  USE section_handler_module
   USE link_vars, ONLY: maxpoints, linktype
   USE point_vars, ONLY: thalweg, &
        &harea=>area, harea_old=>area_old, hq=>q, hq_old=>q_old, &
        &hvel=>vel, hy=>y, hy_old=>y_old, hlatq=>lateral_inflow, &
-       &hlatq_old=>lateral_inflow_old
+       &hlatq_old=>lateral_inflow_old, section_number
 
   IMPLICIT NONE
 
@@ -220,7 +221,9 @@ SUBROUTINE tvd_interp(time, htime0, htime1)
            y(link,point) = val
 
            val = y(link,point) - thalweg(link,point)
-           CALL section(link, point, val, area(link,point), width(link,point), &
+
+           CALL sections%props(section_number(link, point), val, &
+                &area(link,point), width(link,point), &
                 &val0, val0, val0)
 
            ! val0 = DBLE(harea_old(link, point))

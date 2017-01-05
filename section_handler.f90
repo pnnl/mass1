@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  4, 2017 by William A. Perkins
-! Last Change: 2017-01-05 11:28:32 d3g096
+! Last Change: 2017-01-05 14:00:31 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE section_handler_module
@@ -61,6 +61,7 @@ MODULE section_handler_module
      PROCEDURE :: write_geometry => section_handler_write_geometry
      PROCEDURE :: find => section_handler_find
      PROCEDURE :: size => section_handler_size
+     PROCEDURE :: props => section_handler_props
      PROCEDURE :: destroy => section_handler_destroy
   END type section_handler
 
@@ -68,6 +69,7 @@ MODULE section_handler_module
      MODULE PROCEDURE new_section_handler
   END INTERFACE section_handler
 
+  TYPE (section_handler), PUBLIC :: sections
 
 CONTAINS
   ! ----------------------------------------------------------------
@@ -281,6 +283,29 @@ CONTAINS
     CLASS (section_handler), INTENT(IN) :: this
     section_handler_size = this%xslist%size()
   END FUNCTION section_handler_size
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE section_handler_props
+  ! ----------------------------------------------------------------
+  SUBROUTINE section_handler_props(this, sectid, &
+       &depth, area, hydrad, topwidth, conveyance, dkdy)
+    IMPLICIT NONE
+    CLASS (section_handler), INTENT(IN) :: this
+    INTEGER, INTENT(IN) :: sectid
+    DOUBLE PRECISION, INTENT(IN) :: depth
+    DOUBLE PRECISION, INTENT(OUT) :: area, hydrad, topwidth, conveyance, dkdy
+    CLASS (xsection_t), POINTER :: xsect
+    CHARACTER(LEN=256) :: msg
+    
+    xsect => this%find(sectid)
+    IF (ASSOCIATED(xsect)) THEN
+       CALL xsect%props(depth, area, hydrad, topwidth, conveyance, dkdy)
+    ELSE 
+       WRITE(msg, *) 'Section ', sectid, ' not found'
+       CALL error_message(msg)
+    END IF
+  END SUBROUTINE section_handler_props
+
 
 
   ! ----------------------------------------------------------------

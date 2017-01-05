@@ -35,6 +35,7 @@ SUBROUTINE flow_sim
   USE point_vars
   USE fluvial_coeffs
   USE flow_coeffs
+  USE section_handler_module
   USE logicals , ONLY : do_latflow
 
   IMPLICIT NONE
@@ -109,8 +110,11 @@ SUBROUTINE flow_sim
            ! set geometric data for points i, i+1
            point_num = point
            depth = y(link,point) - thalweg(link,point) !remember y is ELEVATION
-           CALL section(link,point_num,depth,area_temp,width,conveyance,dkdy,hydrad)
-           !CALL section(link,point_num,depth,area_temp,width,conveyance,dkdy)
+           
+           CALL sections%props(section_number(link, point_num), depth, &
+                &area_temp, hydrad, width, conveyance, dkdy)
+           conveyance = res_coeff*kstrick(link,point_num)*conveyance
+           dkdy = res_coeff*kstrick(link,point_num)*dkdy
 
            y1 = y(link,point)
            q1 = q(link,point)
@@ -126,8 +130,12 @@ SUBROUTINE flow_sim
 
            point_num = point + 1
            depth = y(link,point+1) - thalweg(link,point+1)
-           CALL section(link,point_num,depth,area_temp,width,conveyance,dkdy,hydrad)
-           !CALL section(link,point_num,depth,area_temp,width,conveyance,dkdy)
+
+           CALL sections%props(section_number(link, point_num), depth, &
+                &area_temp, hydrad, width, conveyance, dkdy)
+           conveyance = res_coeff*kstrick(link,point_num)*conveyance
+           dkdy = res_coeff*kstrick(link,point_num)*dkdy
+
            y2 = y(link,point+1)
            q2 = q(link,point+1)
            a2 = area_temp
@@ -295,8 +303,10 @@ SUBROUTINE flow_sim
 
            depth = y(link,point) - thalweg(link,point)
 
-           CALL section(link,point,depth,area_temp,width,conveyance,dkdy,hydrad)
-           !CALL section(link,point,depth,area_temp,width,conveyance,dkdy)
+           CALL sections%props(section_number(link, point_num), depth, &
+                &area_temp, hydrad, width, conveyance, dkdy)
+           conveyance = res_coeff*kstrick(link,point)*conveyance
+           dkdy = res_coeff*kstrick(link,point)*dkdy
 
            area(link,point) = area_temp
            top_width(link,point) = width

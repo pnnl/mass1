@@ -31,7 +31,6 @@ SUBROUTINE array_dealloc
 USE flow_coeffs
 USE link_vars
 USE point_vars
-USE section_vars
 USE transport_vars
 USE hydro_output_module
 
@@ -62,18 +61,6 @@ DEALLOCATE(k_diff)
 DEALLOCATE(top_width,hyd_radius,froude_num,friction_slope,bed_shear)
 DEALLOCATE(lateral_inflow, lateral_inflow_old)
 DEALLOCATE(courant_num, diffuse_num)
-
-!-----------------------------------------------------------
-!module sections_vars
-
-DEALLOCATE(section_id,section_type,delta_y,sect_levels)
-DEALLOCATE(section_number)
- 
-DEALLOCATE(bottom_width,bottom_width_flood)
-DEALLOCATE(depth_main)
-
-DEALLOCATE(sect_area,sect_hydradius,sect_depth)
-DEALLOCATE(sect_width,sect_convey,sect_perm)
 
 !----------------------------------------------------------
 !MODULE transport_vars

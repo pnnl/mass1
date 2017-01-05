@@ -32,16 +32,11 @@ SUBROUTINE array_alloc
 USE flow_coeffs
 USE link_vars
 USE point_vars
-USE section_vars
 USE transport_vars
 USE general_vars, ONLY : maxlinks,maxpoint
 USE hydro_output_module
 
 IMPLICIT NONE
-
-INTEGER :: maxsections
-
-maxsections = total_sections
 
 !----------------------------------------------------------
 !flow coeff module
@@ -81,17 +76,6 @@ ALLOCATE(courant_num(maxlinks,maxpoint), diffuse_num(maxlinks,maxpoint))
 ALLOCATE(section_number(maxlinks,maxpoint))
 ALLOCATE(y_old(maxlinks,maxpoint))
 
-!-----------------------------------------------------------
-!module sections_vars
-
-!!$ALLOCATE(section_id(maxsections),section_type(maxsections),delta_y(maxsections),sect_levels(maxsections))
-!!$ 
-!!$ALLOCATE(bottom_width(maxsections),bottom_width_flood(maxsections))
-!!$ALLOCATE(depth_main(maxsections))
-!!$ALLOCATE(sect_area(maxsections,maxlevels),sect_hydradius(maxsections,maxlevels),sect_depth(maxsections,maxlevels))
-!!$ALLOCATE(sect_width(maxsections,maxlevels),sect_convey(maxsections,maxlevels),sect_perm(maxsections,maxlevels))
-
-!----------------------------------------------------------
 !MODULE transport_vars
 
 ALLOCATE(c(maxlinks,0:maxpoint+2))

@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2017-01-04 15:49:06 d3g096
+# Last Change: 2017-01-05 13:46:03 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -88,9 +88,7 @@ set(mass1src
   read_config.f90
   read_hotstart.f90
   scalars_module.f90
-  section.f90
-  section_data.f90
-  section_table.f90
+  section_handler.f90
   svgrp.f90
   tdg_equation_coeff.f90
   trans_bc.f90

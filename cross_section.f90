@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2017-01-05 10:37:52 d3g096
+! Last Change: 2017-01-05 14:00:04 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -41,11 +41,11 @@ MODULE cross_section
        INTEGER, INTENT(OUT) :: ioerr
      END SUBROUTINE read_proc
      
-     SUBROUTINE props_proc(this, depth, kstrick, area, hydrad, topwidth, conveyance, dkdy)
+     SUBROUTINE props_proc(this, depth, area, hydrad, topwidth, conveyance, dkdy)
        IMPORT :: xsection_t
        IMPLICIT NONE
        CLASS(xsection_t), INTENT(IN) :: this
-       DOUBLE PRECISION, INTENT(IN) :: depth, kstrick
+       DOUBLE PRECISION, INTENT(IN) :: depth 
        DOUBLE PRECISION, INTENT(OUT) :: area, hydrad, topwidth, conveyance, dkdy
      END SUBROUTINE props_proc
 
@@ -126,8 +126,6 @@ MODULE cross_section
      PROCEDURE :: destroy => general_destroy
   END type general_section
 
-  DOUBLE PRECISION, PARAMETER, PRIVATE :: res_coeff = 1.49
-
 CONTAINS
 
   ! ----------------------------------------------------------------
@@ -159,11 +157,11 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE rectangular_props
   ! ----------------------------------------------------------------
-  SUBROUTINE rectangular_props(this, depth, kstrick, area, hydrad, &
+  SUBROUTINE rectangular_props(this, depth, area, hydrad, &
        &topwidth, conveyance, dkdy)
     IMPLICIT NONE
     CLASS(rectangular_section), INTENT(IN) :: this
-    DOUBLE PRECISION, INTENT(IN) :: depth, kstrick
+    DOUBLE PRECISION, INTENT(IN) :: depth
     DOUBLE PRECISION, INTENT(OUT) :: area, hydrad, topwidth, conveyance, dkdy
     DOUBLE PRECISION :: perm
 
@@ -175,7 +173,7 @@ CONTAINS
        hydrad = 0.0
     END IF
     topwidth = this%bottom_width
-    conveyance = res_coeff*kstrick*(area**(5./3.))/(perm**(2./3.))
+    conveyance = (area**(5./3.))/(perm**(2./3.))
     dkdy =  conveyance*(5.0*this%bottom_width/area - 4.0/perm)/3.0
   END SUBROUTINE rectangular_props
 
@@ -208,17 +206,17 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE rectangular_flood_props
   ! ----------------------------------------------------------------
-  SUBROUTINE rectangular_flood_props(this, depth, kstrick, area, hydrad, &
+  SUBROUTINE rectangular_flood_props(this, depth, area, hydrad, &
        &topwidth, conveyance, dkdy)
 
     IMPLICIT NONE
     CLASS(rectangular_flood_section), INTENT(IN) :: this
-    DOUBLE PRECISION, INTENT(IN) :: depth, kstrick
+    DOUBLE PRECISION, INTENT(IN) :: depth
     DOUBLE PRECISION, INTENT(OUT) :: area, hydrad, topwidth, conveyance, dkdy
     DOUBLE PRECISION :: perm
     
     IF (depth .LE. this%depth_main) THEN
-       CALL rectangular_props(this, depth, kstrick, area, hydrad, &
+       CALL rectangular_props(this, depth, area, hydrad, &
             &topwidth, conveyance, dkdy)
     ELSE
        area = this%depth_main*this%bottom_width + &
@@ -226,7 +224,7 @@ CONTAINS
        perm = 2*depth + this%bottom_width_flood
        topwidth = this%bottom_width_flood
        hydrad = area/perm
-       conveyance = res_coeff*kstrick*(area**(5./3.))/(perm**(2./3.))
+       conveyance = (area**(5./3.))/(perm**(2./3.))
        dkdy = conveyance*(5.0*topwidth/area - 4.0/perm)/3.0
     ENDIF
   END SUBROUTINE rectangular_flood_props
@@ -458,11 +456,11 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE general_props
   ! ----------------------------------------------------------------
-  SUBROUTINE general_props(this, depth, kstrick, area, hydrad, &
+  SUBROUTINE general_props(this, depth, area, hydrad, &
        &topwidth, conveyance, dkdy)
     IMPLICIT NONE
     CLASS(general_section), INTENT(IN) :: this
-    DOUBLE PRECISION, INTENT(IN) :: depth, kstrick
+    DOUBLE PRECISION, INTENT(IN) :: depth 
     DOUBLE PRECISION, INTENT(OUT) :: area, hydrad, topwidth, conveyance, dkdy
 
     TYPE (general_section_prop) :: prop
@@ -470,8 +468,8 @@ CONTAINS
     area = prop%area
     hydrad = prop%hydradius
     topwidth = prop%topwidth
-    conveyance = res_coeff*kstrick*prop%conveyance
-    dkdy = res_coeff*kstrick*prop%dkdy
+    conveyance = prop%conveyance
+    dkdy = prop%dkdy
 
   END SUBROUTINE general_props
 

@@ -36,8 +36,8 @@ USE general_vars
 USE date_vars
 USE file_vars
 USE logicals
-USE section_vars , ONLY : total_sections
 USE link_vars, ONLY : linktype
+USE section_handler_module
 
 USE scalars
 USE met_data_module, ONLY : read_met_data
@@ -119,8 +119,9 @@ CALL link_data
 CALL point_data
 	IF(debug_print == 1)WRITE(11,*)'done with point data'
 
-CALL section_data_count
-CALL section_data
+sections = section_handler()
+CALL sections%read(filename(4))
+
 	IF(debug_print == 1)WRITE(11,*)'done with section data'
 
 CALL link_bc
@@ -298,7 +299,9 @@ DO WHILE(run)
 
 END DO ! end main time loop
 
+CALL sections%destroy()
 CALL array_dealloc
+
 
 CLOSE(99)
 

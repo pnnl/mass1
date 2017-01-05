@@ -27,6 +27,7 @@
 SUBROUTINE nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
 
   USE general_vars, ONLY: units, delta_t
+  USE section_handler_module
   USE point_vars
   USE link_vars, ONLY : linktype, crest
   USE pidlink
@@ -138,7 +139,9 @@ SUBROUTINE nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
      ! get it (throw everything else away
    
      d = y(link,point) - thalweg(link,point)
-     call section(link, point, d, a, twid, c, g, gp)
+
+     CALL sections%props(section_number(link,point), d, &
+          &a, twid, c, g, gp)
      
      a = 0.0
      b = 1.0

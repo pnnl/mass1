@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created January  3, 2017 by William A. Perkins
-  ! Last Change: 2017-01-05 11:29:46 d3g096
+  ! Last Change: 2017-01-05 13:49:02 d3g096
   ! ----------------------------------------------------------------
 PROGRAM cross_section_test
   USE utility
@@ -15,7 +15,6 @@ PROGRAM cross_section_test
   USE section_handler_module
   IMPLICIT NONE
 
-  TYPE (section_handler) :: sections
   CLASS (xsection_t), POINTER :: x
 
   sections = section_handler()
