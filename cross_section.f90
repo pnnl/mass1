@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2017-01-04 14:57:00 d3g096
+! Last Change: 2017-01-05 06:23:50 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -138,6 +138,7 @@ CONTAINS
     CLASS(rectangular_section), INTENT(IN) :: this
     INTEGER, INTENT(IN) :: iounit
     INTEGER, INTENT(OUT) :: ioerr
+    ioerr = 0
     ! do nothing
     RETURN
   END SUBROUTINE rectangular_print
