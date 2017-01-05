@@ -33,7 +33,7 @@ if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffpe-trap=invalid,zero,overflow")
 elseif (CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
   # w/ Intel, build static binaries that trap floating point exceptions
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpe0 -static")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpe0")
 endif()
 
 # -------------------------------------------------------------
