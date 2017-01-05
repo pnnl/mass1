@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  4, 2017 by William A. Perkins
-! Last Change: 2017-01-05 10:56:27 d3g096
+! Last Change: 2017-01-05 11:28:32 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE section_handler_module
@@ -29,6 +29,13 @@ MODULE section_handler_module
      TYPE (section_list_node), POINTER :: next
   END type section_list_node
 
+  INTERFACE section_list_node
+     MODULE PROCEDURE new_section_list_node
+  END INTERFACE section_list_node
+
+  ! ----------------------------------------------------------------
+  ! TYPE section_list
+  ! ----------------------------------------------------------------
   TYPE, PUBLIC :: section_list
      TYPE (section_list_node), POINTER :: head
      TYPE (section_list_node), POINTER :: tail
@@ -40,6 +47,9 @@ MODULE section_handler_module
      PROCEDURE :: find => section_list_find
   END type section_list
 
+  INTERFACE section_list
+     MODULE PROCEDURE new_section_list
+  END INTERFACE section_list
 
   ! ----------------------------------------------------------------
   ! TYPE section_handler
@@ -50,11 +60,25 @@ MODULE section_handler_module
      PROCEDURE :: read => section_handler_read
      PROCEDURE :: write_geometry => section_handler_write_geometry
      PROCEDURE :: find => section_handler_find
+     PROCEDURE :: size => section_handler_size
      PROCEDURE :: destroy => section_handler_destroy
   END type section_handler
 
+  INTERFACE section_handler
+     MODULE PROCEDURE new_section_handler
+  END INTERFACE section_handler
+
 
 CONTAINS
+  ! ----------------------------------------------------------------
+  !  FUNCTION new_section_list_node
+  ! ----------------------------------------------------------------
+  FUNCTION new_section_list_node()
+    IMPLICIT NONE
+    TYPE (section_list_node) :: new_section_list_node
+    NULLIFY(new_section_list_node%prev)
+    NULLIFY(new_section_list_node%next)
+  END FUNCTION new_section_list_node
 
   ! ----------------------------------------------------------------
   ! INTEGER FUNCTION section_list_size
@@ -159,6 +183,16 @@ CONTAINS
   END FUNCTION section_list_find
 
   ! ----------------------------------------------------------------
+  !  FUNCTION new_section_list
+  ! ----------------------------------------------------------------
+  FUNCTION new_section_list()
+    IMPLICIT NONE
+    TYPE (section_list) :: new_section_list
+    NULLIFY(new_section_list%head)
+    NULLIFY(new_section_list%tail)
+  END FUNCTION new_section_list
+
+  ! ----------------------------------------------------------------
   ! SUBROUTINE section_handler_read
   ! ----------------------------------------------------------------
   SUBROUTINE section_handler_read(this, fname)
@@ -172,7 +206,7 @@ CONTAINS
     
     CALL status_message(TRIM(fname) // ': Reading sections ...')
     CALL open_existing(fname, iounit, fatal=.TRUE.)
-    
+
     DO WHILE (.TRUE.)
        x => read_cross_section(iounit, ierr)
        IF (.NOT. ASSOCIATED(x)) EXIT
@@ -239,6 +273,15 @@ CONTAINS
     RETURN
   END FUNCTION section_handler_find
 
+  ! ----------------------------------------------------------------
+  ! INTEGER FUNCTION section_handler_size
+  ! ----------------------------------------------------------------
+  INTEGER FUNCTION section_handler_size(this)
+    IMPLICIT NONE
+    CLASS (section_handler), INTENT(IN) :: this
+    section_handler_size = this%xslist%size()
+  END FUNCTION section_handler_size
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE section_handler_destroy
@@ -248,6 +291,16 @@ CONTAINS
     CLASS (section_handler), INTENT(INOUT) :: this
     CALL this%xslist%clear()
   END SUBROUTINE section_handler_destroy
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION new_section_handler
+  ! ----------------------------------------------------------------
+  FUNCTION new_section_handler()
+    IMPLICIT NONE
+    TYPE (section_handler) :: new_section_handler
+    new_section_handler%xslist = section_list()
+  END FUNCTION new_section_handler
+
 
 END MODULE section_handler_module
 
