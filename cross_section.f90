@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2017-01-05 08:38:26 d3g096
+! Last Change: 2017-01-05 10:37:52 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -544,17 +544,20 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! FUNCTION read_cross_section
   ! ----------------------------------------------------------------
-  FUNCTION read_cross_section(iounit)
+  FUNCTION read_cross_section(iounit, ierr) RESULT(xsect)
     IMPLICIT NONE
-    CLASS(xsection_t), POINTER :: read_cross_section
+    CLASS(xsection_t), POINTER :: xsect
     INTEGER, INTENT(in) :: iounit
+    INTEGER, INTENT(out) :: ierr
 
     INTEGER :: id
     INTEGER :: section_type
     INTEGER :: ioerr
     CHARACTER(LEN=80) :: msg
 
-    NULLIFY(read_cross_section)
+    ierr = 0
+    id = 0
+    NULLIFY(xsect)
 
     
     
@@ -562,32 +565,36 @@ CONTAINS
 
     SELECT CASE (section_type)
     CASE (1)
-       ALLOCATE(rectangular_section :: read_cross_section)
+       ALLOCATE(rectangular_section :: xsect)
     CASE (2)
-       ALLOCATE(rectangular_flood_section :: read_cross_section)
+       ALLOCATE(rectangular_flood_section :: xsect)
     CASE (50)
-       ALLOCATE(general_section :: read_cross_section)
+       ALLOCATE(general_section :: xsect)
     CASE DEFAULT
        WRITE(msg, *) 'Cross section ', id, ': unknown type: ', section_type
        CALL error_message(msg)
     END SELECT
 
-    read_cross_section%id = id
-    CALL read_cross_section%read(iounit, ioerr)
+    xsect%id = id
+    CALL xsect%read(iounit, ioerr)
 
     IF (ioerr .NE. 0) THEN
        WRITE (msg, *) 'Cross section ', id, ', type ', section_type, ": error reading"
        CALL error_message(msg)
-       CALL read_cross_section%destroy()
-       DEALLOCATE(read_cross_section)
-       NULLIFY(read_cross_section)
+       CALL xsect%destroy()
+       DEALLOCATE(xsect)
+       NULLIFY(xsect)
+       ierr = ierr + 1
        RETURN
     END IF
 
     RETURN
 100 CONTINUE
     RETURN
-200 CALL error_message('Unknown error reading cross section')
+200 CONTINUE
+    WRITE(msg, *) 'Unknown error reading cross section, last ID = ', id
+    CALL error_message(msg)
+    ierr = ierr + 1
     RETURN
   END FUNCTION read_cross_section
 
