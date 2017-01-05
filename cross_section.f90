@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2017-01-04 14:57:00 d3g096
+! Last Change: 2017-01-05 08:33:27 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -368,7 +368,8 @@ CONTAINS
        DO j = 1,count-1
           IF((level >= y_new(j)) .AND. (level <= y_new(j+1))) EXIT
        END DO
-       this%prop(i)%topwidth = linear_interp(width_new(j),y_new(j),width_new(j+1),y_new(j+1),level)
+       this%prop(i)%topwidth = &
+            &linear_interp(width_new(j),y_new(j),width_new(j+1),y_new(j+1),level)
 
        this%prop(i)%area = &
             &this%delta_y*0.5*(this%prop(i)%topwidth + this%prop(i-1)%topwidth) + &
@@ -385,17 +386,20 @@ CONTAINS
     ! monotonically increases with depth
     ! linear extrapolation from previous 2 conveyance points
 
-    DO i = 2,num_levels
+    DO i = 2, this%nlevel
        IF (this%prop(i)%conveyance .LT. this%prop(i-1)%conveyance) THEN
           this%nonmono = .true.
+          ! WRITE (*,*) 'Section ', this%id, ", level", i, ": conveyance at ", &
+          !      &this%prop(i)%depth, " = ", this%prop(i)%conveyance, " < ", &
+          !      &this%prop(i-1)%conveyance
           level = this%prop(i)%depth
           IF(i == 2)THEN
              this%prop(i)%conveyance = 0.5*&
                   &(this%prop(i-1)%conveyance + this%prop(i+1)%conveyance)
           ELSE
              this%prop(i)%conveyance = &
-                  &linear_interp(this%prop(i-2)%depth, this%prop(i-2)%conveyance, &
-                  &this%prop(i-1)%depth, this%prop(i-1)%conveyance, level)
+                  &linear_interp(this%prop(i-2)%conveyance, this%prop(i-2)%depth, &
+                  &this%prop(i-1)%conveyance, this%prop(i-1)%depth, level)
           ENDIF
        END IF
     END DO
