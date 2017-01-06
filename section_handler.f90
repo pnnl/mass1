@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  4, 2017 by William A. Perkins
-! Last Change: 2017-01-05 14:00:31 d3g096
+! Last Change: 2017-01-05 15:57:09 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE section_handler_module
@@ -23,7 +23,7 @@ MODULE section_handler_module
   ! ----------------------------------------------------------------
   ! TYPE section_list_node
   ! ----------------------------------------------------------------
-  TYPE, PUBLIC :: section_list_node
+  TYPE :: section_list_node
      CLASS (xsection_t), POINTER :: section
      TYPE (section_list_node), POINTER :: prev
      TYPE (section_list_node), POINTER :: next
@@ -36,7 +36,7 @@ MODULE section_handler_module
   ! ----------------------------------------------------------------
   ! TYPE section_list
   ! ----------------------------------------------------------------
-  TYPE, PUBLIC :: section_list
+  TYPE :: section_list
      TYPE (section_list_node), POINTER :: head
      TYPE (section_list_node), POINTER :: tail
    CONTAINS 
@@ -157,6 +157,7 @@ CONTAINS
 
     DO WHILE (ASSOCIATED(this%tail))
        xsect => this%pop()
+       CALL xsect%destroy()
        DEALLOCATE(xsect)
     END DO
   END SUBROUTINE section_list_clear
