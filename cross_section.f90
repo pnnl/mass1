@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2017-01-05 14:00:04 d3g096
+! Last Change: 2017-01-06 09:35:03 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -76,6 +76,15 @@ MODULE cross_section
      PROCEDURE :: destroy => rectangular_destroy
   END type rectangular_section
 
+  ! ----------------------------------------------------------------
+  ! TYPE trapezoidal_section
+  ! ----------------------------------------------------------------
+  TYPE, PUBLIC, EXTENDS(rectangular_section) :: trapezoidal_section
+     DOUBLE PRECISION :: sidez
+   CONTAINS
+     PROCEDURE :: read => trapezoidal_read
+     PROCEDURE :: props => trapezoidal_props
+  END type trapezoidal_section
   ! ----------------------------------------------------------------
   ! TYPE rectangular_flood_section
   ! ----------------------------------------------------------------
@@ -187,6 +196,48 @@ CONTAINS
     ! do nothing
 
   END SUBROUTINE rectangular_destroy
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE trapezoidal_read
+  ! ----------------------------------------------------------------
+  SUBROUTINE trapezoidal_read(this, iounit, ioerr)
+    IMPLICIT NONE
+    CLASS (trapezoidal_section), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: iounit
+    INTEGER, INTENT(OUT) :: ioerr
+    ioerr = 0
+
+    READ(iounit,*,IOSTAT=ioerr) this%bottom_width, this%sidez
+    
+  END SUBROUTINE trapezoidal_read
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE trapezoidal_props
+  !
+  ! Taken from Table 2-1 in Chow
+  ! ----------------------------------------------------------------
+  SUBROUTINE trapezoidal_props(this, depth, area, hydrad, topwidth, conveyance, dkdy)
+    IMPLICIT NONE
+    CLASS (trapezoidal_section), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: depth 
+    DOUBLE PRECISION, INTENT(OUT) :: area, hydrad, topwidth, conveyance, dkdy
+
+    ! to make thing a little more readable
+    DOUBLE PRECISION :: b, z, P, dAdy, dPdy
+    b = this%bottom_width
+    z = this%sidez
+    
+    area = (b + z*depth)*depth
+    P = b + 2.0*depth*SQRT(1 + z*z)
+    hydrad = area/P
+    topwidth = b + 2.0*z*depth
+    conveyance = area*hydrad**(2.0/3.0)
+    ! or conveyance = area**(5.0/3.0)/P
+    dAdy = b + 2*z*depth
+    dPdy = 2*SQRT(1 + z*z)
+    dkdy = (5.0/3.0)*dAdy*hydrad**(2.0/3.0) - (2.0/3.0)*hydrad**(5.0/3.0)*dPdy
+
+  END SUBROUTINE trapezoidal_props
 
 
   ! ----------------------------------------------------------------
@@ -566,6 +617,8 @@ CONTAINS
        ALLOCATE(rectangular_section :: xsect)
     CASE (2)
        ALLOCATE(rectangular_flood_section :: xsect)
+    CASE (3)
+       ALLOCATE(trapezoidal_section :: xsect)
     CASE (50)
        ALLOCATE(general_section :: xsect)
     CASE DEFAULT
@@ -595,5 +648,44 @@ CONTAINS
     ierr = ierr + 1
     RETURN
   END FUNCTION read_cross_section
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE cross_section_table
+  ! ----------------------------------------------------------------
+  SUBROUTINE cross_section_table(iounit, xsect, ymax, dy)
+    IMPLICIT NONE
+    INTEGER, INTENT(IN) :: iounit
+    CLASS(xsection_t), INTENT(IN) :: xsect
+    DOUBLE PRECISION, INTENT(IN) :: ymax, dy
+    
+    DOUBLE PRECISION :: y
+    DOUBLE PRECISION :: area, hydrad, topwidth, conveyance, dkdy
+    INTEGER :: id, i, steps
+    
+
+    WRITE(iounit, *)
+    WRITE(iounit, *) 'Section Number ', xsect%id
+    WRITE(iounit, 10)
+    WRITE(iounit, 12) 'y', 'Width', 'Area', 'H Radius', 'Convey', 'dkdy'
+    WRITE(iounit, 10)
+
+    steps = AINT(ymax/dy + 0.5) + 1
+    y = 0
+    DO i = 0, steps
+       y = REAL(i)*dy
+       CALL xsect%props(y, area, hydrad, topwidth, conveyance, dkdy)
+       WRITE(iounit, 15) y, area, hydrad, topwidth, conveyance, dkdy
+    END DO
+    WRITE(iounit, 10)
+    WRITE(iounit, *)
+  
+10 FORMAT(6('-------------'))
+12 FORMAT(6(1X, A12))
+15 FORMAT(6(1X, F12.2))
+
+    
+
+  END SUBROUTINE cross_section_table
+
 
 END MODULE cross_section
