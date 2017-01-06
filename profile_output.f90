@@ -28,18 +28,13 @@
 ! ----------------------------------------------------------------
 MODULE profile_output_module
 
-  USE link_vars
-  USE general_vars
-  USE point_vars
+  USE utility
+  USE accumulator
   USE file_vars
   USE transport_vars
   USE date_vars
-  
-  USE scalars
   USE gas_functions
-  USE met_data_module
   USE logicals, ONLY : file_exist, do_temp, do_gas, temp_exchange, gas_exchange
-  USE accumulator
 
   IMPLICIT NONE
   
