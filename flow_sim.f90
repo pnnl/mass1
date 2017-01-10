@@ -35,7 +35,6 @@ SUBROUTINE flow_sim
   USE point_vars
   USE fluvial_coeffs
   USE flow_coeffs
-  USE section_handler_module
   USE logicals , ONLY : do_latflow
 
   IMPLICIT NONE
@@ -111,7 +110,7 @@ SUBROUTINE flow_sim
            point_num = point
            depth = y(link,point) - thalweg(link,point) !remember y is ELEVATION
            
-           CALL sections%props(section_number(link, point_num), depth, &
+           CALL ptsection(link, point_num)%wrap%props(depth, &
                 &area_temp, hydrad, width, conveyance, dkdy)
            conveyance = res_coeff*kstrick(link,point_num)*conveyance
            dkdy = res_coeff*kstrick(link,point_num)*dkdy
@@ -131,7 +130,7 @@ SUBROUTINE flow_sim
            point_num = point + 1
            depth = y(link,point+1) - thalweg(link,point+1)
 
-           CALL sections%props(section_number(link, point_num), depth, &
+           CALL ptsection(link, point_num)%wrap%props(depth, &
                 &area_temp, hydrad, width, conveyance, dkdy)
            conveyance = res_coeff*kstrick(link,point_num)*conveyance
            dkdy = res_coeff*kstrick(link,point_num)*dkdy
@@ -303,7 +302,7 @@ SUBROUTINE flow_sim
 
            depth = y(link,point) - thalweg(link,point)
 
-           CALL sections%props(section_number(link, point), depth, &
+           CALL ptsection(link, point)%wrap%props(depth, &
                 &area_temp, hydrad, width, conveyance, dkdy)
            conveyance = res_coeff*kstrick(link,point)*conveyance
            dkdy = res_coeff*kstrick(link,point)*dkdy

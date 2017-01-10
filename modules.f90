@@ -97,12 +97,19 @@ END MODULE link_vars
 !----------------------------------------------------------
 MODULE point_vars
 
+  USE cross_section
+
   DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: x, q,thalweg,y,manning,vel,kstrick
   DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: area, area_old, q_old,y_old,k_diff
   DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: top_width, hyd_radius, froude_num, friction_slope, bed_shear
   DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: lateral_inflow, lateral_inflow_old
   DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: courant_num, diffuse_num
   INTEGER, DIMENSION(:,:),ALLOCATABLE, SAVE :: section_number
+
+  TYPE :: ptsection_t
+     CLASS (xsection_t), POINTER :: wrap
+  END type ptsection_t
+  TYPE (ptsection_t), DIMENSION(:,:), ALLOCATABLE, SAVE :: ptsection
 
 END MODULE point_vars
 

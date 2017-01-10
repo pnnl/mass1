@@ -61,6 +61,7 @@ DEALLOCATE(k_diff)
 DEALLOCATE(top_width,hyd_radius,froude_num,friction_slope,bed_shear)
 DEALLOCATE(lateral_inflow, lateral_inflow_old)
 DEALLOCATE(courant_num, diffuse_num)
+DEALLOCATE(section_number, ptsection)
 
 !----------------------------------------------------------
 !MODULE transport_vars

@@ -1,5 +1,21 @@
 2017-01-10  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* array_dealloc.f90 (array_dealloc): deallocate cross section
+	pointer array
+
+	* array_alloc.f90 (array_alloc): allocate cross section pointer
+	array 
+
+	* flow_sim.f90 (flow_sim): use assigned point section instead of
+	the handler looking it up
+
+	* mass1.f90 (mass1): read sections before links and points
+
+	* point_data.f90 (point_data): look up and assign a cross section
+	to each point
+
+	* modules.f90 (point_vars): add array of cross section pointers
+
 	* flow_sim.f90 (flow_sim): fix wrong point index when getting
 	section properties
 

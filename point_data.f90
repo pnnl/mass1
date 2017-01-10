@@ -116,12 +116,14 @@ SUBROUTINE point_data
   USE general_vars, ONLY : units,channel_length_units
   USE transport_vars, ONLY : k_surf
   USE logicals, ONLY : file_exist
+  USE section_handler_module
   
   IMPLICIT NONE
   
   INTEGER :: i,link, junk, point,sec_num,io_unit
   DOUBLE PRECISION :: delta_x, slope, start_el,end_el,manning_n,length,diffusion
   DOUBLE PRECISION :: surface_mass_trans
+  CHARACTER (LEN=256) :: msg
   
   CALL open_existing(filename(3), fileunit(3), fatal=.TRUE.)
   
@@ -161,6 +163,13 @@ SUBROUTINE point_data
            CASE(4) ! length in kilometers
               x(link,i) = x(link,i)*0.6211*5280.0
            END SELECT
+
+           ptsection(link, i)%wrap => sections%find(section_number(link, i))
+           IF (.NOT. ASSOCIATED(ptsection(link, i)%wrap)) THEN
+              WRITE(msg, *) "Cannot find cross section ", section_number(link, i), &
+                   &" for link = ", link, ", point = ", i
+              CALL error_message(msg, fatal=.TRUE.)
+           END IF
            
         END DO
         
@@ -211,6 +220,13 @@ SUBROUTINE point_data
            k_diff(link,i) = diffusion
            k_surf(link,i) = surface_mass_trans
            
+           ptsection(link, i)%wrap => sections%find(section_number(link, i))
+           IF (.NOT. ASSOCIATED(ptsection(link, i)%wrap)) THEN
+              WRITE(msg, *) "Cannot find cross section ", section_number(link, i), &
+                   &" for link = ", link, ", point = ", i
+              CALL error_message(msg, fatal=.TRUE.)
+           END IF
+
         END DO
         
      END SELECT

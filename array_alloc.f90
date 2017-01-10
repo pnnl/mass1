@@ -74,6 +74,7 @@ ALLOCATE(top_width(maxlinks,maxpoint),hyd_radius(maxlinks,maxpoint),&
 ALLOCATE(lateral_inflow(maxlinks,maxpoint), lateral_inflow_old(maxlinks,maxpoint))
 ALLOCATE(courant_num(maxlinks,maxpoint), diffuse_num(maxlinks,maxpoint))
 ALLOCATE(section_number(maxlinks,maxpoint))
+ALLOCATE(ptsection(maxlinks, maxpoint))
 ALLOCATE(y_old(maxlinks,maxpoint))
 
 !MODULE transport_vars
