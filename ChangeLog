@@ -1,5 +1,11 @@
 2017-01-10  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* nonfluvial_coeff.f90 (nonfluvial_coeff): use assigned cross
+	section here too
+
+	* scalars_module.f90 (tvd_interp): use assigned cross section here
+	too 
+
 	* array_dealloc.f90 (array_dealloc): deallocate cross section
 	pointer array
 

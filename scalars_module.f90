@@ -178,7 +178,7 @@ SUBROUTINE tvd_interp(time, htime0, htime1)
   USE point_vars, ONLY: thalweg, &
        &harea=>area, harea_old=>area_old, hq=>q, hq_old=>q_old, &
        &hvel=>vel, hy=>y, hy_old=>y_old, hlatq=>lateral_inflow, &
-       &hlatq_old=>lateral_inflow_old, section_number
+       &hlatq_old=>lateral_inflow_old, ptsection
 
   IMPLICIT NONE
 
@@ -222,7 +222,7 @@ SUBROUTINE tvd_interp(time, htime0, htime1)
 
            val = y(link,point) - thalweg(link,point)
 
-           CALL sections%props(section_number(link, point), val, &
+           CALL ptsection(link,point)%wrap%props(val, &
                 &area(link,point), width(link,point), &
                 &val0, val0, val0)
 
