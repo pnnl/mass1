@@ -303,7 +303,7 @@ SUBROUTINE flow_sim
 
            depth = y(link,point) - thalweg(link,point)
 
-           CALL sections%props(section_number(link, point_num), depth, &
+           CALL sections%props(section_number(link, point), depth, &
                 &area_temp, hydrad, width, conveyance, dkdy)
            conveyance = res_coeff*kstrick(link,point)*conveyance
            dkdy = res_coeff*kstrick(link,point)*dkdy

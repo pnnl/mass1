@@ -1,3 +1,8 @@
+2017-01-10  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* flow_sim.f90 (flow_sim): fix wrong point index when getting
+	section properties
+
 2016-11-16  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* print_output.f90 (print_output): io unit number incorrectly
