@@ -50,6 +50,7 @@ DEALLOCATE(comporder,dsbc_table,transbc_table,tempbc_table)
 DEALLOCATE(latflowbc_table, met_zone)
 DEALLOCATE(lattransbc_table, lattempbc_table)
 DEALLOCATE(crest)
+DEALLOCATE(lpiexp)
 
 !-----------------------------------------------------------
 !module point_vars

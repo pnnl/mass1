@@ -1,3 +1,29 @@
+2017-01-16  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* test/flow/MacDonald-4: add test for super-critical flow
+
+2017-01-13  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* test/flow/drain: add test case for small depth (not working) 
+
+	* read_config.f90 (read_config): set depth_minimum and
+	depth_threshold but they really need to be read
+
+	* link_data.f90 (link_data): read and report lpiexp
+
+	* flow_sim.f90 (depth_check): add depth_check() and use it
+
+	* coeff.f90 (fluvial_coeff): modify coefficients when depth is
+	small or trans-critical flow is indicated
+
+	* array_dealloc.f90 (array_dealloc): deallocate lpiexp link
+	variable
+
+	* array_alloc.f90 (array_alloc): allocate and initialize lpiexp
+	link variable 
+
+	* modules.f90 (link_vars): add lpiexp link variable
+
 2017-01-10  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* nonfluvial_coeff.f90 (nonfluvial_coeff): use assigned cross

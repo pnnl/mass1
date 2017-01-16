@@ -43,6 +43,8 @@ MODULE general_vars
   DOUBLE PRECISION, SAVE :: unit_weight_h2o,density_h2o
   CHARACTER (LEN =120) :: title,version,config_version
 
+  DOUBLE PRECISION, SAVE :: depth_threshold, depth_minimum
+
   INTEGER, SAVE :: print_freq
 
 END MODULE general_vars
@@ -91,6 +93,8 @@ MODULE link_vars
   !INTEGER, SAVE :: linkbc_table(lmax),num_con_links(lmax),con_links(lmax,5),ds_conlink(lmax)
   !INTEGER, SAVE :: comporder(lmax)
   DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE, SAVE :: crest
+
+  DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE, SAVE :: lpiexp
 
 END MODULE link_vars
 
@@ -180,6 +184,7 @@ MODULE fluvial_coeffs
   ! REAL, SAVE :: alpha=1.0,beta=0.5,theta=1.0,q1,q2,a1,a2,b1,b2,k1,k2	&
   !               ,ky1,ky2,y2,y1
   DOUBLE PRECISION, SAVE :: alpha=1.0,beta=0.5,theta=1.0,q1,q2,a1,a2,b1,b2,k1,k2,ky1,ky2,y2,y1
+  DOUBLE PRECISION, SAVE :: d1, d2, fr1, fr2
 
 END MODULE fluvial_coeffs
 

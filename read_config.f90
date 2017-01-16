@@ -318,6 +318,11 @@ SUBROUTINE read_config
 
   CLOSE(10)
 
+  ! Some things that need to be set, but are not read (yet)
+
+  depth_minimum = 0.002          ! m
+  depth_threshold = 0.01         ! m
+
   IF(debug_print == 1)THEN 
 
      OPEN(11,file='debug.txt')

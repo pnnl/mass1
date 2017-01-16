@@ -46,6 +46,8 @@ SELECT CASE(units)
 		grav = 32.2
 		unit_weight_h2o = 62.4 ! lb/ft3
 		density_h2o = 1.94	   ! slugs/ft3
+                depth_minimum = depth_minimum/0.3048
+                depth_threshold = depth_threshold/0.3048
 
 	CASE(2)
 		res_coeff = 1.0	   !manning unit factor used in conveyance calculation
