@@ -63,13 +63,13 @@ SUBROUTINE link_data
      READ(fileunit(2),*,ERR=200)junk,input_option(link),maxpoints(link),linkorder(link),&
           & linktype(link),num_con_links(link),linkbc_table(link),dsbc_table(link), &
           & transbc_table(link),tempbc_table(link),met_zone(link),latflowbc_table(link), &
-          & lattransbc_table(link),lattempbc_table(link)
+          & lattransbc_table(link),lattempbc_table(link),lpiexp(link)
      READ(fileunit(2),*,ERR=200)ds_conlink(link),con_links(link,:)
 
      WRITE(io_unit,*)link,input_option(link),maxpoints(link),linkorder(link),&
           & linktype(link),num_con_links(link),linkbc_table(link),dsbc_table(link), &
           & transbc_table(link),tempbc_table(link),met_zone(link),latflowbc_table(link), &
-          & lattransbc_table(link),lattempbc_table(link)
+          & lattransbc_table(link),lattempbc_table(link),lpiexp(link)
      WRITE(io_unit,*)ds_conlink(link),con_links(link,:)
 
      IF (do_latflow .AND. do_gas) THEN 

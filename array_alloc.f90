@@ -66,6 +66,9 @@ ALLOCATE(crest(maxlinks))
 
 crest = -999.0
 
+ALLOCATE(lpiexp(maxlinks))
+lpiexp = 0.0
+
 !-----------------------------------------------------------
 !module point_vars
 

@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December  1, 2010 by William A. Perkins
-# Last Change: Wed Dec  1 08:22:19 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+# Last Change: 2017-01-16 08:24:57 d3g096
 # -------------------------------------------------------------
 
 set -u
@@ -21,6 +21,7 @@ dirs=" \
     storage \
     MacDonald-1 \
     MacDonald-3 \
+    MacDonald-4 \
     varied \
     varied-pid \
     varied-pool \
