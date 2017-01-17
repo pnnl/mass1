@@ -13,12 +13,11 @@
 #    	faq, bugs, etc:   type "help seeking-assistance"
 #    	immediate help:   type "help"
 #    	plot window:      hit 'h'
-# set terminal postscript eps enhanced defaultplex \
+set terminal postscript eps enhanced defaultplex \
    leveldefault color colortext \
    solid dashlength 1.0 linewidth 1.0 butt noclip \
    palfuncparam 2000,0.003 \
    "Helvetica" 18 
-# set output 'profile.eps'
 unset clip points
 set clip one
 unset clip two
@@ -48,7 +47,7 @@ set format z "% g"
 set format cb "% g"
 set angles radians
 unset grid
-set key title "150 kcfs, GCL @ 1240 ft"
+set key title "150 kcfs, GCL @ 975 ft"
 set key inside left top vertical Right noreverse enhanced autotitles nobox
 set key noinvert samplen 4 spacing 1 width 0 height 0 
 set key maxcolumns 0 maxrows 0
@@ -119,7 +118,7 @@ set xlabel "River Miles from GCL"
 set xlabel  offset character 0, 0, 0 font "" textcolor lt -1 norotate
 set x2label "" 
 set x2label  offset character 0, 0, 0 font "" textcolor lt -1 norotate
-set xrange [ 110.000 : 170.000 ] noreverse nowriteback
+set xrange [ 0.000 : 170.000 ] noreverse nowriteback
 set x2range [ * : * ] noreverse nowriteback  # (currently [110.000:170.000] )
 set ylabel "Elevation, ft" 
 set ylabel  offset character 0, 0, 0 font "" textcolor lt -1 rotate by -270
@@ -150,5 +149,21 @@ set loadpath
 set fontpath 
 set fit noerrorvariables
 GNUTERM = "x11"
-plot "<tail -n 736 profile1.out" using 4:5 axes x1y1 title "Water Surface" with lines ls 1, "" using 4:13 axes x1y1 title "Thalweg" with lines ls 7, "" using 4:7 axes x1y2 title "Velocity" with lines ls 3
+set key title "Columbia River 150 kcfs, GCL @ 975 ft"
+set xrange [ 0.000 : 170.000 ]
+set output 'profile1.eps'
+plot "<tail -n 741 profile1.out" using 4:5 axes x1y1 title "Water Surface" with lines ls 1, \
+     "" using 4:13 axes x1y1 title "Thalweg" with lines ls 7, \
+     "" using 4:7 axes x1y2 title "Velocity" with lines ls 3
+set key title "Kettle River 10 kcfs, GCL @ 975 ft"
+set xrange [ 0.000 : * ]
+set output 'profile2.eps'
+plot "<tail -n 741 profile2.out" using 4:5 axes x1y1 title "Water Surface" with lines ls 1, \
+     "" using 4:13 axes x1y1 title "Thalweg" with lines ls 7, \
+     "" using 4:7 axes x1y2 title "Velocity" with lines ls 3
+set key title "Spokane River 10 kcfs, GCL @ 975 ft"
+set output 'profile3.eps'
+plot "<tail -n 741 profile3.out" using 4:5 axes x1y1 title "Water Surface" with lines ls 1, \
+     "" using 4:13 axes x1y1 title "Thalweg" with lines ls 7, \
+     "" using 4:7 axes x1y2 title "Velocity" with lines ls 3
 #    EOF

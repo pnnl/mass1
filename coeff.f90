@@ -38,7 +38,7 @@ SUBROUTINE fluvial_coeff(a,b,c,d,g,ap,bp,cp,dp,gp,dx,dt,gr,latq_old,latq_new,lpi
   DOUBLE PRECISION :: latq_old,latq_new
   DOUBLE PRECISION, INTENT(IN) :: lpiexp
   DOUBLE PRECISION :: dt
-  DOUBLE PRECISION :: sigma, frictwt, fravg
+  DOUBLE PRECISION :: sigma, fravg, davg
 
   ! Normal fluvial link
 
@@ -71,8 +71,10 @@ SUBROUTINE fluvial_coeff(a,b,c,d,g,ap,bp,cp,dp,gp,dx,dt,gr,latq_old,latq_new,lpi
   ! change the friction weighting
   IF ( (d1 .LT. depth_threshold) .OR. (d2 .LT. depth_threshold)) THEN
      sigma = 0.0
-     beta = 0.00
+     beta = 0.95
   END IF
+
+
   ap = alpha*theta*sigma*(-q2*b2*(q2-q1)/dx/a2**2           &
        + b2*(q2/a2**2)*(a2-a1)*(q2/a2+q1/a1)/dx/2.0   &
        - b2*(q2/a2 + q1/a1)**2/dx/4.0)                            &
