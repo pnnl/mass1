@@ -1,5 +1,19 @@
 2017-01-19  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* test/CMakeLists.txt: add more subdirectories
+
+	* test/flow/slopebreak2: add automated test
+
+	* test/flow/slopebreak1: add automated test
+
+	* test/flow/MacDonald-3: add automated test
+
+	* test/flow/MacDonald-4: add automated test
+
+	* test/flow/MacDonald-1: add automated test
+
+	* test/flow/normal: don't use shell script to run automated test 
+
 	* CMakeLists.txt: add test sub-directory and runtests target
 
 	* test/flow/normal: attempt to automate running this test

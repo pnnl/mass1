@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2017-01-19 11:28:26 d3g096
+# Last Change: 2017-01-19 11:35:51 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -22,47 +22,56 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/link-bc-files.dat"
 )
 
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/plot-depth.gp.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/plot-depth.gp"
+)
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/plot-elev.gp.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/plot-elev.gp"
+)
+
 set(testfiles 
   "${CMAKE_CURRENT_BINARY_DIR}/mass1.cfg"
   "${CMAKE_CURRENT_BINARY_DIR}/link-bc-files.dat"
-  "${CMAKE_CURRENT_SOURCE_DIR}/gage_control.dat"
   "${CMAKE_CURRENT_SOURCE_DIR}/initial.dat"
   "${CMAKE_CURRENT_SOURCE_DIR}/link.dat"
   "${CMAKE_CURRENT_SOURCE_DIR}/point.dat"
   "${CMAKE_CURRENT_SOURCE_DIR}/profile_control.dat"
   "${CMAKE_CURRENT_SOURCE_DIR}/section.dat"
-  "${CMAKE_CURRENT_SOURCE_DIR}/../BCFiles/inflow-bc.dat"
-  "${CMAKE_CURRENT_SOURCE_DIR}/../BCFiles/tailwater-bc.dat"
+  "${CMAKE_CURRENT_SOURCE_DIR}/flow.dat"
+  "${CMAKE_CURRENT_SOURCE_DIR}/stage.dat"
 )
 
 add_custom_command(
-  OUTPUT "profile1.out"
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/profile1.out"
   COMMAND ${mass1exe} > mass1.log
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-  COMMENT "Running test flow/normal"
+  COMMENT "Running test flow/MacDonald-1"
   DEPENDS mass1 ${testfiles}
 )
-set(rundeps "profile1.out")
+set(rundeps "${CMAKE_CURRENT_BINARY_DIR}/profile1.out")
 
 if (GNUPLOT_EXECUTABLE) 
   add_custom_command(
-    OUTPUT plot.eps plot-elev.eps
-    COMMAND "${GNUPLOT_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp" > plot.eps
-    COMMAND "${GNUPLOT_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/plot-elev.gp" > plot-elev.eps
+    OUTPUT plot-depth.eps plot-elev.eps
+    COMMAND "${GNUPLOT_EXECUTABLE}" "plot-depth.gp" > plot-depth.eps
+    COMMAND "${GNUPLOT_EXECUTABLE}" "plot-elev.gp" > plot-elev.eps
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    COMMENT "Plotting tests flow/normal"
+    COMMENT "Plotting test flow/MacDonald-1"
     DEPENDS 
-    profile1.out
-    "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/plot-elev.gp"
+    "${CMAKE_CURRENT_BINARY_DIR}/profile1.out"
+    "${CMAKE_CURRENT_BINARY_DIR}/plot-depth.gp"
+    "${CMAKE_CURRENT_BINARY_DIR}/plot-elev.gp"
   )
-  set(rundeps plot.eps plot-elev.eps)
+  set(rundeps plot-depth.eps plot-elev.eps)
 endif (GNUPLOT_EXECUTABLE)
 
-add_custom_target(run_normal_test
+add_custom_target(run_macdonald_1_test
   DEPENDS ${rundeps}
 )
-add_dependencies(runtests run_normal_test)
+add_dependencies(runtests run_macdonald_1_test)
 
 set_property(DIRECTORY 
   APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
@@ -70,9 +79,7 @@ set_property(DIRECTORY
   output.out
   profile1.out
   status.out
-  plot.ps
-  plot.eps
-  plot-elev.ps
+  plot-depth.eps
   plot-elev.eps
   mass1.log
 )

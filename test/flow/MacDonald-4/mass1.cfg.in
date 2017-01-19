@@ -20,8 +20,8 @@ MASS1 Configuration File - Normal Flow Test - $Id$
 2 	/ time units
 0 	/ channel length units
 0 	/ downstream bc type
-2 	/ max links
-200 	/ max points on a link
+1 	/ max links
+1000 	/ max points on a link
 4 	/ max bc table
 10 	/ max times in a bc table
 1 	/ total number of x-sections
@@ -32,7 +32,7 @@ MASS1 Configuration File - Normal Flow Test - $Id$
 "@SRC@/section.dat" 	 	/ Section file name
 "link-bc-files.dat" 	/ linkBC file name
 "@SRC@/initial.dat"        / initial file name
-"output.out" 	 	/ output file name
+"@SRC@/output.out" 	 	/ output file name
 no-gasbcfiles              / gas transport file name
 no-tempbcfiles        / temperature input
 no-weatherfile	                / weather files
@@ -43,9 +43,9 @@ no-restartfile  	                / Write restart file name
 "@SRC@/gage_control.dat" 	                / gage control file name
 "@SRC@/profile_control.dat" 	 	/ profile file name
 nolatinflow		/ lateral inflow bs file name
-01-01-1997 	 	/ date run begins
-03:00:00 	 	/ time run begins
-01-01-1997 	 	/ date run ends
-10:59:59 	 	/ time run ends
-0.1000000 	 	/ delta t in hours (4*36s=144s)
-20 		 	/ printout frequency
+03-31-1996 	 	/ date run begins
+00:00:00 	 	/ time run begins
+04-11-1996 	 	/ date run ends
+00:00:00 	 	/ time run ends
+0.10000 	 	/ delta t in hours (4*36s=144s)
+120 		 	/ printout frequency
