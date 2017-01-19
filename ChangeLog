@@ -1,3 +1,10 @@
+2017-01-17  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* coeff.f90 (fluvial_coeff): change direction of beta
+
+	* test/flow/drain: add more points; run longer with different time
+	step; try narrower section; stable, but not quite right
+
 2017-01-19  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* test/CMakeLists.txt: add more subdirectories
