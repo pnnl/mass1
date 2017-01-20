@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Sun Jan  8 09:47:36 2006 by William A. Perkins <perk@mcperktop.local>
+# Last Change: 2017-01-19 14:15:05 d3g096
 # -------------------------------------------------------------
 # $Id$
 
@@ -24,21 +24,7 @@ model=${MODEL-../../../mass1}
 
 $model
 
-(echo \
-    set terminal postscript landscape color solid \"Helvetica\" 14\; \
-    load \"plot-depth.gp\"\; ) | \
-        gnuplot > plot-depth.ps
-(echo \
-    set terminal postscript eps color solid \"Helvetica\" 22 \; \
-    load \"plot-depth.gp\"\; ) | \
-        gnuplot > plot-depth.eps
+gnuplot < plot-depth.gp > plot-depth.eps
 
-(echo \
-    set terminal postscript landscape color solid \"Helvetica\" 14\; \
-    load \"plot-elev.gp\"\; ) | \
-        gnuplot > plot-elev.ps
-(echo \
-    set terminal postscript eps color solid \"Helvetica\" 22 \; \
-    load \"plot-elev.gp\"\; ) | \
-        gnuplot > plot-elev.eps
+gnuplot < plot-elev.gp > plot-elev.eps
 

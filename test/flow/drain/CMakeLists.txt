@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2017-01-19 14:11:31 d3g096
+# Last Change: 2017-01-20 08:00:38 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -31,8 +31,8 @@ set(testfiles
   "${CMAKE_CURRENT_SOURCE_DIR}/point.dat"
   "${CMAKE_CURRENT_SOURCE_DIR}/profile_control.dat"
   "${CMAKE_CURRENT_SOURCE_DIR}/section.dat"
-  "${CMAKE_CURRENT_SOURCE_DIR}/../BCFiles/inflow-bc.dat"
-  "${CMAKE_CURRENT_SOURCE_DIR}/../BCFiles/tailwater-bc.dat"
+  "${CMAKE_CURRENT_SOURCE_DIR}/inflow-bc.dat"
+  "${CMAKE_CURRENT_SOURCE_DIR}/tailwater-bc.dat"
 )
 
 add_custom_command(
@@ -46,23 +46,32 @@ set(rundeps "${CMAKE_CURRENT_BINARY_DIR}/profile1.out")
 
 if (GNUPLOT_EXECUTABLE) 
   add_custom_command(
-    OUTPUT plot.eps plot-elev.eps
+    OUTPUT 
+    "${CMAKE_CURRENT_BINARY_DIR}/plot.eps" 
+    "${CMAKE_CURRENT_BINARY_DIR}/plot-elev.eps" 
+    "${CMAKE_CURRENT_BINARY_DIR}/plot-disch.eps"
     COMMAND "${GNUPLOT_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp" > plot.eps
     COMMAND "${GNUPLOT_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/plot-elev.gp" > plot-elev.eps
+    COMMAND "${GNUPLOT_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/plot-disch.gp" > plot-drain.eps
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    COMMENT "Plotting tests flow/normal"
+    COMMENT "Plotting tests flow/drain"
     DEPENDS 
     "${CMAKE_CURRENT_BINARY_DIR}/profile1.out"
     "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp"
     "${CMAKE_CURRENT_SOURCE_DIR}/plot-elev.gp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/plot-disch.gp"
   )
-  set(rundeps plot.eps plot-elev.eps)
+  set(rundeps 
+    "${CMAKE_CURRENT_BINARY_DIR}/plot.eps" 
+    "${CMAKE_CURRENT_BINARY_DIR}/plot-elev.eps" 
+    "${CMAKE_CURRENT_BINARY_DIR}/plot-disch.eps"
+    )
 endif (GNUPLOT_EXECUTABLE)
 
-add_custom_target(run_normal_test
+add_custom_target(run_drain_test
   DEPENDS ${rundeps}
 )
-add_dependencies(runtests run_normal_test)
+add_dependencies(runtests run_drain_test)
 
 set_property(DIRECTORY 
   APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
@@ -70,10 +79,9 @@ set_property(DIRECTORY
   output.out
   profile1.out
   status.out
-  plot.ps
   plot.eps
-  plot-elev.ps
   plot-elev.eps
+  plot-drain.eps
   mass1.log
 )
 

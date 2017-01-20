@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2017-01-19 10:17:25 d3g096
+# Last Change: 2017-01-19 14:17:39 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -107,10 +107,9 @@ target_link_libraries(mass1 gastemp ts)
 install(TARGETS mass1 DESTINATION bin)
 
 # save for running tests
-set(mass1exe "")
-get_property(mass1exe TARGET mass1 PROPERTY LOCATION)
-message(STATUS "MASS1 executable: ${mass1exe}")
-
+set(mass1exe $<TARGET_FILE:mass1>)
+#this is deprecated
+#get_property(mass1exe TARGET mass1 PROPERTY LOCATION)
 
 # -------------------------------------------------------------
 # cross_section_test

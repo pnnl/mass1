@@ -7,10 +7,11 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created July  2, 1999 by William A. Perkins
-# Last Change: Wed Dec  1 07:24:31 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+# Last Change: 2017-01-19 15:08:53 d3g096
 # -------------------------------------------------------------
 # $Id$
 
+set terminal postscript eps color solid "Helvetica,18"
 set format x "%.0f"
 set format y "%.0f"
 set nokey
