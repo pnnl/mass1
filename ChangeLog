@@ -1,5 +1,7 @@
 2017-01-20  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* CMakeLists.txt: look for awk to use in tests
+
 	* test/CMakeLists.txt: add more subdirectories
 
 	* test/flow/drain: add automated test

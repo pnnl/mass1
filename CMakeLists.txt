@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2017-01-19 14:17:39 d3g096
+# Last Change: 2017-01-20 10:51:08 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -49,6 +49,11 @@ find_package(PerlModules COMPONENTS Date::Manip)
 find_program(GNUPLOT_EXECUTABLE gnuplot)
 # find_package(gnuplot)
 # should check version
+
+find_program(AWK_EXECUTABLE gawk)
+if (NOT AWK_EXECUTABLE) 
+  find_program(AWK_EXECUTABLE awk)
+endif ()
 
 # -------------------------------------------------------------
 # subdirectories

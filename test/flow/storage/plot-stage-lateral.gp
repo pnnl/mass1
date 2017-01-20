@@ -1,21 +1,26 @@
 # -------------------------------------------------------------
-# file: CMakeLists.txt
+# file: plot.gp
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Battelle Memorial Institute
 # Pacific Northwest Laboratory
 # -------------------------------------------------------------
 # -------------------------------------------------------------
-# Created January 19, 2017 by William A. Perkins
-# Last Change: 2017-01-20 08:22:50 d3g096
+# Created July 13, 1999 by William A. Perkins
+# Last Change: 2017-01-20 09:40:52 d3g096
 # -------------------------------------------------------------
+# $Id$
 
-add_subdirectory(flow/drain)
-add_subdirectory(flow/MacDonald-4)
-add_subdirectory(flow/MacDonald-3)
-add_subdirectory(flow/MacDonald-1)
-add_subdirectory(flow/storage)
-add_subdirectory(flow/slopebreak2)
-add_subdirectory(flow/slopebreak1)
-add_subdirectory(flow/lateral)
-add_subdirectory(flow/normal)
+set terminal postscript eps color solid "Helvetica,18"
+
+set xdata time
+set timefmt "%m-%d-%Y %H:%M:%S"
+
+set ylabel 'Elevation, feet'
+# set yrange [0:2000]
+
+set pointsize 0.4
+# set key below
+
+plot 'ts1149-@CASE@.out' using 1:3 axes x1y1 title "Downstream Stage" with linespoints lt 1
+     
