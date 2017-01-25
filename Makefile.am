@@ -8,11 +8,11 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created June 23, 2005 by William A. Perkins
-# Last Change: Fri Dec 10 08:45:22 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+# Last Change: 2017-01-25 07:22:59 d3g096
 # -------------------------------------------------------------
 # RCS ID: $Id$
 
-AM_FCFLAGS = ${F90MODPATH}time_series ${F90MODPATH}gastemp
+AM_FCFLAGS = ${FC_MODINC}time_series ${FC_MODINC}gastemp
 
 SUBDIRS = @SUBDIRS@
 
@@ -93,7 +93,7 @@ write_restart.$(OBJEXT): modules.$(OBJEXT) scalars_module.$(OBJEXT)
 
 
 clean-local:
-	rm -f *.$(F90MODULEEXT)
+	rm -f *.$(FC_MODEXT)
 	rm -f *.il work.*
 	rm -f *~
 
