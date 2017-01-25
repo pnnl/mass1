@@ -24,7 +24,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created June 23, 2005 by William A. Perkins
-# Last Change: Fri Dec 10 08:45:22 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+# Last Change: 2017-01-25 07:22:59 d3g096
 # -------------------------------------------------------------
 # RCS ID: $Id$
 
@@ -100,14 +100,12 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_triplet = @build@
-host_triplet = @host@
 bin_PROGRAMS = mass1$(EXEEXT)
 check_PROGRAMS = svgrptest$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/time_series/acinclude.m4 \
-	$(top_srcdir)/acinclude.m4 $(top_srcdir)/configure.in
+am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
@@ -265,20 +263,10 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EXEEXT = @EXEEXT@
-F90 = @F90@
-F90DEBUG = @F90DEBUG@
-F90FLAGS = @F90FLAGS@
-F90LDFLAGS = @F90LDFLAGS@
-F90LIBS = @F90LIBS@
-F90MODPATH = @F90MODPATH@
-F90MODULEEXT = @F90MODULEEXT@
-F90OPTIMIZE = @F90OPTIMIZE@
-F90PROFILE = @F90PROFILE@
-F90TRAPOBJ = @F90TRAPOBJ@
 FC = @FC@
 FCFLAGS = @FCFLAGS@
-FCFLAGS_f90 = @FCFLAGS_f90@
-FFLAGS = @FFLAGS@
+FC_MODEXT = @FC_MODEXT@
+FC_MODINC = @FC_MODINC@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -289,6 +277,7 @@ LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
+MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 OBJEXT = @OBJEXT@
@@ -315,26 +304,19 @@ abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_FC = @ac_ct_FC@
+ac_empty = @ac_empty@
 am__leading_dot = @am__leading_dot@
 am__tar = @am__tar@
 am__untar = @am__untar@
 bindir = @bindir@
-build = @build@
 build_alias = @build_alias@
-build_cpu = @build_cpu@
-build_os = @build_os@
-build_vendor = @build_vendor@
 builddir = @builddir@
 datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
-host = @host@
 host_alias = @host_alias@
-host_cpu = @host_cpu@
-host_os = @host_os@
-host_vendor = @host_vendor@
 htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
@@ -359,7 +341,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_FCFLAGS = ${F90MODPATH}time_series ${F90MODPATH}gastemp
+AM_FCFLAGS = ${FC_MODINC}time_series ${FC_MODINC}gastemp
 mass1_SOURCES = \
     accumulator.f90                             \
     array_alloc.f90                             \
@@ -415,7 +397,7 @@ all: all-recursive
 .SUFFIXES: .f90 .o .obj
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -441,9 +423,9 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
 
-$(top_srcdir)/configure:  $(am__configure_deps)
+$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	$(am__cd) $(srcdir) && $(AUTOCONF)
-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
+$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 $(am__aclocal_m4_deps):
 install-binPROGRAMS: $(bin_PROGRAMS)
@@ -507,10 +489,10 @@ distclean-compile:
 	-rm -f *.tab.c
 
 .f90.o:
-	$(AM_V_FC)$(FCCOMPILE) -c -o $@ $(FCFLAGS_f90) $<
+	$(AM_V_FC)$(FCCOMPILE) -c -o $@ $<
 
 .f90.obj:
-	$(AM_V_FC)$(FCCOMPILE) -c -o $@ $(FCFLAGS_f90) `$(CYGPATH_W) '$<'`
+	$(AM_V_FC)$(FCCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -972,7 +954,7 @@ trans_bc.$(OBJEXT):  modules.$(OBJEXT) bctable.$(OBJEXT)
 write_restart.$(OBJEXT): modules.$(OBJEXT) scalars_module.$(OBJEXT)
 
 clean-local:
-	rm -f *.$(F90MODULEEXT)
+	rm -f *.$(FC_MODEXT)
 	rm -f *.il work.*
 	rm -f *~
 

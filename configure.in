@@ -8,14 +8,15 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 25, 2003 by William A. Perkins
-# Last Change: Fri Dec 10 08:40:56 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+# Last Change: 2017-01-25 07:15:09 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
 # Initialization
 # -------------------------------------------------------------
-AC_INIT(mass1.f90)
-AM_INIT_AUTOMAKE(MASS1,0.80)
+AC_INIT(MASS1, 0.90)
+AM_INIT_AUTOMAKE()
+AM_MAINTAINER_MODE()
 
 # -------------------------------------------------------------
 # Stuff to include subdirectories
@@ -30,12 +31,13 @@ AC_SUBST(SUBDIRS)
 # -------------------------------------------------------------
 # Checks for Programs we need
 # -------------------------------------------------------------
+AC_PROG_FC()
+AC_FC_MODULE_FLAG()
+AC_FC_MODULE_EXTENSION()
 AC_PROG_RANLIB()
-AC_PROG_INSTALL()
 AC_PROG_LN_S()
 AC_PROG_MAKE_SET()
-AC_PROG_FC()
-AC_PROG_F90()
+AC_PROG_INSTALL()
 
 # -------------------------------------------------------------
 # Check perl to see if we do the scripts
@@ -64,10 +66,6 @@ fi
 AC_LANG(Fortran)
                                 # search for modules in the
                                 # time_series directory
-
-FCFLAGS="$FCFLAGS"
-FFLAGS="$FCFLAGS"
-LIBS="$LIBS $F90LIBS"
 
 AC_CONFIG_SUBDIRS(time_series)
 AC_CONFIG_FILES([

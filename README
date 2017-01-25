@@ -7,23 +7,20 @@ Pacific Northwest Laboratory
 -------------------------------------------------------------
 -------------------------------------------------------------
 Created June 10, 2005 by William A. Perkins
-Last Change: Fri Dec 17 06:59:58 2010 by William A. Perkins <d3g096@bearflag.pnl.gov>
+Last Change: 2017-01-25 06:45:25 d3g096
 -------------------------------------------------------------
+
+-------------------------------------------------------------
+Code check out from PNNL Stash repository
+-------------------------------------------------------------
+
+git clone https://stash.pnnl.gov/scm/~d3g096/mass1.git
+cd mass1
+git submodule update --init
 
 -------------------------------------------------------------
 MASS1 compilation via GNU autotools
 -------------------------------------------------------------
-
-MASS1 is configured and compiled using the GNU autotools.  If you
-check MASS1 out of CVS, you must build the configure script on a
-system that has the GNU autotools installed (Linux systems usually
-do).  The configure script is built by the command
-
-    sh bootstrap.sh
-
-You do not have to do this on the machine you which to compile for;
-the only requirement is that a reasonably recent version of autotools
-is installed (autoconf and automake).
 
 To compile MASS1, the configure script must be run on the architecture
 you wish to run MASS1.  The following architectures and compilers are
@@ -124,6 +121,6 @@ PE10900:
     configure --with-f90=gfortran-mp-4.4 --enable-f90-debug \
               --with-extra-f90flags=-ffpe-trap=invalid,zero,overflow
 
-Bearflag w/Intel Fortran:
+Flophouse w/Intel Fortran:
 
     configure --with-f90=ifort --with-extra-f90flags="-O -fpe0"
