@@ -109,12 +109,12 @@ END SUBROUTINE link_data
 ! ----------------------------------------------------------------
 ! INTEGER FUNCTION link_set_order
 ! ----------------------------------------------------------------
-RECURSIVE FUNCTION link_set_order(link, order0) 
+RECURSIVE FUNCTION link_set_order(link, order0) RESULT(order)
 
   USE link_vars
 
   IMPLICIT NONE
-  INTEGER :: link_set_order
+  INTEGER :: order
   INTEGER, INTENT(IN) :: link, order0
   INTEGER :: i, ulink, o
   
@@ -125,7 +125,7 @@ RECURSIVE FUNCTION link_set_order(link, order0)
      o = link_set_order(ulink, o)
   END DO
   linkorder(link) = o
-  link_set_order = o + 1
+  order = o + 1
 END FUNCTION link_set_order
 
 ! ----------------------------------------------------------------
