@@ -35,6 +35,7 @@ USE point_vars
 USE transport_vars
 USE general_vars, ONLY : maxlinks,maxpoint
 USE hydro_output_module
+USE confluence_module
 
 IMPLICIT NONE
 
@@ -79,6 +80,7 @@ ALLOCATE(courant_num(maxlinks,maxpoint), diffuse_num(maxlinks,maxpoint))
 ALLOCATE(section_number(maxlinks,maxpoint))
 ALLOCATE(ptsection(maxlinks, maxpoint))
 ALLOCATE(y_old(maxlinks,maxpoint))
+ALLOCATE(ucon(maxlinks), dcon(maxlinks))
 
 !MODULE transport_vars
 

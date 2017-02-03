@@ -1,3 +1,33 @@
+2017-02-03  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* scalars_module.f90 (tvd_transport): use confluence instances for
+	link end boundary conditions
+
+	* read_config.f90 (read_config): don't read stuff in deleted
+	section_vars module 
+
+	* print_output.f90 (print_output): remove section data print out 
+
+	* modules.f90: remove section_vars module - no longer needed
+
+	* link_data.f90 (link_set_order): use the confluences to get
+	computational order
+	(link_connect): build confluences and attach them to appropriate
+	links; array-based code is still there
+
+	* flow_sim.f90 (flow_sim): use confluence instances for link end
+	boundary conditions where appropriate (original array-based code
+	is still there)
+
+	* array_dealloc.f90 (array_dealloc): deallocate confluence
+	pointers  
+
+	* array_alloc.f90 (array_alloc): allocate pointers for upstream
+	and downstream confluences for each link
+
+	* confluence_module.f90 (confluence_module): encapsulate the idea
+	of a "confluence" -- where links connect to each other
+
 2017-02-01  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* link_data.f90 (link_set_order, link_connect): add routines to

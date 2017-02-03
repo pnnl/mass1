@@ -264,6 +264,8 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
   USE gas_functions
   USE hydro_output_module
 
+  USE confluence_module
+
   IMPLICIT NONE
 
   INTEGER :: species_num
@@ -318,6 +320,8 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                 &c(con_links(link,j),maxpoints(con_links(link,j)))
         END DO
         c(link,point) = sum/q(link,point)
+        c(link,point) = ucon(link)%wrap%conc(c)
+        
 !!$        DO j=1,num_con_links(link)
 !!$           c(link,1) =  c(con_links(link,j),maxpoints(con_links(link,j)))
 !!$        END DO
@@ -511,6 +515,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                  sum = sum + q(con_links(link,j),maxpoints(con_links(link,j)))*c(con_links(link,j),maxpoints(con_links(link,j)))
                  c(link,point) = sum/q(link,point)
               END DO
+              c(link,point) = ucon(link)%wrap%conc(c)
            
            ! internal fluvial link that has an active table BC
            ELSE IF((num_con_links(link) /= 0) .AND. (transbc_table(link) /= 0)) THEN ! internal link with table spec

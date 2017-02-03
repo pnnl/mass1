@@ -61,7 +61,8 @@ SUBROUTINE link_data
      !
      ! linkorder(link), num_con_links(link), con_links(link,:)
      !
-     ! the format needs to be reworked
+     ! the format needs to be reworked, mainly because the second line is not needed
+     ! consider moving boundary condition information to another file
 
 
      WRITE(io_unit,*)'link number -',link
@@ -70,13 +71,13 @@ SUBROUTINE link_data
           & linktype(link),num_con_links(link),linkbc_table(link),dsbc_table(link), &
           & transbc_table(link),tempbc_table(link),met_zone(link),latflowbc_table(link), &
           & lattransbc_table(link),lattempbc_table(link),lpiexp(link)
-     READ(fileunit(2),*,ERR=200)ds_conlink(link),con_links(link,:)
+     READ(fileunit(2),*,ERR=200)ds_conlink(link) ! ,con_links(link,:)
 
      WRITE(io_unit,*)link,input_option(link),maxpoints(link),linkorder(link),&
           & linktype(link),num_con_links(link),linkbc_table(link),dsbc_table(link), &
           & transbc_table(link),tempbc_table(link),met_zone(link),latflowbc_table(link), &
           & lattransbc_table(link),lattempbc_table(link),lpiexp(link)
-     WRITE(io_unit,*)ds_conlink(link),con_links(link,:)
+     WRITE(io_unit,*)ds_conlink(link) ! ,con_links(link,:)
 
      IF (do_latflow .AND. do_gas) THEN 
         IF (latflowbc_table(link) .NE. 0 .AND. lattransbc_table(link) .EQ. 0) THEN
@@ -112,6 +113,7 @@ END SUBROUTINE link_data
 RECURSIVE FUNCTION link_set_order(link, order0) RESULT(order)
 
   USE link_vars
+  USE confluence_module
 
   IMPLICIT NONE
   INTEGER :: order
@@ -120,10 +122,12 @@ RECURSIVE FUNCTION link_set_order(link, order0) RESULT(order)
   
   o = order0
 
-  DO i = 1, num_con_links(link)
-     ulink = con_links(link, i)
-     o = link_set_order(ulink, o)
-  END DO
+  IF (ASSOCIATED(ucon(link)%wrap)) THEN
+     DO i = 1, ucon(link)%wrap%n_ulink
+        ulink = ucon(link)%wrap%ulink(i)
+        o = link_set_order(ulink, o)
+     END DO
+  END IF
   linkorder(link) = o
   order = o + 1
 END FUNCTION link_set_order
@@ -136,6 +140,7 @@ SUBROUTINE link_connect()
   USE utility
   USE link_vars
   USE general_vars, ONLY : maxlinks
+  USE confluence_module
 
   IMPLICIT NONE
 
@@ -145,7 +150,9 @@ SUBROUTINE link_connect()
   LOGICAL :: done
   INTEGER :: ierr
   INTEGER :: link_set_order
+  TYPE (confluence_t), POINTER :: con
 
+  NULLIFY(con)
   nds = 0
   ierr = 0
 
@@ -154,6 +161,8 @@ SUBROUTINE link_connect()
   DO link = 1, maxlinks
      num_con_links(link) = 0  
      con_links(link,:) = 0
+     NULLIFY(ucon(link)%wrap)
+     NULLIFY(dcon(link)%wrap)
   END DO
 
   DO link = 1, maxlinks
@@ -171,6 +180,17 @@ SUBROUTINE link_connect()
         i = i + 1
         con_links(dlink,i) = link
         num_con_links(dlink) = i
+        IF (.NOT. ASSOCIATED(ucon(dlink)%wrap)) THEN 
+           ALLOCATE(con)
+           con = confluence_t(dlink)
+           ucon(dlink)%wrap => con
+           NULLIFY(con)
+        END IF
+        dcon(link)%wrap => ucon(dlink)%wrap
+        i = dcon(link)%wrap%n_ulink
+        i = i + 1
+        dcon(link)%wrap%ulink(i) = link
+        dcon(link)%wrap%n_ulink = i
      ELSE 
         nds = nds + 1
      END IF
@@ -237,9 +257,9 @@ SUBROUTINE link_connect()
   DO link = 1, maxlinks
      WRITE(msg, '("link ", I4, "(order = ", I4, ") upstream links:")') &
           &linkname(link), linkorder(link)
-     IF (num_con_links(link) .GT. 0) THEN
-        DO i = 1, num_con_links(link)
-           WRITE(lbl, '(I4)') con_links(link, i)
+     IF (ASSOCIATED(ucon(link)%wrap)) THEN
+        DO i = 1, ucon(link)%wrap%n_ulink
+           WRITE(lbl, '(I4)') ucon(link)%wrap%ulink(i)
            msg = TRIM(msg) // " " // TRIM(lbl)
         END DO
      ELSE 

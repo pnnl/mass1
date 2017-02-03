@@ -30,7 +30,7 @@ SUBROUTINE read_config
   USE utility
   USE file_vars
   USE general_vars
-  USE section_vars
+  ! USE section_vars
   USE point_vars
   USE date_vars
   USE logicals
@@ -41,6 +41,7 @@ SUBROUTINE read_config
   CHARACTER(LEN=*), PARAMETER :: config_name = 'mass1.cfg'
   CHARACTER(LEN=1024) :: msg
   INTEGER :: dumlog, dumlog0
+  INTEGER :: ignored
   INTEGER :: line
 
   do_accumulate = .FALSE.
@@ -222,7 +223,7 @@ SUBROUTINE read_config
   READ(10,*,ERR=110)maxtimes    ! not used anymore
   line = line + 1
 
-  READ(10,*,ERR=110)total_sections ! overwritten by section_data_count()
+  READ(10,*,ERR=110) ignored ! total_sections 
   line = line + 1
 
   READ(10,*,ERR=110)scalar_steps
@@ -336,7 +337,7 @@ SUBROUTINE read_config
      WRITE(11,*)maxpoint
      WRITE(11,*)maxtable
      WRITE(11,*)maxtimes
-     WRITE(11,*)total_sections
+     WRITE(11,*) "total_sections ignored"
      WRITE(11,*)scalar_steps
      WRITE(11,*)debug_print
      WRITE(11,*)'accumulate: ', do_accumulate

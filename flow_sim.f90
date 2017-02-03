@@ -3,7 +3,7 @@
 !            Pacific Northwest National Laboratory
 !***************************************************************
 !
-! NAME:	flow_sim
+! NAME: flow_sim
 !
 ! VERSION and DATE: MASS1 v0.75 3/25/98
 !
@@ -20,7 +20,7 @@
 !
 ! MOD HISTORY: added hydrad to CALL section and added
 !              calculation of froude_num, friction_slope, etc. ; mcr 11/21/1997
-!			   added lateral inflow; mcr 3/25/98
+!                          added lateral inflow; mcr 3/25/98
 !
 !***************************************************************
 !
@@ -54,6 +54,7 @@ SUBROUTINE flow_sim
   USE fluvial_coeffs
   USE flow_coeffs
   USE logicals , ONLY : do_latflow
+  USE confluence_module
 
   IMPLICIT NONE
 
@@ -104,17 +105,19 @@ SUBROUTINE flow_sim
         f(link,point) = bcval - q1
 
      ELSE
-	sum = 0.0
-	sum2 = 0.0
-	DO j=1,num_con_links(link)
+        sum = 0.0
+        sum2 = 0.0
+        DO j=1,num_con_links(link)
            sum = sum + e(con_links(link,j),maxpoints(con_links(link,j)))
            sum2 = sum2 + q(con_links(link,j),maxpoints(con_links(link,j))) + &
                 &f(con_links(link,j),maxpoints(con_links(link,j))) + &
                 &e(con_links(link,j),maxpoints(con_links(link,j)))*&
                 &(y(link,point) - y(con_links(link,j),maxpoints(con_links(link,j))))
-	END DO
-	e(link,point) = sum
-	f(link,point) = -q(link,point) + sum2
+        END DO
+        e(link,point) = sum
+        f(link,point) = -q(link,point) + sum2
+        e(link,point) = ucon(link)%wrap%coeff_e()
+        f(link,point) = ucon(link)%wrap%coeff_f()
 
      END IF
 
@@ -199,7 +202,7 @@ SUBROUTINE flow_sim
            ! transport
 
 
-           IF(linktype(link) == 6)THEN	  ! hydropower plant
+           IF(linktype(link) == 6)THEN    ! hydropower plant
               call bc_table_interpolate(hydrobc, linkbc_table(link), time/time_mult)
               temp = bc_table_current(hydrobc, linkbc_table(link), 1)
               bcval = bc_table_current(hydrobc, linkbc_table(link), 2)
@@ -222,7 +225,7 @@ SUBROUTINE flow_sim
         n(link,point) = (d*gp - dp*g)/denom
 
         denom = b - m(link,point)*(c + d*e(link,point))
-        e(link,point+1)	= (l(link,point)*(c + d*e(link,point)) - a)/denom
+        e(link,point+1) = (l(link,point)*(c + d*e(link,point)) - a)/denom
         f(link,point+1) = (n(link,point)*(c + d*e(link,point)) +d*f(link,point) + g)/denom
 
      END DO points
@@ -269,6 +272,7 @@ SUBROUTINE flow_sim
      ELSE
         ! junction conditions
         dy = y(ds_conlink(link),1) - y(link,point)
+        dy = dcon(link)%wrap%elev() - y(link,point)
         dq = e(link,point)*dy + f(link,point)
         y(link,point) = y(link,point) + dy
         q(link,point) = q(link,point) + dq

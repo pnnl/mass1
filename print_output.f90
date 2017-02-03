@@ -32,13 +32,13 @@ USE point_vars
 USE file_vars
 USE transport_vars
 USE date_vars
-USE section_vars
 USE logicals
 
 USE scalars
 USE gas_functions
 USE met_data_module
 USE date_time
+USE section_handler_module
 
 IMPLICIT NONE
 
@@ -100,12 +100,7 @@ WRITE(iounit1,'("channel length units - ",i4)') channel_length_units
 WRITE(iounit1,'("downstream boundary condition type - ",i4)') dsbc_type
 WRITE(iounit1,'("maximum number of links - ",i5)') maxlinks
 WRITE(iounit1,'("maximum number of points on a link - ",i5)') maxpoint
-! WRITE(iounit1,'("maximum number of input bc tabels - ",i5)') maxtable
-! WRITE(iounit1,'("maximum number of time values in a input bc table file - ",i5)') maxtimes
-WRITE(iounit1,'("total number of cross sections - ",i5)') total_sections
-WRITE(iounit1,'("maximum number of (x,y) cross section definition pairs - ",i5)') maxpairs
-WRITE(iounit1,'("maximum number of vertical levels in a cross section geoconveyannce table - ",i5)') maxlevels
-
+WRITE(iounit1,'("total number of cross sections - ",i5)') sections%size()
 
 WRITE(iounit1,'("link data input file - ",a80)') filename(2)
 WRITE(iounit1,'("point data input file - ",a80)') filename(3)

@@ -33,8 +33,11 @@ USE link_vars
 USE point_vars
 USE transport_vars
 USE hydro_output_module
+USE confluence_module
 
 IMPLICIT NONE
+
+INTEGER :: link
 
 !----------------------------------------------------------
 !flow coeff module
@@ -51,6 +54,8 @@ DEALLOCATE(latflowbc_table, met_zone)
 DEALLOCATE(lattransbc_table, lattempbc_table)
 DEALLOCATE(crest)
 DEALLOCATE(lpiexp)
+DEALLOCATE(ucon, dcon)
+
 
 !-----------------------------------------------------------
 !module point_vars
