@@ -68,16 +68,16 @@ SUBROUTINE link_data
      WRITE(io_unit,*)'link number -',link
 
      READ(fileunit(2),*,ERR=200)junk,input_option(link),maxpoints(link),linkorder(link),&
-          & linktype(link),num_con_links(link),linkbc_table(link),dsbc_table(link), &
+          & linktype(link),junk,linkbc_table(link),dsbc_table(link), &
           & transbc_table(link),tempbc_table(link),met_zone(link),latflowbc_table(link), &
           & lattransbc_table(link),lattempbc_table(link),lpiexp(link)
-     READ(fileunit(2),*,ERR=200)ds_conlink(link) ! ,con_links(link,:)
+     READ(fileunit(2),*,ERR=200)ds_conlink(link)
 
      WRITE(io_unit,*)link,input_option(link),maxpoints(link),linkorder(link),&
-          & linktype(link),num_con_links(link),linkbc_table(link),dsbc_table(link), &
+          & linktype(link),junk,linkbc_table(link),dsbc_table(link), &
           & transbc_table(link),tempbc_table(link),met_zone(link),latflowbc_table(link), &
           & lattransbc_table(link),lattempbc_table(link),lpiexp(link)
-     WRITE(io_unit,*)ds_conlink(link) ! ,con_links(link,:)
+     WRITE(io_unit,*)ds_conlink(link)
 
      IF (do_latflow .AND. do_gas) THEN 
         IF (latflowbc_table(link) .NE. 0 .AND. lattransbc_table(link) .EQ. 0) THEN
@@ -159,8 +159,6 @@ SUBROUTINE link_connect()
   CALL status_message("Connecting Links ...")
 
   DO link = 1, maxlinks
-     num_con_links(link) = 0  
-     con_links(link,:) = 0
      NULLIFY(ucon(link)%wrap)
      NULLIFY(dcon(link)%wrap)
   END DO
@@ -176,10 +174,6 @@ SUBROUTINE link_connect()
            CALL error_message(msg)
            ierr = ierr + 1
         END IF
-        i = num_con_links(dlink)
-        i = i + 1
-        con_links(dlink,i) = link
-        num_con_links(dlink) = i
         IF (.NOT. ASSOCIATED(ucon(dlink)%wrap)) THEN 
            ALLOCATE(con)
            con = confluence_t(dlink)
@@ -218,38 +212,6 @@ SUBROUTINE link_connect()
         EXIT
      END IF
   END DO
-
-
-  ! minorder = 1
-  ! DO link = 1, maxlinks
-  !    IF (num_con_links(link) .EQ. 0) THEN
-  !       linkorder(link) = minorder
-  !       minorder = minorder + 1
-  !    END IF
-  ! END DO
-
-  ! ! all other links need to have a higher order than in (1)
-  ! DO link = 1, maxlinks
-  !    IF (num_con_links(link) .NE. 0) THEN
-  !       linkorder(link) = minorder
-  !    END IF
-  ! END DO
-
-  ! ! (2) make sure connected links' order is 1 higher than those above
-
-  ! done = .FALSE.
-  ! DO WHILE (.NOT. done) 
-  !    done = .TRUE.
-  !    DO link = 1, maxlinks
-  !       DO i = 1, num_con_links(link)
-  !          ulink = con_links(link, i)
-  !          IF (linkorder(ulink) .GE. linkorder(link)) THEN
-  !             linkorder(link) = linkorder(ulink) + 1
-  !             done = .FALSE.
-  !          END IF
-  !       END DO
-  !    END DO
-  ! END DO
 
 
   ! spit out connectivity and order information 

@@ -85,13 +85,9 @@ END MODULE file_vars
 MODULE link_vars
 
   INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: maxpoints,linkname,linkorder,comporder,linktype,input_option
-  INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: linkbc_table,num_con_links,ds_conlink,&
+  INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: linkbc_table,ds_conlink,&
        & dsbc_table,transbc_table,tempbc_table,latflowbc_table,lattransbc_table,lattempbc_table
   INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: met_zone
-  INTEGER, DIMENSION(:,:),ALLOCATABLE, SAVE :: con_links
-  !INTEGER, SAVE ::  maxpoints(lmax),linkorder(lmax)
-  !INTEGER, SAVE :: linkbc_table(lmax),num_con_links(lmax),con_links(lmax,5),ds_conlink(lmax)
-  !INTEGER, SAVE :: comporder(lmax)
   DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE, SAVE :: crest
 
   DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE, SAVE :: lpiexp
