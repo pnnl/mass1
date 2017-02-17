@@ -28,12 +28,6 @@ set ydata
 set zdata
 set x2data
 set y2data
-set timefmt x "%d/%m/%y,%H:%M"
-set timefmt y "%d/%m/%y,%H:%M"
-set timefmt z "%d/%m/%y,%H:%M"
-set timefmt x2 "%d/%m/%y,%H:%M"
-set timefmt y2 "%d/%m/%y,%H:%M"
-set timefmt cb "%d/%m/%y,%H:%M"
 set boxwidth
 set style fill  empty border
 set style rectangle back fc  lt -3 fillstyle   solid 1.00 border lt -1
