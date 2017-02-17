@@ -1,5 +1,9 @@
 2017-02-17  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* flow_sim.f90 (flow_sim): make delta_x local; don't use global
+
+	* modules.f90 (general_vars): remove more unused global variables 
+
 	* tdg_equation_coeff.f90 (tdg_coeff_read): remove global
 	variable no longer used
 
