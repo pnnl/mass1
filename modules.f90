@@ -33,11 +33,11 @@ MODULE general_vars
 
   DOUBLE PRECISION, SAVE :: time,time_begin,time_end,delta_t,time_mult,time_step
   INTEGER, SAVE :: units, channel_length_units
-  INTEGER, SAVE :: time_units,mass_check,debug_print
+  INTEGER, SAVE :: time_units,debug_print
   INTEGER, SAVE :: lateral_inflow_flag, sediment_flag, contaminant_flag
   INTEGER, SAVE :: diffusion_flag,degass_flag,infiltration_flag
   INTEGER, SAVE :: print_output_flag, plot_output_flag
-  INTEGER, SAVE :: maxlinks,maxpoint,maxtable,maxtimes,scalar_steps
+  INTEGER, SAVE :: maxlinks,maxpoint,scalar_steps
   INTEGER, SAVE :: dsbc_type
   DOUBLE PRECISION, SAVE :: res_coeff,grav, delta_x
   DOUBLE PRECISION, SAVE :: unit_weight_h2o,density_h2o
@@ -66,7 +66,6 @@ MODULE logicals
   LOGICAL, SAVE :: gas_diffusion, gas_exchange
   LOGICAL, SAVE :: print_sections,write_sections,read_sections
   LOGICAL, SAVE :: do_latflow
-  LOGICAL, SAVE :: file_exist
   LOGICAL, SAVE :: do_accumulate
 
 END MODULE logicals

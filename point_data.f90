@@ -115,7 +115,6 @@ SUBROUTINE point_data
   USE file_vars
   USE general_vars, ONLY : units,channel_length_units
   USE transport_vars, ONLY : k_surf
-  USE logicals, ONLY : file_exist
   
   IMPLICIT NONE
   

@@ -11,7 +11,6 @@ MODULE met_data_module
   USE time_series
   USE date_time
   USE date_vars
-  USE logicals, ONLY : file_exist
 
   IMPLICIT NONE
 

@@ -1,3 +1,33 @@
+2017-02-17  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* tdg_equation_coeff.f90 (tdg_coeff_read): remove global
+	variable no longer used
+
+	* read_hotstart.f90 (read_hotstart): remove global
+	variable no longer used
+
+	* read_config.f90 (read_config): don't read ignored variables
+
+	* profile_output.f90 (profile_output_module): remove global
+	variable no longer used
+
+	* point_data.f90 (point_data): remove global variable no longer
+	used
+
+	* met_data_module.f90 (met_data_module): remove global variable no
+	longer used
+
+	* link_data.f90 (link_data): remove global variable no longer used
+
+	* initial_cond.f90 (initial_cond): remove global variable no longer
+	used
+
+	* gage_output.f90 (gage_output): remove global variable no longer
+	used
+
+	* modules.f90 (general_vars, logicals): remove variables no longer
+	used 
+
 2017-02-01  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* link_data.f90 (link_set_order, link_connect): add routines to

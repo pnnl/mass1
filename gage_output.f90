@@ -37,7 +37,7 @@ SUBROUTINE gage_output
   USE scalars
   USE met_data_module
   USE gas_functions
-  USE logicals, ONLY : file_exist, do_temp, do_gas, temp_exchange, gas_exchange
+  USE logicals, ONLY : do_temp, do_gas, temp_exchange, gas_exchange
 
   USE hydro_output_module
   USE accumulator

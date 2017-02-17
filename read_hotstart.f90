@@ -34,11 +34,11 @@ USE point_vars
 USE file_vars
 USE transport_vars
 USE scalars
-USE logicals, ONLY : file_exist
 
 IMPLICIT NONE
 
 INTEGER :: link,point,i,j
+LOGICAL :: file_exist
 
 !OPEN(91,file='hotstart.dat',form='binary')
 INQUIRE(FILE=filename(12),EXIST=file_exist)

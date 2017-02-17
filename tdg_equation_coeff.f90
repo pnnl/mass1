@@ -66,7 +66,6 @@ SUBROUTINE tdg_coeff_read(status_iounit, error_iounit)
 
 USE utility
 USE file_vars
-USE logicals, ONLY : file_exist
 
 IMPLICIT NONE
 

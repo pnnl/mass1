@@ -38,7 +38,7 @@ MODULE profile_output_module
   USE scalars
   USE gas_functions
   USE met_data_module
-  USE logicals, ONLY : file_exist, do_temp, do_gas, temp_exchange, gas_exchange
+  USE logicals, ONLY : do_temp, do_gas, temp_exchange, gas_exchange
   USE accumulator
 
   IMPLICIT NONE
