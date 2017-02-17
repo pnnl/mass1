@@ -217,10 +217,10 @@ SUBROUTINE read_config
   READ(10,*,ERR=110)maxpoint
   line = line + 1
 
-  READ(10,*,ERR=110)maxtable    ! not used anymore
+  READ(10,*,ERR=110) ignored ! maxtable
   line = line + 1
 
-  READ(10,*,ERR=110)maxtimes    ! not used anymore
+  READ(10,*,ERR=110) ignored ! maxtimes
   line = line + 1
 
   READ(10,*,ERR=110) ignored ! total_sections 
@@ -335,8 +335,8 @@ SUBROUTINE read_config
      WRITE(11,*)dsbc_type
      WRITE(11,*)maxlinks
      WRITE(11,*)maxpoint
-     WRITE(11,*)maxtable
-     WRITE(11,*)maxtimes
+     WRITE(11,*)'maxtable ignored'
+     WRITE(11,*)'maxtimes ignored'
      WRITE(11,*) "total_sections ignored"
      WRITE(11,*)scalar_steps
      WRITE(11,*)debug_print

@@ -38,7 +38,6 @@ SUBROUTINE link_data
   USE link_vars
   USE general_vars, ONLY : maxlinks
   USE file_vars
-  USE logicals, ONLY : file_exist
 
   IMPLICIT NONE
 

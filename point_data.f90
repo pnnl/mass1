@@ -115,9 +115,8 @@ SUBROUTINE point_data
   USE file_vars
   USE general_vars, ONLY : units,channel_length_units
   USE transport_vars, ONLY : k_surf
-  USE logicals, ONLY : file_exist
   USE section_handler_module
-  
+
   IMPLICIT NONE
   
   INTEGER :: i,link, junk, point,sec_num,io_unit

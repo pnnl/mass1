@@ -33,7 +33,6 @@ SUBROUTINE initial_cond
     USE link_vars
     USE scalars, ONLY: species
     USE general_vars, ONLY : maxlinks,units
-    USE logicals, ONLY : file_exist
 
     IMPLICIT NONE
 
