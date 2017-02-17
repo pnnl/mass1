@@ -62,6 +62,7 @@ SUBROUTINE flow_sim
   DOUBLE PRECISION :: depth,area_temp,width,conveyance,dkdy,hydrad
   DOUBLE PRECISION :: sum,sum2,bcval,dy,dq,y_new_time, q_new_time
   DOUBLE PRECISION :: temp
+  DOUBLE PRECISION :: delta_x
 
   INTEGER :: i,j,point_num,link,point,table_type
 
