@@ -24,7 +24,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created June 23, 2005 by William A. Perkins
-# Last Change: 2017-01-25 07:22:59 d3g096
+# Last Change: 2017-02-17 15:00:08 d3g096
 # -------------------------------------------------------------
 # RCS ID: $Id$
 
@@ -118,8 +118,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_mass1_OBJECTS = accumulator.$(OBJEXT) array_alloc.$(OBJEXT) \
-	array_dealloc.$(OBJEXT) bctable.$(OBJEXT) coeff.$(OBJEXT) \
-	flow_sim.$(OBJEXT) gage_output.$(OBJEXT) \
+	array_dealloc.$(OBJEXT) banner.$(OBJEXT) bctable.$(OBJEXT) \
+	coeff.$(OBJEXT) flow_sim.$(OBJEXT) gage_output.$(OBJEXT) \
 	hydro_output.$(OBJEXT) initial_cond.$(OBJEXT) \
 	kick_off.$(OBJEXT) latflow_bc.$(OBJEXT) \
 	linear_interp.$(OBJEXT) link_bc.$(OBJEXT) link_data.$(OBJEXT) \
@@ -346,6 +346,7 @@ mass1_SOURCES = \
     accumulator.f90                             \
     array_alloc.f90                             \
     array_dealloc.f90                           \
+    banner.f90                                  \
     bctable.f90                                 \
     coeff.f90                                   \
     flow_sim.f90                                \

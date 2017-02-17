@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created June 23, 2005 by William A. Perkins
-# Last Change: 2017-01-25 07:22:59 d3g096
+# Last Change: 2017-02-17 15:00:08 d3g096
 # -------------------------------------------------------------
 # RCS ID: $Id$
 
@@ -23,6 +23,7 @@ mass1_SOURCES =                                 \
     accumulator.f90                             \
     array_alloc.f90                             \
     array_dealloc.f90                           \
+    banner.f90                                  \
     bctable.f90                                 \
     coeff.f90                                   \
     flow_sim.f90                                \

@@ -60,13 +60,7 @@ CALL time_series_module_init()
 utility_error_iounit = 11
 utility_status_iounit = 99
 
-version = 'MASS1 Version 0.84 Date: 08-15-1999'
-WRITE(*,*)'Modular Aquatic Simulation System 1D (MASS1)'
-WRITE(*,*)'Pacific Northwest National Laboratory'
-WRITE(*,*)' '
-WRITE(*,*)version
-
-
+CALL banner()
 
 ! open the status file - this file records progress through the
 ! input stream and errors
