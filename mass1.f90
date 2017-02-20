@@ -158,7 +158,7 @@ IF(do_gas)THEN
 		END SELECT
 	END DO
     IF(gas_exchange)THEN
-       CALL open_existing('gas_exchange_coeff.dat', 88, fatal=.TRUE.)
+       CALL open_existing(filename(11), 88, fatal=.TRUE.)
     ENDIF
 ENDIF
 
