@@ -176,14 +176,16 @@ CONTAINS
 
     perm = this%bottom_width + 2.0*depth
     area = depth*this%bottom_width
-    IF (perm > 0.0) THEN
+    topwidth = this%bottom_width
+    IF (area .GT. 0.0) THEN
        hydrad = area/perm
+       conveyance = (area**(5./3.))/(perm**(2./3.))
+       dkdy =  conveyance*(5.0*this%bottom_width/area - 4.0/perm)/3.0
     ELSE 
        hydrad = 0.0
+       conveyance = 0.0
+       dkdy = 0.0
     END IF
-    topwidth = this%bottom_width
-    conveyance = (area**(5./3.))/(perm**(2./3.))
-    dkdy =  conveyance*(5.0*this%bottom_width/area - 4.0/perm)/3.0
   END SUBROUTINE rectangular_props
 
   ! ----------------------------------------------------------------
