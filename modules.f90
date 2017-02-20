@@ -41,7 +41,7 @@ MODULE general_vars
   INTEGER, SAVE :: dsbc_type
   DOUBLE PRECISION, SAVE :: res_coeff,grav
   DOUBLE PRECISION, SAVE :: unit_weight_h2o,density_h2o
-  CHARACTER (LEN =120) :: version,config_version
+  CHARACTER (LEN =120) :: config_version
 
   DOUBLE PRECISION, SAVE :: depth_threshold, depth_minimum
 
