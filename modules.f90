@@ -34,14 +34,10 @@ MODULE general_vars
   DOUBLE PRECISION, SAVE :: time,time_begin,time_end,delta_t,time_mult,time_step
   INTEGER, SAVE :: units, channel_length_units
   INTEGER, SAVE :: time_units,debug_print
-  INTEGER, SAVE :: lateral_inflow_flag
-  INTEGER, SAVE :: diffusion_flag,degass_flag
-  INTEGER, SAVE :: print_output_flag, plot_output_flag
   INTEGER, SAVE :: maxlinks,maxpoint,scalar_steps
   INTEGER, SAVE :: dsbc_type
   DOUBLE PRECISION, SAVE :: res_coeff,grav
   DOUBLE PRECISION, SAVE :: unit_weight_h2o,density_h2o
-  CHARACTER (LEN =120) :: config_version
 
   DOUBLE PRECISION, SAVE :: depth_threshold, depth_minimum
 
@@ -64,7 +60,7 @@ MODULE logicals
   LOGICAL, SAVE :: do_restart,do_hotstart
   LOGICAL, SAVE :: temp_diffusion, temp_exchange
   LOGICAL, SAVE :: gas_diffusion, gas_exchange
-  LOGICAL, SAVE :: print_sections,write_sections,read_sections
+  LOGICAL, SAVE :: print_sections
   LOGICAL, SAVE :: do_latflow
   LOGICAL, SAVE :: do_accumulate
 
@@ -85,12 +81,10 @@ MODULE link_vars
 
   INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: maxpoints,linkname,linkorder,comporder,linktype,input_option
   INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: linkbc_table,num_con_links,ds_conlink,&
-       & dsbc_table,transbc_table,tempbc_table,latflowbc_table,lattransbc_table,lattempbc_table
+       & dsbc_table, transbc_table, tempbc_table, &
+       &latflowbc_table, lattransbc_table, lattempbc_table
   INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: met_zone
   INTEGER, DIMENSION(:,:),ALLOCATABLE, SAVE :: con_links
-  !INTEGER, SAVE ::  maxpoints(lmax),linkorder(lmax)
-  !INTEGER, SAVE :: linkbc_table(lmax),num_con_links(lmax),con_links(lmax,5),ds_conlink(lmax)
-  !INTEGER, SAVE :: comporder(lmax)
   DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE, SAVE :: crest
 
   DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE, SAVE :: lpiexp
@@ -117,17 +111,13 @@ MODULE section_vars
   INTEGER, PARAMETER :: maxpairs=1000,maxlevels=3500
   INTEGER, SAVE :: total_sections
   INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: section_id,section_type
-  DOUBLE PRECISION, DIMENSION(:),ALLOCATABLE, SAVE :: bottom_width,bottom_width_flood,depth_main
+  DOUBLE PRECISION, DIMENSION(:),ALLOCATABLE, SAVE :: &
+       &bottom_width,bottom_width_flood,depth_main
   DOUBLE PRECISION, DIMENSION(:),ALLOCATABLE, SAVE :: delta_y,sect_levels
 
 
-  DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: sect_area,sect_hydradius,sect_depth,sect_width,sect_convey,sect_perm
-
-  !INTEGER, SAVE :: section_id(maxsections),section_type(maxsections)
-  !INTEGER, SAVE :: section_number(lmax,pmax), total_sections
-
-  !REAL, SAVE :: bottom_width(maxsections),bottom_width_flood(maxsections)
-  !REAL, SAVE :: depth_main(maxsections)
+  DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: &
+       &sect_area,sect_hydradius,sect_depth,sect_width,sect_convey,sect_perm
 
 CONTAINS
 
@@ -155,7 +145,7 @@ CONTAINS
     ALLOCATE(sect_width(maxsections,maxlevels))
     ALLOCATE(sect_convey(maxsections,maxlevels))
     ALLOCATE(sect_perm(maxsections,maxlevels))
-    
+b    
 
   END SUBROUTINE allocate_section_vars
 

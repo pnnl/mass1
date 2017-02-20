@@ -51,10 +51,10 @@ SUBROUTINE read_config
 
   line = 0
 
-  READ(10,1000, ERR=110)config_version
+  READ(10,1000, ERR=110) msg
   line = line + 1
 1000 FORMAT(a100)
-  WRITE(*,*)config_version
+  WRITE(*,*) msg
 
   READ(10,*, ERR=110)dumlog
   line = line + 1
@@ -174,22 +174,11 @@ SUBROUTINE read_config
      print_sections = .false.
   ENDIF
 
-  READ(10,*,ERR=110)dumlog
+  READ(10,*,ERR=110) ignored ! write_sections
   line = line + 1
-  IF(dumlog == 1)THEN
-     write_sections	= .true.
-  ELSE
-     write_sections = .false.
-  ENDIF
 
-  READ(10,*,ERR=110)dumlog
+  READ(10,*,ERR=110) ignored ! read_sections 
   line = line + 1
-  IF(dumlog == 1)THEN
-     read_sections	= .true.
-  ELSE
-     read_sections = .false.
-  ENDIF
-
 
   READ(10,*,ERR=110)units
   line = line + 1
