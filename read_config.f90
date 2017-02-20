@@ -232,22 +232,22 @@ SUBROUTINE read_config
   READ(10,*,ERR=110)debug_print
   line = line + 1
 
-  READ(10,*,ERR=110)filename(2)
+  READ(10,*,ERR=110)filename(2)         ! links
   line = line + 1
 
-  READ(10,*,ERR=110)filename(3)
+  READ(10,*,ERR=110)filename(3)         ! points
   line = line + 1
 
-  READ(10,*,ERR=110)filename(4)
+  READ(10,*,ERR=110)filename(4)         ! sections
   line = line + 1
 
-  READ(10,*,ERR=110)filename(5)
+  READ(10,*,ERR=110)filename(5)         ! link BC
   line = line + 1
 
-  READ(10,*,ERR=110)filename(6)
+  READ(10,*,ERR=110)filename(6)         ! initial conditions
   line = line + 1
 
-  READ(10,*,ERR=110)filename(7)
+  READ(10,*,ERR=110)filename(7)         ! output.out
   line = line + 1
 
   READ(10,*,ERR=110)filename(9)		! gas transport bc file
@@ -259,25 +259,25 @@ SUBROUTINE read_config
   READ(10,*,ERR=110)filename(18)	! weather bc file
   line = line + 1
 
-  READ(10,*,ERR=110)filename(10)
+  READ(10,*,ERR=110)filename(10)        ! hydro BC file
   line = line + 1
 
-  READ(10,*,ERR=110)filename(11)
+  READ(10,*,ERR=110)filename(11)        ! TDG coefficients
   line = line + 1
 
-  READ(10,*,ERR=110)filename(12)
+  READ(10,*,ERR=110)filename(12)        ! restart file to read
   line = line + 1
 
-  READ(10,*,ERR=110)filename(13)
+  READ(10,*,ERR=110)filename(13)        ! hotstart file to write
   line = line + 1
 
-  READ(10,*,ERR=110)filename(14)
+  READ(10,*,ERR=110)filename(14)        ! gage control
   line = line + 1
 
-  READ(10,*,ERR=110)filename(15)
+  READ(10,*,ERR=110)filename(15)        ! profile control
   line = line + 1
 
-  READ(10,*,ERR=110)filename(16) ! lateral inflow data file
+  READ(10,*,ERR=110)filename(16)        ! lateral inflow data file
   line = line + 1
 
   READ(10,*,ERR=110)date_run_begins
