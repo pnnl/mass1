@@ -117,11 +117,11 @@ SUBROUTINE point_data
 
   IMPLICIT NONE
   
-  INTEGER :: i,link, junk, point,sec_num,io_unit
+  INTEGER :: i,link, junk, point,sec_num
   DOUBLE PRECISION :: delta_x, slope, start_el,end_el,manning_n,length,diffusion
   DOUBLE PRECISION :: surface_mass_trans
   CHARACTER (LEN=256) :: msg
-  INTEGER, PARAMETER :: iunit = 22, iounit = 26
+  INTEGER, PARAMETER :: iunit = 22, io_unit = 26
   
   CALL open_existing(config%point_file, iunit, fatal=.TRUE.)
   
