@@ -30,7 +30,6 @@ MODULE profile_output_module
 
   USE utility
   USE accumulator
-  USE file_vars
   USE transport_vars
   USE gas_functions
   USE mass1_config

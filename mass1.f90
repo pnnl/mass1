@@ -33,7 +33,6 @@ PROGRAM mass1
   USE date_time
   USE time_series
   USE general_vars
-  USE file_vars
   USE link_vars, ONLY : linktype
   USE section_handler_module
 
