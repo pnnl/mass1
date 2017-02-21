@@ -46,19 +46,6 @@ MODULE general_vars
 
 END MODULE general_vars
 !----------------------------------------------------------
-MODULE logicals
-
-  ! LOGICAL, SAVE :: do_flow,do_gas,do_temp,do_printout,do_gageout,do_profileout
-  ! LOGICAL, SAVE :: do_restart,do_hotstart
-  ! LOGICAL, SAVE :: temp_diffusion, temp_exchange
-  ! LOGICAL, SAVE :: gas_diffusion, gas_exchange
-  ! LOGICAL, SAVE :: print_sections
-  ! LOGICAL, SAVE :: do_latflow
-  ! LOGICAL, SAVE :: do_accumulate
-
-END MODULE logicals
-
-!----------------------------------------------------------
 MODULE file_vars
 
   ! CHARACTER (LEN = 100), SAVE :: filename(20)
