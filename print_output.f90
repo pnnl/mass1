@@ -62,7 +62,6 @@ CASE("HEADER")
 
          WRITE(iounit1,1025)
 1025 FORMAT(5x,'One-Dimensional River Simulation Model'//)
-1030 FORMAT(5x,a120/)
          WRITE(iounit1,1040)
 1040 FORMAT(5x,'Pacific Northwest National Laboratory')
          WRITE(iounit1,1050)

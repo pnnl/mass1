@@ -17,8 +17,8 @@
 ! COMMENTS:
 !
 !
-! MOD HISTORY: 	added console output; mcr 12/10/97
-!								merged the old gastrans routine into this routine; mcr 10-8-98
+! MOD HISTORY:  added console output; mcr 12/10/97
+!                                                               merged the old gastrans routine into this routine; mcr 10-8-98
 !
 !
 !***************************************************************
@@ -254,7 +254,7 @@ PROGRAM mass1
         END IF
         CALL accum_calc(time)
         IF (config%do_printout)CALL print_output("RESULT", time)
-        IF (config%do_gageout) CALL gage_output	
+        IF (config%do_gageout) CALL gage_output 
         IF (config%do_profileout) CALL profile_output
         CALL accum_reset(time)
      ENDIF

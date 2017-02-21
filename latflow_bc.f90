@@ -30,7 +30,6 @@ SUBROUTINE latflow_bc
   USE utility
   USE mass1_config
   USE bctable
-  USE link_vars, ONLY: linktype
   
   IMPLICIT NONE
 

@@ -36,7 +36,7 @@ SUBROUTINE initial_cond
   IMPLICIT NONE
 
 
-  INTEGER :: link,point, i
+  INTEGER :: link, i
   DOUBLE PRECISION :: junk3,depth,junk2,junk4
 
   INTEGER, PARAMETER :: iunit = 25

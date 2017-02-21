@@ -143,9 +143,8 @@ SUBROUTINE link_connect()
   IMPLICIT NONE
 
   CHARACTER(LEN=1024) :: msg, lbl
-  INTEGER :: link, dlink, ulink, i
+  INTEGER :: link, dlink, i
   INTEGER :: nds
-  LOGICAL :: done
   INTEGER :: ierr
   INTEGER :: link_set_order
   TYPE (confluence_t), POINTER :: con

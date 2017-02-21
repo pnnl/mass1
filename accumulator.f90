@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created November  6, 2000 by William A. Perkins
-! Last Change: 2017-02-21 08:13:16 d3g096
+! Last Change: 2017-02-21 12:26:20 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE accumulator
@@ -22,7 +22,6 @@ MODULE accumulator
 
   IMPLICIT NONE
   
-  CHARACTER(LEN=80), SAVE, PRIVATE :: RCS_ID = "$Id$"
   DOUBLE PRECISION, PARAMETER, PRIVATE :: realbig = 1.0e+10, realsmall = 1.0e-10
 
   TYPE accum_var_rec

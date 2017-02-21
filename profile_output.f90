@@ -3,7 +3,7 @@
 !            Pacific Northwest National Laboratory
 !***************************************************************
 !
-! NAME:	profile_output
+! NAME: profile_output
 !
 ! VERSION and DATE: MASS1 v0.61 11/21/1997
 !
@@ -36,7 +36,6 @@ MODULE profile_output_module
 
   IMPLICIT NONE
   
-  CHARACTER(LEN=80), SAVE, PRIVATE :: RCS_ID = "$Id$"
   INTEGER, PARAMETER, PRIVATE :: maxpro=10, iobase=40
 
   INTEGER, SAVE, PRIVATE :: num_profiles
@@ -60,29 +59,29 @@ CONTAINS
     INTEGER :: profile_num_links(maxpro), profile_max
     CHARACTER*4 profile_x_units(maxpro)
 
-    CHARACTER*20 fname,string1,string2,input_str
+    CHARACTER*20 fname,string1
     INTEGER :: len1, spot1, spot2
 
     INTEGER, PARAMETER :: punit = 34
    
-	count = 0
+        count = 0
     profile_max = 0
 
     CALL open_existing(config%profile_file, punit, fatal=.TRUE.)
 
-	DO WHILE(.TRUE.)
-       count=count+1	
-       READ(punit,*,END=100)profile_num_links(count),profile_x_units(count),x_pro_start(count)	
-       READ(punit,*)profile(count,1:profile_num_links(count))	
-	END DO
-100	CLOSE(punit)
+        DO WHILE(.TRUE.)
+       count=count+1    
+       READ(punit,*,END=100)profile_num_links(count),profile_x_units(count),x_pro_start(count)  
+       READ(punit,*)profile(count,1:profile_num_links(count))   
+        END DO
+100     CLOSE(punit)
 
     IF (count .gt. 0) count = count - 1
-	num_profiles=count
+        num_profiles=count
 
     ! open the files for each profile
 
-	DO i=1,num_profiles
+        DO i=1,num_profiles
        count = iobase + i
 
                                 !this does not work with Lahey
@@ -103,26 +102,26 @@ CONTAINS
        ! WRITE (fname, '(''profile'', I0.1, ''.out'')') i
 
        OPEN(count,file=fname)
-	END DO
+        END DO
 
     ! compute the relative x distance from start to end on each
     ! profile. 
 
-	DO i=1,num_profiles
+        DO i=1,num_profiles
        profile_max_points(i) = 0
        DO j=1,profile_num_links(i)
           link = profile(i,j)
           profile_max_points(i) =  profile_max_points(i) + maxpoints(link)
        END DO
        profile_max = MAX(profile_max_points(i),profile_max)
-	END DO
+        END DO
 
-	ALLOCATE(x_profile(maxpro,profile_max),profile_link(maxpro,profile_max),profile_point(maxpro,profile_max))
+        ALLOCATE(x_profile(maxpro,profile_max),profile_link(maxpro,profile_max),profile_point(maxpro,profile_max))
 
     ! figure out how the relative x distance along the profile
     ! figure out correspondence with profile point to link,point
 
-	DO i=1,num_profiles
+        DO i=1,num_profiles
        count = 0
 
        IF(profile_x_units(i) == 'RM')THEN
@@ -154,7 +153,7 @@ CONTAINS
           END DO
        END IF
        
-	END DO
+        END DO
 
     
 
@@ -175,11 +174,9 @@ CONTAINS
     IMPLICIT NONE
 
     DOUBLE PRECISION :: depth
-    DOUBLE PRECISION :: tdg_press, tdg_sat
-    DOUBLE PRECISION :: salinity = 0.0
 
     INTEGER :: i,j,link,lastlink,point
-    INTEGER :: profile_max=0,count=0
+    INTEGER :: count=0
     CHARACTER (LEN=10) :: date_string, time_string
 
     IF(time == config%time%begin ) CALL profile_read()

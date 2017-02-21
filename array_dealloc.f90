@@ -37,8 +37,6 @@ USE confluence_module
 
 IMPLICIT NONE
 
-INTEGER :: link
-
 !----------------------------------------------------------
 !flow coeff module
 

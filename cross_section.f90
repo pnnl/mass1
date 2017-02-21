@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2017-02-21 11:16:07 d3g096
+! Last Change: 2017-02-21 12:20:28 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -17,8 +17,6 @@ MODULE cross_section
   USE utility
 
   IMPLICIT NONE
-
-  CHARACTER (LEN=80), PRIVATE, SAVE :: rcsid = "$Id$"
 
   ! ----------------------------------------------------------------
   ! TYPE xsection_t
@@ -145,6 +143,7 @@ CONTAINS
     CLASS(rectangular_section), INTENT(IN) :: this
     INTEGER, INTENT(IN) :: iounit
     INTEGER, INTENT(OUT) :: ioerr
+    ioerr = iounit
     ioerr = 0
     ! do nothing
     RETURN
@@ -295,13 +294,12 @@ CONTAINS
     DOUBLE PRECISION :: linear_interp !external
 
     INTEGER :: i, j, count
-    INTEGER :: num_levels
     INTEGER :: iperm(num_pairs)
     DOUBLE PRECISION :: x(num_pairs), y(num_pairs)
     DOUBLE PRECISION :: y_new(num_pairs)
     DOUBLE PRECISION :: width(num_pairs), width_new(num_pairs)
     DOUBLE PRECISION :: level, x_inter, max_elv, min_elv
-    LOGICAL :: last_point_wet, unique
+    LOGICAL :: last_point_wet
 
     this%delta_y = delta_y
     this%nonmono = .FALSE.
@@ -662,7 +660,7 @@ CONTAINS
     
     DOUBLE PRECISION :: y
     DOUBLE PRECISION :: area, hydrad, topwidth, conveyance, dkdy
-    INTEGER :: id, i, steps
+    INTEGER :: i, steps
     
 
     WRITE(iounit, *)

@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October 10, 2001 by William A. Perkins
-! Last Change: 2017-02-21 11:50:09 d3g096
+! Last Change: 2017-02-21 12:26:20 d3g096
 ! ----------------------------------------------------------------
 
 
@@ -25,7 +25,6 @@ MODULE pidlink
   USE mass1_config
 
   IMPLICIT NONE
-  CHARACTER (LEN=80), PRIVATE, SAVE :: rcsid = "$Id$"
   CHARACTER (LEN=80), PARAMETER, PRIVATE :: default_filename = "pidlink.dat"
   INTEGER, PARAMETER, PRIVATE :: maxlags = 5
 

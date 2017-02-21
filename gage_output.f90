@@ -42,8 +42,6 @@ SUBROUTINE gage_output
 
   IMPLICIT NONE
 
-  CHARACTER(LEN=80), SAVE :: RCS_ID = "$Id$"
-
   INTEGER, PARAMETER :: gcunit = 33, gunit = 51
 
   DOUBLE PRECISION :: depth, tdg_sat, tdg_press
@@ -155,8 +153,6 @@ SUBROUTINE gage_output
           f8.2,2x,f6.2,f6.2,es10.2,2x,es10.2)
 
      !WRITE(count,1000)time/time_mult,q(link,point),y(link,point),depth,vel(link,point),c(link,point),temp(link,point)
-
-1000 FORMAT(6f10.2,11f12.6)
 
   END DO
 

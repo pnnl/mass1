@@ -38,7 +38,7 @@ SUBROUTINE fluvial_coeff(a,b,c,d,g,ap,bp,cp,dp,gp,dx,dt,gr,latq_old,latq_new,lpi
   DOUBLE PRECISION :: latq_old,latq_new
   DOUBLE PRECISION, INTENT(IN) :: lpiexp
   DOUBLE PRECISION :: dt
-  DOUBLE PRECISION :: sigma, fravg, davg
+  DOUBLE PRECISION :: sigma, fravg
 
   ! Normal fluvial link
 
