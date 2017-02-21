@@ -41,7 +41,7 @@ SUBROUTINE point_data_scan()
   
   USE utility
   USE mass1_config
-  USE general_vars
+  ! USE general_vars
 
   IMPLICIT NONE
 
@@ -125,7 +125,7 @@ SUBROUTINE point_data
   
   CALL open_existing(config%point_file, iunit, fatal=.TRUE.)
   
-  CALL print_output("POINTS")
+  CALL print_output("POINTS", 0.0)
   
   
   DO WHILE(.TRUE.)

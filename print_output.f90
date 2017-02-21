@@ -24,11 +24,11 @@
 !***************************************************************
 !
 
-SUBROUTINE print_output(option)
+SUBROUTINE print_output(option, time)
 
 USE mass1_config
 USE link_vars
-USE general_vars
+! USE general_vars
 USE point_vars
 USE transport_vars
 
@@ -40,12 +40,13 @@ USE section_handler_module
 
 IMPLICIT NONE
 
+CHARACTER (LEN=6), INTENT(IN) :: option
+DOUBLE PRECISION, INTENT(IN) :: time
 
 DOUBLE PRECISION :: depth
 DOUBLE PRECISION :: tdg_press, tdg_sat
 DOUBLE PRECISION :: salinity = 0.0
 INTEGER :: link,point
-CHARACTER (LEN=6) :: option
 CHARACTER (LEN=10) :: date_string, time_string
 
 INTEGER, PARAMETER :: iounit1 = 26

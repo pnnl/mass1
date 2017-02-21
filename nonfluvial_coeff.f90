@@ -27,7 +27,6 @@
 SUBROUTINE nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
 
   USE mass1_config
-  ! USE general_vars, ONLY: units
   USE section_handler_module
   USE point_vars
   USE link_vars, ONLY : linktype, crest

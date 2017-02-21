@@ -45,7 +45,7 @@ SUBROUTINE link_data
 
   CALL open_existing(config%link_file, lunit, fatal=.TRUE.)
 
-  CALL print_output("LINKS ")
+  CALL print_output("LINKS ", 0.0)
 
   DO i=1,config%maxlinks
 

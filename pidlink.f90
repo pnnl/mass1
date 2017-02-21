@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October 10, 2001 by William A. Perkins
-! Last Change: 2017-02-21 08:04:31 d3g096
+! Last Change: 2017-02-21 09:16:53 d3g096
 ! ----------------------------------------------------------------
 
 
@@ -316,7 +316,6 @@ CONTAINS
   ! ----------------------------------------------------------------
   SUBROUTINE pidlink_initialize()
 
-    ! USE general_vars, ONLY: time_begin, time_mult, time_step
     USE link_vars, ONLY: linkbc_table
     USE point_vars, ONLY: q
     USE bctable
