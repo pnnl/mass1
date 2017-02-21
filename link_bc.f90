@@ -29,30 +29,24 @@
 SUBROUTINE link_bc
   
   USE utility
+  USE mass1_config
   USE bctable
-  USE general_vars, ONLY: maxlinks
   USE link_vars, ONLY: linktype
-  USE file_vars, ONLY: filename
-  USE date_vars, ONLY: time_option
 
   IMPLICIT NONE
 
   INTEGER :: link
 
-  SELECT CASE(time_option)
-
-  CASE(1) ! time units are sec,hours,minutes, or days in file
-
+  SELECT CASE (config%time%option)
+  CASE (DECIMAL_TIME_OPTION)
      CALL error_message("Time option not supported in link_bc", .TRUE.)
+  CASE (DATE_TIME_OPTION)
+     linkbc => bc_table_read(config%linkbc_file, 1)
 
-  CASE(2) ! date/time format is used mm:dd:yyyy hh:mm:ss converted to decimal julian day
-
-     linkbc => bc_table_read(filename(5), 1)
-
-     DO link=1,maxlinks
+     DO link=1,config%maxlinks
         SELECT CASE(linktype(link)) 
         CASE(6,21)
-           hydrobc => bc_table_read(filename(10), 2)
+           hydrobc => bc_table_read(config%hydrobc_file, 2)
            EXIT
         END SELECT
      END DO

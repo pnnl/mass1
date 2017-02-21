@@ -34,7 +34,7 @@ MODULE profile_output_module
   USE transport_vars
   USE date_vars
   USE gas_functions
-  USE logicals, ONLY : do_temp, do_gas, temp_exchange, gas_exchange
+  USE mass1_config
 
   IMPLICIT NONE
   
@@ -68,7 +68,7 @@ CONTAINS
 	count = 0
     profile_max = 0
 
-    CALL open_existing(filename(15), fileunit(15), fatal=.TRUE.)
+    CALL open_existing(config%profile_file, fileunit(15), fatal=.TRUE.)
 
 	DO WHILE(.TRUE.)
        count=count+1	
@@ -181,7 +181,7 @@ CONTAINS
     INTEGER :: i,j,link,lastlink,point
     INTEGER :: profile_max=0,count=0
 
-    IF(time == time_begin ) CALL profile_read()
+    IF(time == config%time%begin ) CALL profile_read()
 
     DO i=1,num_profiles
 
@@ -234,7 +234,7 @@ CONTAINS
     END DO
 
 
-    IF(time >= time_end)THEN
+    IF(time >= config%time%end)THEN
 
        DO i=1,num_profiles
           count = iobase + i

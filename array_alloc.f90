@@ -29,15 +29,19 @@ SUBROUTINE array_alloc
 
 ! $DEBUG
 
+USE mass1_config
 USE flow_coeffs
 USE link_vars
 USE point_vars
 USE transport_vars
-USE general_vars, ONLY : maxlinks,maxpoint
 USE hydro_output_module
 USE confluence_module
 
 IMPLICIT NONE
+
+INTEGER :: maxlinks, maxpoint
+maxlinks = config%maxlinks
+maxpoint = config%maxpoint
 
 !----------------------------------------------------------
 !flow coeff module

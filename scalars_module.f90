@@ -86,10 +86,14 @@ END SUBROUTINE allocate_species_components
 
 SUBROUTINE allocate_species(error_iounit,status_iounit)
 
-  USE general_vars, ONLY: maxlinks, maxpoint
+  USE mass1_config
 
   IMPLICIT NONE
   INTEGER :: alloc_stat,error_iounit,status_iounit
+  INTEGER :: maxlinks, maxpoint
+
+  maxlinks = config%maxlinks
+  maxpoint = config%maxpoint
 
   ALLOCATE(species(max_species), STAT = alloc_stat)
   IF(alloc_stat /= 0)THEN
@@ -172,7 +176,7 @@ END FUNCTION tvd_steps
 ! ----------------------------------------------------------------
 SUBROUTINE tvd_interp(time, htime0, htime1)
 
-  USE general_vars, ONLY: maxlinks, htime=>time, htime_begin=>time_begin
+  USE mass1_config
   USE section_handler_module
   USE link_vars, ONLY: maxpoints, linktype
   USE point_vars, ONLY: thalweg, &
@@ -182,14 +186,19 @@ SUBROUTINE tvd_interp(time, htime0, htime1)
 
   IMPLICIT NONE
 
+  DOUBLE PRECISION :: htime, htime_begin, htime_end
   DOUBLE PRECISION :: time, htime0, htime1
   DOUBLE PRECISION :: val, val0, val1
   INTEGER :: link, point
   EXTERNAL dlinear_interp
   DOUBLE PRECISION dlinear_interp
 
+  htime_begin = config%time%begin
+  htime_end = config%time%end
+  
+
   IF (time .eq. htime_begin) THEN
-     DO link = 1, maxlinks
+     DO link = 1, config%maxlinks
         y(link,:) = hy_old(link,:)
         area(link,:) = harea_old(link,:)
         q(link,:) = hq_old(link,:)
@@ -197,7 +206,7 @@ SUBROUTINE tvd_interp(time, htime0, htime1)
      END DO
   END IF
 
-  DO link = 1, maxlinks
+  DO link = 1, config%maxlinks
      area_old(link,:) = area(link,:)
      q_old(link,:) = q(link,:)
      y_old(link,:) = y(link,:)
@@ -248,8 +257,8 @@ END SUBROUTINE tvd_interp
 !----------------------------------------------------------------------------------
 SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
 
+  USE mass1_config
   USE transport_vars , ONLY : k_surf, dxx
-  USE general_vars, ONLY : maxlinks, maxpoint, time_mult, time_begin
   USE link_vars, ONLY : maxpoints, comporder, linktype, &
        &linkbc_table, met_zone, tempbc_table, transbc_table, &
        &lattempbc_table, lattransbc_table
@@ -274,7 +283,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
 
   INTEGER :: i,j,link,point
   DOUBLE PRECISION :: velave,sum,cflx,s,corr,tmp,phi,dtdx,ave_vel
-  DOUBLE PRECISION :: f(maxpoint)
+  DOUBLE PRECISION :: f(config%maxpoint)
   DOUBLE PRECISION :: k_e,k_w,area_e,area_w,flux_e,flux_w
   DOUBLE PRECISION :: qspill,qgen 
   DOUBLE PRECISION :: energy_source, depth, transfer_coeff
@@ -294,7 +303,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
   !WRITE(*,*)c(1,0),c(1,151),dxx(1,0),dxx(1,151)
   ! run through links from top to bottom
   
-  links_forward: DO i=1,maxlinks
+  links_forward: DO i=1,config%maxlinks
 
      link = comporder(i)
 
@@ -317,12 +326,13 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
         
         IF((linktype(i) == 6) .AND. (species_num == 1))THEN
            
-           call bc_table_interpolate(hydrobc, linkbc_table(link), time/time_mult)
+           call bc_table_interpolate(hydrobc, linkbc_table(link), time/config%time%mult)
            qgen = bc_table_current(hydrobc, linkbc_table(link), 1)
            qspill = bc_table_current(hydrobc, linkbc_table(link), 2)
            
-           IF(do_temp .AND. temp_exchange) CALL update_met_data(time, met_zone(link))
-           IF(do_temp) t_water = species(2)%conc(link,2)
+           IF(config%do_temp .AND. config%temp_exchange) &
+                &CALL update_met_data(config%do_gas, time, met_zone(link))
+           IF(config%do_temp) t_water = species(2)%conc(link,2)
            IF(qspill > 0.0)THEN
               !			equations are for %Sat and effective Spill Q in Kcfs
               !			Qspill is in effective KCFS = Qspill + qgen_frac*Qgen
@@ -390,7 +400,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
         
         
         !set distance difference array
-        IF(time == time_begin)THEN
+        IF(time == config%time%begin)THEN
            point = 1
            dxx(link,1) = ABS(x(link,point+1) - x(link,point))
            dxx(link,0) = dxx(link,1)
@@ -409,10 +419,11 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
         
         SELECT CASE(species_num)
         CASE(1) ! gas species
-           IF(do_temp .AND. temp_exchange) CALL update_met_data(time, met_zone(link))
-           IF(do_temp)THEN
+           IF(config%do_temp .AND. config%temp_exchange) &
+                &CALL update_met_data(config%do_gas, time, met_zone(link))
+           IF(config%do_temp)THEN
               IF((.NOT. ASSOCIATED(ucon(link)%wrap)) .AND. (tempbc_table(link) /= 0))THEN
-                 call bc_table_interpolate(tempbc, tempbc_table(link), time/time_mult)
+                 call bc_table_interpolate(tempbc, tempbc_table(link), time/config%time%mult)
                  t_water = bc_table_current(tempbc, tempbc_table(link), 1)
               ELSE
                  t_water = species(2)%conc(link,1)
@@ -422,18 +433,18 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
            IF((.NOT. ASSOCIATED(ucon(link)%wrap)) .AND. (transbc_table(link) /= 0))THEN
               SELECT CASE(linktype(link))
               CASE(1)
-                 call bc_table_interpolate(transbc, transbc_table(link), time/time_mult)
+                 call bc_table_interpolate(transbc, transbc_table(link), time/config%time%mult)
                  c(link,point) = bc_table_current(transbc, transbc_table(link), 1)
 
               CASE(20) ! %TDG Saturation is specified
-                 call bc_table_interpolate(transbc, transbc_table(link), time/time_mult)
+                 call bc_table_interpolate(transbc, transbc_table(link), time/config%time%mult)
                  upstream_c = bc_table_current(transbc, transbc_table(link), 1)
                  c(link,point) = TDGasConcfromSat(upstream_c, t_water, salinity, baro_press)
                  
                  
                  !-------------------------------------------------------------------
               CASE(21) ! Hydro project inflow link
-                 call bc_table_interpolate(hydrobc, linkbc_table(link), time/time_mult)
+                 call bc_table_interpolate(hydrobc, linkbc_table(link), time/config%time%mult)
                  qgen = bc_table_current(hydrobc, linkbc_table(link), 1)
                  qspill = bc_table_current(hydrobc, linkbc_table(link), 2)
 
@@ -481,7 +492,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                  hydro_spill(link) = qspill
                  hydro_disch(link) = q(link, 1)
 
-                 call bc_table_interpolate(transbc, transbc_table(link), time/time_mult)
+                 call bc_table_interpolate(transbc, transbc_table(link), time/config%time%mult)
                  upstream_c = bc_table_current(transbc, transbc_table(link), 1)
                  upstream_c = TDGasConcfromSat(upstream_c, t_water, salinity, baro_press)
                  
@@ -506,16 +517,16 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
               
               SELECT CASE(linktype(link))
               CASE(1) ! % internal C (mg/L) specified
-                 call bc_table_interpolate(transbc, transbc_table(link), time/time_mult)
+                 call bc_table_interpolate(transbc, transbc_table(link), time/config%time%mult)
                  c(link,point) = bc_table_current(transbc, transbc_table(link), 1)
                  
               CASE(20) ! internal %TDG Saturation is specified
-                 call bc_table_interpolate(transbc, transbc_table(link), time/time_mult)
+                 call bc_table_interpolate(transbc, transbc_table(link), time/config%time%mult)
                  upstream_c = bc_table_current(transbc, transbc_table(link), 1)
                  c(link,point) = TDGasConcfromSat(upstream_c, t_water, salinity, baro_press)
                               
               CASE(21) ! Hydro project inflow for an internal link
-                 call bc_table_interpolate(hydrobc, linkbc_table(link), time/time_mult)
+                 call bc_table_interpolate(hydrobc, linkbc_table(link), time/config%time%mult)
                  qgen = bc_table_current(hydrobc, linkbc_table(link), 1)
                  qspill = bc_table_current(hydrobc, linkbc_table(link), 2)
                  
@@ -539,12 +550,12 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                     
                     SELECT CASE(gas_eqn_type(link))
                     CASE(0)
-                       call bc_table_interpolate(transbc, transbc_table(link), time/time_mult)
+                       call bc_table_interpolate(transbc, transbc_table(link), time/config%time%mult)
                        c(link,point) = bc_table_current(transbc, transbc_table(link), 1)
                        hydro_conc(link) = c(link,point)
                        hydro_sat(link) = TDGasSaturation(hydro_conc(link), t_water, salinity, baro_press)
                     CASE(1)
-                       call bc_table_interpolate(transbc, transbc_table(link), time/time_mult)
+                       call bc_table_interpolate(transbc, transbc_table(link), time/config%time%mult)
                        tdg_saturation = bc_table_current(transbc, transbc_table(link), 1)
                        hydro_conc(link) = c(link,point)
                        hydro_sat(link) = tdg_saturation
@@ -605,12 +616,12 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
            
         CASE(2) ! temperature species
            IF((.NOT. ASSOCIATED(ucon(link)%wrap)) .AND. (tempbc_table(link) /= 0))THEN
-              call bc_table_interpolate(tempbc, tempbc_table(link), time/time_mult)
+              call bc_table_interpolate(tempbc, tempbc_table(link), time/config%time%mult)
               c(link,point) = bc_table_current(tempbc, tempbc_table(link), 1)
            ELSE IF((ASSOCIATED(ucon(link)%wrap)) .AND. (tempbc_table(link) == 0)) THEN! internal link
               c(link, point) = ucon(link)%wrap%conc(c)
            ELSE IF((ASSOCIATED(ucon(link)%wrap)) .AND. (tempbc_table(link) /= 0)) THEN! internal link with table spec
-              call bc_table_interpolate(tempbc, tempbc_table(link), time/time_mult)
+              call bc_table_interpolate(tempbc, tempbc_table(link), time/config%time%mult)
               c(link,point) = bc_table_current(tempbc, tempbc_table(link), 1)
            ELSE 
               WRITE(*,*)'no temp BC specification for link',link,' -- ABORT'
@@ -706,8 +717,8 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
         !	explicit finite-volume solution
         !
         diffusion = .FALSE.
-        IF( (species_num == 1) .AND. gas_diffusion ) diffusion = .TRUE.
-        IF( (species_num == 2) .AND. temp_diffusion ) diffusion = .TRUE.
+        IF( (species_num == 1) .AND. config%gas_diffusion ) diffusion = .TRUE.
+        IF( (species_num == 2) .AND. config%temp_diffusion ) diffusion = .TRUE.
         IF(diffusion)THEN
            DO point = 2, maxpoints(link)-1
               
@@ -739,17 +750,17 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                                 ! lateral inflow is the same as the
                                 ! current concentration
 
-        IF (do_latflow) THEN
+        IF (config%do_latflow) THEN
            DO point=2,maxpoints(link)-1
               avg_area = (area(link,point) + area_old(link,point))/2.0
               avg_latq = (latq(link,point) + latq_old(link,point))/2.0
               IF (avg_latq < 0.0) THEN
                  upstream_c = c(link,point)
               ELSE IF (species_num .EQ. 1 .AND. lattransbc_table(link) .GT. 0) THEN ! tdg
-                 call bc_table_interpolate(transbc, lattransbc_table(link), time/time_mult)
+                 call bc_table_interpolate(transbc, lattransbc_table(link), time/config%time%mult)
                  upstream_c = bc_table_current(transbc, lattransbc_table(link), 1);
               ELSE IF (species_num .EQ. 2 .AND. lattempbc_table(link) .GT. 0) THEN ! temperature
-                 call bc_table_interpolate(tempbc, lattempbc_table(link), time/time_mult)
+                 call bc_table_interpolate(tempbc, lattempbc_table(link), time/config%time%mult)
                  upstream_c = bc_table_current(tempbc, lattempbc_table(link), 1);
               ELSE 
                  upstream_c = c(link,point)
@@ -764,9 +775,9 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
 
                                 ! Gas exchange
 
-        IF((species_num == 1) .AND. (gas_exchange) )THEN
+        IF((species_num == 1) .AND. (config%gas_exchange) )THEN
            DO point=2,maxpoints(link)-1
-              CALL update_met_data(time, met_zone(link))
+              CALL update_met_data(config%do_gas, time, met_zone(link))
               t_water = species(2)%conc(link,point)
               ccstar  = TDGasConc(baro_press, t_water, salinity) !c* will be conc at baro press
               transfer_coeff = gasx_a + gasx_b*windspeed + gasx_c*windspeed**2 + gasx_d*windspeed**3
@@ -782,9 +793,9 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                                 ! Heating/Cooling to Atmosphere
         
         !-------------------------------------------------------------------------
-        IF((species_num == 2) .AND. (temp_exchange) )THEN
+        IF((species_num == 2) .AND. (config%temp_exchange) )THEN
            DO point=2,maxpoints(link)-1
-              CALL update_met_data(time, met_zone(link))
+              CALL update_met_data(config%do_gas, time, met_zone(link))
               t_water = c(link,point)
               depth = y(link,point) - thalweg(link,point)
               call met_zone_coeff(met_zone(link), met_coeff)

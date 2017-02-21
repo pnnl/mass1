@@ -26,277 +26,261 @@
 
 PROGRAM mass1
 
-! set units and time constant
+  ! set units and time constant
 
 
-USE utility
-USE date_time
-USE time_series
-USE general_vars
-USE date_vars
-USE file_vars
-USE logicals
-USE link_vars, ONLY : linktype
-USE section_handler_module
+  USE utility
+  USE date_time
+  USE time_series
+  USE general_vars
+  USE date_vars
+  USE file_vars
+  USE logicals
+  USE link_vars, ONLY : linktype
+  USE section_handler_module
 
-USE scalars
-USE met_data_module, ONLY : read_met_data
-USE tdg_equation_coeff
-USE profile_output_module
-USE accumulator
-USE pidlink
+  USE scalars
+  USE met_data_module, ONLY : read_met_data
+  USE tdg_equation_coeff
+  USE profile_output_module
+  USE accumulator
+  USE pidlink
+  USE mass1_config
 
-IMPLICIT NONE
+  IMPLICIT NONE
 
-DOUBLE PRECISION  model_time
-INTEGER, SAVE :: time_step_count = 0
-INTEGER :: species_num, i
-INTEGER :: link
-INTEGER :: tsteps
-LOGICAL run
+  DOUBLE PRECISION  model_time
+  INTEGER, SAVE :: time_step_count = 0
+  INTEGER :: species_num, i
+  INTEGER :: link
+  INTEGER :: tsteps
+  LOGICAL run
 
-CALL date_time_flags()
-CALL time_series_module_init()
-utility_error_iounit = 11
-utility_status_iounit = 99
+  CALL date_time_flags()
+  CALL time_series_module_init()
+  utility_error_iounit = 11
+  utility_status_iounit = 99
 
-CALL banner()
+  CALL banner()
 
-! open the status file - this file records progress through the
-! input stream and errors
-!
-CALL open_new('status.out', utility_status_iounit)
+  ! open the status file - this file records progress through the
+  ! input stream and errors
+  !
+  CALL open_new('status.out', utility_status_iounit)
 
-! read in configuration file
-CALL read_config
+  ! read in configuration file
+  CALL config%read()
 
-CALL print_output("HEADER")
-CALL print_output("CONFIG")
+  CALL print_output("HEADER")
+  CALL print_output("CONFIG")
 
 
-IF(debug_print == 1) WRITE(11,*)'done reading configuration file'
+  IF(config%debug_print) WRITE(11,*)'done reading configuration file'
 
-IF(time_option == 2)THEN
-    date_string = date_run_begins
-    time_string = time_run_begins
-    time_begin = date_to_decimal(date_string, time_string)
-
-    date_string = date_run_ends
-    time_string = time_run_ends
-		time_end = date_to_decimal(date_string, time_string)
-    WRITE(*,1120)date_run_begins,time_run_begins
+  SELECT CASE (config%time%option)
+  CASE (DATE_TIME_OPTION)
+     WRITE(*,1120) config%time%date_run_begins, config%time%time_run_begins
 1120 FORMAT(//' Simulation Starts on Date: ',a10,'  Time: ',a8/)
-	 WRITE(*,1130)date_run_ends,time_run_ends
+     WRITE(*,1130) config%time%date_run_ends, config%time%time_run_ends
 1130 FORMAT(' Simulation Ends on Date: ',a10,'  Time: ',a8//)
+  END SELECT
 
-!assume given in hours need to convert to decimal days
-    time_step = delta_t/24.0
+  !-----------------------------------------------------------------------
+  ! call startup routines 
 
-!assume given in hours need to convert to seconds
-    delta_t= delta_t*3600.0   
-ENDIF
+  ! CALL point_data_scan   ! or something to determine maxlinks and maxpoint prior to allocation
+  CALL array_alloc
+  CALL allocate_species(utility_error_iounit, utility_status_iounit)
+  DO i=1,max_species
+     CALL allocate_species_components(i, config%maxlinks, config%maxpoint, &
+          &utility_status_iounit, utility_error_iounit)
+  END DO
+  IF(config%debug_print)WRITE(11,*)'done with array alloc'
 
-!-----------------------------------------------------------------------
-! call startup routines 
+  sections = section_handler()
+  CALL sections%read(config%section_file)
 
-! CALL point_data_scan   ! or something to determine maxlinks and maxpoint prior to allocation
-CALL array_alloc
-CALL allocate_species(utility_error_iounit, utility_status_iounit)
-DO i=1,max_species
-	CALL allocate_species_components(i, maxlinks, maxpoint, utility_status_iounit, utility_error_iounit)
-END DO
-	IF(debug_print == 1)WRITE(11,*)'done with array alloc'
+  IF(config%debug_print)WRITE(11,*)'done with section data'
 
-sections = section_handler()
-CALL sections%read(filename(4))
+  CALL link_data
+  IF(config%debug_print)WRITE(11,*)'done link data'
 
-	IF(debug_print == 1)WRITE(11,*)'done with section data'
+  CALL point_data
+  IF(config%debug_print)WRITE(11,*)'done with point data'
 
-CALL link_data
-	IF(debug_print == 1)WRITE(11,*)'done link data'
+  CALL link_bc
+  IF(config%debug_print)WRITE(11,*)'link BC data done'
 
-CALL point_data
-	IF(debug_print == 1)WRITE(11,*)'done with point data'
+  IF(config%do_latflow)THEN
+     CALL latflow_bc
+     IF(config%debug_print)WRITE(11,*)'lateral inflow BC data done'
+  ENDIF
 
-CALL link_bc
-	IF(debug_print == 1)WRITE(11,*)'link BC data done'
+  IF(config%do_hotstart)THEN
+     CALL read_hotstart
+  ELSE
+     CALL initial_cond
+  ENDIF
+  IF(config%debug_print) WRITE(11,*)'done with ICs or hotstart read'
 
-IF(do_latflow)THEN
-   CALL latflow_bc
-   IF(debug_print == 1)WRITE(11,*)'lateral inflow BC data done'
-ENDIF
-    
-IF(do_hotstart)THEN
-	CALL read_hotstart
-ELSE
-	CALL initial_cond
-ENDIF
-	IF(debug_print == 1) WRITE(11,*)'done with ICs or hotstart read'
+  CALL kick_off
+  IF(config%debug_print) WRITE(11,*)'done with kick_off'
 
-CALL kick_off
-	IF(debug_print == 1) WRITE(11,*)'done with kick_off'
+  IF(config%do_gas)THEN
+     species_num = 1
+     CALL transport_bc(species_num)
+     IF(config%debug_print) WRITE(11,*)'done reading gas transport table'
+     CALL allocate_tdg_coeff(config%maxlinks,utility_status_iounit, utility_error_iounit)
+     ! read tdg spill coefficient tables
+     ! if linktype 6,20, or 21 is there, then open and read file
+     DO link=1,config%maxlinks
+        SELECT CASE(linktype(link)) 
+        CASE(6,21)
+           CALL tdg_coeff_read(utility_status_iounit, utility_error_iounit)
+           EXIT
+        END SELECT
+     END DO
+     IF(config%gas_exchange)THEN
+        CALL open_existing(config%tdg_coeff_file, 88, fatal=.TRUE.)
+     ENDIF
+  ENDIF
 
-IF(time_option == 1)THEN
-		time_begin = time_begin*time_mult
-		time_end = time_end*time_mult
-		delta_t = delta_t*time_mult
-		time_step = delta_t
-ENDIF
+  IF(config%do_temp)THEN
+     species_num = 2
+     CALL transport_bc(species_num)
+     IF(config%temp_exchange)&
+          & CALL read_met_data(config%weather_file)
+     IF(config%debug_print) WRITE(11,*)'done reading temp transport table'
+  ENDIF
 
-IF(do_gas)THEN
-	species_num = 1
-	CALL transport_bc(species_num)
-	IF(debug_print == 1) WRITE(11,*)'done reading gas transport table'
-	CALL allocate_tdg_coeff(maxlinks,utility_status_iounit, utility_error_iounit)
-			! read tdg spill coefficient tables
-			! if linktype 6,20, or 21 is there, then open and read file
-	DO link=1,maxlinks
-			SELECT CASE(linktype(link)) 
-			CASE(6,21)
-			CALL tdg_coeff_read(utility_status_iounit, utility_error_iounit)
-			EXIT
-		END SELECT
-	END DO
-    IF(gas_exchange)THEN
-       CALL open_existing(filename(11), 88, fatal=.TRUE.)
-    ENDIF
-ENDIF
+  !------------------------------------------------------------------------------
+  !------------------------------------------------------------------------------
+  ! execute time loop in model
+  !------------------------------------------------------------------------------
 
-IF(do_temp)THEN
-	species_num = 2
-	CALL transport_bc(species_num)
-	IF(temp_exchange)&
-             & CALL read_met_data(filename(18))
-	IF(debug_print == 1) WRITE(11,*)'done reading temp transport table'
-ENDIF
+  model_time = config%time%begin
+  time = model_time/config%time%mult
 
-!------------------------------------------------------------------------------
-!------------------------------------------------------------------------------
-! execute time loop in model
-!------------------------------------------------------------------------------
+  IF(model_time <= config%time%end) run = .true.
 
-model_time = time_begin
-time = model_time/time_mult
+  DO WHILE(run)
 
-IF(model_time <= time_end) run = .true.
+     IF((config%debug_print).AND.(time == config%time%begin))THEN
+        WRITE(11,*)'main computational loop in mass1'
+        WRITE(11,*)time,config%time%begin,config%time%end,&
+             &config%time%delta_t,config%time%mult
+        WRITE(11,*)' '
+     ENDIF
 
-DO WHILE(run)
+     ! print out initial conditions
 
-	IF((debug_print == 1).AND.(time == time_begin))THEN
-		WRITE(11,*)'main computational loop in mass1'
-		WRITE(11,*)time,time_begin,time_end,delta_t,time_mult
-		WRITE(11,*)' '
-	ENDIF
+     IF (time == config%time%begin) THEN
+        CALL accum_initialize()
+        CALL accum_reset(time)
+        CALL accumulate()
+        CALL accum_calc(time)
+        IF (config%do_printout) CALL print_output("RESULT")
+        IF (config%do_profileout) CALL profile_output
+        IF (config%do_gageout) CALL gage_output
+     END IF
 
-                                ! print out initial conditions
+     IF (config%do_flow) THEN
+        CALL flow_sim
+     ENDIF
 
-    IF (time == time_begin) THEN
-       CALL accum_initialize()
-       CALL accum_reset(time)
-       CALL accumulate()
-       CALL accum_calc(time)
-       IF (do_printout) CALL print_output("RESULT")
-       IF (do_profileout) CALL profile_output
-       IF (do_gageout) CALL gage_output
-    END IF
-       
-	IF(do_flow)THEN
-		CALL flow_sim
-	ENDIF
+     ! transport simulation is performed at
+     ! integral divisions of the hydrodynamic
+     ! time step
 
-                                ! transport simulation is performed at
-                                ! integral divisions of the hydrodynamic
-                                ! time step
+     IF (config%do_gas .OR. config%do_temp) THEN
 
-    IF (do_gas .OR. do_temp) THEN
+        scalar_time = model_time
+        IF (config%scalar_steps .GT. 0) THEN
+           tsteps = config%scalar_steps
+        ELSE
+           tsteps = tvd_steps(config%time%delta_t)
+           WRITE(*, '(" Using ", I5, " transport steps")') tsteps
+        END IF
 
-       scalar_time = model_time
-       IF (scalar_steps .GT. 0) THEN
-          tsteps = scalar_steps
-       ELSE
-          tsteps = tvd_steps(delta_t)
-          WRITE(*, '(" Using ", I5, " transport steps")') tsteps
-       END IF
+        scalar_delta_t = config%time%delta_t/DBLE(tsteps)
 
-       scalar_delta_t = delta_t/DBLE(tsteps)
+        DO i = 1, tsteps
 
-       DO i = 1, tsteps
+           IF((config%debug_print))THEN
+              WRITE(11,*)'transport sub loop in mass1'
+              WRITE(11,*)i, scalar_time,model_time
+              WRITE(11,*)' '
+           ENDIF
 
-          IF((debug_print == 1))THEN
-             WRITE(11,*)'transport sub loop in mass1'
-             WRITE(11,*)i, scalar_time,model_time
-             WRITE(11,*)' '
-          ENDIF
+           CALL tvd_interp(scalar_time, model_time, model_time + config%time%delta_t)
 
-          CALL tvd_interp(scalar_time, model_time, model_time + delta_t)
-          
-          IF(do_gas)THEN
-             species_num = 1
-             CALL tvd_transport(species_num, species(species_num)%conc,species(species_num)%concold &
-                  & ,utility_status_iounit, utility_error_iounit)
-          END IF
+           IF(config%do_gas)THEN
+              species_num = 1
+              CALL tvd_transport(species_num, species(species_num)%conc,species(species_num)%concold &
+                   & ,utility_status_iounit, utility_error_iounit)
+           END IF
 
-          IF(do_temp)THEN
-             species_num = 2
-             CALL tvd_transport(species_num, species(species_num)%conc,species(species_num)%concold &
-                  & , utility_status_iounit, utility_error_iounit)
-          END IF
+           IF(config%do_temp)THEN
+              species_num = 2
+              CALL tvd_transport(species_num, species(species_num)%conc,species(species_num)%concold &
+                   & , utility_status_iounit, utility_error_iounit)
+           END IF
 
-          scalar_time = model_time + DBLE(i)/DBLE(tsteps)*time_step
+           scalar_time = model_time + DBLE(i)/DBLE(tsteps)*config%time%step
 
-       END DO
+        END DO
 
-    END IF
+     END IF
 
-                                ! update time step here so correct
-                                ! time is placed in output
+     ! update time step here so correct
+     ! time is placed in output
 
-    ! model_time = model_time + time_step
-	time_step_count = time_step_count + 1    
-	model_time = time_begin + time_step_count*time_step
-	time = model_time/time_mult
-	IF(model_time >= (time_end)) run = .false.
+     ! model_time = model_time + time_step
+     time_step_count = time_step_count + 1    
+     model_time = config%time%begin + time_step_count*config%time%step
+     time = model_time/config%time%mult
+     IF(model_time >= (config%time%end)) run = .false.
 
-	CALL decimal_to_date(time, date_string, time_string)
-	WRITE(*,1020)date_string,time_string
+     CALL decimal_to_date(time, date_string, time_string)
+     WRITE(*,1020)date_string,time_string
 1020 FORMAT(' Done Crunching through ** Date: ',a10,'  Time: ',a8)
 
-                                ! do output as specified
+     ! do output as specified
 
-    IF (MOD(time_step_count,print_freq) == 0) THEN
-       IF (.NOT. do_accumulate) THEN 
-          CALL accum_reset(time)
-          CALL accumulate()
-       END IF
-       CALL accum_calc(time)
-       IF (do_printout)CALL print_output("RESULT")
-       IF (do_gageout) CALL gage_output	
-       IF (do_profileout) CALL profile_output
-       CALL accum_reset(time)
-	ENDIF
+     IF (MOD(time_step_count, config%print_freq) == 0) THEN
+        IF (.NOT. config%do_accumulate) THEN 
+           CALL accum_reset(time)
+           CALL accumulate()
+        END IF
+        CALL accum_calc(time)
+        IF (config%do_printout)CALL print_output("RESULT")
+        IF (config%do_gageout) CALL gage_output	
+        IF (config%do_profileout) CALL profile_output
+        CALL accum_reset(time)
+     ENDIF
 
-	IF(debug_print == 1) WRITE(11,*)'simulation time = ',time/time_mult
+     IF(config%debug_print) WRITE(11,*)'simulation time = ',time/config%time%mult
 
-	IF((do_restart).AND.(time >= time_end))THEN
-		CALL write_restart
-	ENDIF
+     IF((config%do_restart).AND.(time >= config%time%end))THEN
+        CALL write_restart
+     ENDIF
 
-	IF((debug_print == 1).AND.(time >= time_end))THEN
-		WRITE(11,*)'ALL DONE!!'
-		WRITE(11,*)time,time_begin,time_end,delta_t,time_mult
-		CLOSE(11)
-	ENDIF
+     IF((config%debug_print).AND.(time >= config%time%end))THEN
+        WRITE(11,*)'ALL DONE!!'
+        WRITE(11,*)time,config%time%begin,config%time%end,config%time%delta_t,config%time%mult
+        CLOSE(11)
+     ENDIF
 
-    IF (do_accumulate) CALL accumulate()
+     IF (config%do_accumulate) CALL accumulate()
 
-    CALL pidlink_assemble_lagged()
+     CALL pidlink_assemble_lagged()
 
-END DO ! end main time loop
+  END DO ! end main time loop
 
-CALL sections%destroy()
-CALL array_dealloc
+  CALL sections%destroy()
+  CALL array_dealloc
 
 
-CLOSE(99)
+  CLOSE(99)
 
 END PROGRAM mass1

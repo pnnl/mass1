@@ -166,12 +166,11 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE update_met_data
   ! ----------------------------------------------------------------
-  SUBROUTINE update_met_data(time, met_zone)
-
-    USE logicals, ONLY: do_gas
+  SUBROUTINE update_met_data(do_gas, time, met_zone)
 
     IMPLICIT NONE
 
+    LOGICAL, INTENT(IN) :: do_gas
     DOUBLE PRECISION, INTENT(IN) :: time
     INTEGER, INTENT(IN) :: met_zone
 

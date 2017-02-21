@@ -7,13 +7,14 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created November  6, 2000 by William A. Perkins
-! Last Change: Tue Dec  7 09:38:11 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+! Last Change: 2017-02-20 14:05:48 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE accumulator
 ! ----------------------------------------------------------------
 MODULE accumulator
 
+  USE mass1_config
   USE general_vars
   USE logicals
   USE link_vars
@@ -88,25 +89,25 @@ CONTAINS
     IMPLICIT NONE
     INTEGER :: ispecies
 
-    CALL accum_init_var(maxlinks, maxpoint, accum_var%y)
-    CALL accum_init_var(maxlinks, maxpoint, accum_var%q)
-    CALL accum_init_var(maxlinks, maxpoint, accum_var%vel)
-    CALL accum_init_var(maxlinks, maxpoint, accum_var%area)
-    CALL accum_init_var(maxlinks, maxpoint, accum_var%top_width)
-    CALL accum_init_var(maxlinks, maxpoint, accum_var%hyd_radius)
-    CALL accum_init_var(maxlinks, maxpoint, accum_var%froude_num)
-    CALL accum_init_var(maxlinks, maxpoint, accum_var%courant_num)
-    CALL accum_init_var(maxlinks, maxpoint, accum_var%diffuse_num)
-    CALL accum_init_var(maxlinks, maxpoint, accum_var%friction_slope)
-    CALL accum_init_var(maxlinks, maxpoint, accum_var%bed_shear)
+    CALL accum_init_var(config%maxlinks, config%maxpoint, accum_var%y)
+    CALL accum_init_var(config%maxlinks, config%maxpoint, accum_var%q)
+    CALL accum_init_var(config%maxlinks, config%maxpoint, accum_var%vel)
+    CALL accum_init_var(config%maxlinks, config%maxpoint, accum_var%area)
+    CALL accum_init_var(config%maxlinks, config%maxpoint, accum_var%top_width)
+    CALL accum_init_var(config%maxlinks, config%maxpoint, accum_var%hyd_radius)
+    CALL accum_init_var(config%maxlinks, config%maxpoint, accum_var%froude_num)
+    CALL accum_init_var(config%maxlinks, config%maxpoint, accum_var%courant_num)
+    CALL accum_init_var(config%maxlinks, config%maxpoint, accum_var%diffuse_num)
+    CALL accum_init_var(config%maxlinks, config%maxpoint, accum_var%friction_slope)
+    CALL accum_init_var(config%maxlinks, config%maxpoint, accum_var%bed_shear)
 
     ALLOCATE(accum_var%conc(max_species))
     
     DO ispecies = 1, max_species
-       CALL accum_init_var(maxlinks, maxpoint, accum_var%conc(ispecies))
+       CALL accum_init_var(config%maxlinks, config%maxpoint, accum_var%conc(ispecies))
     END DO
 
-    CALL accum_init_tdg(maxlinks, maxpoint, accum_var%tdg)
+    CALL accum_init_tdg(config%maxlinks, config%maxpoint, accum_var%tdg)
 
   END SUBROUTINE accum_initialize
 
@@ -205,9 +206,10 @@ CONTAINS
     DOUBLE PRECISION :: tdg_sat, tdg_press, deltap
     DOUBLE PRECISION :: salinity = 0.0
     
-    DO link = 1, maxlinks
-       IF ((do_temp .AND. temp_exchange) .OR. (do_gas .AND. gas_exchange) ) &
-               &CALL update_met_data(time, met_zone(link))
+    DO link = 1, config%maxlinks
+       IF ((config%do_temp .AND. config%temp_exchange) .OR. &
+            &(config%do_gas .AND. config%gas_exchange) ) &
+               &CALL update_met_data(config%do_gas, time, met_zone(link))
       DO point = 1, maxpoints(link)
          tdg_press = TDGasPress(species(1)%conc(link,point), species(2)%conc(link,point), salinity)
          IF (tdg_press .GT. tdg%press%max(link, point)) &
@@ -258,10 +260,10 @@ CONTAINS
     CALL accumulate_var(bed_shear, accum_var%bed_shear)
 
     DO ispec = 1, max_species
-       call accumulate_var(species(ispec)%conc(:,1:maxpoint), accum_var%conc(ispec))
+       call accumulate_var(species(ispec)%conc(:,1:config%maxpoint), accum_var%conc(ispec))
     END DO
 
-    IF (do_gas) CALL accumulate_tdg(accum_var%tdg)
+    IF (config%do_gas) CALL accumulate_tdg(accum_var%tdg)
     
     accum_count = accum_count + 1
 
@@ -323,7 +325,7 @@ CONTAINS
        CALL accum_calc_var(accum_var%conc(ispec))
     END DO
 
-    IF (do_gas) CALL accum_calc_tdg(accum_var%tdg)
+    IF (config%do_gas) CALL accum_calc_tdg(accum_var%tdg)
 
     accum_time = (accum_time + model_time)/2.0
     

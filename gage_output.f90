@@ -27,6 +27,7 @@
 SUBROUTINE gage_output
 
   USE utility
+  USE mass1_config
   USE link_vars
   USE general_vars
   USE point_vars
@@ -37,7 +38,6 @@ SUBROUTINE gage_output
   USE scalars
   USE met_data_module
   USE gas_functions
-  USE logicals, ONLY : do_temp, do_gas, temp_exchange, gas_exchange
 
   USE hydro_output_module
   USE accumulator
@@ -58,9 +58,9 @@ SUBROUTINE gage_output
   CHARACTER (LEN=256) fname,string1,string2
   CHARACTER (LEN=256), ALLOCATABLE, SAVE :: gage_fname(:)
 
-  IF(time == time_begin )THEN
+  IF(time == config%time%begin )THEN
      count=0
-     CALL open_existing(filename(14), fileunit(14), fatal=.TRUE.)
+     CALL open_existing(config%gage_file, fileunit(14), fatal=.TRUE.)
 
      DO WHILE(.TRUE.)
         READ(fileunit(14),*, END=100) link, point
@@ -121,8 +121,9 @@ SUBROUTINE gage_output
      link = gage_link(i)
      point = gage_point(i)
      depth = accum_var%y%sum(link,point) - thalweg(link,point)
-     IF( (do_temp .AND. temp_exchange) .OR. (do_gas .AND. gas_exchange) ) &
-          &CALL update_met_data(time, met_zone(link))
+     IF( (config%do_temp .AND. config%temp_exchange) .OR. &
+          &(config%do_gas .AND. config%gas_exchange) ) &
+          &CALL update_met_data(config%do_gas, time, met_zone(link))
      tdg_sat = TDGasSaturation(species(1)%conc(link,point), species(2)%conc(link,point), &
           &salinity, baro_press)
      tdg_press = TDGasPress(species(1)%conc(link,point), species(2)%conc(link,point), salinity)
@@ -159,9 +160,9 @@ SUBROUTINE gage_output
 
   END DO
 
-  IF (time > time_begin) CALL hydro_output(date_string,time_string)
+  IF (time > config%time%begin) CALL hydro_output(date_string,time_string)
 
-  IF(time >= time_end)THEN
+  IF(time >= config%time%end)THEN
      CALL hydro_output_done()
      DEALLOCATE(gage_link, gage_point, gage_fname)
   ENDIF

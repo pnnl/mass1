@@ -28,6 +28,7 @@
 SUBROUTINE read_hotstart
 
 USE utility
+USE mass1_config
 USE link_vars
 USE general_vars
 USE point_vars
@@ -41,17 +42,17 @@ INTEGER :: link,point,i,j
 LOGICAL :: file_exist
 
 !OPEN(91,file='hotstart.dat',form='binary')
-INQUIRE(FILE=filename(12),EXIST=file_exist)
+INQUIRE(FILE=config%restart_load_file,EXIST=file_exist)
 IF(file_exist)THEN
-   OPEN(fileunit(12),file=filename(12),form='unformatted')
-   WRITE(99,*)'hotstart file opened: ',filename(12)
+   OPEN(fileunit(12),file=config%restart_load_file,form='unformatted')
+   WRITE(99,*)'hotstart file opened: ',config%restart_load_file
 ELSE
-   WRITE(*,*)'hotstart file does not exist - ABORT: ',filename(12)
-   WRITE(99,*)'hotstart file does not exist - ABORT: ',filename(12)
+   WRITE(*,*)'hotstart file does not exist - ABORT: ',config%restart_load_file
+   WRITE(99,*)'hotstart file does not exist - ABORT: ',config%restart_load_file
    CALL EXIT(1)
 ENDIF
 
-DO link=1,maxlinks
+DO link=1,config%maxlinks
 DO point=1,maxpoints(link)
 READ(fileunit(12))i,j,q(link,point),y(link,point),species(1)%conc(link,point),species(2)%conc(link,point)
 END DO

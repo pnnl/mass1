@@ -26,6 +26,7 @@
 
 SUBROUTINE print_output(option)
 
+USE mass1_config
 USE link_vars
 USE general_vars
 USE point_vars
@@ -55,8 +56,8 @@ SELECT CASE(option)
 
 CASE("HEADER")        
   
-        OPEN(fileunit(7),file=filename(7))
-    WRITE(99,*)'general output file ', filename(7),' opened'
+        OPEN(fileunit(7),file=config%output_file)
+    WRITE(99,*)'general output file ', config%output_file,' opened'
 
          WRITE(iounit1,1026)
 1026 FORMAT(5x,'Modular Aquatic Simulation System 1D (MASS1)'/)
@@ -82,40 +83,40 @@ CASE("HEADER")
 
 CASE("CONFIG")
 
-         WRITE(iounit1,1120)date_run_begins,time_run_begins
+         WRITE(iounit1,1120) config%time%date_run_begins,config%time%time_run_begins
 1120 FORMAT('Simulation Starts on Date: ',a10,'  Time: ',a8/)
-         WRITE(iounit1,1130)date_run_ends,time_run_ends
+         WRITE(iounit1,1130) config%time%date_run_ends,config%time%time_run_ends
 1130 FORMAT('Simulation Ends on Date: ',a10,'  Time: ',a8/)
 
 
-WRITE(iounit1,'("time step (hours) - ",f6.3)') delta_t
-WRITE(iounit1,'("printout frequency in time step multiples - ",i4)') print_freq
+WRITE(iounit1,'("time step (hours) - ",f6.3)') config%time%delta_t
+WRITE(iounit1,'("printout frequency in time step multiples - ",i4)') config%print_freq
 
-WRITE(iounit1,'("units - ",i4)') units
-WRITE(iounit1,'("time_option - ",i4)') time_option
-WRITE(iounit1,'("time units - ",i4)') time_units
-WRITE(iounit1,'("channel length units - ",i4)') channel_length_units
-WRITE(iounit1,'("downstream boundary condition type - ",i4)') dsbc_type
-WRITE(iounit1,'("maximum number of links - ",i5)') maxlinks
-WRITE(iounit1,'("maximum number of points on a link - ",i5)') maxpoint
+WRITE(iounit1,'("units - ",i4)') config%units
+WRITE(iounit1,'("time_option - ",i4)') config%time%option
+WRITE(iounit1,'("time units - ",i4)') config%time%units
+WRITE(iounit1,'("channel length units - ",i4)') config%channel_length_units
+WRITE(iounit1,'("downstream boundary condition type - ",i4)') config%dsbc_type
+WRITE(iounit1,'("maximum number of links - ",i5)') config%maxlinks
+WRITE(iounit1,'("maximum number of points on a link - ",i5)') config%maxpoint
 WRITE(iounit1,'("total number of cross sections - ",i5)') sections%size()
 
-WRITE(iounit1,'("link data input file - ",a80)') filename(2)
-WRITE(iounit1,'("point data input file - ",a80)') filename(3)
-WRITE(iounit1,'("cross section input file -",a80)') filename(4)
-WRITE(iounit1,'("link boundary condition files - ",a80)') filename(5)
-WRITE(iounit1,'("lateral inflow boundary files - ",a80)') filename(16)
-WRITE(iounit1,'("coldstart initial link condition file - ",a80)') filename(6)
-WRITE(iounit1,'("general output (this file) - ",a80)') filename(7)
-WRITE(iounit1,'("gas transport boundary condition files - ",a80)') filename(9)
-WRITE(iounit1,'("temperature boundary condition files - ",a80)') filename(17)
-WRITE(iounit1,'("weather/meteorlogical conditions files - ",a80)') filename(18)
-WRITE(iounit1,'("hydro-project link boundary conditions files - ",a80)') filename(10)
-WRITE(iounit1,'("total dissolved gas equation definitions - ",a80)') filename(11)
-WRITE(iounit1,'("file to read hotstart data from on a restart - ",a80)') filename(12)
-WRITE(iounit1,'("file to write the hotstart data to on end of run - ",a80)') filename(13)
-WRITE(iounit1,'("gage control file - ",a80)') filename(14)
-WRITE(iounit1,'("profile control file - ",a80)') filename(15)
+WRITE(iounit1,'("link data input file - ",a80)') config%link_file
+WRITE(iounit1,'("point data input file - ",a80)') config%point_file
+WRITE(iounit1,'("cross section input file -",a80)') config%section_file
+WRITE(iounit1,'("link boundary condition files - ",a80)') config%linkbc_file
+WRITE(iounit1,'("lateral inflow boundary files - ",a80)') config%lateral_file
+WRITE(iounit1,'("coldstart initial link condition file - ",a80)') config%initial_file
+WRITE(iounit1,'("general output (this file) - ",a80)') config%output_file
+WRITE(iounit1,'("gas transport boundary condition files - ",a80)') config%tempbc_file
+WRITE(iounit1,'("temperature boundary condition files - ",a80)') config%transbc_file
+WRITE(iounit1,'("weather/meteorlogical conditions files - ",a80)') config%weather_file
+WRITE(iounit1,'("hydro-project link boundary conditions files - ",a80)') config%hydrobc_file
+WRITE(iounit1,'("total dissolved gas equation definitions - ",a80)') config%tdg_coeff_file
+WRITE(iounit1,'("file to read hotstart data from on a restart - ",a80)') config%restart_load_file
+WRITE(iounit1,'("file to write the hotstart data to on end of run - ",a80)') config%restart_save_file
+WRITE(iounit1,'("gage control file - ",a80)') config%gage_file
+WRITE(iounit1,'("profile control file - ",a80)') config%profile_file
 
 
 WRITE(fileunit(7),'(//,"end of input specifications",//)')
@@ -154,7 +155,7 @@ WRITE(fileunit(7),1110)
 
 
 
-DO link=1,maxlinks
+DO link=1,config%maxlinks
    DO point=1,maxpoints(link)
       depth = y(link,point) - thalweg(link,point)
       tdg_sat = TDGasSaturation(species(1)%conc(link,point), species(2)%conc(link,point), salinity, baro_press)
@@ -174,7 +175,7 @@ END DO
                 2x,f8.2,2x,es10.2,2x, &
    f8.2,2x,f6.2,f6.2,es10.2,2x,es10.2)
 
-IF(time >= time_end)THEN
+IF(time >= config%time%end)THEN
         CLOSE(fileunit(7))
 ENDIF
 

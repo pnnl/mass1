@@ -26,7 +26,8 @@
 
 SUBROUTINE nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
 
-  USE general_vars, ONLY: units, delta_t
+  USE mass1_config
+  ! USE general_vars, ONLY: units
   USE section_handler_module
   USE point_vars
   USE link_vars, ONLY : linktype, crest
@@ -40,7 +41,7 @@ SUBROUTINE nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
   DOUBLE PRECISION :: twid, cw, hwmin, ycrest, oldycrest
   DOUBLE PRECISION :: maxtravel, sensitivity
   
-  maxtravel = 20.0*delta_t/3600.0
+  maxtravel = 20.0*config%time%delta_t/3600.0
   sensitivity = 0.01
 
   SELECT CASE(linktype(link))
@@ -153,11 +154,11 @@ SUBROUTINE nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
      bp = 0.0
      dp = 1.0
      
-     SELECT CASE(units)
-     CASE (1)
+     SELECT CASE(config%units)
+     CASE (ENGLISH_UNITS)
         cw = 3.33
         hwmin = 1.0e-05
-     CASE (2)
+     CASE (METRIC_UNITS)
         cw = 1.85
         hwmin = 1.0e-05
      END SELECT

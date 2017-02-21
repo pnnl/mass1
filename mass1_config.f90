@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2017-02-20 12:00:15 d3g096
+! Last Change: 2017-02-20 14:54:57 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE mass1_config
@@ -15,10 +15,11 @@
 MODULE mass1_config
 
   USE utility
+  USE date_time
 
   IMPLICIT NONE
 
-  PRIVATE
+  PUBLIC
 
   ENUM, BIND(C)
      ENUMERATOR :: DECIMAL_TIME_OPTION = 1
@@ -75,7 +76,6 @@ MODULE mass1_config
      LOGICAL :: gas_diffusion, gas_exchange
      LOGICAL :: do_latflow
      LOGICAL :: do_accumulate
-     INTEGER :: transport_steps
      INTEGER :: print_freq
      LOGICAL :: print_sections
      LOGICAL :: write_sections
@@ -109,6 +109,8 @@ MODULE mass1_config
   END type configuration_t
 
   CHARACTER(LEN=path_length), PARAMETER :: config_name = 'mass1.cfg'
+
+  TYPE (configuration_t), PUBLIC :: config
 
 CONTAINS
 
@@ -286,7 +288,7 @@ CONTAINS
 
     READ(iunit,*,ERR=110) dumlog
     line = line + 1
-    SELECT CASE (dumlog) 
+    SELECT CASE (dumlog+1) 
     CASE (1)
        this%time%option = DECIMAL_TIME_OPTION
     CASE (2)
@@ -338,7 +340,7 @@ CONTAINS
     READ(iunit,*,ERR=110) this%maxlinks
     line = line + 1
 
-    READ(iunit,*,ERR=110) ignored ! maxpoint
+    READ(iunit,*,ERR=110) this%maxpoint
     line = line + 1
 
     READ(iunit,*,ERR=110) ignored ! maxtable
@@ -353,8 +355,13 @@ CONTAINS
     READ(iunit,*,ERR=110) this%scalar_steps
     line = line + 1
 
-    READ(iunit,*,ERR=110) this%debug_print
+    READ(iunit,*,ERR=110) dumlog
     line = line + 1
+    IF (dumlog .EQ. 1) THEN 
+       this%debug_print = .true.
+    ELSE 
+       this%debug_print = .false.
+    END IF
 
     READ(iunit,*,ERR=110) this%link_file
     line = line + 1
@@ -444,6 +451,10 @@ CONTAINS
     CLOSE(iunit)
 
     
+    ! figure out time constant
+    ! code works in seconds internally if date option = 1
+    ! code works in decimal julian days if date_option = 2
+
     SELECT CASE(this%time%option)
     CASE(DECIMAL_TIME_OPTION)
        SELECT CASE(this%time%units)
@@ -456,9 +467,20 @@ CONTAINS
        CASE(4)
           this%time%mult = 86400.00d0 !days
        END SELECT
+       this%time%begin = this%time%begin*this%time%mult
+       this%time%end = this%time%end*this%time%mult
+       this%time%delta_t = this%time%delta_t*this%time%mult
+       this%time%step = this%time%step*this%time%mult
     CASE(2)
        this%time%mult = 1.00d0 ! things are converted to decimal julian day
+       this%time%begin = &
+            &date_to_decimal(this%time%date_run_begins, this%time%time_run_begins)
+       this%time%end = &
+            &date_to_decimal(this%time%date_run_ends, this%time%time_run_ends)
     END SELECT
+
+    this%time%step = this%time%delta_t/24.0
+    this%time%delta_t = this%time%delta_t*3600.0
 
     RETURN 
 

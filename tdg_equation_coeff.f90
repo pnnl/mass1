@@ -65,6 +65,7 @@ END SUBROUTINE allocate_tdg_coeff
 SUBROUTINE tdg_coeff_read(status_iounit, error_iounit)
 
 USE utility
+USE mass1_config
 USE file_vars
 
 IMPLICIT NONE
@@ -72,7 +73,7 @@ IMPLICIT NONE
 INTEGER :: i,link,junk,status_iounit, error_iounit
 
 ! read in general link-related boundary condition table
-CALL open_existing(filename(11), fileunit(11), fatal=.TRUE.)
+CALL open_existing(config%tdg_coeff_file, fileunit(11), fatal=.TRUE.)
 
 DO WHILE(.TRUE.)
 	READ(fileunit(11),*,END=100)link

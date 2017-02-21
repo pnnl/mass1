@@ -28,24 +28,17 @@
 SUBROUTINE latflow_bc
 
   USE utility
+  USE mass1_config
   USE bctable
-  USE general_vars, ONLY: maxlinks
   USE link_vars, ONLY: linktype
-  USE file_vars, ONLY: filename
-  USE date_vars, ONLY: time_option
   
   IMPLICIT NONE
 
-  SELECT CASE(time_option)
-
-  CASE(1) ! time units are sec,hours,minutes, or days in file
-
+  SELECT CASE(config%time%option)
+  CASE(DECIMAL_TIME_OPTION)
      CALL error_message("Time option not supported in link_bc", .TRUE.)
-
-  CASE(2) ! date/time format is used mm:dd:yyyy hh:mm:ss converted to decimal julian day
-
-     latflowbc => bc_table_read(filename(16), 1)
-
+  CASE(DATE_TIME_OPTION)
+     latflowbc => bc_table_read(config%lateral_file, 1)
   END SELECT
 
 END SUBROUTINE latflow_bc

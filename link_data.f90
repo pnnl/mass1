@@ -34,9 +34,8 @@ SUBROUTINE link_data
   ! input_option == 2 is link-style; quick, uniform properties on each link
 
   USE utility
-  USE logicals, ONLY: do_latflow, do_gas, do_temp
+  USE mass1_config
   USE link_vars
-  USE general_vars, ONLY : maxlinks
   USE file_vars
 
   IMPLICIT NONE
@@ -45,11 +44,11 @@ SUBROUTINE link_data
   CHARACTER(LEN=1024) :: msg
 
   io_unit = fileunit(7)
-  CALL open_existing(filename(2), fileunit(2), fatal=.TRUE.)
+  CALL open_existing(config%link_file, fileunit(2), fatal=.TRUE.)
 
   CALL print_output("LINKS ")
 
-  DO i=1,maxlinks
+  DO i=1,config%maxlinks
 
      READ(fileunit(2),*,END=100,ERR=200)link
      BACKSPACE(fileunit(2))
@@ -78,12 +77,12 @@ SUBROUTINE link_data
           & lattransbc_table(link),lattempbc_table(link),lpiexp(link)
      WRITE(io_unit,*)ds_conlink(link)
 
-     IF (do_latflow .AND. do_gas) THEN 
+     IF (config%do_latflow .AND. config%do_gas) THEN 
         IF (latflowbc_table(link) .NE. 0 .AND. lattransbc_table(link) .EQ. 0) THEN
            WRITE(msg, *) "Link ", link, ": lateral inflow specified without transport (gas) values"
            CALL error_message(msg, .FALSE.)
         END IF
-     ELSE IF (do_latflow .AND. do_temp) THEN
+     ELSE IF (config%do_latflow .AND. config%do_temp) THEN
         IF (latflowbc_table(link) .NE. 0 .AND. lattempbc_table(link) .EQ. 0) THEN
            WRITE(msg, *) "Link ", link, ": lateral inflow specified without transport (temp) values"
            CALL error_message(msg, .FALSE.)
@@ -101,7 +100,8 @@ SUBROUTINE link_data
 
 200 CONTINUE
 
-  WRITE(msg, *) TRIM(filename(2)) // ': error in or near link record ', link, ' of ', maxlinks
+  WRITE(msg, *) TRIM(config%link_file) // ': error in or near link record ', &
+       &link, ' of ', config%maxlinks
   CALL error_message(msg, fatal=.TRUE.)
 
 END SUBROUTINE link_data
@@ -137,8 +137,8 @@ END FUNCTION link_set_order
 SUBROUTINE link_connect()
 
   USE utility
+  USE mass1_config
   USE link_vars
-  USE general_vars, ONLY : maxlinks
   USE confluence_module
 
   IMPLICIT NONE
@@ -157,17 +157,17 @@ SUBROUTINE link_connect()
 
   CALL status_message("Connecting Links ...")
 
-  DO link = 1, maxlinks
+  DO link = 1, config%maxlinks
      NULLIFY(ucon(link)%wrap)
      NULLIFY(dcon(link)%wrap)
   END DO
 
-  DO link = 1, maxlinks
+  DO link = 1, config%maxlinks
 
      dlink = ds_conlink(link)
      IF (dlink .NE. 0) THEN 
         ! Is specified downstream link id valid?
-        IF (dlink .LT. 1 .OR. dlink .GT. maxlinks) THEN
+        IF (dlink .LT. 1 .OR. dlink .GT. config%maxlinks) THEN
            WRITE(msg, '("link , I4, : invalid downstream link id (",I4,")")')&
                 & link, dlink
            CALL error_message(msg)
@@ -205,7 +205,7 @@ SUBROUTINE link_connect()
   ! determine computational order: 
 
   linkorder(:) = 0
-  DO link = 1, maxlinks
+  DO link = 1, config%maxlinks
      IF (ds_conlink(link) .EQ. 0) THEN
         i = link_set_order(link, 1)
         EXIT
@@ -215,7 +215,7 @@ SUBROUTINE link_connect()
 
   ! spit out connectivity and order information 
 
-  DO link = 1, maxlinks
+  DO link = 1, config%maxlinks
      WRITE(msg, '("link ", I4, "(order = ", I4, ") upstream links:")') &
           &linkname(link), linkorder(link)
      IF (ASSOCIATED(ucon(link)%wrap)) THEN

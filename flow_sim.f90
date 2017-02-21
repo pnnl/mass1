@@ -47,13 +47,13 @@ SUBROUTINE flow_sim
 
   ! $DEBUG
 
+  USE mass1_config
   USE general_vars
   USE link_vars
   USE bctable
   USE point_vars
   USE fluvial_coeffs
   USE flow_coeffs
-  USE logicals , ONLY : do_latflow
   USE confluence_module
 
   IMPLICIT NONE
@@ -74,7 +74,7 @@ SUBROUTINE flow_sim
   ! run through links top down according to computational order
 
 
-  links_forward: DO i=1,maxlinks
+  links_forward: DO i=1,config%maxlinks
 
      link = comporder(i)
 
@@ -93,10 +93,10 @@ SUBROUTINE flow_sim
 
         SELECT CASE(linktype(link))
         CASE(1,20)
-           call bc_table_interpolate(linkbc, linkbc_table(link), time/time_mult)
+           call bc_table_interpolate(linkbc, linkbc_table(link), time/config%time%mult)
            bcval = bc_table_current(linkbc, linkbc_table(link), 1)
         CASE(21)
-           call bc_table_interpolate(hydrobc, linkbc_table(link), time/time_mult)
+           call bc_table_interpolate(hydrobc, linkbc_table(link), time/config%time%mult)
            temp = bc_table_current(hydrobc, linkbc_table(link), 1)
            bcval = bc_table_current(hydrobc, linkbc_table(link), 2)
            bcval = bcval + temp ! total flow rate at the dam
@@ -164,12 +164,14 @@ SUBROUTINE flow_sim
            delta_x = ABS(x(link,point+1) - x(link,point))
 
            ! uniform lateral inflow per unit length
-           IF(do_latflow)THEN
+           IF(config%do_latflow)THEN
               IF(latflowbc_table(link) /= 0)THEN
                  latq_old = lateral_inflow(link,point) 
                  lateral_inflow_old(link,point) = latq_old
-                 call bc_table_interpolate(latflowbc, latflowbc_table(link), time/time_mult)
-                 lateral_inflow(link,point) = bc_table_current(latflowbc, latflowbc_table(link), 1)
+                 call bc_table_interpolate(latflowbc, latflowbc_table(link), &
+                      &time/config%time%mult)
+                 lateral_inflow(link,point) = &
+                      &bc_table_current(latflowbc, latflowbc_table(link), 1)
                  latq_new = lateral_inflow(link,point)
               ELSE
                  latq_old = 0.0
@@ -180,7 +182,8 @@ SUBROUTINE flow_sim
               latq_new = 0.0
            ENDIF
 
-           CALL fluvial_coeff(a,b,c,d,g,ap,bp,cp,dp,gp,delta_x,delta_t,grav,&
+           CALL fluvial_coeff(a,b,c,d,g,ap,bp,cp,dp,gp,delta_x,&
+                &config%time%delta_t,grav,&
                 &latq_old,latq_new,lpiexp(link))
 
 
@@ -192,13 +195,15 @@ SUBROUTINE flow_sim
 
 
            IF(linktype(link) == 6)THEN    ! hydropower plant
-              call bc_table_interpolate(hydrobc, linkbc_table(link), time/time_mult)
+              call bc_table_interpolate(hydrobc, linkbc_table(link), &
+                   &time/config%time%mult)
               temp = bc_table_current(hydrobc, linkbc_table(link), 1)
               bcval = bc_table_current(hydrobc, linkbc_table(link), 2)
               bcval = bcval + temp ! total flow rate at the dam
 
            ELSE ! other non-fluvial links
-              call bc_table_interpolate(linkbc, linkbc_table(link), time/time_mult)
+              call bc_table_interpolate(linkbc, linkbc_table(link), &
+                   &time/config%time%mult)
               bcval = bc_table_current(linkbc, linkbc_table(link), 1)
            ENDIF
 
@@ -225,7 +230,7 @@ SUBROUTINE flow_sim
   !------------------------------------------------------------------------------
   ! run through links bottom to top
 
-  links_backward: DO i=maxlinks,1,-1
+  links_backward: DO i=config%maxlinks,1,-1
 
      link = comporder(i)
 
@@ -235,12 +240,13 @@ SUBROUTINE flow_sim
 
      IF (.NOT. ASSOCIATED(dcon(link)%wrap))THEN
 
-        SELECT CASE(dsbc_type)
+        SELECT CASE(config%dsbc_type)
         CASE(1)
            ! given downstream stage y(t)
 
            y1 = y(link,point)
-           call bc_table_interpolate(linkbc, dsbc_table(link), time/time_mult)
+           call bc_table_interpolate(linkbc, dsbc_table(link), &
+                &time/config%time%mult)
            y_new_time = bc_table_current(linkbc, dsbc_table(link), 1)
 
            dy = y_new_time - y1
@@ -248,7 +254,8 @@ SUBROUTINE flow_sim
         CASE(2)
            ! given Q(t)
            q1 = q(link,point)
-           call bc_table_interpolate(linkbc, dsbc_table(link), time/time_mult)
+           call bc_table_interpolate(linkbc, dsbc_table(link), &
+                &time/config%time%mult)
            q_new_time = bc_table_current(linkbc, dsbc_table(link), 1)
            dq = q_new_time - q1
            dy = (dq - f(link,point))/e(link,point)
@@ -269,14 +276,16 @@ SUBROUTINE flow_sim
      DO point=maxpoints(link)-1,1,-1
 
         IF(linktype(link) == 2)THEN
-           call bc_table_interpolate(linkbc, linkbc_table(link), time/time_mult)
+           call bc_table_interpolate(linkbc, linkbc_table(link), &
+                &time/config%time%mult)
            bcval = bc_table_current(linkbc, linkbc_table(link), 1)
            dq = bcval - q(link,point)
            dy = (dq - f(link,point))/e(link,point)
 
         ELSEIF(linktype(link) == 6)THEN
 
-           call bc_table_interpolate(hydrobc, linkbc_table(link), time/time_mult)
+           call bc_table_interpolate(hydrobc, linkbc_table(link), &
+                &time/config%time%mult)
            temp = bc_table_current(hydrobc, linkbc_table(link), 1)
            bcval = bc_table_current(hydrobc, linkbc_table(link), 2)
            bcval = bcval + temp ! total flow rate at the dam
@@ -309,7 +318,7 @@ SUBROUTINE flow_sim
   ! computes additional data after hydraulics have been
   ! updated for this time 
   !-------------------------------------------------------------------------------
-  DO link = 1,maxlinks
+  DO link = 1,config%maxlinks
      SELECT CASE(linktype(link)) 
      CASE(1,20,21)
         DO point = 1,maxpoints(link)
@@ -345,8 +354,10 @@ SUBROUTINE flow_sim
            ELSE
               delta_x = ABS(x(link,point+1) - x(link,point))
            END IF
-           courant_num(link, point) = ABS(q(link,point))/area_temp*delta_t/delta_x
-           diffuse_num(link, point) = 2.0*k_diff(link,point)*delta_t/delta_x/delta_x
+           courant_num(link, point) = &
+                &ABS(q(link,point))/area_temp*config%time%delta_t/delta_x
+           diffuse_num(link, point) = &
+                &2.0*k_diff(link,point)*config%time%delta_t/delta_x/delta_x
 
         END DO
      END SELECT

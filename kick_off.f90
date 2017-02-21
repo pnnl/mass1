@@ -30,6 +30,7 @@ SUBROUTINE kick_off
 ! set units and time constant
 
 
+USE mass1_config
 USE general_vars
 USE link_vars
 USE date_vars
@@ -39,9 +40,14 @@ IMPLICIT NONE
 
 INTEGER :: i,j
 
-SELECT CASE(units)
+! This stuff needs to be set in config%read()
 
-	CASE(1)
+depth_minimum = 0.001           ! m
+depth_threshold = 0.01          ! m
+
+SELECT CASE(config%units)
+
+	CASE(ENGLISH_UNITS)
 		res_coeff = 1.49   !manning unit factor used in conveyance calculation
 		grav = 32.2
 		unit_weight_h2o = 62.4 ! lb/ft3
@@ -49,7 +55,7 @@ SELECT CASE(units)
                 depth_minimum = depth_minimum/0.3048
                 depth_threshold = depth_threshold/0.3048
 
-	CASE(2)
+	CASE(METRIC_UNITS)
 		res_coeff = 1.0	   !manning unit factor used in conveyance calculation
 		grav = 9.81
 		unit_weight_h2o = 9810.0  ! N/m3
@@ -61,42 +67,13 @@ END SELECT
 ! to the input data
 !
 
-        DO i=1,maxlinks
-        DO j=1,maxlinks
+        DO i=1,config%maxlinks
+        DO j=1,config%maxlinks
           IF(linkorder(j) == i)THEN
             comporder(i) = linkname(j)   !link number to do
           ENDIF
         END DO
         END DO
-
-! figure out time constant
-! code works in seconds internally if date option = 1
-! code works in decimal julian days if date_option = 2
-
-SELECT CASE(time_option)
-
-CASE(1)
-
-	SELECT CASE(time_units)
-
-	CASE(1)
-        time_mult = 1.00d0     !seconds
-
-	CASE(2)
-        time_mult = 60.00d0   !minutes
-	CASE(3)
-        time_mult = 3600.00d0 !hours
-
-	CASE(4)
-        time_mult = 86400.00d0 !days
-
-	END SELECT
-
-CASE(2)
-	
-	time_mult = 1.00d0 ! things are converted to decimal julian day
-
-END SELECT
 
 CALL read_pidlink_info()
 CALL pidlink_initialize()

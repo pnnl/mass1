@@ -40,6 +40,7 @@
 SUBROUTINE point_data_scan()
   
   USE utility
+  USE mass1_config
   USE file_vars
   USE general_vars
 
@@ -53,7 +54,7 @@ SUBROUTINE point_data_scan()
 
   iunit = fileunit(3)
 
-  CALL open_existing(filename(3), iunit, fatal=.TRUE.)
+  CALL open_existing(config%point_file, iunit, fatal=.TRUE.)
   
   ! First, scan the file to find the maximum link id
 
@@ -65,7 +66,7 @@ SUBROUTINE point_data_scan()
 100 CONTINUE
   IF (lmax .LE. 0) THEN
      CALL error_message('No links identified in point file "' // &
-          &TRIM(filename(3)) // '"', fatal = .TRUE.)
+          &TRIM(config%point_file) // '"', fatal = .TRUE.)
   END IF
   ALLOCATE(numpt(lmax))
 
@@ -84,18 +85,18 @@ SUBROUTINE point_data_scan()
 
   ! set global limits accordingly
 
-  maxlinks = lmax
-  maxpoint = MAXVAL(numpt) + 1
+  config%maxlinks = lmax
+  config%maxpoint = MAXVAL(numpt) + 1
 
   DEALLOCATE(numpt)
 
-  IF (maxpoint .LE. 0) THEN
+  IF (config%maxpoint .LE. 0) THEN
      CALL error_message('Unable to scan point file "' //&
-          &TRIM(filename(3)) // '"', fatal = .TRUE.)
+          &TRIM(config%point_file) // '"', fatal = .TRUE.)
   END IF
 
-  WRITE(msg, *) TRIM(filename(3)) // ": found ", maxlinks, &
-       &" links with a maximum points of ", maxpoint
+  WRITE(msg, *) TRIM(config%point_file) // ": found ", config%maxlinks, &
+       &" links with a maximum points of ", config%maxpoint
   CALL status_message(msg)
 
 
@@ -110,10 +111,11 @@ SUBROUTINE point_data
   ! input_option == 2 is link-style; quick, uniform properties on each link
 
   USE utility
+  USE mass1_config
   USE point_vars
   USE link_vars
   USE file_vars
-  USE general_vars, ONLY : units,channel_length_units
+  ! USE general_vars, ONLY : channel_length_units
   USE transport_vars, ONLY : k_surf
   USE section_handler_module
 
@@ -124,7 +126,7 @@ SUBROUTINE point_data
   DOUBLE PRECISION :: surface_mass_trans
   CHARACTER (LEN=256) :: msg
   
-  CALL open_existing(filename(3), fileunit(3), fatal=.TRUE.)
+  CALL open_existing(config%point_file, fileunit(3), fatal=.TRUE.)
   
   io_unit = fileunit(7)
   CALL print_output("POINTS")
@@ -152,14 +154,14 @@ SUBROUTINE point_data
            
            kstrick(link,i) = 1.0/manning(link,i)
            
-           SELECT CASE(channel_length_units)
-           CASE(1) ! length is in feet
+           SELECT CASE(config%channel_length_units)
+           CASE(CHANNEL_FOOT) ! length is in feet
               x(link,i) = x(link,i)
-           CASE(2) ! length is in meters
+           CASE(CHANNEL_METER) ! length is in meters
               x(link,i) = x(link,i)*3.2808
-           CASE(3) ! length is in miles
+           CASE(CHANNEL_MILE) ! length is in miles
               x(link,i) = x(link,i)*5280.0
-           CASE(4) ! length in kilometers
+           CASE(CHANNEL_KM) ! length in kilometers
               x(link,i) = x(link,i)*0.6211*5280.0
            END SELECT
 
@@ -181,19 +183,19 @@ SUBROUTINE point_data
         
         WRITE(io_unit,*)link,length,start_el,end_el,sec_num,manning_n,diffusion,surface_mass_trans
         
-        SELECT CASE(channel_length_units)
-        CASE(1) ! length is in feet
+        SELECT CASE(config%channel_length_units)
+        CASE(CHANNEL_FOOT) ! length is in feet
            length = length
-        CASE(2) ! length is in meters
+        CASE(CHANNEL_METER) ! length is in meters
            length = length*3.2808
-        CASE(3) ! length is in miles
+        CASE(CHANNEL_MILE) ! length is in miles
            length = length*5280.0
-        CASE(4) ! length in kilometers
+        CASE(CHANNEL_KM) ! length in kilometers
            length = length*0.6211*5280.0
         END SELECT
         
-        SELECT CASE(units)
-        CASE(2)
+        SELECT CASE(config%units)
+        CASE(METRIC_UNITS)
            start_el = start_el*3.2808
            end_el = end_el*3.2808
         END SELECT

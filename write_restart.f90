@@ -28,6 +28,7 @@
 
 SUBROUTINE write_restart
 
+USE mass1_config
 USE link_vars
 USE general_vars
 USE point_vars
@@ -41,15 +42,15 @@ IMPLICIT NONE
 INTEGER :: link,point
 INTEGER :: status
 
-OPEN(fileunit(13),file=filename(13),form='unformatted', iostat=status)
+OPEN(fileunit(13), file=config%restart_save_file,form='unformatted', iostat=status)
 
 IF (status .EQ. 0) THEN
-   CALL status_message('Writing hot start to ' // TRIM(filename(13)))
+   CALL status_message('Writing hot start to ' // TRIM(config%restart_save_file))
 ELSE 
-   CALL error_message(TRIM(filename(13)) // ': cannot open for writing', fatal=.TRUE.)
+   CALL error_message(TRIM(config%restart_save_file) // ': cannot open for writing', fatal=.TRUE.)
 END IF
 
-DO link=1,maxlinks
+DO link=1,config%maxlinks
 DO point=1,maxpoints(link)
 WRITE(fileunit(13))link,point,q(link,point),y(link,point),species(1)%conc(link,point),species(2)%conc(link,point)
 END DO

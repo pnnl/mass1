@@ -31,45 +31,46 @@
 !----------------------------------------------------------
 MODULE general_vars
 
-  DOUBLE PRECISION, SAVE :: time,time_begin,time_end,delta_t,time_mult,time_step
-  INTEGER, SAVE :: units, channel_length_units
-  INTEGER, SAVE :: time_units,debug_print
-  INTEGER, SAVE :: maxlinks,maxpoint,scalar_steps
-  INTEGER, SAVE :: dsbc_type
+  DOUBLE PRECISION, SAVE :: time
+  !INTEGER, SAVE :: units, channel_length_units
+  !INTEGER, SAVE :: time_units,debug_print
+  !INTEGER, SAVE :: maxlinks,maxpoint,scalar_steps
+  ! INTEGER, SAVE :: maxpoint
+  !INTEGER, SAVE :: dsbc_type
   DOUBLE PRECISION, SAVE :: res_coeff,grav
   DOUBLE PRECISION, SAVE :: unit_weight_h2o,density_h2o
 
   DOUBLE PRECISION, SAVE :: depth_threshold, depth_minimum
 
-  INTEGER, SAVE :: print_freq
+  ! INTEGER, SAVE :: print_freq
 
 END MODULE general_vars
 !------------------------------------------------------------------
 MODULE date_vars
 
-  INTEGER, SAVE :: time_option
-  CHARACTER (LEN=10) :: date_string, date_run_begins, date_run_ends
-  CHARACTER (LEN=8) :: time_string, time_run_begins, time_run_ends
+  ! INTEGER, SAVE :: time_option
+  CHARACTER (LEN=10) :: date_string !, date_run_begins, date_run_ends
+  CHARACTER (LEN=8) :: time_string !, time_run_begins, time_run_ends
 
 END MODULE date_vars
 
 !----------------------------------------------------------
 MODULE logicals
 
-  LOGICAL, SAVE :: do_flow,do_gas,do_temp,do_printout,do_gageout,do_profileout
-  LOGICAL, SAVE :: do_restart,do_hotstart
-  LOGICAL, SAVE :: temp_diffusion, temp_exchange
-  LOGICAL, SAVE :: gas_diffusion, gas_exchange
-  LOGICAL, SAVE :: print_sections
-  LOGICAL, SAVE :: do_latflow
-  LOGICAL, SAVE :: do_accumulate
+  ! LOGICAL, SAVE :: do_flow,do_gas,do_temp,do_printout,do_gageout,do_profileout
+  ! LOGICAL, SAVE :: do_restart,do_hotstart
+  ! LOGICAL, SAVE :: temp_diffusion, temp_exchange
+  ! LOGICAL, SAVE :: gas_diffusion, gas_exchange
+  ! LOGICAL, SAVE :: print_sections
+  ! LOGICAL, SAVE :: do_latflow
+  ! LOGICAL, SAVE :: do_accumulate
 
 END MODULE logicals
 
 !----------------------------------------------------------
 MODULE file_vars
 
-  CHARACTER (LEN = 100), SAVE :: filename(20)
+  ! CHARACTER (LEN = 100), SAVE :: filename(20)
   INTEGER, SAVE :: ii,fileunit(20) = (/(ii,ii=20,39)/)
 
 END MODULE file_vars

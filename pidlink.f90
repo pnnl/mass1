@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October 10, 2001 by William A. Perkins
-! Last Change: Thu Dec  2 08:30:39 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+! Last Change: 2017-02-20 13:30:55 d3g096
 ! ----------------------------------------------------------------
 
 
@@ -21,6 +21,8 @@
 ! type 12, follows observed discharge.
 ! ----------------------------------------------------------------
 MODULE pidlink
+
+  USE mass1_config
 
   IMPLICIT NONE
   CHARACTER (LEN=80), PRIVATE, SAVE :: rcsid = "$Id$"
@@ -79,7 +81,7 @@ CONTAINS
   SUBROUTINE read_pidlink_info()
 
     USE utility
-    USE general_vars, ONLY: maxlinks
+    USE mass1_config
     USE link_vars, ONLY: linktype
     USE bctable
 
@@ -102,10 +104,10 @@ CONTAINS
                                 ! map the link id's into the array of
                                 ! pidlinks
 
-    ALLOCATE(linkidmap(maxlinks))
+    ALLOCATE(linkidmap(config%maxlinks))
     linkidmap = 0
     count = 0
-    DO l = 1, maxlinks
+    DO l = 1, config%maxlinks
        IF (linktype(l) .EQ. 13 .OR. linktype(l) .EQ. 12) THEN 
           count = count + 1
           linkidmap(l) = count
@@ -201,7 +203,7 @@ CONTAINS
                   &' link ', link, ' must specify lagged stage link BC'
              CALL error_message(msg, fatal=.TRUE.)
           ELSE
-             IF (laglink .EQ. 0  .OR. laglink .GT. maxlinks) THEN
+             IF (laglink .EQ. 0  .OR. laglink .GT. config%maxlinks) THEN
                 WRITE(msg, *) 'error reading pidlink coefficient file ', TRIM(fname), &
                      &' link ', link, 'uses lagged flow from link ', laglink, &
                      &', which is not a valid link '
@@ -264,7 +266,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   SUBROUTINE pidlink_assemble_lagged()
 
-    USE general_vars, ONLY: time, time_step, time_mult
+    USE general_vars, ONLY: time ! , time_step, time_mult
     USE point_vars, ONLY: q
     USE link_vars, ONLY: linkbc_table
     USE bctable
@@ -295,7 +297,7 @@ CONTAINS
                                 ! BC's
 
           IF (rec%lagged(i)%usebc) THEN
-             call bc_table_interpolate(linkbc, rec%lagged(i)%link, time/time_mult)
+             call bc_table_interpolate(linkbc, rec%lagged(i)%link, time/config%time%mult)
              rec%lagged(i)%flow = bc_table_current(linkbc, rec%lagged(i)%link, 1)
           ELSE
              rec%lagged(i)%flow(rec%lagged(i)%nlag) = q(rec%lagged(i)%link, 1)
@@ -314,7 +316,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   SUBROUTINE pidlink_initialize()
 
-    USE general_vars, ONLY: time_begin, time_mult, time_step
+    ! USE general_vars, ONLY: time_begin, time_mult, time_step
     USE link_vars, ONLY: linkbc_table
     USE point_vars, ONLY: q
     USE bctable
@@ -332,7 +334,8 @@ CONTAINS
        rec => piddata(j)
        link = rec%link
        rec%errsum = 0.0
-       call bc_table_interpolate(linkbc, linkbc_table(link), time_begin/time_mult)
+       call bc_table_interpolate(linkbc, linkbc_table(link), &
+            &config%time%begin/config%time%mult)
        rec%oldsetpt = bc_table_current(linkbc, linkbc_table(link), 1)
        
        DO i = 1, rec%numflows
@@ -341,7 +344,8 @@ CONTAINS
                                 ! the right length: the number of
                                 ! time_steps in the lag
 
-          rec%lagged(i)%nlag = MAX(INT(rec%lagged(i)%lag/time_step + 0.5), 1)
+          rec%lagged(i)%nlag = &
+               &MAX(INT(rec%lagged(i)%lag/config%time%step + 0.5), 1)
           ALLOCATE(rec%lagged(i)%flow(rec%lagged(i)%nlag))
 
                                 ! go ahead and fill the lagged
@@ -350,7 +354,8 @@ CONTAINS
                                 ! that stages were specified as BC's)
 
           IF (rec%lagged(i)%usebc) THEN
-             call bc_table_interpolate(linkbc, rec%lagged(i)%link, time_begin/time_mult)
+             call bc_table_interpolate(linkbc, rec%lagged(i)%link, &
+                  &config%time%begin/config%time%mult)
              rec%lagged(i)%flow = bc_table_current(linkbc, rec%lagged(i)%link, 1)
           ELSE
              rec%lagged(i)%flow = q(rec%lagged(i)%link, 1)
@@ -387,7 +392,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   SUBROUTINE pidlink_coeff(link, point, setpt, a, b, c, d, g, ap, bp, cp, dp, gp)
 
-    USE general_vars, ONLY: time, time_step
+    USE general_vars, ONLY: time ! , time_step
     USE point_vars, ONLY: q, y
     USE date_vars, ONLY: date_string, time_string
 
@@ -411,7 +416,7 @@ CONTAINS
     d = 1.0
     g = q(link, point) - q(link, point + 1)
 
-    rec%errsum = rec%errsum + (y(link, point) -  rec%oldsetpt)*time_step
+    rec%errsum = rec%errsum + (y(link, point) -  rec%oldsetpt)*config%time%step
     lag = pidlink_lagged_flow(rec)
 
                                 ! momentum coefficients 
@@ -427,9 +432,9 @@ CONTAINS
        eval = q(link, point)
        lval = y(link, point)
        IF (rec%ti .GT. 0.0) THEN
-          dp = rec%kc*(1.0 + time_step/rec%ti + rec%tr/time_step)
+          dp = rec%kc*(1.0 + config%time%step/rec%ti + rec%tr/config%time%step)
        ELSE
-          dp = rec%kc*(1.0 + rec%tr/time_step)
+          dp = rec%kc*(1.0 + rec%tr/config%time%step)
        END IF
 
     ELSE
@@ -439,23 +444,23 @@ CONTAINS
        eval = y(link, point)
        lval = q(link, point)
        IF (rec%ti .GT. 0.0) THEN
-          cp = rec%kc*(1.0 + time_step/rec%ti + rec%tr/time_step)
+          cp = rec%kc*(1.0 + config%time%step/rec%ti + rec%tr/config%time%step)
        ELSE
-          cp = rec%kc*(1.0 + rec%tr/time_step)
+          cp = rec%kc*(1.0 + rec%tr/config%time%step)
        END IF
 
     END IF
 
     IF (rec%ti .GT. 0.0) THEN
        gp = lag - lval + &
-            & rec%kc*eval*(1.0 + time_step/rec%ti) - &
-            & rec%kc*setpt*(1.0 + time_step/rec%ti + rec%tr/time_step) + &
-            & rec%kc/rec%ti*rec%errsum + rec%kc*rec%tr/time_step*rec%oldsetpt
+            & rec%kc*eval*(1.0 + config%time%step/rec%ti) - &
+            & rec%kc*setpt*(1.0 + config%time%step/rec%ti + rec%tr/config%time%step) + &
+            & rec%kc/rec%ti*rec%errsum + rec%kc*rec%tr/config%time%step*rec%oldsetpt
     ELSE
        gp = lag - lval + &
             & rec%kc*eval - &
-            & rec%kc*setpt*(1.0 + rec%tr/time_step) + &
-            & rec%kc*rec%tr/time_step*rec%oldsetpt
+            & rec%kc*setpt*(1.0 + rec%tr/config%time%step) + &
+            & rec%kc*rec%tr/config%time%step*rec%oldsetpt
     END IF
        
 

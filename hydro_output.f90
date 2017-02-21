@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created November  2, 1999 by William A. Perkins
-! Last Change: Wed Sep 29 14:38:21 2010 by William A. Perkins <d3g096@bearflag.pnl.gov>
+! Last Change: 2017-02-20 14:05:15 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -59,9 +59,8 @@ CONTAINS
   ! ----------------------------------------------------------------
   SUBROUTINE hydro_output_setup()
 
+    USE mass1_config
     USE link_vars, ONLY : linktype
-    USE general_vars, ONLY : maxlinks
-    USE logicals, ONLY : do_gas
 
     IMPLICIT NONE
 
@@ -69,13 +68,13 @@ CONTAINS
 
     hydro_links = 0
 
-    IF (.NOT. do_gas) RETURN
+    IF (.NOT. config%do_gas) RETURN
 
                                 ! count up the number of hydro links
 
 
 
-    DO link = 1, maxlinks
+    DO link = 1, config%maxlinks
        SELECT CASE (linktype(link))
        CASE (6,21)
           hydro_links = hydro_links + 1
@@ -93,7 +92,7 @@ CONTAINS
                                 ! and put a header in it
 
     i = 0
-    DO link = 1, maxlinks
+    DO link = 1, config%maxlinks
        hydro_disch(link) = -1.0
        hydro_spill(link) = -1.0
        hydro_gen(link) = -1.0
@@ -118,8 +117,8 @@ CONTAINS
   ! ----------------------------------------------------------------
   SUBROUTINE hydro_output(date, time)
 
+    USE mass1_config
     USE link_vars, ONLY : linktype
-    USE logicals, ONLY : do_gas
     USE gas_functions
 
     IMPLICIT NONE
@@ -128,7 +127,7 @@ CONTAINS
     INTEGER :: i, link
     DOUBLE PRECISION :: press, deltap
 
-    IF (hydro_links .LE. 0 .OR. .NOT. do_gas) RETURN
+    IF (hydro_links .LE. 0 .OR. .NOT. config%do_gas) RETURN
 
     DO i = 1, hydro_links
        link = hydro_specs(i)%link

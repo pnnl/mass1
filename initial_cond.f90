@@ -27,12 +27,12 @@
 SUBROUTINE initial_cond
 
   USE utility
+  USE mass1_config
 	USE file_vars
     USE point_vars
 	USE transport_vars
     USE link_vars
     USE scalars, ONLY: species
-    USE general_vars, ONLY : maxlinks,units
 
     IMPLICIT NONE
 
@@ -40,7 +40,7 @@ SUBROUTINE initial_cond
         INTEGER :: link,point, i
         DOUBLE PRECISION :: junk3,depth,junk2,junk4
 
-        CALL open_existing(filename(6), fileunit(6))
+        CALL open_existing(config%initial_file, fileunit(6))
         
         lateral_inflow = 0.0;
         lateral_inflow_old = 0.0;
@@ -56,8 +56,9 @@ SUBROUTINE initial_cond
 		c(link,i) = junk2
 		temp(link,i) = junk4
 
-		SELECT CASE(units)
-		CASE(2)
+                ! FIXME: this appears to do nothing?
+		SELECT CASE(config%units)
+		CASE(METRIC_UNITS)
 		 
 		 q(link,i) = q(link,i)
 		 y(link,i) = y(link,i)
