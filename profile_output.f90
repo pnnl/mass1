@@ -63,18 +63,20 @@ CONTAINS
 
     CHARACTER*20 fname,string1,string2,input_str
     INTEGER :: len1, spot1, spot2
+
+    INTEGER, PARAMETER :: punit = 34
    
 	count = 0
     profile_max = 0
 
-    CALL open_existing(config%profile_file, fileunit(15), fatal=.TRUE.)
+    CALL open_existing(config%profile_file, punit, fatal=.TRUE.)
 
 	DO WHILE(.TRUE.)
        count=count+1	
-       READ(fileunit(15),*,END=100)profile_num_links(count),profile_x_units(count),x_pro_start(count)	
-       READ(fileunit(15),*)profile(count,1:profile_num_links(count))	
+       READ(punit,*,END=100)profile_num_links(count),profile_x_units(count),x_pro_start(count)	
+       READ(punit,*)profile(count,1:profile_num_links(count))	
 	END DO
-100	CLOSE(fileunit(15))
+100	CLOSE(punit)
 
     IF (count .gt. 0) count = count - 1
 	num_profiles=count

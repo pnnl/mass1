@@ -30,7 +30,6 @@ USE mass1_config
 USE link_vars
 USE general_vars
 USE point_vars
-USE file_vars
 USE transport_vars
 
 USE scalars
@@ -45,17 +44,17 @@ IMPLICIT NONE
 DOUBLE PRECISION :: depth
 DOUBLE PRECISION :: tdg_press, tdg_sat
 DOUBLE PRECISION :: salinity = 0.0
-INTEGER :: link,point, iounit1
+INTEGER :: link,point
 CHARACTER (LEN=6) :: option
 CHARACTER (LEN=10) :: date_string, time_string
 
-iounit1 = fileunit(7)
+INTEGER, PARAMETER :: iounit1 = 26
 
 SELECT CASE(option)
 
 CASE("HEADER")        
   
-        OPEN(fileunit(7),file=config%output_file)
+        OPEN(iounit1,file=config%output_file)
     WRITE(99,*)'general output file ', config%output_file,' opened'
 
          WRITE(iounit1,1026)
@@ -118,16 +117,16 @@ WRITE(iounit1,'("gage control file - ",a80)') config%gage_file
 WRITE(iounit1,'("profile control file - ",a80)') config%profile_file
 
 
-WRITE(fileunit(7),'(//,"end of input specifications",//)')
+WRITE(iounit1,'(//,"end of input specifications",//)')
 
 CASE("LINKS ")
-   WRITE(fileunit(7),'(//,"--- Link Data ----------------",/)')
+   WRITE(iounit1,'(//,"--- Link Data ----------------",/)')
 
 CASE("POINTS")
-   WRITE(fileunit(7),'(//,"--- Point Data ---------------",/)')
+   WRITE(iounit1,'(//,"--- Point Data ---------------",/)')
 
 CASE("SECTIO")
-   WRITE(fileunit(7),'(//,"--- Section Data -------------",/)')
+   WRITE(iounit1,'(//,"--- Section Data -------------",/)')
 
 CASE("RESULT")
 !-----------------------------------------------------------------------------
@@ -137,20 +136,20 @@ CASE("RESULT")
 
 CALL decimal_to_date(time, date_string, time_string)
 
-WRITE(fileunit(7),*)
-WRITE(fileunit(7),1110)
+WRITE(iounit1,*)
+WRITE(iounit1,1110)
 1110 FORMAT(160('-'))
-WRITE(fileunit(7),1020)date_string,time_string
+WRITE(iounit1,1020)date_string,time_string
 1020 FORMAT('Date: ',a10,'  Time: ',a8/)
-WRITE(fileunit(7),1010)
+WRITE(iounit1,1010)
 1010 FORMAT('link',2x,'point',2x,'distance',2x,'water elev',3x,'discharge',5x,'vel',5x,'depth', &
      7x,'conc',6x,'temp',2x,'%Sat',3x,'TDG P', &
                  2x,'thalweg el',2x,'area ',2x,'top width',2x,'hyd rad',2x,'Fr #',2x,'frict slope', &
          2x,'bed shear')
 
-WRITE(fileunit(7),1110)
+WRITE(iounit1,1110)
 
-!WRITE(fileunit(7),*)time/time_mult  ! temporary output for debugging
+!WRITE(iounit1,*)time/time_mult  ! temporary output for debugging
 
 
 
@@ -161,7 +160,7 @@ DO link=1,config%maxlinks
       tdg_press = TDGasPress(species(1)%conc(link,point), species(2)%conc(link,point), salinity)
 
 
-WRITE(fileunit(7),1000)link,point,x(link,point)/5280.0,y(link,point),q(link,point),vel(link,point),depth, &
+WRITE(iounit1,1000)link,point,x(link,point)/5280.0,y(link,point),q(link,point),vel(link,point),depth, &
      species(1)%conc(link,point),species(2)%conc(link,point),tdg_sat,tdg_press, &
                  thalweg(link,point),area(link,point),top_width(link,point),hyd_radius(link,point), &
          froude_num(link,point),friction_slope(link,point),bed_shear(link,point)
@@ -175,7 +174,7 @@ END DO
    f8.2,2x,f6.2,f6.2,es10.2,2x,es10.2)
 
 IF(time >= config%time%end)THEN
-        CLOSE(fileunit(7))
+        CLOSE(iounit1)
 ENDIF
 
 END SELECT

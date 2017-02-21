@@ -36,22 +36,21 @@ SUBROUTINE link_data
   USE utility
   USE mass1_config
   USE link_vars
-  USE file_vars
 
   IMPLICIT NONE
 
-  INTEGER :: i,link,junk,io_unit
+  INTEGER :: i,link,junk
+  INTEGER, PARAMETER :: io_unit = 26, lunit = 21
   CHARACTER(LEN=1024) :: msg
 
-  io_unit = fileunit(7)
-  CALL open_existing(config%link_file, fileunit(2), fatal=.TRUE.)
+  CALL open_existing(config%link_file, lunit, fatal=.TRUE.)
 
   CALL print_output("LINKS ")
 
   DO i=1,config%maxlinks
 
-     READ(fileunit(2),*,END=100,ERR=200)link
-     BACKSPACE(fileunit(2))
+     READ(lunit,*,END=100,ERR=200)link
+     BACKSPACE(lunit)
 
      linkname(link) = link   
 
@@ -65,11 +64,11 @@ SUBROUTINE link_data
 
      WRITE(io_unit,*)'link number -',link
 
-     READ(fileunit(2),*,ERR=200)junk,input_option(link),maxpoints(link),linkorder(link),&
+     READ(lunit,*,ERR=200)junk,input_option(link),maxpoints(link),linkorder(link),&
           & linktype(link),junk,linkbc_table(link),dsbc_table(link), &
           & transbc_table(link),tempbc_table(link),met_zone(link),latflowbc_table(link), &
           & lattransbc_table(link),lattempbc_table(link),lpiexp(link)
-     READ(fileunit(2),*,ERR=200)ds_conlink(link)
+     READ(lunit,*,ERR=200)ds_conlink(link)
 
      WRITE(io_unit,*)link,input_option(link),maxpoints(link),linkorder(link),&
           & linktype(link),junk,linkbc_table(link),dsbc_table(link), &
@@ -92,7 +91,7 @@ SUBROUTINE link_data
 
 100 CONTINUE
 
-  CLOSE(fileunit(2))
+  CLOSE(lunit)
 
   CALL link_connect
 

@@ -31,7 +31,6 @@ SUBROUTINE gage_output
   USE link_vars
   USE general_vars
   USE point_vars
-  USE file_vars
   USE transport_vars
 
   USE scalars
@@ -46,7 +45,7 @@ SUBROUTINE gage_output
 
   CHARACTER(LEN=80), SAVE :: RCS_ID = "$Id$"
 
-  INTEGER, PARAMETER :: gunit = 51
+  INTEGER, PARAMETER :: gcunit = 33, gunit = 51
 
   DOUBLE PRECISION :: depth, tdg_sat, tdg_press
   DOUBLE PRECISION :: salinity = 0.0
@@ -60,21 +59,21 @@ SUBROUTINE gage_output
 
   IF(time == config%time%begin )THEN
      count=0
-     CALL open_existing(config%gage_file, fileunit(14), fatal=.TRUE.)
+     CALL open_existing(config%gage_file, gcunit, fatal=.TRUE.)
 
      DO WHILE(.TRUE.)
-        READ(fileunit(14),*, END=100) link, point
+        READ(gcunit,*, END=100) link, point
         count=count+1   
      END DO
 100  CONTINUE
-     REWIND(fileunit(14))
+     REWIND(gcunit)
 
      num_gages=count
      ALLOCATE(gage_link(num_gages), gage_point(num_gages))
      ALLOCATE(gage_fname(num_gages))
 
      DO i=1,num_gages
-        READ(fileunit(14),*, END=100) link, point
+        READ(gcunit,*, END=100) link, point
         gage_link(i) = link
         gage_point(i) = point
 
@@ -112,6 +111,8 @@ SUBROUTINE gage_output
         CLOSE(gunit)
 
      END DO
+
+     CLOSE (gcunit)
 
      CALL hydro_output_setup()
 

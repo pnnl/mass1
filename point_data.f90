@@ -41,18 +41,15 @@ SUBROUTINE point_data_scan()
   
   USE utility
   USE mass1_config
-  USE file_vars
   USE general_vars
 
   IMPLICIT NONE
 
-  INTEGER :: iunit
+  INTEGER, PARAMETER :: iunit = 22
   INTEGER :: link, point
   INTEGER :: lmax
   INTEGER, ALLOCATABLE :: numpt(:)
   CHARACTER (LEN=1024) :: msg
-
-  iunit = fileunit(3)
 
   CALL open_existing(config%point_file, iunit, fatal=.TRUE.)
   
@@ -114,7 +111,6 @@ SUBROUTINE point_data
   USE mass1_config
   USE point_vars
   USE link_vars
-  USE file_vars
   ! USE general_vars, ONLY : channel_length_units
   USE transport_vars, ONLY : k_surf
   USE section_handler_module
@@ -125,17 +121,17 @@ SUBROUTINE point_data
   DOUBLE PRECISION :: delta_x, slope, start_el,end_el,manning_n,length,diffusion
   DOUBLE PRECISION :: surface_mass_trans
   CHARACTER (LEN=256) :: msg
+  INTEGER, PARAMETER :: iunit = 22, iounit = 26
   
-  CALL open_existing(config%point_file, fileunit(3), fatal=.TRUE.)
+  CALL open_existing(config%point_file, iunit, fatal=.TRUE.)
   
-  io_unit = fileunit(7)
   CALL print_output("POINTS")
   
   
   DO WHILE(.TRUE.)
      
-     READ(fileunit(3),*,END=100)link
-     BACKSPACE(fileunit(3))
+     READ(iunit,*,END=100)link
+     BACKSPACE(iunit)
      
      WRITE(io_unit,'("Link = ",i10," input option = ",i10)')link,input_option(link)
      
@@ -146,7 +142,7 @@ SUBROUTINE point_data
         
         DO i=1,maxpoints(link)
            
-           READ(fileunit(3),*)junk,point,x(link,i),section_number(link,i),thalweg(link,i), &
+           READ(iunit,*)junk,point,x(link,i),section_number(link,i),thalweg(link,i), &
                 manning(link,i),k_diff(link,i),k_surf(link,i)
            
            WRITE(io_unit,*)link,point,x(link,i),section_number(link,i),thalweg(link,i), &
@@ -179,7 +175,7 @@ SUBROUTINE point_data
      CASE(2)
         
         
-        READ(fileunit(3),*)junk,length,start_el,end_el,sec_num,manning_n,diffusion,surface_mass_trans
+        READ(iunit,*)junk,length,start_el,end_el,sec_num,manning_n,diffusion,surface_mass_trans
         
         WRITE(io_unit,*)link,length,start_el,end_el,sec_num,manning_n,diffusion,surface_mass_trans
         
@@ -232,6 +228,6 @@ SUBROUTINE point_data
         
      END SELECT
   END DO
-100 CLOSE(fileunit(3))
+100 CLOSE(iunit)
 
 END SUBROUTINE point_data

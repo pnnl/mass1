@@ -46,16 +46,6 @@ MODULE general_vars
 
 END MODULE general_vars
 !----------------------------------------------------------
-MODULE file_vars
-
-  ! CHARACTER (LEN = 100), SAVE :: filename(20)
-  INTEGER, SAVE :: ii,fileunit(20) = (/(ii,ii=20,39)/)
-
-END MODULE file_vars
-
-!-----------------------------------------------------
-
-!----------------------------------------------------------
 MODULE link_vars
 
   INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: maxpoints,linkname,linkorder,comporder,linktype,input_option

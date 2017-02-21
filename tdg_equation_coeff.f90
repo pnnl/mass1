@@ -66,22 +66,22 @@ SUBROUTINE tdg_coeff_read(status_iounit, error_iounit)
 
 USE utility
 USE mass1_config
-USE file_vars
 
 IMPLICIT NONE
 
 INTEGER :: i,link,junk,status_iounit, error_iounit
+INTEGER, PARAMETER :: iunit = 30
 
 ! read in general link-related boundary condition table
-CALL open_existing(config%tdg_coeff_file, fileunit(11), fatal=.TRUE.)
+CALL open_existing(config%tdg_coeff_file, iunit, fatal=.TRUE.)
 
 DO WHILE(.TRUE.)
-	READ(fileunit(11),*,END=100)link
-	BACKSPACE(fileunit(11))
-	READ(fileunit(11),*)junk,gas_eqn_type(link),qgen_frac(link),a_gas(link),b_gas(link),c_gas(link)
+	READ(iunit,*,END=100)link
+	BACKSPACE(iunit)
+	READ(iunit,*)junk,gas_eqn_type(link),qgen_frac(link),a_gas(link),b_gas(link),c_gas(link)
 END DO
 
-100 CLOSE(fileunit(11))
+100 CLOSE(iunit)
 WRITE(status_iounit,*)'read in tdg equation coefficients successfully'
 
 END SUBROUTINE tdg_coeff_read

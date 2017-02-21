@@ -32,7 +32,6 @@ USE mass1_config
 USE link_vars
 USE general_vars
 USE point_vars
-USE file_vars
 USE transport_vars
 USE scalars
 USE utility
@@ -41,8 +40,9 @@ IMPLICIT NONE
 
 INTEGER :: link,point
 INTEGER :: status
+INTEGER, PARAMETER :: ounit = 32
 
-OPEN(fileunit(13), file=config%restart_save_file,form='unformatted', iostat=status)
+OPEN(ounit, file=config%restart_save_file,form='unformatted', iostat=status)
 
 IF (status .EQ. 0) THEN
    CALL status_message('Writing hot start to ' // TRIM(config%restart_save_file))
@@ -52,10 +52,10 @@ END IF
 
 DO link=1,config%maxlinks
 DO point=1,maxpoints(link)
-WRITE(fileunit(13))link,point,q(link,point),y(link,point),species(1)%conc(link,point),species(2)%conc(link,point)
+WRITE(ounit)link,point,q(link,point),y(link,point),species(1)%conc(link,point),species(2)%conc(link,point)
 END DO
 END DO
 
-CLOSE(fileunit(13))
+CLOSE(ounit)
 
 END SUBROUTINE write_restart
