@@ -28,7 +28,6 @@ SUBROUTINE print_output(option, time)
 
 USE mass1_config
 USE link_vars
-! USE general_vars
 USE point_vars
 USE transport_vars
 

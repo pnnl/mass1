@@ -41,7 +41,6 @@ SUBROUTINE point_data_scan()
   
   USE utility
   USE mass1_config
-  ! USE general_vars
 
   IMPLICIT NONE
 
@@ -111,7 +110,6 @@ SUBROUTINE point_data
   USE mass1_config
   USE point_vars
   USE link_vars
-  ! USE general_vars, ONLY : channel_length_units
   USE transport_vars, ONLY : k_surf
   USE section_handler_module
 
