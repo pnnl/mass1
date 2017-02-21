@@ -2,6 +2,24 @@
 
 	* point_data.f90 (point_data): fix wrong unit variable
 
+	* tdg_equation_coeff.f90: remove tabs
+
+	* scalars_module.f90 (scalars): remove tabs
+
+	* pidlink.f90: remove unused variables and modules
+
+	* met_data_module.f90: remove TABS and unused variables
+
+	* hydro_output.f90 (hydro_output): remove unnecessary USE
+
+	* gastemp/gas_functions_module.f90: remove tabs
+
+	* gastemp/energy_flux_module.f90: remove tabs
+
+	* cross_section.f90: remove tabs
+
+	* CMakeLists.txt: add -Wall to GNU compiler options
+
 2017-02-17  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* flow_sim.f90 (flow_sim): make delta_x local; don't use global

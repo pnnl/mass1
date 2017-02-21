@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2017-02-20 13:03:25 d3g096
+# Last Change: 2017-02-21 11:09:23 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -30,7 +30,7 @@ list (APPEND CMAKE_MODULE_PATH "${MASS1_SOURCE_DIR}/cmake")
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
   # trap floating point exceptions
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffpe-trap=invalid,zero,overflow")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wall -ffpe-trap=invalid,zero,overflow")
 elseif (CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
   # w/ Intel, build static binaries that trap floating point exceptions
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpe0")

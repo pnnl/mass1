@@ -34,7 +34,7 @@ MODULE met_data_module
   DOUBLE PRECISION, PUBLIC :: t_air     = 10.0 ! air temperature deg. C
   DOUBLE PRECISION, PUBLIC :: t_dew     = 0.0  ! dewpoint temperature deg. C
   DOUBLE PRECISION, PUBLIC :: t_water   = 10.0 ! water temperature deg. C (from model simulation)
-  DOUBLE PRECISION, PUBLIC :: windspeed	= 0.0  ! wind speed m/s
+  DOUBLE PRECISION, PUBLIC :: windspeed = 0.0  ! wind speed m/s
   DOUBLE PRECISION, PUBLIC :: baro_press= 760  ! barometric pressure mm Hg
 
 CONTAINS
@@ -173,7 +173,6 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: time
     INTEGER, INTENT(IN) :: met_zone
 
-    CHARACTER(LEN=1024) :: msg
     INTEGER :: idx
 
     idx = met_zone_index(met_zone)

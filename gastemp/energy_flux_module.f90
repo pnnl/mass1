@@ -53,8 +53,8 @@ CONTAINS
     IMPLICIT NONE
     DOUBLE PRECISION :: coeff(*)
     DOUBLE PRECISION :: t_air, t_dew
-    DOUBLE PRECISION :: reflect = 0.03			! relflectance assumed to be 0.03 
-    DOUBLE PRECISION :: brunt_coeff ! = 0.65	! ave. value
+    DOUBLE PRECISION :: reflect = 0.03                  ! relflectance assumed to be 0.03 
+    DOUBLE PRECISION :: brunt_coeff ! = 0.65    ! ave. value
 
     brunt_coeff  = coeff(4)
     net_longwave = 4.4e-8*(t_air + 273.15)**4 * &
@@ -70,8 +70,8 @@ CONTAINS
     ! longwave back radiation (heat flux OUT) (black body radiation)
     ! formula 2.1.4 in Edinger, Brady, Geyer (1974)
     IMPLICIT NONE
-    DOUBLE PRECISION :: t_water				! water surface temperature in degrees C
-    DOUBLE PRECISION :: emiss = 0.97	! emissivity of water
+    DOUBLE PRECISION :: t_water                         ! water surface temperature in degrees C
+    DOUBLE PRECISION :: emiss = 0.97    ! emissivity of water
 
     back_radiation = -emiss*stephan_boltz*(t_water + 273.15)**4
 
@@ -86,9 +86,9 @@ CONTAINS
     ! formula 2.1.5 in Edinger, Brady, Geyer (1974)
     IMPLICIT NONE
     DOUBLE PRECISION :: coeff(*)
-    DOUBLE PRECISION :: t_water	! water surface temperature in degrees C
-    DOUBLE PRECISION :: t_dew 	! air temperature in degrees C
-    DOUBLE PRECISION :: wind_speed	! wind speed in m/s at a height 7 m above water surface
+    DOUBLE PRECISION :: t_water ! water surface temperature in degrees C
+    DOUBLE PRECISION :: t_dew   ! air temperature in degrees C
+    DOUBLE PRECISION :: wind_speed      ! wind speed in m/s at a height 7 m above water surface
 
     evaporation = -windspeed(coeff, wind_speed)*( sat_vapor_press(t_water) - sat_vapor_press(t_dew) )
 
@@ -103,9 +103,9 @@ CONTAINS
     ! formula 2.1.11 in Edinger, Brady, Geyer (1974)
     IMPLICIT NONE
     DOUBLE PRECISION :: coeff(*)
-    DOUBLE PRECISION :: t_water	! water surface temperature in degrees C
-    DOUBLE PRECISION :: t_air		! air temperature in degrees C
-    DOUBLE PRECISION :: wind_speed	! wind speed in m/s at a height 7 m above water surface
+    DOUBLE PRECISION :: t_water ! water surface temperature in degrees C
+    DOUBLE PRECISION :: t_air           ! air temperature in degrees C
+    DOUBLE PRECISION :: wind_speed      ! wind speed in m/s at a height 7 m above water surface
 
     !conduction = -0.47*windspeed(coeff, wind_speed)*(t_water - t_air)
     conduction = -coeff(3)*windspeed(coeff, wind_speed)*(t_water - t_air)
@@ -122,7 +122,7 @@ CONTAINS
     ! formula 2.4.6 of in Edinger, Brady, Geyer (1974)
     IMPLICIT NONE
     DOUBLE PRECISION :: coeff(*)
-    DOUBLE PRECISION :: wind_speed	! wind speed in m/s at a height 7 m above water surface
+    DOUBLE PRECISION :: wind_speed      ! wind speed in m/s at a height 7 m above water surface
 
     ! formula 2.4.6 of in Edinger, Brady, Geyer (1974)
     ! windspeed = 9.2 + 0.46*wind_speed**2
@@ -161,7 +161,7 @@ CONTAINS
     ! Raudkivi (1979) formula
     !
     ! Note that the air vapor pressure is the air saturation vapor pressure
-    !			evaluated at the dew point temperature
+    !                   evaluated at the dew point temperature
     !
     IMPLICIT NONE
     DOUBLE PRECISION :: t_air

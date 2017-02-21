@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created November  2, 1999 by William A. Perkins
-! Last Change: 2017-02-20 14:05:15 d3g096
+! Last Change: 2017-02-21 11:48:04 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -118,7 +118,6 @@ CONTAINS
   SUBROUTINE hydro_output(date, time)
 
     USE mass1_config
-    USE link_vars, ONLY : linktype
     USE gas_functions
 
     IMPLICIT NONE

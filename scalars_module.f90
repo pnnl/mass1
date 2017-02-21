@@ -17,8 +17,8 @@
 ! COMMENTS:
 !
 ! MOD HISTORY: 10-5-98 added to MASS1 from MASS2
-!							fixed delta x bug in diffusion calc if you reverse distance
-!							reference frame; mcr 10-10-98
+!                                                       fixed delta x bug in diffusion calc if you reverse distance
+!                                                       reference frame; mcr 10-10-98
 !              august 99 - added direct internal bc input, overides upstream C if active
 !
 !***************************************************************
@@ -30,8 +30,8 @@ IMPLICIT NONE
 INTEGER  :: max_species = 2
 
 TYPE scalar_struct
-   DOUBLE PRECISION, POINTER :: conc(:,:)				! c depth-ave concentration
-	DOUBLE PRECISION, POINTER :: concold(:,:)			! c old depth-ave concentration
+   DOUBLE PRECISION, POINTER :: conc(:,:)                               ! c depth-ave concentration
+        DOUBLE PRECISION, POINTER :: concold(:,:)                       ! c old depth-ave concentration
 END TYPE scalar_struct
 
 TYPE(scalar_struct), ALLOCATABLE :: species(:)
@@ -56,13 +56,13 @@ SUBROUTINE allocate_species_components(i, imax, jmax, status_iounit, error_iouni
   ! this routine allocates each component in the array of blocks
   ! allows minimal memory use for each block
   IMPLICIT NONE
-  INTEGER :: i, imax, jmax, status_iounit, error_iounit, alloc_stat	! block number, max i elements, max j elements
+  INTEGER :: i, imax, jmax, status_iounit, error_iounit, alloc_stat     ! block number, max i elements, max j elements
 
   WRITE(status_iounit,*)'starting component allocation for species number - ', i
   WRITE(status_iounit,*)'         maximum number of i elements = ', imax
   WRITE(status_iounit,*)'         maximum number of j elements = ', jmax
 
-  ALLOCATE(species(i)%conc(imax,0:jmax+2), STAT = alloc_stat)		! c depth-ave concentration
+  ALLOCATE(species(i)%conc(imax,0:jmax+2), STAT = alloc_stat)           ! c depth-ave concentration
   IF(alloc_stat /= 0)THEN
      WRITE(error_iounit,*)'allocation failed for the concentration'
      CALL EXIT(1)
@@ -70,7 +70,7 @@ SUBROUTINE allocate_species_components(i, imax, jmax, status_iounit, error_iouni
      WRITE(status_iounit,*)'allocation successful for concentration'
   ENDIF
 
-  ALLOCATE(species(i)%concold(imax,0:jmax+2), STAT = alloc_stat)	! c old depth-ave concentration
+  ALLOCATE(species(i)%concold(imax,0:jmax+2), STAT = alloc_stat)        ! c old depth-ave concentration
   IF(alloc_stat /= 0)THEN
      WRITE(error_iounit,*)'allocation failed for the old concentration'
      CALL EXIT(1)
@@ -180,13 +180,13 @@ SUBROUTINE tvd_interp(time, htime0, htime1)
   USE section_handler_module
   USE link_vars, ONLY: maxpoints, linktype
   USE point_vars, ONLY: thalweg, &
-       &harea=>area, harea_old=>area_old, hq=>q, hq_old=>q_old, &
-       &hvel=>vel, hy=>y, hy_old=>y_old, hlatq=>lateral_inflow, &
+       &harea_old=>area_old, hq=>q, hq_old=>q_old, &
+       &hy=>y, hy_old=>y_old, hlatq=>lateral_inflow, &
        &hlatq_old=>lateral_inflow_old, ptsection
 
   IMPLICIT NONE
 
-  DOUBLE PRECISION :: htime, htime_begin, htime_end
+  DOUBLE PRECISION :: htime_begin, htime_end
   DOUBLE PRECISION :: time, htime0, htime1
   DOUBLE PRECISION :: val, val0, val1
   INTEGER :: link, point
@@ -258,11 +258,11 @@ END SUBROUTINE tvd_interp
 SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
 
   USE mass1_config
-  USE transport_vars , ONLY : k_surf, dxx
+  USE transport_vars , ONLY : dxx
   USE link_vars, ONLY : maxpoints, comporder, linktype, &
        &linkbc_table, met_zone, tempbc_table, transbc_table, &
        &lattempbc_table, lattransbc_table
-  USE point_vars, ONLY: x, hy=>y, k_diff, thalweg
+  USE point_vars, ONLY: x, k_diff, thalweg
   USE bctable
 
   
@@ -280,7 +280,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
   INTEGER :: status_iounit, error_iounit
   DOUBLE PRECISION :: c(:,0:), c_old(:,0:)
 
-  INTEGER :: i,j,link,point
+  INTEGER :: i,link,point
   DOUBLE PRECISION :: velave,sum,cflx,s,corr,tmp,phi,dtdx,ave_vel
   DOUBLE PRECISION :: f(config%maxpoint)
   DOUBLE PRECISION :: k_e,k_w,area_e,area_w,flux_e,flux_w
@@ -333,19 +333,19 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                 &CALL update_met_data(config%do_gas, time, met_zone(link))
            IF(config%do_temp) t_water = species(2)%conc(link,2)
            IF(qspill > 0.0)THEN
-              !			equations are for %Sat and effective Spill Q in Kcfs
-              !			Qspill is in effective KCFS = Qspill + qgen_frac*Qgen
-              !			gas_eqn_type = 1 general quadratic function
-              !			tdg = a_gas + b_gas*Qspill + c_gas*Qspill**2
-              !			OR 
-              !			gas_eqn_type = 2 exponetial equation
-              !			tdg = a_gas + b_gas*EXP(c_gas*Qspill)
-              !			OR 
-              !			gas_eqn_type = 3 exponetial equation
-              !			tdg = a_gas + b_gas*EXP(c_gas*Qspill)
-              !			OR 
-              !			gas_eqn_type = 4 logaritmic equation
-              !			tdg = a_gas + b_gas*LOG(c_gas*Qspill)
+              !                 equations are for %Sat and effective Spill Q in Kcfs
+              !                 Qspill is in effective KCFS = Qspill + qgen_frac*Qgen
+              !                 gas_eqn_type = 1 general quadratic function
+              !                 tdg = a_gas + b_gas*Qspill + c_gas*Qspill**2
+              !                 OR 
+              !                 gas_eqn_type = 2 exponetial equation
+              !                 tdg = a_gas + b_gas*EXP(c_gas*Qspill)
+              !                 OR 
+              !                 gas_eqn_type = 3 exponetial equation
+              !                 tdg = a_gas + b_gas*EXP(c_gas*Qspill)
+              !                 OR 
+              !                 gas_eqn_type = 4 logaritmic equation
+              !                 tdg = a_gas + b_gas*LOG(c_gas*Qspill)
               
               qspill = qspill + qgen_frac(link)*qgen
               qgen   = qgen - qgen_frac(link)*qgen
@@ -390,7 +390,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
            END IF
            
         ELSE
-           c(link,2) =	c(link,1)
+           c(link,2) =  c(link,1)
         ENDIF
         
         
@@ -408,7 +408,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
               dxx(link,point) = ABS(0.5*(x(link,point) - x(link,point-1))) +  &
                    ABS(0.5*(x(link,point+1) - x(link,point)))
            END DO
-           dxx(link,maxpoints(link)) =	ABS(x(link,maxpoints(link)) - x(link,maxpoints(link)-1))
+           dxx(link,maxpoints(link)) =  ABS(x(link,maxpoints(link)) - x(link,maxpoints(link)-1))
            dxx(link,maxpoints(link)+1) = dxx(link,maxpoints(link)) 
            dxx(link,maxpoints(link)+2) = dxx(link,maxpoints(link))
         ENDIF
@@ -449,16 +449,16 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
 
                  IF(qspill > 0.0)THEN
                     
-                    !			equations are for %Sat and effective Spill Q in Kcfs
-                    !			Qspill is in effective KCFS = Qspill + qgen_frac*Qgen
-                    !			gas_eqn_type = 2 general quadratic function
-                    !			tdg = a_gas + b_gas*Qspill + c_gas*Qspill**2
-                    !			OR 
-                    !			gas_eqn_type = 3 exponetial equation
-                    !			tdg = a_gas + b_gas*EXP(c_gas*Qspill)
-                    !			OR 
-                    !			gas_eqn_type = 4 logaritmic equation
-                    !			tdg = a_gas + b_gas*LOG(c_gas*Qspill)
+                    !                   equations are for %Sat and effective Spill Q in Kcfs
+                    !                   Qspill is in effective KCFS = Qspill + qgen_frac*Qgen
+                    !                   gas_eqn_type = 2 general quadratic function
+                    !                   tdg = a_gas + b_gas*Qspill + c_gas*Qspill**2
+                    !                   OR 
+                    !                   gas_eqn_type = 3 exponetial equation
+                    !                   tdg = a_gas + b_gas*EXP(c_gas*Qspill)
+                    !                   OR 
+                    !                   gas_eqn_type = 4 logaritmic equation
+                    !                   tdg = a_gas + b_gas*LOG(c_gas*Qspill)
                     
                     qspill = qspill + qgen_frac(link)*qgen
                     qgen   = qgen - qgen_frac(link)*qgen
@@ -531,18 +531,18 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                  
                  IF(qspill > 0.0)THEN
                     
-                    !			equations are for %Sat and effective Spill Q in Kcfs
-                    !			Qspill is in effective KCFS = Qspill + qgen_frac*Qgen
+                    !                   equations are for %Sat and effective Spill Q in Kcfs
+                    !                   Qspill is in effective KCFS = Qspill + qgen_frac*Qgen
                     !           gas_eqn_type = 0 No eqn given - read specified gas Conc (mg/L)
                     !           gas_eqn_type = 1 No eqn given - read specified gas %Saturation
-                    !			gas_eqn_type = 2 general quadratic function
-                    !			tdg = a_gas + b_gas*Qspill + c_gas*Qspill**2
-                    !			OR 
-                    !			gas_eqn_type = 3 exponetial equation
-                    !			tdg = a_gas + b_gas*EXP(c_gas*Qspill)
-                    !			OR 
-                    !			gas_eqn_type = 4 logaritmic equation
-                    !			tdg = a_gas + b_gas*LOG(c_gas*Qspill)
+                    !                   gas_eqn_type = 2 general quadratic function
+                    !                   tdg = a_gas + b_gas*Qspill + c_gas*Qspill**2
+                    !                   OR 
+                    !                   gas_eqn_type = 3 exponetial equation
+                    !                   tdg = a_gas + b_gas*EXP(c_gas*Qspill)
+                    !                   OR 
+                    !                   gas_eqn_type = 4 logaritmic equation
+                    !                   tdg = a_gas + b_gas*LOG(c_gas*Qspill)
                     
                     qspill = qspill + qgen_frac(link)*qgen
                     qgen   = qgen - qgen_frac(link)*qgen
@@ -660,33 +660,33 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
            if(velave.ge.0)then   !!! +ve velocity case 
               f(point)=c(link,point+1)-c(link,point)
               if(abs(f(point)).gt.1.d-40)then
-                 corr = 0.5*(dxx(link,point+1)+dxx(link,point))/	 &
+                 corr = 0.5*(dxx(link,point+1)+dxx(link,point))/         &
                       (0.5*(dxx(link,point)+dxx(link,point-1)))
-                 s = corr *	&
+                 s = corr *     &
                       (c(link,point)-c(link,point-1))/f(point)
-                 tmp = min(2.d0,2.d0*s,0.33333333333333333d0*	 &
+                 tmp = min(2.d0,2.d0*s,0.33333333333333333d0*    &
                       (2.d0-cflx+(1.d0+cflx)*s))
                  phi = max(0.0,tmp)
               else
                  phi=0
               end if
-              f(point)=velave*	 &
+              f(point)=velave*   &
                    ( c(link,point) + 0.5*(1.0-cflx)*phi*f(point) )
               
            else        !!! -ve velocity case
               f(point)=c(link,point)-c(link,point+1)
               if(abs(f(point)).gt.1.d-40)then
-                 corr = 0.5*(dxx(link,point+1)+dxx(link,point))/	&
-                      (0.5*(dxx(link,point+1)+dxx(link,point+2)))	  
-                 s=corr*						 &
-                      (c(link,point+1)-c(link,point+2))/f(point)	 
+                 corr = 0.5*(dxx(link,point+1)+dxx(link,point))/        &
+                      (0.5*(dxx(link,point+1)+dxx(link,point+2)))         
+                 s=corr*                                                 &
+                      (c(link,point+1)-c(link,point+2))/f(point)         
                  phi=max(0.0d0,min(2.d0,2.d0*s,  &
-                      0.33333333333333333d0*		  &
+                      0.33333333333333333d0*              &
                       (2.d0-cflx+(1.d0+cflx)*s)))
               else
                  phi=0
               end if
-              f(point)=velave*( c(link,point+1) +	 &
+              f(point)=velave*( c(link,point+1) +        &
                    0.5*(1.0-cflx)*phi*f(point) )
            end if
            
@@ -713,7 +713,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
         
         !---------------------------------------------------------------------------
         ! Diffusion Step
-        !	explicit finite-volume solution
+        !       explicit finite-volume solution
         !
         diffusion = .FALSE.
         IF( (species_num == 1) .AND. config%gas_diffusion ) diffusion = .TRUE.
@@ -819,7 +819,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
   ! 
   
   !IF(time==time_end)THEN
-  !	DEALLOCATE(b,m)
+  !     DEALLOCATE(b,m)
   !ENDIF
   
 END SUBROUTINE tvd_transport

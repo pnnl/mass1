@@ -71,8 +71,8 @@ PROGRAM mass1
   ! read in configuration file
   CALL config%read()
 
-  CALL print_output("HEADER")
-  CALL print_output("CONFIG")
+  CALL print_output("HEADER", time)
+  CALL print_output("CONFIG", time)
 
 
   IF(config%debug_print) WRITE(11,*)'done reading configuration file'
@@ -179,7 +179,7 @@ PROGRAM mass1
         CALL accum_reset(time)
         CALL accumulate()
         CALL accum_calc(time)
-        IF (config%do_printout) CALL print_output("RESULT")
+        IF (config%do_printout) CALL print_output("RESULT", time)
         IF (config%do_profileout) CALL profile_output
         IF (config%do_gageout) CALL gage_output
      END IF
@@ -253,7 +253,7 @@ PROGRAM mass1
            CALL accumulate()
         END IF
         CALL accum_calc(time)
-        IF (config%do_printout)CALL print_output("RESULT")
+        IF (config%do_printout)CALL print_output("RESULT", time)
         IF (config%do_gageout) CALL gage_output	
         IF (config%do_profileout) CALL profile_output
         CALL accum_reset(time)

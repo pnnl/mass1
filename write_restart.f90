@@ -30,7 +30,6 @@ SUBROUTINE write_restart
 
 USE mass1_config
 USE link_vars
-USE general_vars
 USE point_vars
 USE transport_vars
 USE scalars
