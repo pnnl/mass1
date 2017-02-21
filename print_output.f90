@@ -32,7 +32,6 @@ USE general_vars
 USE point_vars
 USE file_vars
 USE transport_vars
-USE logicals
 
 USE scalars
 USE gas_functions

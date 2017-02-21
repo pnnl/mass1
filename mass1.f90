@@ -34,7 +34,6 @@ PROGRAM mass1
   USE time_series
   USE general_vars
   USE file_vars
-  USE logicals
   USE link_vars, ONLY : linktype
   USE section_handler_module
 

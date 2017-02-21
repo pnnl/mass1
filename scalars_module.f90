@@ -263,7 +263,6 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
        &linkbc_table, met_zone, tempbc_table, transbc_table, &
        &lattempbc_table, lattransbc_table
   USE point_vars, ONLY: x, hy=>y, k_diff, thalweg
-  USE logicals
   USE bctable
 
   

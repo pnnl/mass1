@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created November  6, 2000 by William A. Perkins
-! Last Change: 2017-02-20 14:05:48 d3g096
+! Last Change: 2017-02-21 08:13:16 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE accumulator
@@ -16,7 +16,6 @@ MODULE accumulator
 
   USE mass1_config
   USE general_vars
-  USE logicals
   USE link_vars
   USE point_vars
   USE scalars
@@ -196,7 +195,6 @@ CONTAINS
   SUBROUTINE accumulate_tdg(tdg)
 
     USE met_data_module
-    USE logicals
     USE gas_functions
 
     IMPLICIT NONE
