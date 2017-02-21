@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2017-01-06 09:35:03 d3g096
+! Last Change: 2017-02-21 11:16:07 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -338,26 +338,26 @@ CONTAINS
 
        IF(y(j) <= level) last_point_wet = .TRUE.
 
-       DO j = 2,num_pairs	! loop through rest of levels and add up width
+       DO j = 2,num_pairs       ! loop through rest of levels and add up width
 
           IF(last_point_wet)THEN
              IF(y(j) <= level)THEN
-		width(i) = width(i) + ABS(x(j) - x(j-1))
-		last_point_wet = .TRUE.
+                width(i) = width(i) + ABS(x(j) - x(j-1))
+                last_point_wet = .TRUE.
              ELSE
-		x_inter = linear_interp(x(j-1),y(j-1),x(j),y(j),level)
-		width(i) = width(i) + ABS(x(j-1) - x_inter)
-		last_point_wet = .FALSE.
+                x_inter = linear_interp(x(j-1),y(j-1),x(j),y(j),level)
+                width(i) = width(i) + ABS(x(j-1) - x_inter)
+                last_point_wet = .FALSE.
              ENDIF
 
           ELSE  ! last point was dry
              IF(y(j) <= level)THEN
-		x_inter = linear_interp(x(j),y(j),x(j-1),y(j-1),level)
-		width(i) = width(i) + ABS(x(j) - x_inter)
-		last_point_wet = .TRUE.
+                x_inter = linear_interp(x(j),y(j),x(j-1),y(j-1),level)
+                width(i) = width(i) + ABS(x(j) - x_inter)
+                last_point_wet = .TRUE.
              ELSE
-		width(i) = width(i)
-		last_point_wet = .FALSE.
+                width(i) = width(i)
+                last_point_wet = .FALSE.
              ENDIF
 
           ENDIF
@@ -369,7 +369,7 @@ CONTAINS
     ! first sort from bottom to top and then eliminate duplicate levels
     iperm = (/(i,i=1,num_pairs)/) ! must initialize for IMSL to use
 
-    CALL SVRGP(num_pairs,y,y_new,iperm)	! IMSL routine to sort
+    CALL SVRGP(num_pairs,y,y_new,iperm) ! IMSL routine to sort
 
     width_new = width(iperm)
 

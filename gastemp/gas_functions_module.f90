@@ -2,7 +2,7 @@
 MODULE gas_functions
 !   basic dissolved gas relationships
 
-!		converted from C (bill perkins version) to F90 by mcr
+!               converted from C (bill perkins version) to F90 by mcr
 
 !   Primary reference:
 
@@ -43,7 +43,7 @@ TYPE(GasCoeff) :: c
   END IF
   value = Dexp(value)
   
-	beta_formula = value
+        beta_formula = value
 
 END FUNCTION beta_formula
 
@@ -71,7 +71,7 @@ INTEGER :: gas
  
   END SELECT
 
-	GasBeta = value
+        GasBeta = value
 
 END FUNCTION
 
@@ -82,7 +82,7 @@ END FUNCTION
 DOUBLE PRECISION FUNCTION cstar_formula( T,  S,  c)
 IMPLICIT NONE
   DOUBLE PRECISION :: value, T, S, K, K100
-	TYPE(GasCoeff) :: c
+        TYPE(GasCoeff) :: c
 
   K = T + 273.15
   K100 = K/100.0
@@ -91,7 +91,7 @@ IMPLICIT NONE
   value = value + S*(c%B1 + c%B2*K100 + c%B3*K100*K100)
   value = Dexp(value)
   
-	cstar_formula = value
+        cstar_formula = value
 
 END FUNCTION
 
@@ -121,7 +121,7 @@ INTEGER :: gas
     
   END SELECT
   
-	GasCStar = value
+        GasCStar = value
 
 END FUNCTION
 
@@ -144,7 +144,7 @@ INTEGER :: gas
   value = GasCStar(gas, T, S)
   value = value*(BP - vp)/(760.0 - vp)
 
-	GasCStarBP = value
+        GasCStarBP = value
 
 END FUNCTION
 
@@ -168,7 +168,7 @@ DOUBLE PRECISION :: K, T, S, value
   value = Dexp(value)          !/* in atmospheres */
   value = value*760.0d0        !    /* in mm Hg */
 
-	GasH2OPress = value
+        GasH2OPress = value
 
 END FUNCTION
 
@@ -180,7 +180,7 @@ END FUNCTION
 !   Hg/m, given the Temperature (T, C) and salinity (S, ppt).  Uses
 !   Equation A-13 of Colt, 1984.
 
-!		5/28/98 : fixed some typos and the conversion from Pa to mmHg/m; mcr
+!               5/28/98 : fixed some typos and the conversion from Pa to mmHg/m; mcr
 !
 !   ------------------------------------------------------------- */
 
@@ -190,19 +190,19 @@ DOUBLE PRECISION :: rho, T, S, A, B, C
   
 DOUBLE PRECISION :: g = 9.80665
   
-  rho = 999.842594				&
-    + 6.793952e-02*T			&
-    - 9.095290e-03*T*T		&
-    + 1.001685e-04*T*T*T	&	
-    - 1.120083e-06*T*T*T*T	&
+  rho = 999.842594                              &
+    + 6.793952e-02*T                    &
+    - 9.095290e-03*T*T          &
+    + 1.001685e-04*T*T*T        &       
+    - 1.120083e-06*T*T*T*T      &
     + 6.536336e-09*T*T*T*T*T
 
   IF(S > 0.0)THEN
 
-    A = 8.34493e-01				&
-      - 4.0899e-03*T			&
-      + 7.6438e-05*T*T		&
-      - 8.2467e-07*T*T*T	&
+    A = 8.34493e-01                             &
+      - 4.0899e-03*T                    &
+      + 7.6438e-05*T*T          &
+      - 8.2467e-07*T*T*T        &
       + 5.3875e-09*T*T*T*T
   
     B = - 5.72466e-03 &
@@ -217,7 +217,7 @@ DOUBLE PRECISION :: g = 9.80665
     
   rho = rho*g*7.50062/1000.0
 
-	GasH2ORhoG = rho
+        GasH2ORhoG = rho
 
 END FUNCTION
 
@@ -310,7 +310,7 @@ END FUNCTION
 
 DOUBLE PRECISION FUNCTION TDGasDP(conc, T,  S,  BP) 
 IMPLICIT NONE
-DOUBLE PRECISION :: T, S, TGP, conc, dP, BP
+DOUBLE PRECISION :: T, S, TGP, conc, BP
 
    TGP = TDGasPress(conc, T, S)
    TDGasDP = TGP - BP
@@ -331,7 +331,7 @@ END FUNCTION
 
 DOUBLE PRECISION FUNCTION TDGasSaturation( conc, T,  S, BP)
 IMPLICIT NONE
-DOUBLE PRECISION :: conc, T, S, BP, DP, Sat
+DOUBLE PRECISION :: conc, T, S, BP, DP
   DP = TDGasDP(conc, T, S, BP)
   TDGasSaturation = 100.0*(BP + DP)/BP
 
@@ -373,8 +373,8 @@ DOUBLE PRECISION FUNCTION TDGasConcfromSat( saturation,  T,  S, BP)
 IMPLICIT NONE
 DOUBLE PRECISION :: saturation, BP, TGP, T, S
   
-	TGP = saturation*BP/100.0
-	TDGasConcfromSat = TDGasConc( TGP,  T,  S)
+        TGP = saturation*BP/100.0
+        TDGasConcfromSat = TDGasConc( TGP,  T,  S)
  
 
 END FUNCTION

@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October 10, 2001 by William A. Perkins
-! Last Change: 2017-02-21 09:16:53 d3g096
+! Last Change: 2017-02-21 11:50:09 d3g096
 ! ----------------------------------------------------------------
 
 
@@ -89,7 +89,6 @@ CONTAINS
 
 
     INTEGER :: l, link, count, laglink, i
-    LOGICAL :: file_exist
     DOUBLE PRECISION :: kc, ti, tr, lagvalues(2*maxlags)
     DOUBLE PRECISION :: lagtime
     CHARACTER (LEN=256) :: fname
@@ -268,14 +267,11 @@ CONTAINS
 
     USE general_vars, ONLY: time ! , time_step, time_mult
     USE point_vars, ONLY: q
-    USE link_vars, ONLY: linkbc_table
     USE bctable
     IMPLICIT NONE
     TYPE (pidlink_rec), POINTER :: rec
 
     INTEGER :: i, j, k
-
-    INTEGER :: table_type
 
     IF (.NOT. ASSOCIATED(piddata)) RETURN
 
@@ -325,8 +321,6 @@ CONTAINS
     TYPE (pidlink_rec), POINTER :: rec
     INTEGER :: i, j, link
 
-    INTEGER :: table_type
-
     IF (.NOT. ASSOCIATED(piddata)) RETURN
 
     DO j = 1, npidlink
@@ -373,7 +367,6 @@ CONTAINS
 
     IMPLICIT NONE
     TYPE (pidlink_rec) :: rec
-    DOUBLE PRECISION :: time
 
     INTEGER :: i
 
@@ -391,7 +384,6 @@ CONTAINS
   ! ----------------------------------------------------------------
   SUBROUTINE pidlink_coeff(link, point, setpt, a, b, c, d, g, ap, bp, cp, dp, gp)
 
-    USE general_vars, ONLY: time ! , time_step
     USE point_vars, ONLY: q, y
 
     IMPLICIT NONE
@@ -399,8 +391,6 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: setpt
     DOUBLE PRECISION, INTENT(OUT) ::  a, b, c, d, g, ap, bp, cp, dp, gp
     TYPE (pidlink_rec), POINTER :: rec
-
-    INTEGER :: table_type
 
     DOUBLE PRECISION :: lag, eval, lval
     CHARACTER (LEN=10) :: date_string, time_string
