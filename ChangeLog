@@ -1,3 +1,7 @@
+2017-02-21  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* point_data.f90 (point_data): fix wrong unit variable
+
 2017-02-17  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* flow_sim.f90 (flow_sim): make delta_x local; don't use global
