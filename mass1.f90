@@ -33,7 +33,6 @@ PROGRAM mass1
   USE date_time
   USE time_series
   USE general_vars
-  USE date_vars
   USE file_vars
   USE logicals
   USE link_vars, ONLY : linktype
@@ -55,18 +54,21 @@ PROGRAM mass1
   INTEGER :: link
   INTEGER :: tsteps
   LOGICAL run
+  CHARACTER (LEN=10) :: date_string, time_string
 
-  CALL date_time_flags()
-  CALL time_series_module_init()
   utility_error_iounit = 11
   utility_status_iounit = 99
 
-  CALL banner()
+  CALL date_time_flags()
+  CALL time_series_module_init()
 
   ! open the status file - this file records progress through the
   ! input stream and errors
   !
   CALL open_new('status.out', utility_status_iounit)
+  CALL open_new('error-warning.out', utility_error_iounit)
+
+  CALL banner()
 
   ! read in configuration file
   CALL config%read()

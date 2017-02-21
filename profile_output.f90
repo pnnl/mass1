@@ -32,7 +32,6 @@ MODULE profile_output_module
   USE accumulator
   USE file_vars
   USE transport_vars
-  USE date_vars
   USE gas_functions
   USE mass1_config
 
@@ -180,6 +179,7 @@ CONTAINS
 
     INTEGER :: i,j,link,lastlink,point
     INTEGER :: profile_max=0,count=0
+    CHARACTER (LEN=10) :: date_string, time_string
 
     IF(time == config%time%begin ) CALL profile_read()
 

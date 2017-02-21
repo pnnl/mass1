@@ -33,7 +33,6 @@ SUBROUTINE gage_output
   USE point_vars
   USE file_vars
   USE transport_vars
-  USE date_vars
 
   USE scalars
   USE met_data_module
@@ -57,6 +56,7 @@ SUBROUTINE gage_output
   INTEGER :: len1,len2,spot1,spot2
   CHARACTER (LEN=256) fname,string1,string2
   CHARACTER (LEN=256), ALLOCATABLE, SAVE :: gage_fname(:)
+  CHARACTER (LEN=10) :: date_string, time_string
 
   IF(time == config%time%begin )THEN
      count=0

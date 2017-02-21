@@ -32,7 +32,6 @@ USE general_vars
 USE point_vars
 USE file_vars
 USE transport_vars
-USE date_vars
 USE logicals
 
 USE scalars
@@ -49,6 +48,7 @@ DOUBLE PRECISION :: tdg_press, tdg_sat
 DOUBLE PRECISION :: salinity = 0.0
 INTEGER :: link,point, iounit1
 CHARACTER (LEN=6) :: option
+CHARACTER (LEN=10) :: date_string, time_string
 
 iounit1 = fileunit(7)
 

@@ -33,7 +33,6 @@ SUBROUTINE kick_off
 USE mass1_config
 USE general_vars
 USE link_vars
-USE date_vars
 USE pidlink
 
 IMPLICIT NONE

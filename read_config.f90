@@ -32,7 +32,6 @@ SUBROUTINE read_config
   USE general_vars
   ! USE section_vars
   USE point_vars
-  USE date_vars
   USE logicals
 
 

@@ -10,7 +10,6 @@ MODULE met_data_module
   USE utility
   USE time_series
   USE date_time
-  USE date_vars
 
   IMPLICIT NONE
 

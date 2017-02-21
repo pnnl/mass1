@@ -45,15 +45,6 @@ MODULE general_vars
   ! INTEGER, SAVE :: print_freq
 
 END MODULE general_vars
-!------------------------------------------------------------------
-MODULE date_vars
-
-  ! INTEGER, SAVE :: time_option
-  CHARACTER (LEN=10) :: date_string !, date_run_begins, date_run_ends
-  CHARACTER (LEN=8) :: time_string !, time_run_begins, time_run_ends
-
-END MODULE date_vars
-
 !----------------------------------------------------------
 MODULE logicals
 

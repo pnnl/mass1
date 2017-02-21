@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October 10, 2001 by William A. Perkins
-! Last Change: 2017-02-20 13:30:55 d3g096
+! Last Change: 2017-02-21 08:04:31 d3g096
 ! ----------------------------------------------------------------
 
 
@@ -394,7 +394,6 @@ CONTAINS
 
     USE general_vars, ONLY: time ! , time_step
     USE point_vars, ONLY: q, y
-    USE date_vars, ONLY: date_string, time_string
 
     IMPLICIT NONE
     INTEGER, INTENT(IN) :: link, point
@@ -405,6 +404,7 @@ CONTAINS
     INTEGER :: table_type
 
     DOUBLE PRECISION :: lag, eval, lval
+    CHARACTER (LEN=10) :: date_string, time_string
 
     rec => piddata(linkidmap(link))
 
