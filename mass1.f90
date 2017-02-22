@@ -157,7 +157,9 @@ IF(do_gas)THEN
 		END SELECT
 	END DO
     IF(gas_exchange)THEN
-       CALL open_existing(filename(11), 88, fatal=.TRUE.)
+       CALL open_existing('gas_exchange_coeff.dat', 88, fatal=.TRUE.)
+       READ(88,*)gasx_a,gasx_b,gasx_c, gasx_d
+       CLOSE(88)
     ENDIF
 ENDIF
 

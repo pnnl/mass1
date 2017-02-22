@@ -1,3 +1,11 @@
+2017-02-22  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* modules.f90 (allocate_section_vars): fix typo accidentally saved
+	in previous commit
+
+	* mass1.f90 (mass1): fix problem with reading gas exchange
+	coefficients (introduced in 2005). 
+
 2017-02-17  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* flow_sim.f90 (flow_sim): make delta_x local; don't use global

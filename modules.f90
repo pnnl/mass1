@@ -145,8 +145,6 @@ CONTAINS
     ALLOCATE(sect_width(maxsections,maxlevels))
     ALLOCATE(sect_convey(maxsections,maxlevels))
     ALLOCATE(sect_perm(maxsections,maxlevels))
-b    
-
   END SUBROUTINE allocate_section_vars
 
 
