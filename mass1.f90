@@ -142,6 +142,8 @@ PROGRAM mass1
      END DO
      IF(config%gas_exchange)THEN
         CALL open_existing(config%tdg_coeff_file, 88, fatal=.TRUE.)
+        READ(88,*)gasx_a,gasx_b,gasx_c, gasx_d
+        CLOSE(88)
      ENDIF
   ENDIF
 
