@@ -32,11 +32,6 @@
 MODULE general_vars
 
   DOUBLE PRECISION, SAVE :: time
-  !INTEGER, SAVE :: units, channel_length_units
-  !INTEGER, SAVE :: time_units,debug_print
-  !INTEGER, SAVE :: maxlinks,maxpoint,scalar_steps
-  ! INTEGER, SAVE :: maxpoint
-  !INTEGER, SAVE :: dsbc_type
   DOUBLE PRECISION, SAVE :: res_coeff,grav
   DOUBLE PRECISION, SAVE :: unit_weight_h2o,density_h2o
 
@@ -70,10 +65,7 @@ MODULE point_vars
   DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: courant_num, diffuse_num
   INTEGER, DIMENSION(:,:),ALLOCATABLE, SAVE :: section_number
 
-  TYPE :: ptsection_t
-     CLASS (xsection_t), POINTER :: wrap
-  END type ptsection_t
-  TYPE (ptsection_t), DIMENSION(:,:), ALLOCATABLE, SAVE :: ptsection
+  TYPE (xsection_ptr), DIMENSION(:,:), ALLOCATABLE, SAVE :: ptsection
 
 END MODULE point_vars
 

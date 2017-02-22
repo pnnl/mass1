@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2017-02-21 12:20:28 d3g096
+! Last Change: 2017-02-22 08:33:33 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -61,6 +61,13 @@ MODULE cross_section
        CLASS(xsection_t), INTENT(INOUT) :: this
      END SUBROUTINE destroy_proc
   END INTERFACE
+
+  ! ----------------------------------------------------------------
+  ! TYPE xsection_ptr
+  ! ----------------------------------------------------------------
+  TYPE, PUBLIC :: xsection_ptr
+     CLASS (xsection_t), POINTER :: p
+  END type xsection_ptr
 
   ! ----------------------------------------------------------------
   ! TYPE rectangular_section

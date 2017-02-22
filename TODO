@@ -9,7 +9,7 @@ Pacific Northwest Laboratory
 -------------------------------------------------------------
 -------------------------------------------------------------
 Created November  1, 1999 by William A. Perkins
-Last Change: Thu May 26 09:41:47 2011 by William A. Perkins <d3g096@PE10900.pnl.gov>
+Last Change: 2017-02-21 13:50:38 d3g096
 -------------------------------------------------------------
 
 $Id$
@@ -32,9 +32,6 @@ Low Priority:
     * eliminate the use of link id's as array indices -- be able to
       give links nonconsecutive, but unique id's, and generate array
       indices internally
-
-    * implement some kind of automatic scheme to determine link
-      computation order. 
 
     * when atmospheric exchange is on met data are repeatedly
       reinterpolated; we need to recode it so that the met data is

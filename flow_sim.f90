@@ -120,7 +120,7 @@ SUBROUTINE flow_sim
            point_num = point
            depth = y(link,point) - thalweg(link,point) !remember y is ELEVATION
            
-           CALL ptsection(link, point_num)%wrap%props(depth, &
+           CALL ptsection(link, point_num)%p%props(depth, &
                 &area_temp, hydrad, width, conveyance, dkdy)
            conveyance = res_coeff*kstrick(link,point_num)*conveyance
            dkdy = res_coeff*kstrick(link,point_num)*dkdy
@@ -142,7 +142,7 @@ SUBROUTINE flow_sim
            point_num = point + 1
            depth = y(link,point+1) - thalweg(link,point+1)
 
-           CALL ptsection(link, point_num)%wrap%props(depth, &
+           CALL ptsection(link, point_num)%p%props(depth, &
                 &area_temp, hydrad, width, conveyance, dkdy)
            conveyance = res_coeff*kstrick(link,point_num)*conveyance
            dkdy = res_coeff*kstrick(link,point_num)*dkdy
@@ -326,7 +326,7 @@ SUBROUTINE flow_sim
            CALL depth_check(thalweg(link, point), y(link,point), q(link,point))
            depth = y(link,point) - thalweg(link,point)
 
-           CALL ptsection(link, point)%wrap%props(depth, &
+           CALL ptsection(link, point)%p%props(depth, &
                 &area_temp, hydrad, width, conveyance, dkdy)
            conveyance = res_coeff*kstrick(link,point)*conveyance
            dkdy = res_coeff*kstrick(link,point)*dkdy

@@ -159,8 +159,8 @@ SUBROUTINE point_data
               x(link,i) = x(link,i)*0.6211*5280.0
            END SELECT
 
-           ptsection(link, i)%wrap => sections%find(section_number(link, i))
-           IF (.NOT. ASSOCIATED(ptsection(link, i)%wrap)) THEN
+           ptsection(link, i)%p => sections%find(section_number(link, i))
+           IF (.NOT. ASSOCIATED(ptsection(link, i)%p)) THEN
               WRITE(msg, *) "Cannot find cross section ", section_number(link, i), &
                    &" for link = ", link, ", point = ", i
               CALL error_message(msg, fatal=.TRUE.)
@@ -215,8 +215,8 @@ SUBROUTINE point_data
            k_diff(link,i) = diffusion
            k_surf(link,i) = surface_mass_trans
            
-           ptsection(link, i)%wrap => sections%find(section_number(link, i))
-           IF (.NOT. ASSOCIATED(ptsection(link, i)%wrap)) THEN
+           ptsection(link, i)%p => sections%find(section_number(link, i))
+           IF (.NOT. ASSOCIATED(ptsection(link, i)%p)) THEN
               WRITE(msg, *) "Cannot find cross section ", section_number(link, i), &
                    &" for link = ", link, ", point = ", i
               CALL error_message(msg, fatal=.TRUE.)
