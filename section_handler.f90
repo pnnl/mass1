@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  4, 2017 by William A. Perkins
-! Last Change: 2017-01-05 15:57:09 d3g096
+! Last Change: 2017-02-22 09:59:52 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE section_handler_module
@@ -15,32 +15,17 @@
 MODULE section_handler_module
   USE utility
   USE cross_section
+  USE dlist_module
 
   IMPLICIT NONE
 
   PRIVATE
 
   ! ----------------------------------------------------------------
-  ! TYPE section_list_node
-  ! ----------------------------------------------------------------
-  TYPE :: section_list_node
-     CLASS (xsection_t), POINTER :: section
-     TYPE (section_list_node), POINTER :: prev
-     TYPE (section_list_node), POINTER :: next
-  END type section_list_node
-
-  INTERFACE section_list_node
-     MODULE PROCEDURE new_section_list_node
-  END INTERFACE section_list_node
-
-  ! ----------------------------------------------------------------
   ! TYPE section_list
   ! ----------------------------------------------------------------
-  TYPE :: section_list
-     TYPE (section_list_node), POINTER :: head
-     TYPE (section_list_node), POINTER :: tail
+  TYPE, EXTENDS(dlist) :: section_list
    CONTAINS 
-     PROCEDURE :: size => section_list_size
      PROCEDURE :: push => section_list_push
      PROCEDURE :: pop => section_list_pop
      PROCEDURE :: clear => section_list_clear
@@ -72,32 +57,6 @@ MODULE section_handler_module
   TYPE (section_handler), PUBLIC :: sections
 
 CONTAINS
-  ! ----------------------------------------------------------------
-  !  FUNCTION new_section_list_node
-  ! ----------------------------------------------------------------
-  FUNCTION new_section_list_node()
-    IMPLICIT NONE
-    TYPE (section_list_node) :: new_section_list_node
-    NULLIFY(new_section_list_node%prev)
-    NULLIFY(new_section_list_node%next)
-  END FUNCTION new_section_list_node
-
-  ! ----------------------------------------------------------------
-  ! INTEGER FUNCTION section_list_size
-  ! ----------------------------------------------------------------
-  INTEGER FUNCTION section_list_size(this)
-    IMPLICIT NONE
-    CLASS (section_list), INTENT(IN) :: this
-    TYPE (section_list_node), POINTER :: node
-
-    section_list_size = 0
-    node => this%head
-    DO WHILE (ASSOCIATED(node)) 
-       section_list_size = section_list_size + 1
-       node => node%next
-    END DO
-  END FUNCTION section_list_size
-
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE section_list_push
@@ -106,20 +65,12 @@ CONTAINS
     IMPLICIT NONE
     CLASS (section_list), INTENT(INOUT) :: this
     CLASS (xsection_t), POINTER, INTENT(IN) :: xsect
-    TYPE (section_list_node), POINTER :: node
-    ALLOCATE(node)
-    NULLIFY(node%prev)
-    NULLIFY(node%next)
-    node%section => xsect
-
-    IF (.NOT. ASSOCIATED(this%head)) THEN
-       this%head => node
-       this%tail => node
-    ELSE
-       node%prev => this%tail
-       this%tail%next => node
-       this%tail => node
-    END IF
+    TYPE (xsection_ptr), POINTER :: ptr
+    CLASS (*), POINTER :: p
+    ALLOCATE(ptr)
+    ptr%p => xsect
+    p => ptr
+    CALL this%genpush(p)
   END SUBROUTINE section_list_push
 
   ! ----------------------------------------------------------------
@@ -129,20 +80,19 @@ CONTAINS
     IMPLICIT NONE
     CLASS (xsection_t), POINTER :: xsect
     CLASS (section_list), INTENT(INOUT) :: this
-
-    TYPE (section_list_node), POINTER :: node
-
+    TYPE (xsection_ptr), POINTER :: ptr
+    CLASS(*), POINTER :: p
+    
     NULLIFY(xsect)
-    IF (ASSOCIATED(this%tail)) THEN
-       node => this%tail
-       xsect => node%section
-       IF (.NOT. ASSOCIATED(node%prev)) THEN
-          NULLIFY(this%tail)
-          NULLIFY(this%head)
-       ELSE 
-          this%tail => node%prev
-       END IF
-       DEALLOCATE(node)
+    p => this%genpop()
+
+    IF (ASSOCIATED(p)) THEN
+       SELECT TYPE (p)
+       TYPE IS (xsection_ptr)
+          ptr => p
+          xsect => ptr%p
+          DEALLOCATE(ptr)
+       END SELECT
     END IF
     RETURN
   END FUNCTION section_list_pop
@@ -155,10 +105,14 @@ CONTAINS
     CLASS (section_list), INTENT(INOUT) :: this
     CLASS (xsection_t), POINTER :: xsect
 
-    DO WHILE (ASSOCIATED(this%tail))
+    DO WHILE (.TRUE.)
        xsect => this%pop()
-       CALL xsect%destroy()
-       DEALLOCATE(xsect)
+       IF (ASSOCIATED(xsect)) THEN
+          CALL xsect%destroy()
+          DEALLOCATE(xsect)
+       ELSE 
+          EXIT
+       END IF
     END DO
   END SUBROUTINE section_list_clear
 
@@ -171,14 +125,24 @@ CONTAINS
     CLASS (xsection_t), POINTER :: xsect
     CLASS (section_list), INTENT(IN) :: this
     INTEGER, INTENT(IN) :: id
-    TYPE (section_list_node), POINTER :: node
+    TYPE (dlist_node), POINTER :: node
+    TYPE (xsection_ptr), POINTER :: ptr
+    CLASS(*), POINTER :: p
     
     NULLIFY(xsect)
     node => this%head
     DO WHILE (ASSOCIATED(node)) 
-       IF (node%section%id .EQ. id) THEN
-          xsect => node%section
-          EXIT
+       p => node%data
+       IF (ASSOCIATED(p)) THEN
+          SELECT TYPE (p)
+          TYPE IS (xsection_ptr)
+             ptr => p
+             xsect => ptr%p
+             IF (xsect%id .EQ. id) THEN
+                EXIT
+             END IF
+          END SELECT
+          NULLIFY(xsect)
        END IF
        node => node%next
     END DO
@@ -234,9 +198,10 @@ CONTAINS
     IMPLICIT NONE
     CLASS (section_handler), INTENT(IN) :: this
     CHARACTER(LEN=*), INTENT(IN) :: fname
-    CLASS (xsection_t), POINTER :: x
+    CLASS (xsection_ptr), POINTER :: ptr
+    CLASS (*), POINTER :: p
     CHARACTER(LEN=256) :: msg
-    TYPE (section_list_node), POINTER :: node
+    TYPE (dlist_node), POINTER :: node
     INTEGER, PARAMETER :: iounit = 24
     INTEGER :: count, ioerr
 
@@ -249,9 +214,14 @@ CONTAINS
 
     node => this%xslist%head
     DO WHILE (ASSOCIATED(node)) 
-       x => node%section
-       CALL x%print(iounit, ioerr)
-       count = count + 1
+       p => node%data
+       IF (ASSOCIATED(p)) THEN
+          SELECT TYPE (p)
+          TYPE IS (xsection_ptr)
+             ptr => p
+             CALL ptr%p%print(iounit, ioerr)
+          END SELECT
+       END IF
        node => node%next
     END DO
     CLOSE(iounit)
