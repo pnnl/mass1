@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2017-01-05 13:46:03 d3g096
+# Last Change: 2017-01-19 09:48:12 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -99,6 +99,12 @@ add_executable(mass1 ${mass1src})
 target_link_libraries(mass1 gastemp ts)
 install(TARGETS mass1 DESTINATION bin)
 
+# save for running tests
+set(mass1exe "")
+get_property(mass1exe TARGET mass1 PROPERTY LOCATION)
+message(STATUS "MASS1 executable: ${mass1exe}")
+
+
 # -------------------------------------------------------------
 # cross_section_test
 # -------------------------------------------------------------
@@ -112,6 +118,29 @@ add_executable(cross_section_test
 target_link_libraries(cross_section_test ts)
 
 # -------------------------------------------------------------
+# trapezoid_test
+# -------------------------------------------------------------
+add_executable(cross_section_table
+  cross_section_table.f90
+  section_handler.f90
+  cross_section.f90
+  linear_interp.f90
+  svgrp.f90
+)
+target_link_libraries(cross_section_table ts)
+
+# -------------------------------------------------------------
 # svgrptest
 # -------------------------------------------------------------
 add_executable(svgrptest svgrp-test.f90 svgrp.f90)
+
+
+# -------------------------------------------------------------
+# custom test target
+# -------------------------------------------------------------
+add_custom_target(runtests
+  COMMENT "MASS1 tests completed"
+)
+
+# target runtests must exist before doing this
+add_subdirectory(test)

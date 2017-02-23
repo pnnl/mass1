@@ -140,8 +140,7 @@ SUBROUTINE nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
    
      d = y(link,point) - thalweg(link,point)
 
-     CALL sections%props(section_number(link,point), d, &
-          &a, twid, c, g, gp)
+     CALL ptsection(link, point)%wrap%props(d, a, twid, c, g, gp)
      
      a = 0.0
      b = 1.0

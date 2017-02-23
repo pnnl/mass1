@@ -1,3 +1,64 @@
+2017-01-19  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* CMakeLists.txt: add test sub-directory and runtests target
+
+	* test/flow/normal: attempt to automate running this test
+
+	* test/CMakeLists.txt: add
+
+2017-01-16  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* test/flow/MacDonald-4: add test for super-critical flow
+
+2017-01-13  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* test/flow/drain: add test case for small depth (not working) 
+
+	* read_config.f90 (read_config): set depth_minimum and
+	depth_threshold but they really need to be read
+
+	* link_data.f90 (link_data): read and report lpiexp
+
+	* flow_sim.f90 (depth_check): add depth_check() and use it
+
+	* coeff.f90 (fluvial_coeff): modify coefficients when depth is
+	small or trans-critical flow is indicated
+
+	* array_dealloc.f90 (array_dealloc): deallocate lpiexp link
+	variable
+
+	* array_alloc.f90 (array_alloc): allocate and initialize lpiexp
+	link variable 
+
+	* modules.f90 (link_vars): add lpiexp link variable
+
+2017-01-10  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* nonfluvial_coeff.f90 (nonfluvial_coeff): use assigned cross
+	section here too
+
+	* scalars_module.f90 (tvd_interp): use assigned cross section here
+	too 
+
+	* array_dealloc.f90 (array_dealloc): deallocate cross section
+	pointer array
+
+	* array_alloc.f90 (array_alloc): allocate cross section pointer
+	array 
+
+	* flow_sim.f90 (flow_sim): use assigned point section instead of
+	the handler looking it up
+
+	* mass1.f90 (mass1): read sections before links and points
+
+	* point_data.f90 (point_data): look up and assign a cross section
+	to each point
+
+	* modules.f90 (point_vars): add array of cross section pointers
+
+	* flow_sim.f90 (flow_sim): fix wrong point index when getting
+	section properties
+
 2016-11-16  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* print_output.f90 (print_output): io unit number incorrectly

@@ -113,16 +113,16 @@ DO i=1,max_species
 END DO
 	IF(debug_print == 1)WRITE(11,*)'done with array alloc'
 
+sections = section_handler()
+CALL sections%read(filename(4))
+
+	IF(debug_print == 1)WRITE(11,*)'done with section data'
+
 CALL link_data
 	IF(debug_print == 1)WRITE(11,*)'done link data'
 
 CALL point_data
 	IF(debug_print == 1)WRITE(11,*)'done with point data'
-
-sections = section_handler()
-CALL sections%read(filename(4))
-
-	IF(debug_print == 1)WRITE(11,*)'done with section data'
 
 CALL link_bc
 	IF(debug_print == 1)WRITE(11,*)'link BC data done'

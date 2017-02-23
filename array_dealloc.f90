@@ -50,6 +50,7 @@ DEALLOCATE(comporder,dsbc_table,transbc_table,tempbc_table)
 DEALLOCATE(latflowbc_table, met_zone)
 DEALLOCATE(lattransbc_table, lattempbc_table)
 DEALLOCATE(crest)
+DEALLOCATE(lpiexp)
 
 !-----------------------------------------------------------
 !module point_vars
@@ -61,6 +62,7 @@ DEALLOCATE(k_diff)
 DEALLOCATE(top_width,hyd_radius,froude_num,friction_slope,bed_shear)
 DEALLOCATE(lateral_inflow, lateral_inflow_old)
 DEALLOCATE(courant_num, diffuse_num)
+DEALLOCATE(section_number, ptsection)
 
 !----------------------------------------------------------
 !MODULE transport_vars

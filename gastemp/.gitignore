@@ -1,0 +1,7 @@
+/energy_flux.mod
+/energy_flux_module.o
+/gas_coeffs.mod
+/gas_coeffs_module.o
+/gas_functions.mod
+/gas_functions_module.o
+/libgastemp.a

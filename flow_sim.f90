@@ -25,6 +25,24 @@
 !***************************************************************
 !
 
+! ----------------------------------------------------------------
+! SUBROUTINE depth_check
+! ----------------------------------------------------------------
+SUBROUTINE depth_check(thalweg, y, q)
+  USE general_vars, ONLY: depth_minimum
+  IMPLICIT NONE
+  DOUBLE PRECISION, INTENT(IN) :: thalweg
+  DOUBLE PRECISION, INTENT(INOUT) :: y, q
+  DOUBLE PRECISION :: depth
+
+  depth = y - thalweg
+  IF (depth .LT. depth_minimum) THEN
+     y = thalweg + depth_minimum
+     ! q = 0.0
+  END if
+END SUBROUTINE depth_check
+
+
 SUBROUTINE flow_sim
 
   ! $DEBUG
@@ -35,7 +53,6 @@ SUBROUTINE flow_sim
   USE point_vars
   USE fluvial_coeffs
   USE flow_coeffs
-  USE section_handler_module
   USE logicals , ONLY : do_latflow
 
   IMPLICIT NONE
@@ -111,11 +128,13 @@ SUBROUTINE flow_sim
            point_num = point
            depth = y(link,point) - thalweg(link,point) !remember y is ELEVATION
            
-           CALL sections%props(section_number(link, point_num), depth, &
+           CALL ptsection(link, point_num)%wrap%props(depth, &
                 &area_temp, hydrad, width, conveyance, dkdy)
            conveyance = res_coeff*kstrick(link,point_num)*conveyance
            dkdy = res_coeff*kstrick(link,point_num)*dkdy
 
+           d1 = depth
+           fr1 = froude_num(link,point)
            y1 = y(link,point)
            q1 = q(link,point)
            a1 = area_temp
@@ -131,11 +150,13 @@ SUBROUTINE flow_sim
            point_num = point + 1
            depth = y(link,point+1) - thalweg(link,point+1)
 
-           CALL sections%props(section_number(link, point_num), depth, &
+           CALL ptsection(link, point_num)%wrap%props(depth, &
                 &area_temp, hydrad, width, conveyance, dkdy)
            conveyance = res_coeff*kstrick(link,point_num)*conveyance
            dkdy = res_coeff*kstrick(link,point_num)*dkdy
 
+           d2 = depth
+           fr2 = froude_num(link,point+1)
            y2 = y(link,point+1)
            q2 = q(link,point+1)
            a2 = area_temp
@@ -167,7 +188,8 @@ SUBROUTINE flow_sim
               latq_new = 0.0
            ENDIF
 
-           CALL fluvial_coeff(link,a,b,c,d,g,ap,bp,cp,dp,gp,delta_x,delta_t,grav,latq_old,latq_new)
+           CALL fluvial_coeff(a,b,c,d,g,ap,bp,cp,dp,gp,delta_x,delta_t,grav,&
+                &latq_old,latq_new,lpiexp(link))
 
 
            ! nonfluvial internal links ----------------------------
@@ -301,9 +323,10 @@ SUBROUTINE flow_sim
      CASE(1,20,21)
         DO point = 1,maxpoints(link)
 
+           CALL depth_check(thalweg(link, point), y(link,point), q(link,point))
            depth = y(link,point) - thalweg(link,point)
 
-           CALL sections%props(section_number(link, point_num), depth, &
+           CALL ptsection(link, point)%wrap%props(depth, &
                 &area_temp, hydrad, width, conveyance, dkdy)
            conveyance = res_coeff*kstrick(link,point)*conveyance
            dkdy = res_coeff*kstrick(link,point)*dkdy
@@ -317,6 +340,7 @@ SUBROUTINE flow_sim
            IF (froude_num(link, point) .GE. 1.0) THEN
               WRITE (msg, '("warning: supercritial (Fr=", F5.1, ") indicated at link ", I3, ", point ", I3)')&
                    &froude_num(link, point), link, point
+              CALL status_message(msg)
            END IF
 
            friction_slope(link,point) =&
