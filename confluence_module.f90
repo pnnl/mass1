@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February  2, 2017 by William A. Perkins
-  ! Last Change: 2017-02-03 09:32:08 d3g096
+  ! Last Change: 2017-02-24 10:12:15 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE confluence_module
@@ -134,15 +134,19 @@ CONTAINS
     DOUBLE PRECISION :: uconc
     CLASS (confluence_t), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(IN) :: c(:, 0:)
+    DOUBLE PRECISION :: qi, ci
     INTEGER :: i, ulink, upmax
 
     uconc = 0.0
     DO i = 1, this%n_ulink
        ulink = this%ulink(i)
        upmax = maxpoints(ulink)
-       uconc = q(ulink, upmax)*c(ulink, upmax)
+       qi = q(ulink, upmax)
+       ci = c(ulink, upmax)
+       uconc = uconc + qi*ci
     END DO
-    uconc = uconc/q(this%dlink, 1)
+    qi = q(this%dlink, 1)
+    uconc = uconc/qi
   END FUNCTION confluence_conc
 
 
