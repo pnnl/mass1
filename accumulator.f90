@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created November  6, 2000 by William A. Perkins
-! Last Change: 2017-02-21 12:26:20 d3g096
+! Last Change: 2017-02-22 14:09:29 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE accumulator
@@ -193,45 +193,46 @@ CONTAINS
   ! ----------------------------------------------------------------
   SUBROUTINE accumulate_tdg(tdg)
 
-    USE met_data_module
     USE gas_functions
 
     IMPLICIT NONE
 
     TYPE (accum_tdg_rec) :: tdg
     INTEGER :: link, point
-    DOUBLE PRECISION :: tdg_sat, tdg_press, deltap
+    DOUBLE PRECISION :: tdg_sat, tdg_press, deltap, baro_press
     DOUBLE PRECISION :: salinity = 0.0
     
     DO link = 1, config%maxlinks
-       IF ((config%do_temp .AND. config%temp_exchange) .OR. &
-            &(config%do_gas .AND. config%gas_exchange) ) &
-               &CALL update_met_data(config%do_gas, time, met_zone(link))
-      DO point = 1, maxpoints(link)
-         tdg_press = TDGasPress(species(1)%conc(link,point), species(2)%conc(link,point), salinity)
-         IF (tdg_press .GT. tdg%press%max(link, point)) &
-              &tdg%press%max(link, point) = tdg_press
-         IF (tdg_press .LT. tdg%press%min(link, point)) &
-              &tdg%press%min(link, point) = tdg_press
-         tdg%press%sum(link, point) = tdg%press%sum(link, point) + tdg_press
-
-         tdg_sat = TDGasSaturation(species(1)%conc(link,point), species(2)%conc(link,point), &
-              &salinity, baro_press)
-         IF (tdg_sat .GT. tdg%sat%max(link, point)) &
-              &tdg%sat%max(link, point) = tdg_sat
-         IF (tdg_sat .LT. tdg%sat%min(link, point)) &
-              &tdg%sat%min(link, point) = tdg_sat
-         tdg%sat%sum(link, point) = tdg%sat%sum(link, point) + tdg_sat
-
-         deltap = tdg_press - baro_press
-         IF (deltap .GT. tdg%deltap%max(link, point)) &
-              &tdg%deltap%max(link, point) = deltap
-         IF (deltap .LT. tdg%deltap%min(link, point)) &
-              &tdg%deltap%min(link, point) = deltap
-         tdg%deltap%sum(link, point) = tdg%deltap%sum(link, point) + deltap
+       IF (config%met_required) THEN
+          baro_press = metzone(link)%p%current%bp
+       ELSE 
+          baro_press = 760.0
+       END IF
+       DO point = 1, maxpoints(link)
+          tdg_press = TDGasPress(species(1)%conc(link,point), species(2)%conc(link,point), salinity)
+          IF (tdg_press .GT. tdg%press%max(link, point)) &
+               &tdg%press%max(link, point) = tdg_press
+          IF (tdg_press .LT. tdg%press%min(link, point)) &
+               &tdg%press%min(link, point) = tdg_press
+          tdg%press%sum(link, point) = tdg%press%sum(link, point) + tdg_press
+          
+          tdg_sat = TDGasSaturation(species(1)%conc(link,point), species(2)%conc(link,point), &
+               &salinity, baro_press)
+          IF (tdg_sat .GT. tdg%sat%max(link, point)) &
+               &tdg%sat%max(link, point) = tdg_sat
+          IF (tdg_sat .LT. tdg%sat%min(link, point)) &
+               &tdg%sat%min(link, point) = tdg_sat
+          tdg%sat%sum(link, point) = tdg%sat%sum(link, point) + tdg_sat
+          
+          deltap = tdg_press - baro_press
+          IF (deltap .GT. tdg%deltap%max(link, point)) &
+               &tdg%deltap%max(link, point) = deltap
+          IF (deltap .LT. tdg%deltap%min(link, point)) &
+               &tdg%deltap%min(link, point) = deltap
+          tdg%deltap%sum(link, point) = tdg%deltap%sum(link, point) + deltap
          
-      END DO
-   END DO
+       END DO
+    END DO
   END SUBROUTINE accumulate_tdg
 
 

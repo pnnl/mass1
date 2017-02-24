@@ -33,7 +33,6 @@ USE transport_vars
 
 USE scalars
 USE gas_functions
-USE met_data_module
 USE date_time
 USE section_handler_module
 
@@ -44,7 +43,7 @@ DOUBLE PRECISION, INTENT(IN) :: time
 
 DOUBLE PRECISION :: depth
 DOUBLE PRECISION :: tdg_press, tdg_sat
-DOUBLE PRECISION :: salinity = 0.0
+DOUBLE PRECISION :: salinity = 0.0, baro_press
 INTEGER :: link,point
 CHARACTER (LEN=10) :: date_string, time_string
 
@@ -154,6 +153,11 @@ WRITE(iounit1,1110)
 
 DO link=1,config%maxlinks
    DO point=1,maxpoints(link)
+      IF (config%do_gas .AND. config%met_required) THEN
+         baro_press = metzone(link)%p%current%bp
+      ELSE 
+         baro_press = 760.0
+      END IF
       depth = y(link,point) - thalweg(link,point)
       tdg_sat = TDGasSaturation(species(1)%conc(link,point), species(2)%conc(link,point), salinity, baro_press)
       tdg_press = TDGasPress(species(1)%conc(link,point), species(2)%conc(link,point), salinity)

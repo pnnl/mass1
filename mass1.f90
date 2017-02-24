@@ -37,7 +37,6 @@ PROGRAM mass1
   USE section_handler_module
 
   USE scalars
-  USE met_data_module, ONLY : read_met_data
   USE tdg_equation_coeff
   USE profile_output_module
   USE accumulator
@@ -97,6 +96,11 @@ PROGRAM mass1
   END DO
   IF(config%debug_print)WRITE(11,*)'done with array alloc'
 
+  IF (config%met_required) THEN
+     met_zone_manager = met_zone_manager_t()
+     CALL met_zone_manager%read(config%weather_file)
+  END IF
+
   sections = section_handler()
   CALL sections%read(config%section_file)
 
@@ -148,8 +152,6 @@ PROGRAM mass1
   IF(config%do_temp)THEN
      species_num = 2
      CALL transport_bc(species_num)
-     IF(config%temp_exchange)&
-          & CALL read_met_data(config%weather_file)
      IF(config%debug_print) WRITE(11,*)'done reading temp transport table'
   ENDIF
 
@@ -195,6 +197,8 @@ PROGRAM mass1
      IF (config%do_gas .OR. config%do_temp) THEN
 
         scalar_time = model_time
+
+        CALL met_zone_manager%update(scalar_time)
         IF (config%scalar_steps .GT. 0) THEN
            tsteps = config%scalar_steps
         ELSE

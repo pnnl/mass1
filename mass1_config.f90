@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2017-02-20 14:54:57 d3g096
+! Last Change: 2017-02-22 12:00:52 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE mass1_config
@@ -74,6 +74,7 @@ MODULE mass1_config
      LOGICAL :: do_hotstart
      LOGICAL :: temp_diffusion, temp_exchange
      LOGICAL :: gas_diffusion, gas_exchange
+     LOGICAL :: met_required
      LOGICAL :: do_latflow
      LOGICAL :: do_accumulate
      INTEGER :: print_freq
@@ -481,6 +482,10 @@ CONTAINS
 
     this%time%step = this%time%delta_t/24.0
     this%time%delta_t = this%time%delta_t*3600.0
+
+    this%met_required = &
+         &(this%do_temp .AND. this%temp_exchange) .OR. &
+         &(this%do_gas .AND. this%gas_exchange)
 
     RETURN 
 

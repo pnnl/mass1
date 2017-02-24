@@ -43,9 +43,6 @@ DOUBLE PRECISION :: scalar_time, scalar_delta_t
 DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE, PRIVATE :: vel, area, width, area_old, q, q_old, y, y_old
 DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE, PRIVATE :: latq, latq_old
 
-! air-water gas exchange coefficient parameters
-DOUBLE PRECISION :: gasx_a = 0.0, gasx_b = 0.0 , gasx_c = 0.0, gasx_d = 0.0
-
 DOUBLE PRECISION, PRIVATE, PARAMETER :: max_courant = 0.99
 DOUBLE PRECISION, PRIVATE, PARAMETER :: max_diffuse = 0.99
 
@@ -260,13 +257,12 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
   USE mass1_config
   USE transport_vars , ONLY : dxx
   USE link_vars, ONLY : maxpoints, comporder, linktype, &
-       &linkbc_table, met_zone, tempbc_table, transbc_table, &
+       &linkbc_table, metzone, tempbc_table, transbc_table, &
        &lattempbc_table, lattransbc_table
   USE point_vars, ONLY: x, k_diff, thalweg
   USE bctable
 
   
-  USE met_data_module
   USE energy_flux
   USE tdg_equation_coeff
   USE gas_functions
@@ -285,11 +281,10 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
   DOUBLE PRECISION :: f(config%maxpoint)
   DOUBLE PRECISION :: k_e,k_w,area_e,area_w,flux_e,flux_w
   DOUBLE PRECISION :: qspill,qgen 
-  DOUBLE PRECISION :: energy_source, depth, transfer_coeff
+  DOUBLE PRECISION :: depth
   DOUBLE PRECISION :: tdg_saturation = 100.0, upstream_c
   DOUBLE PRECISION :: avg_area, avg_latq
-  DOUBLE PRECISION :: salinity = 0.0, ccstar
-  DOUBLE PRECISION :: met_coeff(met_ncoeff)
+  DOUBLE PRECISION :: salinity = 0.0, baro_press, t_water
 
   LOGICAL :: diffusion, fluvial, nonfluvial
 
@@ -329,8 +324,11 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
            qgen = bc_table_current(hydrobc, linkbc_table(link), 1)
            qspill = bc_table_current(hydrobc, linkbc_table(link), 2)
            
-           IF(config%do_temp .AND. config%temp_exchange) &
-                &CALL update_met_data(config%do_gas, time, met_zone(link))
+           IF (config%met_required) THEN
+              baro_press = metzone(link)%p%current%bp
+           ELSE 
+              baro_press = 760.0
+           END IF
            IF(config%do_temp) t_water = species(2)%conc(link,2)
            IF(qspill > 0.0)THEN
               !                 equations are for %Sat and effective Spill Q in Kcfs
@@ -418,8 +416,6 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
         
         SELECT CASE(species_num)
         CASE(1) ! gas species
-           IF(config%do_temp .AND. config%temp_exchange) &
-                &CALL update_met_data(config%do_gas, time, met_zone(link))
            IF(config%do_temp)THEN
               IF((.NOT. ASSOCIATED(ucon(link)%wrap)) .AND. (tempbc_table(link) /= 0))THEN
                  call bc_table_interpolate(tempbc, tempbc_table(link), time/config%time%mult)
@@ -776,14 +772,16 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
 
         IF((species_num == 1) .AND. (config%gas_exchange) )THEN
            DO point=2,maxpoints(link)-1
-              CALL update_met_data(config%do_gas, time, met_zone(link))
               t_water = species(2)%conc(link,point)
-              ccstar  = TDGasConc(baro_press, t_water, salinity) !c* will be conc at baro press
-              transfer_coeff = gasx_a + gasx_b*windspeed + gasx_c*windspeed**2 + gasx_d*windspeed**3
-              transfer_coeff = transfer_coeff*3.2808/86400.0
-              !c(link,point) = c(link,point) + k_surf(link,point)*(100.0 - c(link,point))*delta_t
               c(link,point) = c(link,point) + &
-                   transfer_coeff*(ccstar - c(link,point))*width(link,point)*delta_t/area(link,point)
+                   &metzone(link)%p%gas_exchange(t_water, c(link, point), salinity)* &
+                   &width(link,point)*delta_t/area(link,point)
+              ! ccstar  = TDGasConc(baro_press, t_water, salinity) !c* will be conc at baro press
+              ! transfer_coeff = gasx_a + gasx_b*windspeed + gasx_c*windspeed**2 + gasx_d*windspeed**3
+              ! transfer_coeff = transfer_coeff*3.2808/86400.0
+              ! !c(link,point) = c(link,point) + k_surf(link,point)*(100.0 - c(link,point))*delta_t
+              ! c(link,point) = c(link,point) + &
+              !      transfer_coeff*(ccstar - c(link,point))*width(link,point)*delta_t/area(link,point)
               IF(c(link,point) < 0.0) c(link,point) = 0.0
            END DO
            c(link,maxpoints(link)) = c(link,maxpoints(link)-1)
@@ -794,16 +792,18 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
         !-------------------------------------------------------------------------
         IF((species_num == 2) .AND. (config%temp_exchange) )THEN
            DO point=2,maxpoints(link)-1
-              CALL update_met_data(config%do_gas, time, met_zone(link))
+              ! CALL update_met_data(config%do_gas, time, met_zone(link))
               t_water = c(link,point)
               depth = y(link,point) - thalweg(link,point)
-              call met_zone_coeff(met_zone(link), met_coeff)
-              energy_source = net_heat_flux(met_coeff,&
-                   &net_solar, t_water, t_air, t_dew, windspeed) &
-                   /(1000.0*4186.0/3.2808) ! rho*specifc heat*depth in feet
+              !call met_zone_coeff(met_zone(link), met_coeff)
+              c(link,point) = c(link, point) +&
+                   &metzone(link)%p%energy_flux(t_water)* &
+                   &delta_t*width(link,point)/area(link,point)
+              ! energy_source = net_heat_flux(met_coeff,&
+              !      &net_solar, t_water, t_air, t_dew, windspeed) &
+              !      /(1000.0*4186.0/3.2808) ! rho*specifc heat*depth in feet
               
-              !c(link,point) = c(link,point) + energy_source*delta_t/depth
-              c(link,point) = c(link,point) + energy_source*delta_t*width(link,point)/area(link,point)
+              ! c(link,point) = c(link,point) + energy_source*delta_t*width(link,point)/area(link,point)
 
               ! IF(c(link,point) <   0.0) c(link,point) =   0.0 ! frozen - should add warning printout
               ! IF(c(link,point) > 100.0) c(link,point) = 100.0 ! boiling - should add warning printout

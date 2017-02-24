@@ -43,13 +43,16 @@ END MODULE general_vars
 !----------------------------------------------------------
 MODULE link_vars
 
+  USE met_zone
+
   INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: maxpoints,linkname,linkorder,comporder,linktype,input_option
   INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: linkbc_table,ds_conlink,&
        & dsbc_table,transbc_table,tempbc_table,latflowbc_table,lattransbc_table,lattempbc_table
-  INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: met_zone
   DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE, SAVE :: crest
 
   DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE, SAVE :: lpiexp
+
+  TYPE (met_zone_ptr), DIMENSION(:), ALLOCATABLE, SAVE :: metzone
 
 END MODULE link_vars
 

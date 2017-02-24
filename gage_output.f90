@@ -33,7 +33,6 @@ SUBROUTINE gage_output
   USE transport_vars
 
   USE scalars
-  USE met_data_module
   USE gas_functions
 
   USE hydro_output_module
@@ -53,6 +52,7 @@ SUBROUTINE gage_output
   CHARACTER (LEN=256) fname,string1,string2
   CHARACTER (LEN=256), ALLOCATABLE, SAVE :: gage_fname(:)
   CHARACTER (LEN=10) :: date_string, time_string
+  DOUBLE PRECISION :: baro_press
 
   IF(time == config%time%begin )THEN
      count=0
@@ -119,9 +119,11 @@ SUBROUTINE gage_output
      link = gage_link(i)
      point = gage_point(i)
      depth = accum_var%y%sum(link,point) - thalweg(link,point)
-     IF( (config%do_temp .AND. config%temp_exchange) .OR. &
-          &(config%do_gas .AND. config%gas_exchange) ) &
-          &CALL update_met_data(config%do_gas, time, met_zone(link))
+     IF (config%do_gas .AND. config%met_required) THEN
+        baro_press = metzone(link)%p%current%bp
+     ELSE 
+        baro_press = 760.0
+     END IF
      tdg_sat = TDGasSaturation(species(1)%conc(link,point), species(2)%conc(link,point), &
           &salinity, baro_press)
      tdg_press = TDGasPress(species(1)%conc(link,point), species(2)%conc(link,point), salinity)

@@ -39,7 +39,7 @@ SUBROUTINE link_data
 
   IMPLICIT NONE
 
-  INTEGER :: i,link,junk
+  INTEGER :: i,link,junk, metzone_idx
   INTEGER, PARAMETER :: io_unit = 26, lunit = 21
   CHARACTER(LEN=1024) :: msg
 
@@ -66,13 +66,13 @@ SUBROUTINE link_data
 
      READ(lunit,*,ERR=200)junk,input_option(link),maxpoints(link),linkorder(link),&
           & linktype(link),junk,linkbc_table(link),dsbc_table(link), &
-          & transbc_table(link),tempbc_table(link),met_zone(link),latflowbc_table(link), &
+          & transbc_table(link),tempbc_table(link), metzone_idx,latflowbc_table(link), &
           & lattransbc_table(link),lattempbc_table(link),lpiexp(link)
      READ(lunit,*,ERR=200)ds_conlink(link)
 
      WRITE(io_unit,*)link,input_option(link),maxpoints(link),linkorder(link),&
           & linktype(link),junk,linkbc_table(link),dsbc_table(link), &
-          & transbc_table(link),tempbc_table(link),met_zone(link),latflowbc_table(link), &
+          & transbc_table(link),tempbc_table(link),metzone_idx,latflowbc_table(link), &
           & lattransbc_table(link),lattempbc_table(link),lpiexp(link)
      WRITE(io_unit,*)ds_conlink(link)
 
@@ -86,6 +86,10 @@ SUBROUTINE link_data
            WRITE(msg, *) "Link ", link, ": lateral inflow specified without transport (temp) values"
            CALL error_message(msg, .FALSE.)
         END IF
+     END IF
+
+     IF (config%met_required) THEN
+        metzone(link)%p => met_zone_manager%find(metzone_idx)
      END IF
   END DO
 
