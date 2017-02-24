@@ -232,8 +232,8 @@ SUBROUTINE tvd_interp(time, htime0, htime1)
            val = y(link,point) - thalweg(link,point)
 
            CALL ptsection(link,point)%wrap%props(val, &
-                &area(link,point), width(link,point), &
-                &val0, val0, val0)
+                &area(link,point), val0, width(link,point), &
+                &val0, val0)
 
            ! val0 = DBLE(harea_old(link, point))
            ! val1 = DBLE(harea(link, point))
