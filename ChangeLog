@@ -1,3 +1,23 @@
+2017-02-08  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* scalars_module.f90 (tvd_transport): num_con_links() and
+	con_links() no longer needed
+
+	* array_dealloc.f90 (array_dealloc): num_con_links() and
+	con_links() no longer needed
+
+	* array_alloc.f90 (array_alloc): num_con_links() and con_links()
+	no longer needed
+
+	* flow_sim.f90 (flow_sim): num_con_links() and con_links() no
+	longer needed
+
+	* link_data.f90 (link_data, link_set_order): num_con_links() and
+	con_links() no longer needed
+
+	* modules.f90 (link_vars): remove num_con_links() and con_links()
+	because they are no longer needed
+
 2017-02-03  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* scalars_module.f90 (tvd_transport): use confluence instances for
