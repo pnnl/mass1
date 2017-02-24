@@ -118,59 +118,6 @@ MODULE point_vars
 END MODULE point_vars
 
 !----------------------------------------------------------
-! global data module for cross section variables
-!
-MODULE section_vars
-
-  INTEGER, PARAMETER :: maxpairs=1000,maxlevels=3500
-  INTEGER, SAVE :: total_sections
-  INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: section_id,section_type
-  DOUBLE PRECISION, DIMENSION(:),ALLOCATABLE, SAVE :: bottom_width,bottom_width_flood,depth_main
-  DOUBLE PRECISION, DIMENSION(:),ALLOCATABLE, SAVE :: delta_y,sect_levels
-
-
-  DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: sect_area,sect_hydradius,sect_depth,sect_width,sect_convey,sect_perm
-
-  !INTEGER, SAVE :: section_id(maxsections),section_type(maxsections)
-  !INTEGER, SAVE :: section_number(lmax,pmax), total_sections
-
-  !REAL, SAVE :: bottom_width(maxsections),bottom_width_flood(maxsections)
-  !REAL, SAVE :: depth_main(maxsections)
-
-CONTAINS
-
-  ! ----------------------------------------------------------------
-  ! SUBROUTINE allocate_section_vars
-  ! ----------------------------------------------------------------
-  SUBROUTINE allocate_section_vars()
-
-    IMPLICIT NONE
-
-    INTEGER :: maxsections
-
-    maxsections = total_sections
-
-    ALLOCATE(section_id(maxsections))
-    ALLOCATE(section_type(maxsections))
-    ALLOCATE(delta_y(maxsections))
-    ALLOCATE(sect_levels(maxsections))
-    ALLOCATE(bottom_width(maxsections))
-    ALLOCATE(bottom_width_flood(maxsections))
-    ALLOCATE(depth_main(maxsections))
-    ALLOCATE(sect_area(maxsections,maxlevels))
-    ALLOCATE(sect_hydradius(maxsections,maxlevels))
-    ALLOCATE(sect_depth(maxsections,maxlevels))
-    ALLOCATE(sect_width(maxsections,maxlevels))
-    ALLOCATE(sect_convey(maxsections,maxlevels))
-    ALLOCATE(sect_perm(maxsections,maxlevels))
-    
-
-  END SUBROUTINE allocate_section_vars
-
-
-END MODULE section_vars
-
-!----------------------------------------------------------
 MODULE flow_coeffs
 
   DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: e,f,l,m,n

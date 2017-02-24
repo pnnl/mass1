@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2017-01-19 09:48:12 d3g096
+# Last Change: 2017-02-02 12:10:35 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -44,6 +44,18 @@ find_package(Perl)
 find_package(PerlModules COMPONENTS Date::Manip)
 
 # -------------------------------------------------------------
+# Gnuplot - for tests
+# -------------------------------------------------------------
+find_program(GNUPLOT_EXECUTABLE gnuplot)
+# find_package(gnuplot)
+# should check version
+
+find_program(AWK_EXECUTABLE gawk)
+if (NOT AWK_EXECUTABLE) 
+  find_program(AWK_EXECUTABLE awk)
+endif ()
+
+# -------------------------------------------------------------
 # subdirectories
 # -------------------------------------------------------------
 
@@ -68,6 +80,7 @@ set(mass1src
   bctable.f90
   coeff.f90
   cross_section.f90
+  confluence_module.f90
   flow_sim.f90
   gage_output.f90
   hydro_output.f90
@@ -100,10 +113,9 @@ target_link_libraries(mass1 gastemp ts)
 install(TARGETS mass1 DESTINATION bin)
 
 # save for running tests
-set(mass1exe "")
-get_property(mass1exe TARGET mass1 PROPERTY LOCATION)
-message(STATUS "MASS1 executable: ${mass1exe}")
-
+set(mass1exe $<TARGET_FILE:mass1>)
+#this is deprecated
+#get_property(mass1exe TARGET mass1 PROPERTY LOCATION)
 
 # -------------------------------------------------------------
 # cross_section_test

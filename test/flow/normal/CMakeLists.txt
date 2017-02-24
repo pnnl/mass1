@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2017-01-19 09:52:40 d3g096
+# Last Change: 2017-01-19 14:11:31 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -20,12 +20,6 @@ configure_file(
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/link-bc-files.dat.in"
   "${CMAKE_CURRENT_BINARY_DIR}/link-bc-files.dat"
-)
-
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/runit.sh.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/runit.sh"
-  @ONLY
 )
 
 set(testfiles 
@@ -41,11 +35,32 @@ set(testfiles
   "${CMAKE_CURRENT_SOURCE_DIR}/../BCFiles/tailwater-bc.dat"
 )
 
-add_custom_target(run_normal_test
-  COMMAND sh ./runit.sh >& make.log
+add_custom_command(
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/profile1.out"
+  COMMAND ${mass1exe} > mass1.log
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Running test flow/normal"
   DEPENDS mass1 ${testfiles}
+)
+set(rundeps "${CMAKE_CURRENT_BINARY_DIR}/profile1.out")
+
+if (GNUPLOT_EXECUTABLE) 
+  add_custom_command(
+    OUTPUT plot.eps plot-elev.eps
+    COMMAND "${GNUPLOT_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp" > plot.eps
+    COMMAND "${GNUPLOT_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/plot-elev.gp" > plot-elev.eps
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    COMMENT "Plotting tests flow/normal"
+    DEPENDS 
+    "${CMAKE_CURRENT_BINARY_DIR}/profile1.out"
+    "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/plot-elev.gp"
+  )
+  set(rundeps plot.eps plot-elev.eps)
+endif (GNUPLOT_EXECUTABLE)
+
+add_custom_target(run_normal_test
+  DEPENDS ${rundeps}
 )
 add_dependencies(runtests run_normal_test)
 

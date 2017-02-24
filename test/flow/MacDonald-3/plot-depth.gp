@@ -7,10 +7,11 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January  2, 2004 by William A. Perkins
-# Last Change: Thu Sep 30 07:17:52 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+# Last Change: 2017-01-19 14:15:43 d3g096
 # -------------------------------------------------------------
 # $Id$
 
+set terminal postscript eps color solid "Helvetica,18"
 set auto
 set xlabel "Longitudinal Distance, m"
 set ylabel "Depth, m"

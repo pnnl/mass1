@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: 2017-01-13 11:19:51 d3g096
+# Last Change: 2017-01-20 07:57:04 d3g096
 # -------------------------------------------------------------
 # $Id$
 
@@ -20,30 +20,13 @@ set -e
 TRAP_FPE='INVALID=ABORT(1);UNDERFL=ZERO;OVERFL=ABORT(1);INT_OVERFL=ABORT(1);DIVZERO=ABORT(1);DEBUG'
 export TRAP_FPE
 
-model=${MODEL-../../../mass1}
+model=${MODEL-../../../build/mass1}
 
 $model
 
-(echo \
-    set terminal postscript landscape color solid \"Helvetica\" 14\; \
-    load \"plot.gp\"\; ) | \
-        gnuplot > plot.ps
-(echo \
-    set terminal postscript eps color solid \"Helvetica\" 22 \; \
-    load \"plot.gp\"\; ) | \
-        gnuplot > plot.eps
+gnuplot < plot.gp > plot.eps
 
-(echo \
-    set terminal postscript landscape color solid \"Helvetica\" 14\; \
-    load \"plot-elev.gp\"\; ) | \
-        gnuplot > plot-elev.ps
-(echo \
-    set terminal postscript eps color solid \"Helvetica\" 22 \; \
-    load \"plot-elev.gp\"\; ) | \
-        gnuplot > plot-elev.eps
+gnuplot < plot-elev.gp > plot-elev.eps
 
-(echo \
-    set terminal postscript eps color solid \"Helvetica\" 22 \; \
-    load \"plot-disch.gp\"\; ) | \
-        gnuplot > plot-disch.eps
+gnuplot < plot-disch.gp > plot-disch.eps
 
