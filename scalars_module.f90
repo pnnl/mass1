@@ -284,7 +284,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
   DOUBLE PRECISION :: depth
   DOUBLE PRECISION :: tdg_saturation = 100.0, upstream_c
   DOUBLE PRECISION :: avg_area, avg_latq
-  DOUBLE PRECISION :: salinity = 0.0, baro_press, t_water
+  DOUBLE PRECISION :: salinity = 0.0, baro_press, t_water, energy_source
 
   LOGICAL :: diffusion, fluvial, nonfluvial
 
@@ -796,14 +796,13 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
               t_water = c(link,point)
               depth = y(link,point) - thalweg(link,point)
               !call met_zone_coeff(met_zone(link), met_coeff)
-              c(link,point) = c(link, point) +&
-                   &metzone(link)%p%energy_flux(t_water)* &
-                   &delta_t*width(link,point)/area(link,point)
               ! energy_source = net_heat_flux(met_coeff,&
               !      &net_solar, t_water, t_air, t_dew, windspeed) &
               !      /(1000.0*4186.0/3.2808) ! rho*specifc heat*depth in feet
-              
-              ! c(link,point) = c(link,point) + energy_source*delta_t*width(link,point)/area(link,point)
+
+              energy_source = metzone(link)%p%energy_flux(t_water)
+              c(link,point) = c(link,point) + &
+                   &energy_source*delta_t*width(link,point)/area(link,point)
 
               ! IF(c(link,point) <   0.0) c(link,point) =   0.0 ! frozen - should add warning printout
               ! IF(c(link,point) > 100.0) c(link,point) = 100.0 ! boiling - should add warning printout

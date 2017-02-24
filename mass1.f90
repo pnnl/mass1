@@ -200,7 +200,6 @@ PROGRAM mass1
 
         scalar_time = model_time
 
-        CALL met_zone_manager%update(scalar_time)
         IF (config%scalar_steps .GT. 0) THEN
            tsteps = config%scalar_steps
         ELSE
@@ -219,6 +218,8 @@ PROGRAM mass1
            ENDIF
 
            CALL tvd_interp(scalar_time, model_time, model_time + config%time%delta_t)
+
+           CALL met_zone_manager%update(scalar_time)
 
            IF(config%do_gas)THEN
               species_num = 1
@@ -283,6 +284,7 @@ PROGRAM mass1
 
   END DO ! end main time loop
 
+  CALL met_zone_manager%destroy()
   CALL sections%destroy()
   CALL array_dealloc
 

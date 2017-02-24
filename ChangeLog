@@ -1,5 +1,10 @@
 2017-02-24  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* scalars_module.f90 (tvd_transport): compute energy_source
+	separately to help with debugging
+
+	* mass1.f90 (mass1): update met data at the right time
+
 	* confluence_module.f90 (confluence_conc): fix concentration
 	computation 
 
