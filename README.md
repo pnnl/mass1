@@ -31,23 +31,26 @@ git submodule update --init
 
 ## Requirements
 
-### Fortran 90/95 compiler
+### Fortran 2003 compiler
 
-MASS1 is a relatively portable, vanilla Fortran 90/95 code.  It has
-been built and used on UNIX, Linux, Mac OS X, and Windows.  A Fortran
-90/95 compiler is required.  MASS1 is currently developed and tested
-on Mac OS X and Linux using the following compilers:
+MASS1 is written in Fortran and makes use of several
+[Fortran 2003](http://fortranwiki.org/fortran/show/Fortran+2003)
+constructs.  Consistently, a Fortran compiler that conforms to the
+2003 standard is required to build MASS1. The following compilers are
+known to work:
 
-* [GNU Fortran](https://gcc.gnu.org/fortran/), Version 4.1 or higher
+* [GNU Fortran](https://gcc.gnu.org/fortran/), Version 4.8 or higher
 
 * [Intel Fortran](https://software.intel.com/en-us/fortran-compilers),
-  Version 10 or higher
+  Version 14 or higher 
 
-In the past, Fortran compilers from
-[NAG](https://www.nag.com/nag-compiler),
-[Absoft](https://www.absoft.com/),
-[IBM](http://www-03.ibm.com/software/products/en/xlfortran-linux), and
-others have worked.
+## Optional Software
+
+### Gnuplot
+
+[Gnuplot](http://www.gnuplot.info/) is used to plot MASS1 test
+results.  If [Gnuplot](http://www.gnuplot.info/) is not found on the
+system, tests can still be run, but the results will not be plotted.  
 
 ### Perl
 
@@ -79,28 +82,19 @@ reading MASS1 time series output and boundary condition files.
 
 ## Configure and Build
 
-MASS1 uses the [GNU Build System](https://en.wikipedia.org/wiki/GNU_Build_System) 
-to build MASS1.  The `configure` script is used to query the system
+MASS1 uses [CMake](https://cmake.org/) cross-platform tools to
+configure and build MASS1.  CMake queries  the system
 and determine if the compiler has sufficient capability to compile
-MASS1.  On most systems, simply executing the `configure` script is
-sufficient, but sometimes options are required. To get a list of
-options, 
+MASS1 and if optional software is available.  
+
+A typical configuration:
 
 ```
-./configure --help
-```
-
-A typical way to require the GNU Fortran compiler and trapping of
-floating point errors:
-
-```
-./configure FC=gfortran FCFLAGS="-O2 -ffpe-trap=invalid,zero,overflow"
-```
-
-Similarly, for the Intel Fortran compiler:
-
-```
-./configure FC=ifort FCFLAGS="-O3 -fpe0"
+mkdir build
+cd build
+FC=gfortran
+export FC
+cmake -D CMAKE_BUILD_TYPE:STRING=Release ..
 ```
 
 
