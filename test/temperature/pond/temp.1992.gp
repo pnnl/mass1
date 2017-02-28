@@ -24,12 +24,7 @@ set ydata
 set zdata
 set x2data
 set y2data
-set timefmt x "%m-%d-%Y %H:%M:%S"
-set timefmt y "%m-%d-%Y %H:%M:%S"
-set timefmt z "%m-%d-%Y %H:%M:%S"
-set timefmt x2 "%m-%d-%Y %H:%M:%S"
-set timefmt y2 "%m-%d-%Y %H:%M:%S"
-set timefmt cb "%m-%d-%Y %H:%M:%S"
+set timefmt "%m-%d-%Y %H:%M:%S"
 set boxwidth
 set style fill  empty border
 set dummy x,y
