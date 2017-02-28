@@ -22,6 +22,7 @@ The MASS1 source code is currently hosted on PNNL's internal Git
 repository.  MASS1 shares some code with other applications, which is
 included in MASS1 as a Git sub-module.  Do the following to check out
 the code:
+
 ```
 git clone https://stash.pnnl.gov/scm/~d3g096/mass1.git
 cd mass1
@@ -36,9 +37,12 @@ MASS1 is a relatively portable, vanilla Fortran 90/95 code.  It has
 been built and used on UNIX, Linux, Mac OS X, and Windows.  A Fortran
 90/95 compiler is required.  MASS1 is currently developed and tested
 on Mac OS X and Linux using the following compilers:
-    * [GNU Fortran](https://gcc.gnu.org/fortran/), Version 4.1 or higher
-    * [Intel Fortran](https://software.intel.com/en-us/fortran-compilers),
-      Version 10 or higher
+
+* [GNU Fortran](https://gcc.gnu.org/fortran/), Version 4.1 or higher
+
+* [Intel Fortran](https://software.intel.com/en-us/fortran-compilers),
+  Version 10 or higher
+
 In the past, Fortran compilers from
 [NAG](https://www.nag.com/nag-compiler),
 [Absoft](https://www.absoft.com/),
@@ -51,9 +55,11 @@ Several optional [Perl](https://www.perl.org/) pre/post-processing
 scripts are provided.  These use the following
 [Perl](https://www.perl.org/) modules:
 
-    * `Date::Manip`
-    * `PDL`
-    * `PDL::Graphics::PGPLOT::Window`
+* `Date::Manip`
+
+* `PDL`
+
+* `PDL::Graphics::PGPLOT::Window`
 
 When MASS1 code is configured, the system's
 [Perl](https://www.perl.org/) installation is queried to see if the
@@ -79,18 +85,23 @@ and determine if the compiler has sufficient capability to compile
 MASS1.  On most systems, simply executing the `configure` script is
 sufficient, but sometimes options are required. To get a list of
 options, 
+
 ```
 ./configure --help
 ```
+
 A typical way to require the GNU Fortran compiler and trapping of
 floating point errors:
 
 ```
-./configure FC=gfortran FCFLAGS="-ffpe-trap=invalid,zero,overflow"
+./configure FC=gfortran FCFLAGS="-O2 -ffpe-trap=invalid,zero,overflow"
 ```
+
 Similarly, for the Intel Fortran compiler:
 
 ```
-./configure FC=ifort FCFLAGS="-fpe0"
+./configure FC=ifort FCFLAGS="-O3 -fpe0"
 ```
+
+
 
