@@ -1,5 +1,8 @@
 2017-02-28  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* met_zone.f90 (met_zone_manager_read): forgot to initialize
+	zone%coeff with read coeff
+
 	* test/temperature/pond: fix plots for newer gnuplot
 
 	* CMakeLists.txt: use Git to fill MASS1_REVISION and
