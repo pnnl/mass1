@@ -124,9 +124,9 @@ RECURSIVE FUNCTION link_set_order(link, order0) RESULT(order)
   
   o = order0
 
-  IF (ASSOCIATED(ucon(link)%wrap)) THEN
-     DO i = 1, ucon(link)%wrap%n_ulink
-        ulink = ucon(link)%wrap%ulink(i)
+  IF (ASSOCIATED(ucon(link)%p)) THEN
+     DO i = 1, ucon(link)%p%n_ulink
+        ulink = ucon(link)%p%ulink(i)
         o = link_set_order(ulink, o)
      END DO
   END IF
@@ -160,8 +160,8 @@ SUBROUTINE link_connect()
   CALL status_message("Connecting Links ...")
 
   DO link = 1, config%maxlinks
-     NULLIFY(ucon(link)%wrap)
-     NULLIFY(dcon(link)%wrap)
+     NULLIFY(ucon(link)%p)
+     NULLIFY(dcon(link)%p)
   END DO
 
   DO link = 1, config%maxlinks
@@ -175,17 +175,17 @@ SUBROUTINE link_connect()
            CALL error_message(msg)
            ierr = ierr + 1
         END IF
-        IF (.NOT. ASSOCIATED(ucon(dlink)%wrap)) THEN 
+        IF (.NOT. ASSOCIATED(ucon(dlink)%p)) THEN 
            ALLOCATE(con)
            con = confluence_t(dlink)
-           ucon(dlink)%wrap => con
+           ucon(dlink)%p => con
            NULLIFY(con)
         END IF
-        dcon(link)%wrap => ucon(dlink)%wrap
-        i = dcon(link)%wrap%n_ulink
+        dcon(link)%p => ucon(dlink)%p
+        i = dcon(link)%p%n_ulink
         i = i + 1
-        dcon(link)%wrap%ulink(i) = link
-        dcon(link)%wrap%n_ulink = i
+        dcon(link)%p%ulink(i) = link
+        dcon(link)%p%n_ulink = i
      ELSE 
         nds = nds + 1
      END IF
@@ -220,9 +220,9 @@ SUBROUTINE link_connect()
   DO link = 1, config%maxlinks
      WRITE(msg, '("link ", I4, "(order = ", I4, ") upstream links:")') &
           &linkname(link), linkorder(link)
-     IF (ASSOCIATED(ucon(link)%wrap)) THEN
-        DO i = 1, ucon(link)%wrap%n_ulink
-           WRITE(lbl, '(I4)') ucon(link)%wrap%ulink(i)
+     IF (ASSOCIATED(ucon(link)%p)) THEN
+        DO i = 1, ucon(link)%p%n_ulink
+           WRITE(lbl, '(I4)') ucon(link)%p%ulink(i)
            msg = TRIM(msg) // " " // TRIM(lbl)
         END DO
      ELSE 

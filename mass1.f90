@@ -96,8 +96,8 @@ PROGRAM mass1
   END DO
   IF(config%debug_print)WRITE(11,*)'done with array alloc'
 
+  met_zone_manager = met_zone_manager_t()
   IF (config%met_required) THEN
-     met_zone_manager = met_zone_manager_t()
      CALL met_zone_manager%read(config%weather_file)
   END IF
 

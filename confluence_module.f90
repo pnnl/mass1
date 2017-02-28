@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February  2, 2017 by William A. Perkins
-  ! Last Change: 2017-02-24 10:12:15 d3g096
+  ! Last Change: 2017-02-28 10:07:59 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE confluence_module
@@ -36,7 +36,7 @@ MODULE confluence_module
   END INTERFACE
 
   TYPE, PUBLIC :: confluence_ptr
-     TYPE (confluence_t), POINTER :: wrap
+     TYPE (confluence_t), POINTER :: p
   END type confluence_ptr
 
   INTERFACE confluence_ptr
@@ -157,7 +157,7 @@ CONTAINS
 
     IMPLICIT NONE
     TYPE (confluence_ptr) :: new_confluence_ptr
-    NULLIFY(new_confluence_ptr%wrap)
+    NULLIFY(new_confluence_ptr%p)
   END FUNCTION new_confluence_ptr
 
 END MODULE confluence_module
