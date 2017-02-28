@@ -316,7 +316,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
      !IF(linktype(link) /= 1 )THEN
      IF( nonfluvial )THEN
         point = 1
-        c(link,point) = ucon(link)%wrap%conc(c)
+        c(link,point) = ucon(link)%p%conc(c)
         
         IF((linktype(i) == 6) .AND. (species_num == 1))THEN
            
@@ -417,7 +417,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
         SELECT CASE(species_num)
         CASE(1) ! gas species
            IF(config%do_temp)THEN
-              IF((.NOT. ASSOCIATED(ucon(link)%wrap)) .AND. (tempbc_table(link) /= 0))THEN
+              IF((.NOT. ASSOCIATED(ucon(link)%p)) .AND. (tempbc_table(link) /= 0))THEN
                  call bc_table_interpolate(tempbc, tempbc_table(link), time/config%time%mult)
                  t_water = bc_table_current(tempbc, tempbc_table(link), 1)
               ELSE
@@ -425,7 +425,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
               ENDIF
            ENDIF
            
-           IF((.NOT. ASSOCIATED(ucon(link)%wrap)) .AND. (transbc_table(link) /= 0))THEN
+           IF((.NOT. ASSOCIATED(ucon(link)%p)) .AND. (transbc_table(link) /= 0))THEN
               SELECT CASE(linktype(link))
               CASE(1)
                  call bc_table_interpolate(transbc, transbc_table(link), time/config%time%mult)
@@ -504,11 +504,11 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
               END SELECT
            !
            ! pure internal connection between fluvial links - just mix and pass through
-           ELSE IF ((ASSOCIATED(ucon(link)%wrap)) .AND. (transbc_table(link) == 0)) THEN
-              c(link,point) = ucon(link)%wrap%conc(c)
+           ELSE IF ((ASSOCIATED(ucon(link)%p)) .AND. (transbc_table(link) == 0)) THEN
+              c(link,point) = ucon(link)%p%conc(c)
            
            ! internal fluvial link that has an active table BC
-           ELSE IF ((ASSOCIATED(ucon(link)%wrap)) .AND. (transbc_table(link) /= 0)) THEN ! internal link with table spec
+           ELSE IF ((ASSOCIATED(ucon(link)%p)) .AND. (transbc_table(link) /= 0)) THEN ! internal link with table spec
               
               SELECT CASE(linktype(link))
               CASE(1) ! % internal C (mg/L) specified
@@ -588,8 +588,8 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
                  sum = 0.0
                  
                  upstream_c = 0.0
-                 IF (ASSOCIATED(ucon(link)%wrap)) THEN
-                    upstream_c = ucon(link)%wrap%conc(c)
+                 IF (ASSOCIATED(ucon(link)%p)) THEN
+                    upstream_c = ucon(link)%p%conc(c)
                  END IF
 
                  IF (qspill + qgen .gt. 0.0) THEN
@@ -610,12 +610,12 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
            ENDIF
            
         CASE(2) ! temperature species
-           IF((.NOT. ASSOCIATED(ucon(link)%wrap)) .AND. (tempbc_table(link) /= 0))THEN
+           IF((.NOT. ASSOCIATED(ucon(link)%p)) .AND. (tempbc_table(link) /= 0))THEN
               call bc_table_interpolate(tempbc, tempbc_table(link), time/config%time%mult)
               c(link,point) = bc_table_current(tempbc, tempbc_table(link), 1)
-           ELSE IF((ASSOCIATED(ucon(link)%wrap)) .AND. (tempbc_table(link) == 0)) THEN! internal link
-              c(link, point) = ucon(link)%wrap%conc(c)
-           ELSE IF((ASSOCIATED(ucon(link)%wrap)) .AND. (tempbc_table(link) /= 0)) THEN! internal link with table spec
+           ELSE IF((ASSOCIATED(ucon(link)%p)) .AND. (tempbc_table(link) == 0)) THEN! internal link
+              c(link, point) = ucon(link)%p%conc(c)
+           ELSE IF((ASSOCIATED(ucon(link)%p)) .AND. (tempbc_table(link) /= 0)) THEN! internal link with table spec
               call bc_table_interpolate(tempbc, tempbc_table(link), time/config%time%mult)
               c(link,point) = bc_table_current(tempbc, tempbc_table(link), 1)
            ELSE 

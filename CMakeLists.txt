@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2017-02-22 14:46:22 d3g096
+# Last Change: 2017-02-28 09:03:47 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -56,6 +56,30 @@ if (NOT AWK_EXECUTABLE)
 endif ()
 
 # -------------------------------------------------------------
+# GIT - for banner revision
+# -------------------------------------------------------------
+find_package(Git)
+
+if (GIT_EXECUTABLE) 
+  execute_process(
+    COMMAND ${GIT_EXECUTABLE} describe --always --abbrev=6 --dirty
+    WORKING_DIRECTORY "${MASS1_SOURCE_DIR}"
+    OUTPUT_VARIABLE MASS1_REVISION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+  execute_process(
+    COMMAND ${GIT_EXECUTABLE} log -1 --format=%cd --date=local
+    WORKING_DIRECTORY "${MASS1_SOURCE_DIR}"
+    OUTPUT_VARIABLE MASS1_REVISION_DATE
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+else(GIT_EXECUTABLE)
+  set(MASS1_REVISION "Unknown")
+  set(MASS1_REVISION_DATE "Unknown")
+endif(GIT_EXECUTABLE)
+configure_file(banner.f90.in banner.f90 @ONLY)
+
+# -------------------------------------------------------------
 # subdirectories
 # -------------------------------------------------------------
 
@@ -77,7 +101,7 @@ set(mass1src
   accumulator.f90
   array_alloc.f90
   array_dealloc.f90
-  banner.f90
+  "${CMAKE_CURRENT_BINARY_DIR}/banner.f90"
   bctable.f90
   coeff.f90
   cross_section.f90

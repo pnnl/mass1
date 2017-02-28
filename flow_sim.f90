@@ -89,7 +89,7 @@ SUBROUTINE flow_sim
 
      point = 1
 
-     IF (.NOT. ASSOCIATED(ucon(link)%wrap)) THEN  ! must be an upstream most link
+     IF (.NOT. ASSOCIATED(ucon(link)%p)) THEN  ! must be an upstream most link
 
         SELECT CASE(linktype(link))
         CASE(1,20)
@@ -106,8 +106,8 @@ SUBROUTINE flow_sim
         f(link,point) = bcval - q1
 
      ELSE
-        e(link,point) = ucon(link)%wrap%coeff_e()
-        f(link,point) = ucon(link)%wrap%coeff_f()
+        e(link,point) = ucon(link)%p%coeff_e()
+        f(link,point) = ucon(link)%p%coeff_f()
      END IF
 
 
@@ -238,7 +238,7 @@ SUBROUTINE flow_sim
 
      ! set downstream bc y(t) or Q(t)  OR junction conditions
 
-     IF (.NOT. ASSOCIATED(dcon(link)%wrap))THEN
+     IF (.NOT. ASSOCIATED(dcon(link)%p))THEN
 
         SELECT CASE(config%dsbc_type)
         CASE(1)
@@ -266,7 +266,7 @@ SUBROUTINE flow_sim
         q(link,point) = q(link,point) + dq
 
      ELSE
-        dy = dcon(link)%wrap%elev() - y(link,point)
+        dy = dcon(link)%p%elev() - y(link,point)
         dq = e(link,point)*dy + f(link,point)
         y(link,point) = y(link,point) + dy
         q(link,point) = q(link,point) + dq

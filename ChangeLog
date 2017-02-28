@@ -2,6 +2,13 @@
 
 	* test/temperature/pond: fix plots for newer gnuplot
 
+	* CMakeLists.txt: use Git to fill MASS1_REVISION and
+	MASS1_REVISION_DATE 
+
+	* banner.f90.in (banner): include code revision and date
+
+	* scripts/read.R: add script to read MASS1 time series and BC files
+
 2017-02-24  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* scalars_module.f90 (tvd_transport): compute energy_source
