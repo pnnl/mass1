@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2017-02-17 14:37:10 d3g096
+! Last Change: 2017-02-28 09:32:01 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! SUBROUTINE banner
@@ -15,8 +15,8 @@
 SUBROUTINE banner()
 
   IMPLICIT NONE
-  WRITE(*, 10)
-  WRITE (*, 15)
+  WRITE (*, 10)
+  WRITE (*, 15) '@MASS1_REVISION@ (@MASS1_REVISION_DATE@)'
 10 FORMAT(&
      &T4, " ____    ____       _       ______    ______    __     ", /,&
      &T4, "|_   \  /   _|     / \    .' ____ \ .' ____ \  /  |    ", /,&
@@ -28,6 +28,7 @@ SUBROUTINE banner()
         &T4, 'Modular Aquatic Simulation System 1D (MASS1)', /,&
         &T4, 'Pacific Northwest National Laboratory', /,&
         &T4, 'Hydrology Group', /,&
+        &T4, 'Revision: ', A, /, &
         &T4, 'Contact:', /,&
         &T8, 'Dr. Marshall C. Richmond (marshall.richmond@pnnl.gov)', /,&
         &T8, 'William A. Perkins (william.perkins@pnnl.gov)', /)
