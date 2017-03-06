@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December  1, 2010 by William A. Perkins
-# Last Change: 2017-01-16 08:24:57 d3g096
+# Last Change: 2017-03-06 09:53:45 d3g096
 # -------------------------------------------------------------
 
 set -u
@@ -22,6 +22,8 @@ dirs=" \
     MacDonald-1 \
     MacDonald-3 \
     MacDonald-4 \
+    dam-break \
+    drain \
     varied \
     varied-pid \
     varied-pool \

@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March  6, 2017 by William A. Perkins
-# Last Change: 2017-03-06 09:46:42 d3g096
+# Last Change: 2017-03-06 09:52:07 d3g096
 # -------------------------------------------------------------
 
 set key left
@@ -20,6 +20,7 @@ set format y "%.0f"
 set y2tics nomirror
 set y2label "Froude Number"
 set format y2 "%.1f"
+set y2range [0:1.5]
 
 set xrange [0:10]
 set xlabel "Distance, miles"
