@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: 2017-03-06 09:51:13 d3g096
+# Last Change: 2017-03-06 11:06:00 d3g096
 # -------------------------------------------------------------
 # $Id$
 
@@ -19,8 +19,5 @@ model=${MODEL-../../../mass1}
 
 $model
 
-(echo \
-    set terminal postscript eps color solid \"Helvetica\" 18 \; \
-    load \"plot.gp\"\; ) | \
-        gnuplot > plot.eps
+gnuplot < plot.gp > plot.eps
 

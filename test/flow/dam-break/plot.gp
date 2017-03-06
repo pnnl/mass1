@@ -7,9 +7,10 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March  6, 2017 by William A. Perkins
-# Last Change: 2017-03-06 09:52:07 d3g096
+# Last Change: 2017-03-06 11:13:54 d3g096
 # -------------------------------------------------------------
 
+set terminal postscript eps color solid "Helvetica" 18 
 set key left
 
 set yrange [0:*]
