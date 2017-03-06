@@ -89,6 +89,13 @@ MASS1 and if optional software is available.
 
 A typical configuration:
 
+1. In the top MASS1 source directory (where `CMakeLists.txt` is
+   located), make a directory for the build, called `build` maybe, and
+   change into that directory.
+   
+2. If necessary, choose the Fortran compiler to use by setting `FC`
+   and `FCFLAGS` environment variables. For example, 
+
 ```
 mkdir build
 cd build

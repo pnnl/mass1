@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created February 28, 2017 by William A. Perkins
-# Last Change: 2017-03-06 12:03:39 d3g096
+# Last Change: 2017-03-06 12:47:36 d3g096
 # -------------------------------------------------------------
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
 
@@ -65,15 +65,14 @@ set(testfiles
 )
 
 add_custom_command(
-  OUTPUT 
-  "ts1500.out"
+  OUTPUT "ts1500.out"
   COMMAND ${mass1exe} > mass1.log
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Running test temperature/pond"
   DEPENDS mass1 ${testfiles}
 )
 set(rundeps 
-  "${CMAKE_CURRENT_BINARY_DIR}/1500.out"
+  "ts1500.out"
 )
 
 if (GNUPLOT_EXECUTABLE) 

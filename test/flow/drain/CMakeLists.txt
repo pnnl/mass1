@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2017-03-06 12:24:16 d3g096
+# Last Change: 2017-03-06 13:12:48 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -82,6 +82,7 @@ set_property(DIRECTORY
   plot.eps
   plot-elev.eps
   plot-disch.eps
+  error-warning.out
   mass1.log
 )
 
