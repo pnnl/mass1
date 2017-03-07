@@ -55,6 +55,7 @@ ALLOCATE(e(maxlinks,maxpoint),f(maxlinks,maxpoint),l(maxlinks,maxpoint),&
 ALLOCATE(maxpoints(maxlinks),linkname(maxlinks),linkorder(maxlinks),linktype(maxlinks),input_option(maxlinks))
 ALLOCATE(linkbc_table(maxlinks),ds_conlink(maxlinks))
 ALLOCATE(comporder(maxlinks),dsbc_table(maxlinks),transbc_table(maxlinks),tempbc_table(maxlinks))
+ALLOCATE(usbc(maxlinks), dsbc(maxlinks), latbc(maxlinks))
 ALLOCATE(latflowbc_table(maxlinks), metzone(maxlinks))
 latflowbc_table = 0
 ALLOCATE(lattransbc_table(maxlinks), lattempbc_table(maxlinks))

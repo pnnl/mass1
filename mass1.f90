@@ -42,6 +42,7 @@ PROGRAM mass1
   USE accumulator
   USE pidlink
   USE mass1_config
+  USE bc_module
 
   IMPLICIT NONE
 
@@ -112,10 +113,13 @@ PROGRAM mass1
   CALL point_data
   IF(config%debug_print)WRITE(11,*)'done with point data'
 
+  bc_manager = new_bc_manager()
+  CALL bc_manager%read(LINK_BC_TYPE, config%linkbc_file)
   CALL link_bc
   IF(config%debug_print)WRITE(11,*)'link BC data done'
 
   IF(config%do_latflow)THEN
+     CALL bc_manager%read(LATFLOW_BC_TYPE, config%lateral_file)
      CALL latflow_bc
      IF(config%debug_print)WRITE(11,*)'lateral inflow BC data done'
   ENDIF
@@ -188,6 +192,8 @@ PROGRAM mass1
         IF (config%do_gageout) CALL gage_output
      END IF
 
+     CALL bc_manager%update(model_time/config%time%mult)
+
      IF (config%do_flow) THEN
         CALL flow_sim
      ENDIF
@@ -216,6 +222,8 @@ PROGRAM mass1
               WRITE(11,*)i, scalar_time,model_time
               WRITE(11,*)' '
            ENDIF
+
+           CALL bc_manager%update(scalar_time/config%time%mult)
 
            CALL tvd_interp(scalar_time, model_time, model_time + config%time%delta_t)
 

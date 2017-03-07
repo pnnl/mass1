@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created January 17, 2017 by William A. Perkins
-  ! Last Change: 2017-03-06 15:04:30 d3g096
+  ! Last Change: 2017-03-07 14:28:45 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE bc_module
@@ -20,21 +20,26 @@ MODULE bc_module
 
   IMPLICIT NONE
 
-  ENUM, BIND(C) 
-     ENUMERATOR :: LINK_BC = 1
-     ENUMERATOR :: LATFLOW_BC
-     ENUMERATOR :: HYDRO_BC
-     ENUMERATOR :: TEMP_BC
-     ENUMERATOR :: TRANS_BC
-  END ENUM
-
   PRIVATE
+
+  ENUM, BIND(C) 
+     ENUMERATOR :: BC_ENUM = 0
+     ENUMERATOR :: LINK_BC_TYPE = 1
+     ENUMERATOR :: LATFLOW_BC_TYPE
+     ENUMERATOR :: HYDRO_BC_TYPE
+     ENUMERATOR :: TEMP_BC_TYPE
+     ENUMERATOR :: TRANS_BC_TYPE
+  END ENUM
+  PUBLIC :: BC_ENUM, LINK_BC_TYPE, LATFLOW_BC_TYPE, HYDRO_BC_TYPE, &
+       &TEMP_BC_TYPE, TRANS_BC_TYPE
+  
 
   ! ----------------------------------------------------------------
   ! TYPE bc_t
   ! ----------------------------------------------------------------
   TYPE, ABSTRACT, PUBLIC :: bc_t
      INTEGER :: ID
+     DOUBLE PRECISION :: current_value
    CONTAINS
      PROCEDURE (read_proc), DEFERRED :: read 
      PROCEDURE (update_proc), DEFERRED :: update
@@ -69,31 +74,33 @@ MODULE bc_module
   ! ----------------------------------------------------------------
   ! TYPE simple_bc
   ! ----------------------------------------------------------------
-  TYPE, PUBLIC, EXTENDS(bc_t) :: simple_bc
+  TYPE, PUBLIC, EXTENDS(bc_t) :: simple_bc_t
      TYPE (time_series_rec), POINTER :: tbl
-     DOUBLE PRECISION :: current_value
    CONTAINS
      PROCEDURE :: read => simple_bc_read
      PROCEDURE :: update => simple_bc_update
      PROCEDURE :: destroy => simple_bc_destroy
-  END type simple_bc
+  END type simple_bc_t
 
   
   ! ----------------------------------------------------------------
   ! TYPE bc_ptr
   ! ----------------------------------------------------------------
   TYPE, PUBLIC :: bc_ptr
-     INTEGER (KIND=LINK_BC) :: bc_kind
+     INTEGER (KIND(BC_ENUM)) :: bc_kind
      CLASS (bc_t), POINTER :: p
   END type bc_ptr
 
-  ! TYPE, PUBLIC, EXTENDS(simple_bc) :: hydro_bc
-  !    DOUBLE PRECISION :: current_spill
-  !    DOUBLE PRECISION :: current_powerhouse
-  !  CONTAINS
-  !    PROCEDURE read => hydro_bc_read
-  !    PROCEDURE update => simple_bc_update
-  ! END type hydro_bc
+  ! ----------------------------------------------------------------
+  ! TYPE hydro_bc
+  ! ----------------------------------------------------------------
+  TYPE, PUBLIC, EXTENDS(simple_bc_t) :: hydro_bc_t
+     DOUBLE PRECISION :: current_spill
+     DOUBLE PRECISION :: current_powerhouse
+   CONTAINS
+     PROCEDURE :: read => hydro_bc_read
+     PROCEDURE :: update => hydro_bc_update
+  END type hydro_bc_t
 
   ! ----------------------------------------------------------------
   ! TYPE bc_list
@@ -122,6 +129,12 @@ MODULE bc_module
      PROCEDURE :: update => bc_manager_update
      PROCEDURE :: destroy => bc_manager_destroy
   END type bc_manager_t
+
+  INTERFACE bc_manager_t
+     MODULE PROCEDURE new_bc_manager
+  END INTERFACE bc_manager_t
+
+  PUBLIC :: new_bc_manager
   
   TYPE (bc_manager_t), PUBLIC :: bc_manager
 
@@ -133,17 +146,17 @@ CONTAINS
   FUNCTION bc_kind_name(bckind) RESULT(s)
     IMPLICIT NONE
     CHARACTER(LEN=80) :: s
-    INTEGER (KIND=LINK_BC), INTENT(IN) :: bckind
+    INTEGER (KIND(BC_ENUM)), INTENT(IN) :: bckind
     SELECT CASE (bckind)
-    CASE (LINK_BC)
+    CASE (LINK_BC_TYPE)
        s = "Hydrodynamic"
-    CASE (LATFLOW_BC)
+    CASE (LATFLOW_BC_TYPE)
        s = "Lateral Inflow"
-    CASE (HYDRO_BC)
+    CASE (HYDRO_BC_TYPE)
        s = "Hydropower"
-    CASE (TEMP_BC)
+    CASE (TEMP_BC_TYPE)
        s = "Temperature"
-    CASE (TRANS_BC)
+    CASE (TRANS_BC_TYPE)
        s = "TDG"
     CASE DEFAULT
        s = "Unknown"
@@ -155,7 +168,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   SUBROUTINE simple_bc_read(this, fname)
     IMPLICIT NONE
-    CLASS(simple_bc), INTENT(INOUT) :: this
+    CLASS(simple_bc_t), INTENT(INOUT) :: this
     CHARACTER(LEN=*), INTENT(IN) :: fname
     INTEGER, PARAMETER :: iunit = 55
     this%tbl => time_series_read(fname, iunit)
@@ -166,7 +179,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   SUBROUTINE simple_bc_update(this, time)
     IMPLICIT NONE
-    CLASS(simple_bc), INTENT(INOUT) :: this
+    CLASS(simple_bc_t), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: time
 
     CALL time_series_interp(this%tbl, time)
@@ -179,9 +192,33 @@ CONTAINS
   ! ----------------------------------------------------------------
   SUBROUTINE simple_bc_destroy(this)
     IMPLICIT NONE
-    CLASS(simple_bc), INTENT(INOUT) :: this
+    CLASS(simple_bc_t), INTENT(INOUT) :: this
     CALL time_series_destroy(this%tbl)
   END SUBROUTINE simple_bc_destroy
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE hydro_bc_read
+  ! ----------------------------------------------------------------
+  SUBROUTINE hydro_bc_read(this, fname)
+    IMPLICIT NONE
+    CLASS(hydro_bc_t), INTENT(INOUT) :: this
+    CHARACTER(LEN=*), INTENT(IN) :: fname
+    INTEGER, PARAMETER :: iunit = 55
+    this%tbl => time_series_read(fname, unit=iunit, fields=2)
+  END SUBROUTINE hydro_bc_read
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE hydro_bc_update
+  ! ----------------------------------------------------------------
+  SUBROUTINE hydro_bc_update(this, time)
+    IMPLICIT NONE
+    CLASS(hydro_bc_t), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: time
+    CALL time_series_interp(this%tbl, time)
+    this%current_powerhouse = this%tbl%current(1)
+    this%current_spill = this%tbl%current(2)
+    this%current_value = this%current_spill + this%current_powerhouse
+  END SUBROUTINE hydro_bc_update
 
   ! ----------------------------------------------------------------
   !  FUNCTION new_bc_list
@@ -200,7 +237,7 @@ CONTAINS
   SUBROUTINE bc_list_push(this, bckind, bc)
     IMPLICIT NONE
     CLASS (bc_list), INTENT(INOUT) :: this
-    INTEGER (KIND=LINK_BC), INTENT(IN) :: bckind
+    INTEGER (KIND(BC_ENUM)), INTENT(IN) :: bckind
     CLASS (bc_t), POINTER, INTENT(IN) :: bc
     TYPE (bc_ptr), POINTER :: ptr
     CLASS(*), POINTER :: p
@@ -262,7 +299,7 @@ CONTAINS
     IMPLICIT NONE
     CLASS (bc_t), POINTER :: bc
     CLASS (bc_list) :: this
-    INTEGER (KIND=LINK_BC), INTENT(IN) :: bckind
+    INTEGER (KIND(BC_ENUM)), INTENT(IN) :: bckind
     INTEGER, INTENT(IN) :: bcid
 
     TYPE (dlist_node), POINTER :: node
@@ -325,7 +362,7 @@ CONTAINS
   SUBROUTINE bc_manager_read(this, bckind, filename)
     IMPLICIT NONE
     CLASS (bc_manager_t), INTENT(INOUT) :: this
-    INTEGER (KIND=LINK_BC), INTENT(IN) :: bckind
+    INTEGER (KIND(BC_ENUM)), INTENT(IN) :: bckind
     CHARACTER(LEN=*), INTENT(IN) :: filename
     INTEGER, PARAMETER :: iounit = 53
 
@@ -343,10 +380,10 @@ CONTAINS
     DO WHILE(.TRUE.)
        READ(iounit, *, END=101, ERR=1000) bcid, bcfile
        SELECT CASE (bckind)
-       CASE (LINK_BC, LATFLOW_BC, TEMP_BC, TRANS_BC)
-          ALLOCATE(simple_bc :: bc)
-       ! CASE (HYDRO_BC)
-       !    ALLOCATE(hydro_bc :: bc)
+       CASE (LINK_BC_TYPE, LATFLOW_BC_TYPE, TEMP_BC_TYPE, TRANS_BC_TYPE)
+          ALLOCATE(simple_bc_t :: bc)
+       CASE (HYDRO_BC_TYPE)
+          ALLOCATE(hydro_bc_t :: bc)
        CASE DEFAULT
           WRITE(msg, *) TRIM(filename) // ": unknown BC kind: ", bckind
           CALL error_message(msg, fatal=.TRUE.)
@@ -369,6 +406,14 @@ CONTAINS
     CALL error_message("Error reading BC table" // TRIM(filename), .TRUE.)
   END SUBROUTINE bc_manager_read
 
+  ! ----------------------------------------------------------------
+  !  FUNCTION new_bc_manager
+  ! ----------------------------------------------------------------
+  FUNCTION new_bc_manager() RESULT (man)
+    IMPLICIT NONE
+    TYPE (bc_manager_t) :: man
+    man%bcs = new_bc_list()
+  END FUNCTION new_bc_manager
 
   ! ----------------------------------------------------------------
   !  FUNCTION bc_manager_find
@@ -377,7 +422,7 @@ CONTAINS
     IMPLICIT NONE
     CLASS (bc_t), POINTER :: bc
     CLASS (bc_manager_t), INTENT(IN) :: this
-    INTEGER (KIND=LINK_BC), INTENT(IN) :: bckind
+    INTEGER (KIND(BC_ENUM)), INTENT(IN) :: bckind
     INTEGER, INTENT(IN) :: bcid
     bc => this%bcs%find(bckind, bcid)
   END FUNCTION bc_manager_find

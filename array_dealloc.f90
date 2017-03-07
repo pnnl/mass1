@@ -53,6 +53,7 @@ DEALLOCATE(lattransbc_table, lattempbc_table)
 DEALLOCATE(crest)
 DEALLOCATE(lpiexp)
 DEALLOCATE(ucon, dcon)
+DEALLOCATE(usbc, dsbc, latbc)
 
 
 !-----------------------------------------------------------

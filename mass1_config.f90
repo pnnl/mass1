@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2017-03-06 12:42:53 d3g096
+! Last Change: 2017-03-07 13:08:11 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE mass1_config
@@ -18,36 +18,44 @@ MODULE mass1_config
   USE date_time
 
   IMPLICIT NONE
-
-  PUBLIC
+  
+  PRIVATE
 
   ENUM, BIND(C)
+     ENUMERATOR :: TIME_OPTION = 0
      ENUMERATOR :: DECIMAL_TIME_OPTION = 1
      ENUMERATOR :: DATE_TIME_OPTION = 2
   END ENUM
+  PUBLIC :: TIME_OPTION, DECIMAL_TIME_OPTION, DATE_TIME_OPTION
 
   ENUM, BIND(C)
+     ENUMERATOR :: TIME_UNITS = 0
      ENUMERATOR :: SECOND_UNITS = 1
      ENUMERATOR :: MINUTE_UNITS = 2
      ENUMERATOR :: HOUR_UNITS = 3
      ENUMERATOR :: DAY_UNITS = 4
   END ENUM
+  PUBLIC :: TIME_UNITS, SECOND_UNITS, MINUTE_UNITS, HOUR_UNITS, DAY_UNITS
 
   ENUM, BIND(C)
+     ENUMERATOR :: UNIT_SYSTEM = 0
      ENUMERATOR :: ENGLISH_UNITS = 1
      ENUMERATOR :: METRIC_UNITS = 2
   END ENUM
+  PUBLIC :: UNIT_SYSTEM, ENGLISH_UNITS, METRIC_UNITS
 
   ENUM, BIND(C)
+     ENUMERATOR :: CHANNEL_UNITS = 0
      ENUMERATOR :: CHANNEL_FOOT = 1
      ENUMERATOR :: CHANNEL_METER = 2
      ENUMERATOR :: CHANNEL_MILE = 3
      ENUMERATOR :: CHANNEL_KM = 4
   END ENUM
+  PUBLIC :: CHANNEL_UNITS, CHANNEL_FOOT, CHANNEL_METER, CHANNEL_MILE, CHANNEL_KM
 
   TYPE, PUBLIC :: time_frame_t
-     INTEGER(KIND(DECIMAL_TIME_OPTION)) :: option
-     INTEGER(KIND(SECOND_UNITS)) :: units
+     INTEGER(KIND(TIME_OPTION)) :: option
+     INTEGER(KIND(TIME_UNITS)) :: units
      DOUBLE PRECISION :: time
      DOUBLE PRECISION :: begin, end 
      DOUBLE PRECISION :: delta_t
@@ -60,7 +68,7 @@ MODULE mass1_config
        ! PROCEDURE internal 
     END type time_frame_t
 
-  INTEGER, PARAMETER :: path_length = 1024
+  INTEGER, PARAMETER, PRIVATE :: path_length = 1024
 
   TYPE, PUBLIC :: configuration_t
      CHARACTER(LEN=256) :: config_version
@@ -85,8 +93,8 @@ MODULE mass1_config
      INTEGER :: maxlinks
      INTEGER :: maxpoint
      INTEGER :: scalar_steps
-     INTEGER(KIND=ENGLISH_UNITS) :: units
-     INTEGER(KIND=CHANNEL_FOOT) :: channel_length_units
+     INTEGER(KIND(UNIT_SYSTEM)) :: units
+     INTEGER(KIND(CHANNEL_UNITS)) :: channel_length_units
      INTEGER :: dsbc_type
      TYPE (time_frame_t) :: time
      CHARACTER(LEN=path_length) :: link_file
@@ -109,7 +117,7 @@ MODULE mass1_config
      PROCEDURE :: read => configuration_read
   END type configuration_t
 
-  CHARACTER(LEN=path_length), PARAMETER :: config_name = 'mass1.cfg'
+  CHARACTER(LEN=path_length), PARAMETER, PRIVATE :: config_name = 'mass1.cfg'
 
   TYPE (configuration_t), PUBLIC :: config
 

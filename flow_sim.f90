@@ -101,6 +101,7 @@ SUBROUTINE flow_sim
            bcval = bc_table_current(hydrobc, linkbc_table(link), 2)
            bcval = bcval + temp ! total flow rate at the dam
         END SELECT
+        bcval = usbc(link)%p%current_value
         q1 = q(link,point)
         e(link,point) = 0.0
         f(link,point) = bcval - q1
@@ -165,9 +166,13 @@ SUBROUTINE flow_sim
 
            ! uniform lateral inflow per unit length
            IF(config%do_latflow)THEN
-              IF(latflowbc_table(link) /= 0)THEN
-                 latq_old = lateral_inflow(link,point) 
-                 lateral_inflow_old(link,point) = latq_old
+              latq_old = lateral_inflow(link,point) 
+              lateral_inflow_old(link,point) = latq_old
+              IF (ASSOCIATED(latbc(link)%p)) THEN
+                 lateral_inflow(link,point) = &
+                      &latbc(link)%p%current_value
+                 latq_new = lateral_inflow(link,point)
+              ELSE IF(latflowbc_table(link) /= 0)THEN
                  call bc_table_interpolate(latflowbc, latflowbc_table(link), &
                       &time/config%time%mult)
                  lateral_inflow(link,point) = &
@@ -200,12 +205,12 @@ SUBROUTINE flow_sim
               temp = bc_table_current(hydrobc, linkbc_table(link), 1)
               bcval = bc_table_current(hydrobc, linkbc_table(link), 2)
               bcval = bcval + temp ! total flow rate at the dam
-
            ELSE ! other non-fluvial links
               call bc_table_interpolate(linkbc, linkbc_table(link), &
                    &time/config%time%mult)
               bcval = bc_table_current(linkbc, linkbc_table(link), 1)
            ENDIF
+           bcval = usbc(link)%p%current_value
 
            CALL nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
 
@@ -240,23 +245,23 @@ SUBROUTINE flow_sim
 
      IF (.NOT. ASSOCIATED(dcon(link)%p))THEN
 
+        call bc_table_interpolate(linkbc, dsbc_table(link), &
+             &time/config%time%mult)
+        bcval = bc_table_current(linkbc, dsbc_table(link), 1)
+        bcval = dsbc(link)%p%current_value
         SELECT CASE(config%dsbc_type)
         CASE(1)
            ! given downstream stage y(t)
 
            y1 = y(link,point)
-           call bc_table_interpolate(linkbc, dsbc_table(link), &
-                &time/config%time%mult)
-           y_new_time = bc_table_current(linkbc, dsbc_table(link), 1)
+           y_new_time = bcval
 
            dy = y_new_time - y1
            dq = e(link,point)*dy + f(link,point)
         CASE(2)
            ! given Q(t)
            q1 = q(link,point)
-           call bc_table_interpolate(linkbc, dsbc_table(link), &
-                &time/config%time%mult)
-           q_new_time = bc_table_current(linkbc, dsbc_table(link), 1)
+           q_new_time = bcval
            dq = q_new_time - q1
            dy = (dq - f(link,point))/e(link,point)
         END SELECT
@@ -279,6 +284,7 @@ SUBROUTINE flow_sim
            call bc_table_interpolate(linkbc, linkbc_table(link), &
                 &time/config%time%mult)
            bcval = bc_table_current(linkbc, linkbc_table(link), 1)
+           bcval = usbc(link)%p%current_value
            dq = bcval - q(link,point)
            dy = (dq - f(link,point))/e(link,point)
 
@@ -289,6 +295,7 @@ SUBROUTINE flow_sim
            temp = bc_table_current(hydrobc, linkbc_table(link), 1)
            bcval = bc_table_current(hydrobc, linkbc_table(link), 2)
            bcval = bcval + temp ! total flow rate at the dam
+           bcval = usbc(link)%p%current_value
 
            dq = bcval - q(link,point)
            dy = (dq - f(link,point))/e(link,point)
