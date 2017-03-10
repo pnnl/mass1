@@ -58,6 +58,8 @@ MODULE link_vars
   TYPE (bc_ptr), DIMENSION(:), ALLOCATABLE, SAVE :: latbc
 
   TYPE (met_zone_ptr), DIMENSION(:), ALLOCATABLE, SAVE :: metzone
+
+  LOGICAL, SAVE :: do_hydro_bc
   
 
 END MODULE link_vars

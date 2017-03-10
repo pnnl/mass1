@@ -115,6 +115,9 @@ PROGRAM mass1
 
   bc_manager = new_bc_manager()
   CALL bc_manager%read(LINK_BC_TYPE, config%linkbc_file)
+  IF (do_hydro_bc) THEN
+     CALL bc_manager%read(HYDRO_BC_TYPE, config%hydrobc_file)
+  END IF
   CALL link_bc
   IF(config%debug_print)WRITE(11,*)'link BC data done'
 

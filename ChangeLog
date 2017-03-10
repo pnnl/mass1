@@ -1,3 +1,16 @@
+2017-03-10  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* test/CMakeLists.txt: include new test directory
+
+	* test/flow/normal-hydro: add simple test w/ hydro BCs
+
+	* mass1.f90 (mass1): have BC manager read hydro BCs if needed
+
+	* link_data.f90 (link_data): set hydro BC flag
+
+	* modules.f90 (link_vars): add flag to indicate hydro BCs are
+	needed 
+
 2017-02-28  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* met_zone.f90 (met_zone_manager_read): forgot to initialize

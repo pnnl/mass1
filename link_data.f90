@@ -47,6 +47,7 @@ SUBROUTINE link_data
 
   CALL print_output("LINKS ", 0.0)
 
+  do_hydro_bc = .FALSE.
   DO i=1,config%maxlinks
 
      READ(lunit,*,END=100,ERR=200)link
@@ -75,6 +76,12 @@ SUBROUTINE link_data
           & transbc_table(link),tempbc_table(link),metzone_idx,latflowbc_table(link), &
           & lattransbc_table(link),lattempbc_table(link),lpiexp(link)
      WRITE(io_unit,*)ds_conlink(link)
+
+     ! See if there are any links requiring a "hydro" BC
+     SELECT CASE (linktype(link))
+     CASE (21, 6)
+        do_hydro_bc = .TRUE.
+     END SELECT
 
      IF (config%do_latflow .AND. config%do_gas) THEN 
         IF (latflowbc_table(link) .NE. 0 .AND. lattransbc_table(link) .EQ. 0) THEN
