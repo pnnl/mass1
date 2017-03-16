@@ -31,6 +31,13 @@ git submodule update --init
 
 ## Requirements
 
+MASS1 has been used primarily on UNIX, Linux, and Mac OS X
+systems. The following describes how to build MASS1 on those
+platforms.  It has been built and used on Windows systems, but rarely.
+The following should work on Windows if [Cygwin](https://cygwin.com/)
+or [MinGW](http://www.mingw.org/) is utilized.  A native Windows build
+may be available in the future. 
+
 ### Fortran 90/95 compiler
 
 MASS1 is a relatively portable, vanilla Fortran 90/95 code.  It has
@@ -43,11 +50,12 @@ on Mac OS X and Linux using the following compilers:
 * [Intel Fortran](https://software.intel.com/en-us/fortran-compilers),
   Version 10 or higher
 
-In the past, Fortran compilers from
-[NAG](https://www.nag.com/nag-compiler),
+In general, the Intel compiler produces a faster executable, but for
+most applications, this is not noticable. In the past, Fortran
+compilers from [NAG](https://www.nag.com/nag-compiler),
 [Absoft](https://www.absoft.com/),
 [IBM](http://www-03.ibm.com/software/products/en/xlfortran-linux), and
-others have worked.
+others have worked.  
 
 ### Perl
 
