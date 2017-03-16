@@ -101,9 +101,9 @@ ENDIF
 
 ! CALL point_data_scan   ! or something to determine maxlinks and maxpoint prior to allocation
 CALL array_alloc
-CALL allocate_species(utility_error_iounit, utility_status_iounit)
+CALL allocate_species()
 DO i=1,max_species
-	CALL allocate_species_components(i, maxlinks, maxpoint, utility_status_iounit, utility_error_iounit)
+	CALL allocate_species_components(i, maxlinks, maxpoint)
 END DO
 	IF(debug_print == 1)WRITE(11,*)'done with array alloc'
 
