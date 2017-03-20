@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2017-03-07 13:08:11 d3g096
+! Last Change: 2017-03-10 09:25:33 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE mass1_config
@@ -90,6 +90,7 @@ MODULE mass1_config
      LOGICAL :: write_sections
      LOGICAL :: read_sections
      LOGICAL :: debug_print
+     LOGICAL :: do_hydro_bc
      INTEGER :: maxlinks
      INTEGER :: maxpoint
      INTEGER :: scalar_steps

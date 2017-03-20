@@ -48,19 +48,15 @@ MODULE link_vars
 
   INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: maxpoints,linkname,linkorder,comporder,linktype,input_option
   INTEGER, DIMENSION(:),ALLOCATABLE, SAVE :: linkbc_table,ds_conlink,&
-       & dsbc_table,transbc_table,tempbc_table,latflowbc_table,lattransbc_table,lattempbc_table
+       & dsbc_table,transbc_table,tempbc_table,latflowbc_table,&
+       &lattransbc_table,lattempbc_table
   DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE, SAVE :: crest
 
   DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE, SAVE :: lpiexp
 
-  TYPE (bc_ptr), DIMENSION(:), ALLOCATABLE, SAVE :: usbc
-  TYPE (bc_ptr), DIMENSION(:), ALLOCATABLE, SAVE :: dsbc
-  TYPE (bc_ptr), DIMENSION(:), ALLOCATABLE, SAVE :: latbc
-
-  TYPE (met_zone_ptr), DIMENSION(:), ALLOCATABLE, SAVE :: metzone
-
-  LOGICAL, SAVE :: do_hydro_bc
+  TYPE (bc_ptr), DIMENSION(:), ALLOCATABLE, SAVE :: usbc, dsbc, latbc
   
+  TYPE (met_zone_ptr), DIMENSION(:), ALLOCATABLE, SAVE :: metzone
 
 END MODULE link_vars
 

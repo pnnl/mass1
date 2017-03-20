@@ -35,6 +35,7 @@ SUBROUTINE kick_off
   USE general_vars
   USE link_vars
   USE pidlink
+  USE scalars
 
   IMPLICIT NONE
 
@@ -112,6 +113,46 @@ SUBROUTINE kick_off
            WRITE(msg, *) 'Link ', i, ': cannot find Lateral BC, ', latflowbc_table(i)
            CALL error_message(msg)
            ierr = ierr + 1
+        END IF
+     END IF
+
+     IF (config%do_temp) THEN
+        IF (tempbc_table(i) .NE. 0) THEN
+           sclrbc(i, 2)%p => bc_manager%find(TEMP_BC_TYPE, tempbc_table(i))
+           IF (.NOT. ASSOCIATED(sclrbc(i, 2)%p)) THEN
+              WRITE(msg, *) 'Link ', i, ': cannot find temperature BC, ', tempbc_table(i)
+              CALL error_message(msg)
+              ierr = ierr + 1
+           END IF
+        END IF
+        IF (ASSOCIATED(latbc(i)%p) .AND. lattempbc_table(i) .NE. 0) THEN
+           latsclrbc(i, 2)%p =>  bc_manager%find(TEMP_BC_TYPE, lattempbc_table(i))
+           IF (.NOT. ASSOCIATED(latsclrbc(i, 2)%p)) THEN
+              WRITE(msg, *) 'Link ', i, ': cannot find lateral temperature BC, ', &
+                   &lattempbc_table(i)
+              CALL error_message(msg)
+              ierr = ierr + 1
+           END IF
+        END IF
+     END IF
+
+     IF (config%do_gas) THEN
+        IF (transbc_table(i) .NE. 0) THEN
+           sclrbc(i, 1)%p => bc_manager%find(TRANS_BC_TYPE, transbc_table(i))
+           IF (.NOT. ASSOCIATED(sclrbc(i, 1)%p)) THEN
+              WRITE(msg, *) 'Link ', i, ': cannot find TDG BC, ', transbc_table(i)
+              CALL error_message(msg)
+              ierr = ierr + 1
+           END IF
+        END IF
+        IF (ASSOCIATED(latbc(i)%p) .AND. lattransbc_table(i) .NE. 0) THEN
+           latsclrbc(i, 1)%p =>  bc_manager%find(TRANS_BC_TYPE, lattransbc_table(i))
+           IF (.NOT. ASSOCIATED(latsclrbc(i, 1)%p)) THEN
+              WRITE(msg, *) 'Link ', i, ': cannot find lateral TDG BC, ', &
+                   &lattransbc_table(i)
+              CALL error_message(msg)
+              ierr = ierr + 1
+           END IF
         END IF
      END IF
   END DO

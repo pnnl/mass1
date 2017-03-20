@@ -115,7 +115,7 @@ PROGRAM mass1
 
   bc_manager = new_bc_manager()
   CALL bc_manager%read(LINK_BC_TYPE, config%linkbc_file)
-  IF (do_hydro_bc) THEN
+  IF (config%do_hydro_bc) THEN
      CALL bc_manager%read(HYDRO_BC_TYPE, config%hydrobc_file)
   END IF
   CALL link_bc
@@ -134,10 +134,8 @@ PROGRAM mass1
   ENDIF
   IF(config%debug_print) WRITE(11,*)'done with ICs or hotstart read'
 
-  CALL kick_off
-  IF(config%debug_print) WRITE(11,*)'done with kick_off'
-
   IF(config%do_gas)THEN
+     CALL bc_manager%read(TRANS_BC_TYPE, config%transbc_file)
      species_num = 1
      CALL transport_bc(species_num)
      IF(config%debug_print) WRITE(11,*)'done reading gas transport table'
@@ -159,10 +157,14 @@ PROGRAM mass1
   ENDIF
 
   IF(config%do_temp)THEN
+     CALL bc_manager%read(TEMP_BC_TYPE, config%tempbc_file)
      species_num = 2
      CALL transport_bc(species_num)
      IF(config%debug_print) WRITE(11,*)'done reading temp transport table'
   ENDIF
+
+  CALL kick_off
+  IF(config%debug_print) WRITE(11,*)'done with kick_off'
 
   !------------------------------------------------------------------------------
   !------------------------------------------------------------------------------
@@ -234,14 +236,16 @@ PROGRAM mass1
 
            IF(config%do_gas)THEN
               species_num = 1
-              CALL tvd_transport(species_num, species(species_num)%conc,species(species_num)%concold &
-                   & ,utility_status_iounit, utility_error_iounit)
+              CALL tvd_transport(species_num, &
+                   &species(species_num)%conc,&
+                   &species(species_num)%concold)
            END IF
 
            IF(config%do_temp)THEN
               species_num = 2
-              CALL tvd_transport(species_num, species(species_num)%conc,species(species_num)%concold &
-                   & , utility_status_iounit, utility_error_iounit)
+              CALL tvd_transport(species_num, &
+                   &species(species_num)%conc,&
+                   &species(species_num)%concold)
            END IF
 
            scalar_time = model_time + DBLE(i)/DBLE(tsteps)*config%time%step

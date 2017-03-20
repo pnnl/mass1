@@ -90,17 +90,6 @@ SUBROUTINE flow_sim
      point = 1
 
      IF (.NOT. ASSOCIATED(ucon(link)%p)) THEN  ! must be an upstream most link
-
-        SELECT CASE(linktype(link))
-        CASE(1,20)
-           call bc_table_interpolate(linkbc, linkbc_table(link), time/config%time%mult)
-           bcval = bc_table_current(linkbc, linkbc_table(link), 1)
-        CASE(21)
-           call bc_table_interpolate(hydrobc, linkbc_table(link), time/config%time%mult)
-           temp = bc_table_current(hydrobc, linkbc_table(link), 1)
-           bcval = bc_table_current(hydrobc, linkbc_table(link), 2)
-           bcval = bcval + temp ! total flow rate at the dam
-        END SELECT
         bcval = usbc(link)%p%current_value
         q1 = q(link,point)
         e(link,point) = 0.0
@@ -172,12 +161,6 @@ SUBROUTINE flow_sim
                  lateral_inflow(link,point) = &
                       &latbc(link)%p%current_value
                  latq_new = lateral_inflow(link,point)
-              ELSE IF(latflowbc_table(link) /= 0)THEN
-                 call bc_table_interpolate(latflowbc, latflowbc_table(link), &
-                      &time/config%time%mult)
-                 lateral_inflow(link,point) = &
-                      &bc_table_current(latflowbc, latflowbc_table(link), 1)
-                 latq_new = lateral_inflow(link,point)
               ELSE
                  latq_old = 0.0
                  latq_new = 0.0
@@ -198,18 +181,7 @@ SUBROUTINE flow_sim
            ! nonfluvial links also need q_old for
            ! transport
 
-
-           IF(linktype(link) == 6)THEN    ! hydropower plant
-              call bc_table_interpolate(hydrobc, linkbc_table(link), &
-                   &time/config%time%mult)
-              temp = bc_table_current(hydrobc, linkbc_table(link), 1)
-              bcval = bc_table_current(hydrobc, linkbc_table(link), 2)
-              bcval = bcval + temp ! total flow rate at the dam
-           ELSE ! other non-fluvial links
-              call bc_table_interpolate(linkbc, linkbc_table(link), &
-                   &time/config%time%mult)
-              bcval = bc_table_current(linkbc, linkbc_table(link), 1)
-           ENDIF
+           ! FIXME: test usbc association before using
            bcval = usbc(link)%p%current_value
 
            CALL nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
@@ -245,9 +217,6 @@ SUBROUTINE flow_sim
 
      IF (.NOT. ASSOCIATED(dcon(link)%p))THEN
 
-        call bc_table_interpolate(linkbc, dsbc_table(link), &
-             &time/config%time%mult)
-        bcval = bc_table_current(linkbc, dsbc_table(link), 1)
         bcval = dsbc(link)%p%current_value
         SELECT CASE(config%dsbc_type)
         CASE(1)
@@ -281,20 +250,12 @@ SUBROUTINE flow_sim
      DO point=maxpoints(link)-1,1,-1
 
         IF(linktype(link) == 2)THEN
-           call bc_table_interpolate(linkbc, linkbc_table(link), &
-                &time/config%time%mult)
-           bcval = bc_table_current(linkbc, linkbc_table(link), 1)
            bcval = usbc(link)%p%current_value
            dq = bcval - q(link,point)
            dy = (dq - f(link,point))/e(link,point)
 
         ELSEIF(linktype(link) == 6)THEN
 
-           call bc_table_interpolate(hydrobc, linkbc_table(link), &
-                &time/config%time%mult)
-           temp = bc_table_current(hydrobc, linkbc_table(link), 1)
-           bcval = bc_table_current(hydrobc, linkbc_table(link), 2)
-           bcval = bcval + temp ! total flow rate at the dam
            bcval = usbc(link)%p%current_value
 
            dq = bcval - q(link,point)

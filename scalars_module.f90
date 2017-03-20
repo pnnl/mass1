@@ -25,6 +25,8 @@
 !
 MODULE scalars
 
+USE bc_module
+
 IMPLICIT NONE
 
 INTEGER  :: max_species = 2
@@ -45,6 +47,8 @@ DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE, PRIVATE :: latq, latq_old
 
 DOUBLE PRECISION, PRIVATE, PARAMETER :: max_courant = 0.99
 DOUBLE PRECISION, PRIVATE, PARAMETER :: max_diffuse = 0.99
+
+TYPE (bc_ptr), PUBLIC, DIMENSION(:,:), ALLOCATABLE :: sclrbc, latsclrbc
 
 CONTAINS
 !#####################################################################################################
@@ -107,7 +111,10 @@ SUBROUTINE allocate_species(error_iounit,status_iounit)
        &area(maxlinks,maxpoint), area_old(maxlinks,maxpoint),&
        &q(maxlinks,maxpoint), q_old(maxlinks,maxpoint), &
        &y(maxlinks,maxpoint), y_old(maxlinks,maxpoint), &
-       &latq(maxlinks,maxpoint), latq_old(maxlinks,maxpoint), STAT = alloc_stat)
+       &latq(maxlinks,maxpoint), latq_old(maxlinks,maxpoint), &
+       &sclrbc(maxlinks, max_species), latsclrbc(maxlinks, max_species),&
+       &STAT = alloc_stat)
+
   IF(alloc_stat /= 0)THEN
      WRITE(error_iounit,*)'allocation failed for scalar hydrodynamic variables'
      CALL EXIT(1)
@@ -252,7 +259,7 @@ END SUBROUTINE tvd_interp
 ! species = 2 is Ave. Water Temperature
 ! 
 !----------------------------------------------------------------------------------
-SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
+SUBROUTINE tvd_transport(species_num, c, c_old)
 
   USE mass1_config
   USE transport_vars , ONLY : dxx
@@ -273,7 +280,6 @@ SUBROUTINE tvd_transport(species_num, c, c_old,status_iounit, error_iounit)
   IMPLICIT NONE
 
   INTEGER :: species_num
-  INTEGER :: status_iounit, error_iounit
   DOUBLE PRECISION :: c(:,0:), c_old(:,0:)
 
   INTEGER :: i,link,point

@@ -1,4 +1,24 @@
+2017-03-20  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* mass1_config.f90 (mass1_config): add do_hydro_bc to
+	configuration 
+
+	* scalars_module.f90 (scalars): add BC pointers for transported
+	scalars and allocate them (remove from modules.f90)
+
+2017-03-15  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* modules.f90 (link_vars): add BC pointer arrays for temperature
+	and TDG
+
+2017-03-13  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* kick_off.f90 (kick_off): assign (hydro) boundary conditions to
+	links 
+
 2017-03-10  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* flow_sim.f90 (flow_sim): remove use of bc_table_interpolate()
 
 	* test/CMakeLists.txt: include new test directory
 
