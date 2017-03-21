@@ -1,3 +1,11 @@
+2017-03-21  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* bc_module.f90 (hydro_bc_discharge): routine to split discharge
+	from hydro BC
+
+	* scalars_module.f90 (tvd_transport): switch out temperature
+	boundary conditions with BC pointers
+
 2017-03-20  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* mass1_config.f90 (mass1_config): add do_hydro_bc to

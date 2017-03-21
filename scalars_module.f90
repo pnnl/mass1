@@ -423,9 +423,9 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
         SELECT CASE(species_num)
         CASE(1) ! gas species
            IF(config%do_temp)THEN
-              IF((.NOT. ASSOCIATED(ucon(link)%p)) .AND. (tempbc_table(link) /= 0))THEN
-                 call bc_table_interpolate(tempbc, tempbc_table(link), time/config%time%mult)
-                 t_water = bc_table_current(tempbc, tempbc_table(link), 1)
+              IF ((.NOT. ASSOCIATED(ucon(link)%p)) .AND. &
+                   &ASSOCIATED(sclrbc(link, 2)%p)) THEN
+                 t_water = sclrbc(link, 2)%p%current_value
               ELSE
                  t_water = species(2)%conc(link,1)
               ENDIF
@@ -616,14 +616,10 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
            ENDIF
            
         CASE(2) ! temperature species
-           IF((.NOT. ASSOCIATED(ucon(link)%p)) .AND. (tempbc_table(link) /= 0))THEN
-              call bc_table_interpolate(tempbc, tempbc_table(link), time/config%time%mult)
-              c(link,point) = bc_table_current(tempbc, tempbc_table(link), 1)
-           ELSE IF((ASSOCIATED(ucon(link)%p)) .AND. (tempbc_table(link) == 0)) THEN! internal link
+           IF (ASSOCIATED(sclrbc(link, species_num)%p)) THEN
+              c(link, point) = sclrbc(link, species_num)%p%current_value
+           ELSE IF (ASSOCIATED(ucon(link)%p)) THEN
               c(link, point) = ucon(link)%p%conc(c)
-           ELSE IF((ASSOCIATED(ucon(link)%p)) .AND. (tempbc_table(link) /= 0)) THEN! internal link with table spec
-              call bc_table_interpolate(tempbc, tempbc_table(link), time/config%time%mult)
-              c(link,point) = bc_table_current(tempbc, tempbc_table(link), 1)
            ELSE 
               WRITE(*,*)'no temp BC specification for link',link,' -- ABORT'
               WRITE(99,*)'no temp BC specification for link',link,' -- ABORT'
@@ -757,12 +753,8 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
               avg_latq = (latq(link,point) + latq_old(link,point))/2.0
               IF (avg_latq < 0.0) THEN
                  upstream_c = c(link,point)
-              ELSE IF (species_num .EQ. 1 .AND. lattransbc_table(link) .GT. 0) THEN ! tdg
-                 call bc_table_interpolate(transbc, lattransbc_table(link), time/config%time%mult)
-                 upstream_c = bc_table_current(transbc, lattransbc_table(link), 1);
-              ELSE IF (species_num .EQ. 2 .AND. lattempbc_table(link) .GT. 0) THEN ! temperature
-                 call bc_table_interpolate(tempbc, lattempbc_table(link), time/config%time%mult)
-                 upstream_c = bc_table_current(tempbc, lattempbc_table(link), 1);
+              ELSE IF (ASSOCIATED(latsclrbc(link, species_num)%p)) THEN
+                 upstream_c = latsclrbc(link, species_num)%p%current_value
               ELSE 
                  upstream_c = c(link,point)
                  ! FIXME: should this be reported as an error?

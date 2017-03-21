@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created January 17, 2017 by William A. Perkins
-  ! Last Change: 2017-03-07 14:28:45 d3g096
+  ! Last Change: 2017-03-21 07:56:59 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE bc_module
@@ -135,6 +135,7 @@ MODULE bc_module
   END INTERFACE bc_manager_t
 
   PUBLIC :: new_bc_manager
+  PUBLIC :: hydro_bc_discharge
   
   TYPE (bc_manager_t), PUBLIC :: bc_manager
 
@@ -447,6 +448,27 @@ CONTAINS
     CALL this%bcs%clear()
   END SUBROUTINE bc_manager_destroy
 
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE hydro_bc_discharge
+  ! ----------------------------------------------------------------
+  SUBROUTINE hydro_bc_discharge(bc, qgen, qspill)
+    IMPLICIT NONE
+    CLASS (bc_t), POINTER, INTENT(IN) :: bc
+    DOUBLE PRECISION, INTENT(OUT) :: qgen, qspill
+    CLASS (hydro_bc_t), POINTER :: hbc
+
+    NULLIFY(hbc)
+    SELECT TYPE (bc) 
+    CLASS IS (hydro_bc_t)
+       hbc => bc
+       qgen = hbc%current_powerhouse
+       qspill = hbc%current_spill
+    CLASS DEFAULT
+       CALL error_message('hydro_bc_discharge: attempt to use a non-hydro BC', &
+            &fatal=.TRUE.)
+    END SELECT
+  END SUBROUTINE hydro_bc_discharge
 
 END MODULE bc_module
   
