@@ -73,7 +73,6 @@ DEALLOCATE(section_number, ptsection)
 
 DEALLOCATE(c)
 DEALLOCATE(dxx)
-DEALLOCATE(k_surf)
 DEALLOCATE(temp)
 
 !----------------------------------------------------------

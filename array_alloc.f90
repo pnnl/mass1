@@ -90,7 +90,6 @@ ALLOCATE(ucon(maxlinks), dcon(maxlinks))
 
 ALLOCATE(c(maxlinks,0:maxpoint+2))
 ALLOCATE(dxx(maxlinks,0:maxpoint+2))
-ALLOCATE(k_surf(maxlinks,maxpoint))
 ALLOCATE(temp(maxlinks,0:maxpoint+2))
 
 !----------------------------------------------------------

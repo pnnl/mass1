@@ -110,7 +110,6 @@ SUBROUTINE point_data
   USE mass1_config
   USE point_vars
   USE link_vars
-  USE transport_vars, ONLY : k_surf
   USE section_handler_module
 
   IMPLICIT NONE
@@ -141,10 +140,10 @@ SUBROUTINE point_data
         DO i=1,maxpoints(link)
            
            READ(iunit,*)junk,point,x(link,i),section_number(link,i),thalweg(link,i), &
-                manning(link,i),k_diff(link,i),k_surf(link,i)
+                manning(link,i),k_diff(link,i), surface_mass_trans
            
            WRITE(io_unit,*)link,point,x(link,i),section_number(link,i),thalweg(link,i), &
-                manning(link,i),k_diff(link,i),k_surf(link,i)
+                manning(link,i),k_diff(link,i), surface_mass_trans
            
            kstrick(link,i) = 1.0/manning(link,i)
            
@@ -173,9 +172,9 @@ SUBROUTINE point_data
      CASE(2)
         
         
-        READ(iunit,*)junk,length,start_el,end_el,sec_num,manning_n,diffusion,surface_mass_trans
+        READ(iunit,*)junk,length,start_el,end_el,sec_num,manning_n,diffusion, surface_mass_trans
         
-        WRITE(io_unit,*)link,length,start_el,end_el,sec_num,manning_n,diffusion,surface_mass_trans
+        WRITE(io_unit,*)link,length,start_el,end_el,sec_num,manning_n,diffusion, surface_mass_trans
         
         SELECT CASE(config%channel_length_units)
         CASE(CHANNEL_FOOT) ! length is in feet
@@ -213,7 +212,6 @@ SUBROUTINE point_data
            manning(link,i) = manning_n
            kstrick(link,i) = 1.0/manning_n
            k_diff(link,i) = diffusion
-           k_surf(link,i) = surface_mass_trans
            
            ptsection(link, i)%p => sections%find(section_number(link, i))
            IF (.NOT. ASSOCIATED(ptsection(link, i)%p)) THEN

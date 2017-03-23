@@ -97,7 +97,7 @@ END MODULE fluvial_coeffs
 !---------------------------------------------------------
 MODULE transport_vars
 
-  DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE, SAVE :: c,k_surf
+  DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE, SAVE :: c
   DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE, SAVE :: dxx
   DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE, SAVE :: temp
 

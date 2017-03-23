@@ -791,12 +791,6 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
               c(link,point) = c(link,point) + &
                    &metzone(link)%p%gas_exchange(t_water, c(link, point), salinity)* &
                    &width(link,point)*delta_t/area(link,point)
-              ! ccstar  = TDGasConc(baro_press, t_water, salinity) !c* will be conc at baro press
-              ! transfer_coeff = gasx_a + gasx_b*windspeed + gasx_c*windspeed**2 + gasx_d*windspeed**3
-              ! transfer_coeff = transfer_coeff*3.2808/86400.0
-              ! !c(link,point) = c(link,point) + k_surf(link,point)*(100.0 - c(link,point))*delta_t
-              ! c(link,point) = c(link,point) + &
-              !      transfer_coeff*(ccstar - c(link,point))*width(link,point)*delta_t/area(link,point)
               IF(c(link,point) < 0.0) c(link,point) = 0.0
            END DO
            c(link,maxpoints(link)) = c(link,maxpoints(link)-1)
