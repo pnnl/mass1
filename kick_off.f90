@@ -160,6 +160,10 @@ SUBROUTINE kick_off
   IF (ierr .GT. 0) THEN
      CALL error_message("Too many errors assigning BCs", fatal=.TRUE.)
   END IF
+
+  ! need to do this for PID link initialization
+  CALL bc_manager%update(config%time%begin/config%time%mult)
+
   CALL read_pidlink_info()
   CALL pidlink_initialize()
 

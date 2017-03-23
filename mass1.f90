@@ -118,12 +118,10 @@ PROGRAM mass1
   IF (config%do_hydro_bc) THEN
      CALL bc_manager%read(HYDRO_BC_TYPE, config%hydrobc_file)
   END IF
-  CALL link_bc
   IF(config%debug_print)WRITE(11,*)'link BC data done'
 
   IF(config%do_latflow)THEN
      CALL bc_manager%read(LATFLOW_BC_TYPE, config%lateral_file)
-     CALL latflow_bc
      IF(config%debug_print)WRITE(11,*)'lateral inflow BC data done'
   ENDIF
 
@@ -137,7 +135,6 @@ PROGRAM mass1
   IF(config%do_gas)THEN
      CALL bc_manager%read(TRANS_BC_TYPE, config%transbc_file)
      species_num = 1
-     CALL transport_bc(species_num)
      IF(config%debug_print) WRITE(11,*)'done reading gas transport table'
      CALL allocate_tdg_coeff(config%maxlinks,utility_status_iounit, utility_error_iounit)
      ! read tdg spill coefficient tables
@@ -159,7 +156,6 @@ PROGRAM mass1
   IF(config%do_temp)THEN
      CALL bc_manager%read(TEMP_BC_TYPE, config%tempbc_file)
      species_num = 2
-     CALL transport_bc(species_num)
      IF(config%debug_print) WRITE(11,*)'done reading temp transport table'
   ENDIF
 

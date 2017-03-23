@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2017-03-10 09:25:33 d3g096
+! Last Change: 2017-03-21 13:53:44 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE mass1_config
@@ -114,6 +114,7 @@ MODULE mass1_config
      CHARACTER(LEN=path_length) :: gage_file
      CHARACTER(LEN=path_length) :: profile_file
      CHARACTER(LEN=path_length) :: lateral_file
+     CHARACTER(LEN=path_length) :: pid_file
    CONTAINS
      PROCEDURE :: read => configuration_read
   END type configuration_t
@@ -422,6 +423,9 @@ CONTAINS
 
     READ(iunit,*,ERR=110) this%lateral_file
     line = line + 1
+
+    ! FIXME: add to configuration file
+    this%pid_file = "pidlink.dat"
 
     READ(iunit,*,ERR=110) this%time%date_run_begins
     line = line + 1

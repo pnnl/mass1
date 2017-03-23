@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October 10, 2001 by William A. Perkins
-! Last Change: 2017-02-21 12:26:20 d3g096
+! Last Change: 2017-03-21 13:53:23 d3g096
 ! ----------------------------------------------------------------
 
 
@@ -23,9 +23,9 @@
 MODULE pidlink
 
   USE mass1_config
+  USE bc_module
 
   IMPLICIT NONE
-  CHARACTER (LEN=80), PARAMETER, PRIVATE :: default_filename = "pidlink.dat"
   INTEGER, PARAMETER, PRIVATE :: maxlags = 5
 
   ! ----------------------------------------------------------------
@@ -37,7 +37,7 @@ MODULE pidlink
                                 ! if usebc is .TRUE. the value of link
                                 ! represents a link BC table rather
                                 ! than a link
-     LOGICAL :: usebc
+     CLASS (bc_t), POINTER :: bc
 
                                 ! link identifies where to get the
                                 ! flow from (point 1) and lag is the
@@ -82,7 +82,7 @@ CONTAINS
     USE utility
     USE mass1_config
     USE link_vars, ONLY: linktype
-    USE bctable
+    USE bc_module
 
     IMPLICIT NONE
 
@@ -94,7 +94,7 @@ CONTAINS
     INTEGER :: iounit
     CHARACTER (LEN=1024) :: msg
 
-    fname = default_filename
+    fname = config%pid_file
     iounit = 33
 
                                 ! determine the number of pid type
@@ -187,11 +187,11 @@ CONTAINS
                                 ! identify and check the specified link
 
           laglink = INT(lagvalues(i*2 - 1))
-          piddata(l)%lagged(i)%usebc = .FALSE.
+          NULLIFY(piddata(l)%lagged(i)%bc)
           IF (laglink .LT. 0) THEN
              laglink = -laglink
-             piddata(l)%lagged(i)%usebc = .TRUE.
-             IF (.NOT. bc_table_id_ok(linkbc, laglink)) THEN
+             piddata(l)%lagged(i)%bc => bc_manager%find(LINK_BC_TYPE, laglink)
+             IF (.NOT. ASSOCIATED(piddata(l)%lagged(i)%bc)) THEN
                 WRITE(msg, *) 'error reading pidlink coefficient file ', TRIM(fname), &
                      &': link ', link, 'uses lagged flow from invalid link BC ', laglink
                 CALL error_message(msg, fatal=.TRUE.)
@@ -230,7 +230,7 @@ CONTAINS
           piddata(l)%lagged(i)%nlag = 0
           nullify(piddata(l)%lagged(i)%flow)
 
-          IF (piddata(l)%lagged(i)%usebc) THEN
+          IF (ASSOCIATED(piddata(l)%lagged(i)%bc)) THEN
              WRITE (99,*) '     Link Boundary Condition #', piddata(l)%lagged(i)%link, &
                   &' lagged ', piddata(l)%lagged(i)%lag, ' days'
           ELSE
@@ -266,7 +266,6 @@ CONTAINS
 
     USE general_vars, ONLY: time ! , time_step, time_mult
     USE point_vars, ONLY: q
-    USE bctable
     IMPLICIT NONE
     TYPE (pidlink_rec), POINTER :: rec
 
@@ -291,9 +290,8 @@ CONTAINS
                                 ! sure that stages were specified as
                                 ! BC's
 
-          IF (rec%lagged(i)%usebc) THEN
-             call bc_table_interpolate(linkbc, rec%lagged(i)%link, time/config%time%mult)
-             rec%lagged(i)%flow = bc_table_current(linkbc, rec%lagged(i)%link, 1)
+          IF (ASSOCIATED(rec%lagged(i)%bc)) THEN
+             rec%lagged(i)%flow = rec%lagged(i)%bc%current_value
           ELSE
              rec%lagged(i)%flow(rec%lagged(i)%nlag) = q(rec%lagged(i)%link, 1)
           END IF
@@ -311,9 +309,8 @@ CONTAINS
   ! ----------------------------------------------------------------
   SUBROUTINE pidlink_initialize()
 
-    USE link_vars, ONLY: linkbc_table
+    USE link_vars
     USE point_vars, ONLY: q
-    USE bctable
 
     IMPLICIT NONE
 
@@ -326,9 +323,7 @@ CONTAINS
        rec => piddata(j)
        link = rec%link
        rec%errsum = 0.0
-       call bc_table_interpolate(linkbc, linkbc_table(link), &
-            &config%time%begin/config%time%mult)
-       rec%oldsetpt = bc_table_current(linkbc, linkbc_table(link), 1)
+       rec%oldsetpt = usbc(link)%p%current_value
        
        DO i = 1, rec%numflows
 
@@ -345,10 +340,8 @@ CONTAINS
                                 ! conditions (we should have made sure
                                 ! that stages were specified as BC's)
 
-          IF (rec%lagged(i)%usebc) THEN
-             call bc_table_interpolate(linkbc, rec%lagged(i)%link, &
-                  &config%time%begin/config%time%mult)
-             rec%lagged(i)%flow = bc_table_current(linkbc, rec%lagged(i)%link, 1)
+          IF (ASSOCIATED(rec%lagged(i)%bc)) THEN
+             rec%lagged(i)%flow = rec%lagged(i)%bc%current_value
           ELSE
              rec%lagged(i)%flow = q(rec%lagged(i)%link, 1)
           END IF

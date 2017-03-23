@@ -263,9 +263,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
 
   USE mass1_config
   USE transport_vars , ONLY : dxx
-  USE link_vars, ONLY : maxpoints, comporder, linktype, &
-       &linkbc_table, metzone, tempbc_table, transbc_table, &
-       &lattempbc_table, lattransbc_table
+  USE link_vars
   USE point_vars, ONLY: x, k_diff, thalweg
   USE bctable
 
@@ -296,6 +294,8 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
 
   DOUBLE PRECISION :: time, delta_t
 
+  CHARACTER (LEN=256) :: msg
+
   time = scalar_time
   delta_t = scalar_delta_t
   
@@ -316,26 +316,49 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
         fluvial = .FALSE.
         nonfluvial = .TRUE.
      END SELECT
+
+     ! special things required by TDG
+     SELECT CASE (species_num)
+     CASE (1)
+
+        ! get the upstream temperature, if available
+        IF(config%do_temp)THEN
+           IF ((.NOT. ASSOCIATED(ucon(link)%p)) .AND. &
+                &ASSOCIATED(sclrbc(link, 2)%p)) THEN
+              t_water = sclrbc(link, 2)%p%current_value
+           ELSE
+              t_water = species(2)%conc(link,1) ! FIXME
+           ENDIF
+        ENDIF
+
+        ! have a reasonable value for barometric pressure
+        IF (config%met_required) THEN
+           baro_press = metzone(link)%p%current%bp
+        ELSE 
+           baro_press = 760.0
+        END IF
+
+     END SELECT
+
      !----------------------------------------------------------------------------
      !do nonfluvial first just pass through concentrations
      ! 
      !IF(linktype(link) /= 1 )THEN
      IF( nonfluvial )THEN
         point = 1
+
+        ! FIXME: check association first
         c(link,point) = ucon(link)%p%conc(c)
         
         IF((linktype(i) == 6) .AND. (species_num == 1))THEN
            
-           call bc_table_interpolate(hydrobc, linkbc_table(link), time/config%time%mult)
-           qgen = bc_table_current(hydrobc, linkbc_table(link), 1)
-           qspill = bc_table_current(hydrobc, linkbc_table(link), 2)
-           
-           IF (config%met_required) THEN
-              baro_press = metzone(link)%p%current%bp
+           IF (ASSOCIATED(usbc(link)%p)) THEN
+              CALL hydro_bc_discharge(usbc(link)%p, qgen, qspill)
            ELSE 
-              baro_press = 760.0
+              WRITE(msg, *) 'Link ', link, ' requires a upstream hydro BC'
+              CALL error_message(msg, fatal=.TRUE.)
            END IF
-           IF(config%do_temp) t_water = species(2)%conc(link,2)
+
            IF(qspill > 0.0)THEN
               !                 equations are for %Sat and effective Spill Q in Kcfs
               !                 Qspill is in effective KCFS = Qspill + qgen_frac*Qgen
@@ -422,32 +445,24 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
         
         SELECT CASE(species_num)
         CASE(1) ! gas species
-           IF(config%do_temp)THEN
-              IF ((.NOT. ASSOCIATED(ucon(link)%p)) .AND. &
-                   &ASSOCIATED(sclrbc(link, 2)%p)) THEN
-                 t_water = sclrbc(link, 2)%p%current_value
-              ELSE
-                 t_water = species(2)%conc(link,1)
-              ENDIF
-           ENDIF
-           
-           IF((.NOT. ASSOCIATED(ucon(link)%p)) .AND. (transbc_table(link) /= 0))THEN
+           IF ((.NOT. ASSOCIATED(ucon(link)%p)) .AND. &
+                &ASSOCIATED(sclrbc(link, species_num)%p)) THEN
+              upstream_c = sclrbc(link, species_num)%p%current_value
+              
               SELECT CASE(linktype(link))
               CASE(1)
-                 call bc_table_interpolate(transbc, transbc_table(link), time/config%time%mult)
-                 c(link,point) = bc_table_current(transbc, transbc_table(link), 1)
+                 c(link,point) = upstream_c
 
               CASE(20) ! %TDG Saturation is specified
-                 call bc_table_interpolate(transbc, transbc_table(link), time/config%time%mult)
-                 upstream_c = bc_table_current(transbc, transbc_table(link), 1)
                  c(link,point) = TDGasConcfromSat(upstream_c, t_water, salinity, baro_press)
-                 
-                 
-                 !-------------------------------------------------------------------
+
               CASE(21) ! Hydro project inflow link
-                 call bc_table_interpolate(hydrobc, linkbc_table(link), time/config%time%mult)
-                 qgen = bc_table_current(hydrobc, linkbc_table(link), 1)
-                 qspill = bc_table_current(hydrobc, linkbc_table(link), 2)
+                 IF (ASSOCIATED(usbc(link)%p)) THEN
+                    CALL hydro_bc_discharge(usbc(link)%p, qgen, qspill)
+                 ELSE 
+                    WRITE(msg, *) 'Link ', link, ' requires a upstream hydro BC'
+                    CALL error_message(msg, fatal=.TRUE.)
+                 END IF
 
                  IF(qspill > 0.0)THEN
                     
@@ -493,8 +508,6 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
                  hydro_spill(link) = qspill
                  hydro_disch(link) = q(link, 1)
 
-                 call bc_table_interpolate(transbc, transbc_table(link), time/config%time%mult)
-                 upstream_c = bc_table_current(transbc, transbc_table(link), 1)
                  upstream_c = TDGasConcfromSat(upstream_c, t_water, salinity, baro_press)
                  
                  IF (qspill + qgen .gt. 0.0) THEN
@@ -510,26 +523,28 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
               END SELECT
            !
            ! pure internal connection between fluvial links - just mix and pass through
-           ELSE IF ((ASSOCIATED(ucon(link)%p)) .AND. (transbc_table(link) == 0)) THEN
+           ELSE IF ((ASSOCIATED(ucon(link)%p)) .AND. &
+                & (.NOT. ASSOCIATED(sclrbc(link, species_num)%p))) THEN
               c(link,point) = ucon(link)%p%conc(c)
            
            ! internal fluvial link that has an active table BC
-           ELSE IF ((ASSOCIATED(ucon(link)%p)) .AND. (transbc_table(link) /= 0)) THEN ! internal link with table spec
-              
+           ELSE IF ((ASSOCIATED(ucon(link)%p)) .AND. &
+                &(ASSOCIATED(sclrbc(link, species_num)%p))) THEN ! internal link with table spec
+              upstream_c = sclrbc(link, species_num)%p%current_value
               SELECT CASE(linktype(link))
               CASE(1) ! % internal C (mg/L) specified
-                 call bc_table_interpolate(transbc, transbc_table(link), time/config%time%mult)
-                 c(link,point) = bc_table_current(transbc, transbc_table(link), 1)
+                 c(link,point) = upstream_c
                  
               CASE(20) ! internal %TDG Saturation is specified
-                 call bc_table_interpolate(transbc, transbc_table(link), time/config%time%mult)
-                 upstream_c = bc_table_current(transbc, transbc_table(link), 1)
                  c(link,point) = TDGasConcfromSat(upstream_c, t_water, salinity, baro_press)
                               
               CASE(21) ! Hydro project inflow for an internal link
-                 call bc_table_interpolate(hydrobc, linkbc_table(link), time/config%time%mult)
-                 qgen = bc_table_current(hydrobc, linkbc_table(link), 1)
-                 qspill = bc_table_current(hydrobc, linkbc_table(link), 2)
+                 IF (ASSOCIATED(usbc(link)%p)) THEN
+                    CALL hydro_bc_discharge(usbc(link)%p, qgen, qspill)
+                 ELSE 
+                    WRITE(msg, *) 'Link ', link, ' requires a upstream hydro BC'
+                    CALL error_message(msg, fatal=.TRUE.)
+                 END IF
                  
                  IF(qspill > 0.0)THEN
                     
@@ -551,18 +566,21 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
                     
                     SELECT CASE(gas_eqn_type(link))
                     CASE(0)
-                       call bc_table_interpolate(transbc, transbc_table(link), time/config%time%mult)
-                       c(link,point) = bc_table_current(transbc, transbc_table(link), 1)
+                       c(link,point) = upstream_c
                        hydro_conc(link) = c(link,point)
-                       hydro_sat(link) = TDGasSaturation(hydro_conc(link), t_water, salinity, baro_press)
+                       hydro_sat(link) = &
+                            &TDGasSaturation(hydro_conc(link), t_water, salinity, baro_press)
                     CASE(1)
-                       call bc_table_interpolate(transbc, transbc_table(link), time/config%time%mult)
-                       tdg_saturation = bc_table_current(transbc, transbc_table(link), 1)
-                       hydro_conc(link) = c(link,point)
+                       tdg_saturation = upstream_c
+                       c(link,point) = &
+                            &TDGasConcfromSat(tdg_saturation, t_water, salinity, baro_press)
                        hydro_sat(link) = tdg_saturation
+                       hydro_conc(link) = c(link,point)
                     CASE(2)
-                       tdg_saturation = a_gas(link) + b_gas(link)*qspill/1000.0 + c_gas(link)*(qspill/1000.0)**2 
-                       c(link,point) = TDGasConcfromSat(tdg_saturation, t_water, salinity, baro_press)
+                       tdg_saturation = a_gas(link) + b_gas(link)*qspill/1000.0 + &
+                            &c_gas(link)*(qspill/1000.0)**2 
+                       c(link,point) = &
+                            &TDGasConcfromSat(tdg_saturation, t_water, salinity, baro_press)
                        hydro_conc(link) = c(link,point)
                        hydro_sat(link) = tdg_saturation
                     CASE(3)

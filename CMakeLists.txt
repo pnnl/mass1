@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2017-03-06 14:22:45 d3g096
+# Last Change: 2017-03-22 14:20:06 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -103,7 +103,6 @@ set(mass1src
   array_dealloc.f90
   "${CMAKE_CURRENT_BINARY_DIR}/banner.f90"
   bc_module.f90
-  bctable.f90
   coeff.f90
   cross_section.f90
   confluence_module.f90
@@ -113,9 +112,7 @@ set(mass1src
   hydro_output.f90
   initial_cond.f90
   kick_off.f90
-  latflow_bc.f90
   linear_interp.f90
-  link_bc.f90
   link_data.f90
   mass1.f90
   mass1_config.f90
@@ -131,7 +128,6 @@ set(mass1src
   section_handler.f90
   svgrp.f90
   tdg_equation_coeff.f90
-  trans_bc.f90
   write_restart.f90
 )
 

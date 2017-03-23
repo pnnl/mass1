@@ -1,3 +1,18 @@
+2017-03-23  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* scalars_module.f90 (tvd_transport): use BC pointers instead of
+	bctable: temperature works, TDG maybe not
+
+	* pidlink.f90: use bc_manager and BC pointers instead of bctable 
+
+	* mass1_config.f90 (mass1_config): add pid_file 
+
+	* mass1.f90 (mass1): don't read BCs w/ bctable code
+
+	* kick_off.f90 (kick_off): need to update BCs here
+
+	* CMakeLists.txt: remove bctable code
+
 2017-03-21  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* bc_module.f90 (hydro_bc_discharge): routine to split discharge
