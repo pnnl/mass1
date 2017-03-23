@@ -25,6 +25,7 @@
 !
 MODULE scalars
 
+USE utility
 USE bc_module
 
 IMPLICIT NONE
@@ -265,8 +266,6 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
   USE transport_vars , ONLY : dxx
   USE link_vars
   USE point_vars, ONLY: x, k_diff, thalweg
-  USE bctable
-
   
   USE energy_flux
   USE tdg_equation_coeff

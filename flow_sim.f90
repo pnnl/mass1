@@ -50,7 +50,6 @@ SUBROUTINE flow_sim
   USE mass1_config
   USE general_vars
   USE link_vars
-  USE bctable
   USE point_vars
   USE fluvial_coeffs
   USE flow_coeffs
