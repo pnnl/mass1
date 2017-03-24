@@ -14,7 +14,15 @@ cross-section location along the river course. Lateral (i.e., across
 the river channel) and vertical variations of these quantities are not
 simulated.  
 
-MASS1 was developed by Pacific Northwest National Laboratory (PNNL).
+MASS1 was developed by Pacific Northwest National Laboratory
+(PNNL). It is a research code, written for applications and computer
+platforms specific to the developers.  Others may, or may not,
+find it useful.  
+
+MASS1 is a *command line* application. There is no graphical user
+interface.  [Input and output](doc/README.md) are plain text files.
+There is very little [documentation](doc/README.md), other than the
+code itself.  There is *no user support*.  
 
 ## Obtaining the Code
 
@@ -113,9 +121,5 @@ Similarly, for the Intel Fortran compiler:
 
 ## Usage
 
-MASS1 is a research code. It is a *command line* application. There is
-no graphical user interface.  [Input and output](doc/README.md) are
-plain text files.  There is very little
-[documentation](doc/README.md). 
 
 
