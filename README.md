@@ -111,5 +111,11 @@ Similarly, for the Intel Fortran compiler:
 ./configure FC=ifort FCFLAGS="-O3 -fpe0"
 ```
 
+## Usage
+
+MASS1 is a research code. It is a *command line* application. There is
+no graphical user interface.  [Input and output](doc/README.md) are
+plain text files.  There is very little
+[documentation](doc/README.md). 
 
 
