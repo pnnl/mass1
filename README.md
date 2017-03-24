@@ -14,7 +14,15 @@ cross-section location along the river course. Lateral (i.e., across
 the river channel) and vertical variations of these quantities are not
 simulated.  
 
-MASS1 was developed by Pacific Northwest National Laboratory (PNNL).
+MASS1 was developed by Pacific Northwest National Laboratory
+(PNNL). It is a research code, written for applications and computer
+platforms specific to the developers.  Others may, or may not,
+find it useful.  
+
+MASS1 is a *command line* application. There is no graphical user
+interface.  [Input and output](doc/README.md) are plain text files.
+There is very little [documentation](doc/README.md), other than the
+code itself.  There is *no user support*.  
 
 ## Obtaining the Code
 
@@ -31,6 +39,13 @@ git submodule update --init
 
 ## Requirements
 
+MASS1 has been used primarily on UNIX, Linux, and Mac OS X
+systems. The following describes how to build MASS1 on those
+platforms.  It has been built and used on Windows systems, but rarely.
+The following should work on Windows if [Cygwin](https://cygwin.com/)
+or [MinGW](http://www.mingw.org/) is utilized.  A native Windows build
+may be available in the future. 
+
 ### Fortran 2003 compiler
 
 MASS1 is written in Fortran and makes use of several
@@ -43,6 +58,13 @@ known to work:
 
 * [Intel Fortran](https://software.intel.com/en-us/fortran-compilers),
   Version 14 or higher 
+
+In general, the Intel compiler produces a faster executable, but for
+most applications, this is not noticable. In the past, Fortran
+compilers from [NAG](https://www.nag.com/nag-compiler),
+[Absoft](https://www.absoft.com/),
+[IBM](http://www-03.ibm.com/software/products/en/xlfortran-linux), and
+others have worked.  
 
 ## Optional Software
 
@@ -103,6 +125,8 @@ FC=gfortran
 export FC
 cmake -D CMAKE_BUILD_TYPE:STRING=Release ..
 ```
+
+## Usage
 
 
 
