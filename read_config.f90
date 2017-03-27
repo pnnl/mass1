@@ -54,7 +54,7 @@ SUBROUTINE read_config
   READ(10,1000, ERR=110) msg
   line = line + 1
 1000 FORMAT(a100)
-  WRITE(*,*) msg
+  WRITE(*,*) TRIM(msg)
 
   READ(10,*, ERR=110)dumlog
   line = line + 1

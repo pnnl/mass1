@@ -1,3 +1,9 @@
+2017-03-27  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* read_config.f90 (read_config): better output format
+
+	* link_data.f90 (link_data): fix badly place ELSE IF
+
 2017-02-28  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* scripts/read.R: add script to read MASS1 time series and BC files
