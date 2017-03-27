@@ -88,7 +88,8 @@ SUBROUTINE link_data
            WRITE(msg, *) "Link ", link, ": lateral inflow specified without transport (gas) values"
            CALL error_message(msg, .FALSE.)
         END IF
-     ELSE IF (config%do_latflow .AND. config%do_temp) THEN
+     END IF
+     IF (do_latflow .AND. do_temp) THEN
         IF (latflowbc_table(link) .NE. 0 .AND. lattempbc_table(link) .EQ. 0) THEN
            WRITE(msg, *) "Link ", link, ": lateral inflow specified without transport (temp) values"
            CALL error_message(msg, .FALSE.)
