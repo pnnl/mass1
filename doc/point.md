@@ -14,7 +14,7 @@ Field | Type | Description | Typical Units
 1 | int | Link identifier |
 2 | int | Point index |
 3 | real | Point location | feet, mile
-3 | int | Section identifier
+3 | int | Cross-section identifier
 4 | real | Thalweg elevation | feet
 5 | real | Manning's roughness coefficient |
 6 | real | Longitudinal dispersion coefficient | ft<sup>2</sup>/s
@@ -33,7 +33,7 @@ Field | Type | Description | Typical Units
 2 | real | Length | feet, mile
 3 | real | Upstream elevation | feet
 4 | real | Downstream elevation | feet
-5 | int | Section identifier
+5 | int | Cross-section identifier
 5 | real | Manning's roughness coefficient |
 6 | real | Longitudinal dispersion coefficient | ft<sup>2</sup>/s
 7 | real | ~~Surface transfer coefficient~~ |
