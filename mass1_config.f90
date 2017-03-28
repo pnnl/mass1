@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2017-03-21 13:53:44 d3g096
+! Last Change: 2017-03-28 14:25:32 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE mass1_config
@@ -68,7 +68,7 @@ MODULE mass1_config
        ! PROCEDURE internal 
     END type time_frame_t
 
-  INTEGER, PARAMETER, PRIVATE :: path_length = 1024
+  INTEGER, PARAMETER, PUBLIC :: path_length = 1024
 
   TYPE, PUBLIC :: configuration_t
      CHARACTER(LEN=256) :: config_version

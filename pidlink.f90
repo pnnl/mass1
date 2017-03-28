@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October 10, 2001 by William A. Perkins
-! Last Change: 2017-03-21 13:53:23 d3g096
+! Last Change: 2017-03-28 13:37:18 d3g096
 ! ----------------------------------------------------------------
 
 
@@ -264,7 +264,6 @@ CONTAINS
   ! ----------------------------------------------------------------
   SUBROUTINE pidlink_assemble_lagged()
 
-    USE general_vars, ONLY: time ! , time_step, time_mult
     USE point_vars, ONLY: q
     IMPLICIT NONE
     TYPE (pidlink_rec), POINTER :: rec

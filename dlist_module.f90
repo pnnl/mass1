@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 21, 2017 by William A. Perkins
-! Last Change: 2017-02-22 08:18:04 d3g096
+! Last Change: 2017-03-28 14:11:31 d3g096
 ! ----------------------------------------------------------------
 MODULE dlist_module
 
@@ -34,10 +34,14 @@ MODULE dlist_module
   TYPE, PUBLIC :: dlist
      TYPE (dlist_node), POINTER :: head
      TYPE (dlist_node), POINTER :: tail
+     TYPE (dlist_node), POINTER :: cursor
    CONTAINS 
      PROCEDURE, NON_OVERRIDABLE :: size => dlist_size
+     PROCEDURE, NON_OVERRIDABLE :: begin => dlist_begin
+     PROCEDURE, NON_OVERRIDABLE :: next => dlist_next
      PROCEDURE, NON_OVERRIDABLE :: genpush => dlist_push
      PROCEDURE, NON_OVERRIDABLE :: genpop => dlist_pop
+     PROCEDURE, NON_OVERRIDABLE :: gencurrent => dlist_current
      PROCEDURE :: clear => dlist_clear
   END type dlist
 
@@ -134,6 +138,44 @@ CONTAINS
     END DO
   END SUBROUTINE dlist_clear
 
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE dlist_begin
+  ! ----------------------------------------------------------------
+  SUBROUTINE dlist_begin(this)
+
+    IMPLICIT NONE
+    CLASS (dlist), INTENT(INOUT) :: this
+
+    this%cursor = this%head
+  END SUBROUTINE dlist_begin
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE dlist_next
+  ! ----------------------------------------------------------------
+  SUBROUTINE dlist_next(this)
+    IMPLICIT NONE
+    CLASS (dlist), INTENT(INOUT) :: this
+    
+    IF (ASSOCIATED(this%cursor)) THEN
+       this%cursor => this%cursor%next
+    END IF
+  END SUBROUTINE dlist_next
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION dlist_current
+  ! ----------------------------------------------------------------
+  FUNCTION dlist_current(this) RESULT(data)
+    IMPLICIT NONE
+    CLASS (*), POINTER :: data
+    CLASS (dlist), INTENT(INOUT) :: this
+    
+    NULLIFY(data)
+    IF (ASSOCIATED(this%cursor)) THEN
+       data => this%cursor%data
+    END IF
+  END FUNCTION dlist_current
+
+
 
   ! ----------------------------------------------------------------
   !  FUNCTION new_dlist
@@ -146,6 +188,7 @@ CONTAINS
   END FUNCTION new_dlist
 
 
+  
 
 END MODULE dlist_module
 

@@ -1,4 +1,20 @@
-<<<<<<< HEAD
+2017-03-28  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* dlist_module.f90 (dlist_module): add a cursor to dlist, with
+	some routines to manipulate it
+
+	* gage_output.f90 (gage_output_module): Add
+	(gage_output): simplify with a gage_t type
+
+	* mass1_config.f90 (mass1_config): make path_length public
+
+	* pidlink.f90 (pidlink_assemble_lagged): remove extraneous USE 
+
+2017-03-27  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* read_config.f90 (read_config): better output format
+
+	* link_data.f90 (link_data): fix badly place ELSE IF
 2017-03-23  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* scalars_module.f90 (tvd_transport): use BC pointers instead of
@@ -54,13 +70,6 @@
 
 	* modules.f90 (link_vars): add flag to indicate hydro BCs are
 	needed 
-=======
-2017-03-27  William A. Perkins  <william.perkins@pnnl.gov>
-
-	* read_config.f90 (read_config): better output format
-
-	* link_data.f90 (link_data): fix badly place ELSE IF
->>>>>>> 006af21ac8c74506f00e51ffadd16bdcff160de8
 
 2017-02-28  William A. Perkins  <william.perkins@pnnl.gov>
 

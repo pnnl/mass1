@@ -24,100 +24,148 @@
 !***************************************************************
 !
 
-SUBROUTINE gage_output
+! ----------------------------------------------------------------
+! MODULE gage_output_module
+! ----------------------------------------------------------------
+MODULE gage_output_module
 
   USE utility
   USE mass1_config
+  IMPLICIT NONE
+
+  PRIVATE
+
+  TYPE, PUBLIC :: gage_t
+     CHARACTER (LEN=256) :: fname
+     CHARACTER (LEN=256) :: gname
+     INTEGER :: link, point
+   CONTAINS
+     PROCEDURE :: output => gage_name
+  END type gage_t
+
+  INTERFACE gage_t
+     MODULE PROCEDURE new_gage_t
+  END INTERFACE gage_t
+
+  INTEGER, PUBLIC :: num_gages
+  TYPE (gage_t), PUBLIC, DIMENSION(:), ALLOCATABLE :: gages
+
+  PUBLIC gage_output_read
+
+CONTAINS
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION new_gage_t
+  ! ----------------------------------------------------------------
+  FUNCTION new_gage_t()
+
+    IMPLICIT NONE
+    TYPE (gage_t) :: new_gage_t
+    new_gage_t%fname = ""
+    new_gage_t%gname = ""
+    new_gage_t%link = 0
+    new_gage_t%point = 0
+  END FUNCTION new_gage_t
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION gage_name
+  ! ----------------------------------------------------------------
+  FUNCTION gage_name(this) RESULT (oname)
+
+    IMPLICIT NONE
+    CHARACTER (LEN=path_length) :: oname
+    CLASS (gage_t), INTENT(INOUT) :: this
+    CHARACTER (LEN=80) :: string1, string2
+
+    IF (LEN(TRIM(this%fname)) .LE. 0) THEN
+       this%fname = ''
+       WRITE(string1,*) this%link
+       WRITE(string2,*) this%point
+       string1 = ADJUSTL(string1)
+       string2 = ADJUSTL(string2)
+
+       this%fname = 'ts' // TRIM(string1) // TRIM(string2) // '.out'
+    END IF
+    oname = this%fname
+  END FUNCTION gage_name
+
+  
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE gage_output_read
+  ! ----------------------------------------------------------------
+  SUBROUTINE gage_output_read()
+
+    IMPLICIT NONE
+    INTEGER, PARAMETER :: gcunit = 33, gunit = 51
+    INTEGER :: count, link, point
+    INTEGER :: i
+
+    count=0
+    CALL open_existing(config%gage_file, gcunit, fatal=.TRUE.)
+
+    DO WHILE(.TRUE.)
+       READ(gcunit,*, END=100) link, point
+       count=count+1   
+    END DO
+100 CONTINUE
+    REWIND(gcunit)
+
+    num_gages=count
+    ALLOCATE(gages(num_gages))
+
+    DO i=1,num_gages
+       gages(i) = gage_t()
+       READ(gcunit,*, END=100) link, point
+       gages(i)%link = link
+       gages(i)%point = point
+       gages(i)%fname = ""
+
+       OPEN(gunit, file=gages(i)%output())
+       WRITE(gunit,1005)
+1005   FORMAT('#',1x,'date',8x,'time',5x,'water elev',2x,'discharge',5x,'vel',4x,'depth', &
+            7x,'conc',4x,'temp' ,2x,'%Sat',3x,'TDG P', &
+            4x,'thalweg el',2x,'area ',2x,'top width',2x,'hyd rad',2x,'Fr #',2x,'frict slope', &
+            2x,'bed shear')
+
+       CLOSE(gunit)
+    END DO
+    CLOSE(gcunit)
+  END SUBROUTINE gage_output_read
+
+END MODULE gage_output_module
+
+
+SUBROUTINE gage_output
+
+  USE gage_output_module
   USE link_vars
   USE point_vars
   USE transport_vars
-
   USE scalars
   USE gas_functions
-
   USE hydro_output_module
   USE accumulator
   USE date_time
 
   IMPLICIT NONE
 
-  INTEGER, PARAMETER :: gcunit = 33, gunit = 51
+  INTEGER, PARAMETER :: gunit = 51
 
   DOUBLE PRECISION :: depth, tdg_sat, tdg_press
   DOUBLE PRECISION :: salinity = 0.0
   INTEGER :: i,link,point,count=0
-  INTEGER, SAVE :: num_gages
-  INTEGER, ALLOCATABLE, SAVE :: gage_link(:), gage_point(:)
   INTEGER :: len1,len2,spot1,spot2
-  CHARACTER (LEN=256) fname,string1,string2
-  CHARACTER (LEN=256), ALLOCATABLE, SAVE :: gage_fname(:)
   CHARACTER (LEN=10) :: date_string, time_string
   DOUBLE PRECISION :: baro_press
 
   IF(time == config%time%begin )THEN
-     count=0
-     CALL open_existing(config%gage_file, gcunit, fatal=.TRUE.)
-
-     DO WHILE(.TRUE.)
-        READ(gcunit,*, END=100) link, point
-        count=count+1   
-     END DO
-100  CONTINUE
-     REWIND(gcunit)
-
-     num_gages=count
-     ALLOCATE(gage_link(num_gages), gage_point(num_gages))
-     ALLOCATE(gage_fname(num_gages))
-
-     DO i=1,num_gages
-        READ(gcunit,*, END=100) link, point
-        gage_link(i) = link
-        gage_point(i) = point
-
-        fname = ''
-        fname(1:2) = 'ts'
-        WRITE(string1,*)gage_link(i)
-        WRITE(string2,*)gage_point(i)
-        !READ(gage_point(i),*)string2
-        string1 = ADJUSTL(string1)
-        string2 = ADJUSTL(string2)
-        len1 = LEN_TRIM(string1)
-        len2 = LEN_TRIM(string2)
-        spot1 =3 + len1 - 1
-        fname(3:spot1) = string1(1:len1)
-        spot1 = spot1 + 1
-        spot2 = spot1 + len2 - 1
-        fname(spot1:spot2) = string2(1:len2)
-        spot1 = spot2 + 1
-        spot2 = spot1 + LEN_TRIM('.out')
-        fname(spot1:spot2) = '.out'
-
-        gage_fname(i) = fname
-
-        OPEN(gunit,file=fname)
-        !WRITE(count,1005)'date','time','water el','discharge','velocity','depth ', &
-        ! 'conc ','temp ','thalweg el ','area ','top width ','hyd radius ','Froude Num ','frict slope ', &
-        ! 'bed shear '
-        !1005 FORMAT(2a7,20a12)
-        WRITE(gunit,1005)
-1005    FORMAT('#',1x,'date',8x,'time',5x,'water elev',2x,'discharge',5x,'vel',4x,'depth', &
-             7x,'conc',4x,'temp' ,2x,'%Sat',3x,'TDG P', &
-             4x,'thalweg el',2x,'area ',2x,'top width',2x,'hyd rad',2x,'Fr #',2x,'frict slope', &
-             2x,'bed shear')
-
-        CLOSE(gunit)
-
-     END DO
-
-     CLOSE (gcunit)
-
+     CALL gage_output_read()
      CALL hydro_output_setup()
-
   ENDIF
 
   DO i=1,num_gages
-     link = gage_link(i)
-     point = gage_point(i)
+     link = gages(i)%link
+     point = gages(i)%point
      depth = accum_var%y%sum(link,point) - thalweg(link,point)
      IF (config%do_gas .AND. config%met_required) THEN
         baro_press = metzone(link)%p%current%bp
@@ -130,11 +178,7 @@ SUBROUTINE gage_output
 
      CALL decimal_to_date(accum_time, date_string, time_string)
 
-!!$WRITE(count,1010)date_string,time_string,y(link,point),q(link,point),vel(link,point),depth, &
-!!$     species(1)%conc(link,point),species(2)%conc(link,point), tdg_sat, tdg_press, &
-!!$     thalweg(link,point),area(link,point),top_width(link,point),hyd_radius(link,point), &
-!!$     froude_num(link,point),friction_slope(link,point),bed_shear(link,point)
-     OPEN(gunit, FILE=gage_fname(i), ACTION="WRITE", POSITION="APPEND")
+     OPEN(gunit, FILE=gages(i)%output(), ACTION="WRITE", POSITION="APPEND")
      WRITE(gunit,1010)date_string,time_string,&
           &accum_var%y%sum(link,point),accum_var%q%sum(link,point),&
           &accum_var%vel%sum(link,point),depth, &
@@ -146,23 +190,18 @@ SUBROUTINE gage_output
           &accum_var%froude_num%sum(link,point),&
           &accum_var%friction_slope%sum(link,point),&
           &accum_var%bed_shear%sum(link,point)
-     !WRITE(count,1010)date_string,time_string,y(link,point),q(link,point),vel(link,point),depth, &
-     !     c(link,point),temp(link,point),thalweg(link,point),area(link,point)
-
 
 1010 FORMAT(a10,2x,a8,2x,f8.2,2x,f12.2,2x,f6.2,2x,f7.2,2x,f10.2,2x,f6.2,2x,f6.2,2x,f6.1,2x, &
           f8.2,2x,es10.2,2x, &
           f8.2,2x,f6.2,f6.2,es10.2,2x,es10.2)
-
-     !WRITE(count,1000)time/time_mult,q(link,point),y(link,point),depth,vel(link,point),c(link,point),temp(link,point)
-
+     CLOSE(gunit)
   END DO
 
   IF (time > config%time%begin) CALL hydro_output(date_string,time_string)
 
   IF(time >= config%time%end)THEN
      CALL hydro_output_done()
-     DEALLOCATE(gage_link, gage_point, gage_fname)
+     DEALLOCATE(gages)
   ENDIF
 
 END SUBROUTINE gage_output
