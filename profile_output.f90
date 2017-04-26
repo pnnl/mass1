@@ -29,10 +29,13 @@
 MODULE profile_output_module
 
   USE utility
-  USE accumulator
+  USE general_vars
   USE transport_vars
   USE gas_functions
   USE mass1_config
+  USE link_vars
+  USE point_vars
+  USE scalars
 
   IMPLICIT NONE
   
@@ -174,6 +177,8 @@ CONTAINS
     IMPLICIT NONE
 
     DOUBLE PRECISION :: depth
+    DOUBLE PRECISION :: baro_press, tdg_sat, tdg_press
+    DOUBLE PRECISION :: salinity = 0.0
 
     INTEGER :: i,j,link,lastlink,point
     INTEGER :: count=0
@@ -186,7 +191,7 @@ CONTAINS
        count = iobase + i
        WRITE(count,1110)
 1110   FORMAT('#',160('-'))
-       CALL decimal_to_date(accum_time, date_string, time_string)
+       CALL decimal_to_date(time, date_string, time_string)
        WRITE(count,1010)i,date_string,time_string,profile_max_points(i)
 1010   FORMAT('#Profile Number - ',i3,'   for Date: ',a10,'  Time: ',a8,'  Max number of points on profile = ',i6/)
        WRITE(count,1005)
@@ -202,21 +207,34 @@ CONTAINS
 
           link = profile_link(i,j)
           point = profile_point(i,j)
-          depth = accum_var%y%sum(link,point) - thalweg(link,point)
+          depth = y(link,point) - thalweg(link,point)
+
+          IF (config%met_required) THEN
+             baro_press = metzone(link)%p%current%bp
+          ELSE 
+             baro_press = 760.0
+          END IF
+
+          tdg_press = &
+               &TDGasPress(species(1)%conc(link,point), &
+               &species(2)%conc(link,point), salinity)
+          tdg_sat = TDGasSaturation(species(1)%conc(link,point), &
+               &species(2)%conc(link,point), &
+               &salinity, baro_press)
 
           WRITE(count,1000)link,point,j,x_profile(i,j),&
-               &accum_var%y%sum(link,point), accum_var%q%sum(link,point),&
-               &accum_var%vel%sum(link,point),depth,&
-               &accum_var%conc(1)%sum(link,point),accum_var%conc(2)%sum(link,point),&
-               &accum_var%tdg%sat%sum(link,point),accum_var%tdg%press%sum(link,point), &
-               thalweg(link,point),accum_var%area%sum(link,point),&
-               &accum_var%top_width%sum(link,point),&
-               &accum_var%hyd_radius%sum(link,point),&
-               &accum_var%froude_num%sum(link,point),&
-               &accum_var%courant_num%sum(link,point),&
-               &accum_var%diffuse_num%sum(link,point),&
-               &accum_var%friction_slope%sum(link,point),&
-               &accum_var%bed_shear%sum(link,point)
+               &y(link,point), q(link,point),&
+               &vel(link,point),depth,&
+               &species(1)%conc(link,point),species(2)%conc(link,point),&
+               &tdg_sat,tdg_press, &
+               thalweg(link,point),area(link,point),&
+               &top_width(link,point),&
+               &hyd_radius(link,point),&
+               &froude_num(link,point),&
+               &courant_num(link,point),&
+               &diffuse_num(link,point),&
+               &friction_slope(link,point),&
+               &bed_shear(link,point)
 
           !old WRITE(count,1000)link,point,j,x_profile(i,j),y(link,point),q(link,point),vel(link,point),depth, &
           !     c(link,point),temp(link,point),thalweg(link,point),area(link,point)

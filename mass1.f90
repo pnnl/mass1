@@ -39,7 +39,6 @@ PROGRAM mass1
   USE scalars
   USE tdg_equation_coeff
   USE profile_output_module
-  USE accumulator
   USE pidlink
   USE mass1_config
   USE bc_module
@@ -170,6 +169,9 @@ PROGRAM mass1
   model_time = config%time%begin
   time = model_time/config%time%mult
 
+  CALL bc_manager%update(time)
+  CALL met_zone_manager%update(time)
+
   IF(model_time <= config%time%end) run = .true.
 
   DO WHILE(run)
@@ -184,10 +186,6 @@ PROGRAM mass1
      ! print out initial conditions
 
      IF (time == config%time%begin) THEN
-        CALL accum_initialize()
-        CALL accum_reset(time)
-        CALL accumulate()
-        CALL accum_calc(time)
         IF (config%do_printout) CALL print_output("RESULT", time)
         IF (config%do_profileout) CALL profile_output
         IF (config%do_gageout) CALL gage_output
@@ -266,15 +264,9 @@ PROGRAM mass1
      ! do output as specified
 
      IF (MOD(time_step_count, config%print_freq) == 0) THEN
-        IF (.NOT. config%do_accumulate) THEN 
-           CALL accum_reset(time)
-           CALL accumulate()
-        END IF
-        CALL accum_calc(time)
         IF (config%do_printout)CALL print_output("RESULT", time)
         IF (config%do_gageout) CALL gage_output 
         IF (config%do_profileout) CALL profile_output
-        CALL accum_reset(time)
      ENDIF
 
      IF(config%debug_print) WRITE(11,*)'simulation time = ',time/config%time%mult
@@ -288,8 +280,6 @@ PROGRAM mass1
         WRITE(11,*)time,config%time%begin,config%time%end,config%time%delta_t,config%time%mult
         CLOSE(11)
      ENDIF
-
-     IF (config%do_accumulate) CALL accumulate()
 
      CALL pidlink_assemble_lagged()
 

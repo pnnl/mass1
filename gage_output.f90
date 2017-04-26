@@ -137,6 +137,8 @@ END MODULE gage_output_module
 
 SUBROUTINE gage_output
 
+  USE general_vars
+  USE mass1_config
   USE gage_output_module
   USE link_vars
   USE point_vars
@@ -144,7 +146,6 @@ SUBROUTINE gage_output
   USE scalars
   USE gas_functions
   USE hydro_output_module
-  USE accumulator
   USE date_time
 
   IMPLICIT NONE
@@ -166,30 +167,32 @@ SUBROUTINE gage_output
   DO i=1,num_gages
      link = gages(i)%link
      point = gages(i)%point
-     depth = accum_var%y%sum(link,point) - thalweg(link,point)
+     depth = y(link,point) - thalweg(link,point)
      IF (config%do_gas .AND. config%met_required) THEN
         baro_press = metzone(link)%p%current%bp
      ELSE 
         baro_press = 760.0
      END IF
-     tdg_sat = TDGasSaturation(species(1)%conc(link,point), species(2)%conc(link,point), &
+     tdg_sat = TDGasSaturation(species(1)%conc(link,point), &
+          &species(2)%conc(link,point), &
           &salinity, baro_press)
-     tdg_press = TDGasPress(species(1)%conc(link,point), species(2)%conc(link,point), salinity)
+     tdg_press = TDGasPress(species(1)%conc(link,point), &
+          &species(2)%conc(link,point), salinity)
 
-     CALL decimal_to_date(accum_time, date_string, time_string)
+     CALL decimal_to_date(time, date_string, time_string)
 
      OPEN(gunit, FILE=gages(i)%output(), ACTION="WRITE", POSITION="APPEND")
      WRITE(gunit,1010)date_string,time_string,&
-          &accum_var%y%sum(link,point),accum_var%q%sum(link,point),&
-          &accum_var%vel%sum(link,point),depth, &
-          &accum_var%conc(1)%sum(link,point),accum_var%conc(2)%sum(link,point), &
-          &accum_var%tdg%sat%sum(link,point), accum_var%tdg%press%sum(link,point), &
-          &thalweg(link,point),accum_var%area%sum(link,point),&
-          &accum_var%top_width%sum(link,point),&
-          &accum_var%hyd_radius%sum(link,point),&
-          &accum_var%froude_num%sum(link,point),&
-          &accum_var%friction_slope%sum(link,point),&
-          &accum_var%bed_shear%sum(link,point)
+          &y(link,point),q(link,point),&
+          &vel(link,point),depth, &
+          &species(1)%conc(link,point),species(2)%conc(link,point), &
+          &tdg_sat, tdg_press, &
+          &thalweg(link,point),area(link,point),&
+          &top_width(link,point),&
+          &hyd_radius(link,point),&
+          &froude_num(link,point),&
+          &friction_slope(link,point),&
+          &bed_shear(link,point)
 
 1010 FORMAT(a10,2x,a8,2x,f8.2,2x,f12.2,2x,f6.2,2x,f7.2,2x,f10.2,2x,f6.2,2x,f6.2,2x,f6.1,2x, &
           f8.2,2x,es10.2,2x, &
