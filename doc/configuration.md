@@ -18,6 +18,7 @@ because they are no longer needed or computed internally.  Items
 | 6 | 1 | flag | Enable detailed results print out
 | 7 | 1 | flag | Enable gage results output
 | 8 | 1 | flag | Enable profile results output
+|   | 2 | flag | Average gage and profile output over output time
 | 9 | 1 | flag | Enable TDG dispersion 
 |10 | 1 | flag | Enable atmospheric TDG exchange (requires [met data](met.md))
 |11 | 1 | flag | Enable temperature dispersion 

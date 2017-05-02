@@ -46,11 +46,18 @@ awk -f section-fix.awk < charima_section.txt > mass1_section.txt
 
 ## Utilities
 
-
+These utilities are provided as-is. There is little or no
+documentation (except the code itself).  Some are still used often by the
+authors; others are quite old and in probably in need of maintenance.  
 
 * `CHARIMAarea.pl`
 
-   This computes the cross section area of each cross section in a
+   This computes cross section area for each cross section in a
    file at a specified elevation.  
    
 * `CHARIMAextract.pl`
+
+   Extracts a subset of cross sections from a file.  A range of IDs or
+   river miles.  
+
+* `CHARIMAfill.pl` 
