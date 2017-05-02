@@ -20,8 +20,10 @@
 ## General Cross Section
 
 
-A general cross section example from Lake Roosevelt:
 
+![A general cross section example from Lake Roosevelt](section_12250.pang)
+
+As it looks in the cross section file:
 ```
 12250   50       1.0   RM=79.500, COLUMBIA River
     1  127
