@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January  2, 2004 by William A. Perkins
-# Last Change: 2017-01-16 08:37:26 d3g096
+# Last Change: 2017-05-16 10:47:05 d3g096
 # -------------------------------------------------------------
 # $Id$
 
@@ -21,10 +21,17 @@ set key below
 set key font ",16"
 set xrange [0:1000]
 
-plot "<head -46 profile1.out" using ($4*0.3048):($5*0.3048) title "Initial Conditions" with linespoints lt 1, \
-     "<tail -46 profile1.out" using ($4*0.3048):($5*0.3048) title "Steady State" with points lt 7, \
-     "solution.dat" using ($1*0.3048):($5*0.3048) title "Analytic Solution" with lines lt 3, \
-     "<tail -45 profile1.out" using ($4*0.3048):($13*0.3048) title "Bottom" with lines lt 7
+set ytics nomirror
+set y2tics nomirror
+set y2label "Froude Number"
+set format y2 "%.1f"
+
+plot "<head -46 profile1.out" using ($4*0.3048):($5*0.3048) axes x1y1 title "Initial Conditions" with linespoints lt 1, \
+     "<tail -46 profile1.out" using ($4*0.3048):($5*0.3048) axes x1y1 title "Steady State" with points lt 7, \
+     "<tail -46 profile1.out" using ($4*0.3048):($17) axes x1y2 title "Froude Number" with lines lt 5, \
+     1.0 axes x1y2 notitle with lines lt 0, \
+     "solution.dat" using ($1*0.3048):($5*0.3048)axes x1y1  title "Analytic Solution" with lines lt 3, \
+     "<tail -45 profile1.out" using ($4*0.3048):($13*0.3048) axes x1y1 title "Bottom" with lines lt 7
 
      
      
