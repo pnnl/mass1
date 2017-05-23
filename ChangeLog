@@ -1,5 +1,8 @@
 2017-05-23  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* test/flow/lateral-fill: test filling a dry channel with lateral
+	inflow 
+
 	* test/flow/fill: test for filling a channel from downstream; 
 	doesn't work real well
 
