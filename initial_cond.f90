@@ -67,6 +67,12 @@ SUBROUTINE initial_cond
            temp(link,i) = temp(link,i)
 
         END SELECT
+
+        IF (y(link, i) .LT. (thalweg(link, i) + depth_minimum)) THEN
+           q(link, i) = 0.0
+           y(link, i) = thalweg(link, i) + depth_minimum
+        END IF
+
         species(1)%conc(link,i) = c(link,i)
         species(1)%concold(link,i) = c(link,i)
         species(2)%conc(link,i) = temp(link,i)

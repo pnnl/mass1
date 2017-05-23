@@ -16,6 +16,20 @@
 	* pidlink.f90 (read_pidlink_info): make path names same length to
 	avoid compiler warning
 
+	* test/flow/lateral-fill: test filling a dry channel with lateral
+	inflow 
+
+	* test/flow/fill: test for filling a channel from downstream; 
+	doesn't work real well
+
+	* coeff.f90 (fluvial_coeff): when dry set beta to 1.0 (go all the
+	way) 
+
+	* test/flow/drain: several modifications to make test work
+
+	* flow_sim.f90 (flow_sim): do not get section properties for
+	depths less than depth_minimum
+
 2017-03-28  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* dlist_module.f90 (dlist_module): add a cursor to dlist, with

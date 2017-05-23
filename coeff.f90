@@ -71,7 +71,7 @@ SUBROUTINE fluvial_coeff(a,b,c,d,g,ap,bp,cp,dp,gp,dx,dt,gr,latq_old,latq_new,lpi
   ! change the friction weighting
   IF ( (d1 .LT. depth_threshold) .OR. (d2 .LT. depth_threshold)) THEN
      sigma = 0.0
-     beta = 0.95
+     beta = 1.0
   END IF
 
 
