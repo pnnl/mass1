@@ -310,7 +310,7 @@ SUBROUTINE read_config
 
   ! Some things that need to be set, but are not read (yet)
 
-  depth_minimum = 0.001           ! m
+  depth_minimum = 0.002           ! m
   depth_threshold = 0.01          ! m
 
   IF(debug_print == 1)THEN 

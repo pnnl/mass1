@@ -128,6 +128,7 @@ SUBROUTINE flow_sim
            ! set geometric data for points i, i+1
            point_num = point
            depth = y(link,point) - thalweg(link,point) !remember y is ELEVATION
+           depth = MAX(depth, depth_minimum)
            CALL section(link,point_num,depth,area_temp,width,conveyance,dkdy,hydrad)
            !CALL section(link,point_num,depth,area_temp,width,conveyance,dkdy)
 
@@ -147,6 +148,7 @@ SUBROUTINE flow_sim
 
            point_num = point + 1
            depth = y(link,point+1) - thalweg(link,point+1)
+           depth = MAX(depth, depth_minimum)
            CALL section(link,point_num,depth,area_temp,width,conveyance,dkdy,hydrad)
            !CALL section(link,point_num,depth,area_temp,width,conveyance,dkdy)
 
