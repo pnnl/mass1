@@ -1,3 +1,21 @@
+2017-05-23  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* mass1_config.f90 (mass1_config): put physical constants here
+	(configuration_read): set physical constants here
+
+	* flow_sim.f90 (flow_sim): use physical constants from
+	configuration 
+
+	* gage_output.f90 (gage_output): remove unused variables
+
+	* kick_off.f90 (kick_off): no need to set physical constants here 
+
+	* modules.f90 (general_vars): move physical constants to
+	configuration 
+
+	* pidlink.f90 (read_pidlink_info): make path names same length to
+	avoid compiler warning
+
 2017-03-28  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* dlist_module.f90 (dlist_module): add a cursor to dlist, with

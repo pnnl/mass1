@@ -154,8 +154,7 @@ SUBROUTINE gage_output
 
   DOUBLE PRECISION :: depth, tdg_sat, tdg_press
   DOUBLE PRECISION :: salinity = 0.0
-  INTEGER :: i,link,point,count=0
-  INTEGER :: len1,len2,spot1,spot2
+  INTEGER :: i,link,point
   CHARACTER (LEN=10) :: date_string, time_string
   DOUBLE PRECISION :: baro_press
 

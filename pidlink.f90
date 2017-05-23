@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October 10, 2001 by William A. Perkins
-! Last Change: 2017-03-28 13:37:18 d3g096
+! Last Change: 2017-05-19 08:51:27 d3g096
 ! ----------------------------------------------------------------
 
 
@@ -90,7 +90,7 @@ CONTAINS
     INTEGER :: l, link, count, laglink, i
     DOUBLE PRECISION :: kc, ti, tr, lagvalues(2*maxlags)
     DOUBLE PRECISION :: lagtime
-    CHARACTER (LEN=256) :: fname
+    CHARACTER (LEN=path_length) :: fname
     INTEGER :: iounit
     CHARACTER (LEN=1024) :: msg
 

@@ -40,30 +40,19 @@ SUBROUTINE kick_off
   IMPLICIT NONE
 
   INTEGER :: i,j, ierr
-  TYPE (bc_ptr) :: ptr
   INTEGER(KIND(BC_ENUM)) :: bckind
   CHARACTER (LEN=1024) :: msg
 
   ! This stuff needs to be set in config%read()
-
+  
   depth_minimum = 0.001           ! m
   depth_threshold = 0.01          ! m
 
   SELECT CASE(config%units)
 
   CASE(ENGLISH_UNITS)
-     res_coeff = 1.49   !manning unit factor used in conveyance calculation
-     grav = 32.2
-     unit_weight_h2o = 62.4 ! lb/ft3
-     density_h2o = 1.94    ! slugs/ft3
      depth_minimum = depth_minimum/0.3048
      depth_threshold = depth_threshold/0.3048
-
-  CASE(METRIC_UNITS)
-     res_coeff = 1.0       !manning unit factor used in conveyance calculation
-     grav = 9.81
-     unit_weight_h2o = 9810.0  ! N/m3
-     density_h2o = 1000.0         ! kg/m3
 
   END SELECT
 
@@ -156,6 +145,8 @@ SUBROUTINE kick_off
         END IF
      END IF
   END DO
+
+  
 
   IF (ierr .GT. 0) THEN
      CALL error_message("Too many errors assigning BCs", fatal=.TRUE.)

@@ -32,12 +32,8 @@
 MODULE general_vars
 
   DOUBLE PRECISION, SAVE :: time
-  DOUBLE PRECISION, SAVE :: res_coeff,grav
-  DOUBLE PRECISION, SAVE :: unit_weight_h2o,density_h2o
-
-  DOUBLE PRECISION, SAVE :: depth_threshold, depth_minimum
-
   ! INTEGER, SAVE :: print_freq
+  DOUBLE PRECISION, SAVE :: depth_threshold, depth_minimum
 
 END MODULE general_vars
 !----------------------------------------------------------

@@ -111,8 +111,8 @@ SUBROUTINE flow_sim
            
            CALL ptsection(link, point_num)%p%props(depth, &
                 &area_temp, hydrad, width, conveyance, dkdy)
-           conveyance = res_coeff*kstrick(link,point_num)*conveyance
-           dkdy = res_coeff*kstrick(link,point_num)*dkdy
+           conveyance = config%res_coeff*kstrick(link,point_num)*conveyance
+           dkdy = config%res_coeff*kstrick(link,point_num)*dkdy
 
            d1 = depth
            fr1 = froude_num(link,point)
@@ -133,8 +133,8 @@ SUBROUTINE flow_sim
 
            CALL ptsection(link, point_num)%p%props(depth, &
                 &area_temp, hydrad, width, conveyance, dkdy)
-           conveyance = res_coeff*kstrick(link,point_num)*conveyance
-           dkdy = res_coeff*kstrick(link,point_num)*dkdy
+           conveyance = config%res_coeff*kstrick(link,point_num)*conveyance
+           dkdy = config%res_coeff*kstrick(link,point_num)*dkdy
 
            d2 = depth
            fr2 = froude_num(link,point+1)
@@ -170,7 +170,7 @@ SUBROUTINE flow_sim
            ENDIF
 
            CALL fluvial_coeff(a,b,c,d,g,ap,bp,cp,dp,gp,delta_x,&
-                &config%time%delta_t,grav,&
+                &config%time%delta_t,config%grav,&
                 &latq_old,latq_new,lpiexp(link))
 
 
@@ -295,14 +295,14 @@ SUBROUTINE flow_sim
 
            CALL ptsection(link, point)%p%props(depth, &
                 &area_temp, hydrad, width, conveyance, dkdy)
-           conveyance = res_coeff*kstrick(link,point)*conveyance
-           dkdy = res_coeff*kstrick(link,point)*dkdy
+           conveyance = config%res_coeff*kstrick(link,point)*conveyance
+           dkdy = config%res_coeff*kstrick(link,point)*dkdy
 
            area(link,point) = area_temp
            top_width(link,point) = width
            hyd_radius(link,point) = hydrad
            froude_num(link,point) = &
-                &SQRT((q(link,point)**2*width)/(grav*area_temp**3))
+                &SQRT((q(link,point)**2*width)/(config%grav*area_temp**3))
 
            IF (froude_num(link, point) .GE. 1.0) THEN
               WRITE (msg, '("warning: supercritial (Fr=", F5.1, ") indicated at link ", I3, ", point ", I3)')&
@@ -312,9 +312,9 @@ SUBROUTINE flow_sim
 
            friction_slope(link,point) =&
                 & ((q(link,point)*manning(link,point))/&
-                & (res_coeff*area_temp*(hydrad**2.0)**0.3333333))**2.0
+                & (config%res_coeff*area_temp*(hydrad**2.0)**0.3333333))**2.0
            bed_shear(link,point) = &
-                &unit_weight_h2o*hydrad*friction_slope(link,point)
+                &config%unit_weight_h2o*hydrad*friction_slope(link,point)
 
            IF (point .GE. maxpoints(link)) THEN
               delta_x = ABS(x(link,point-1) - x(link,point))

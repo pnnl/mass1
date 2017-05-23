@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2017-03-28 14:25:32 d3g096
+! Last Change: 2017-05-19 09:15:45 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE mass1_config
@@ -95,6 +95,12 @@ MODULE mass1_config
      INTEGER :: maxpoint
      INTEGER :: scalar_steps
      INTEGER(KIND(UNIT_SYSTEM)) :: units
+
+     DOUBLE PRECISION :: res_coeff
+     DOUBLE PRECISION :: grav
+     DOUBLE PRECISION :: unit_weight_h2o
+     DOUBLE PRECISION :: density_h2o
+
      INTEGER(KIND(CHANNEL_UNITS)) :: channel_length_units
      INTEGER :: dsbc_type
      TYPE (time_frame_t) :: time
@@ -115,6 +121,7 @@ MODULE mass1_config
      CHARACTER(LEN=path_length) :: profile_file
      CHARACTER(LEN=path_length) :: lateral_file
      CHARACTER(LEN=path_length) :: pid_file
+
    CONTAINS
      PROCEDURE :: read => configuration_read
   END type configuration_t
@@ -465,6 +472,25 @@ CONTAINS
     line = line + 1
 
     CLOSE(iunit)
+
+    ! set physical constants for specified unit system
+
+    SELECT CASE(this%units)
+
+    CASE(ENGLISH_UNITS)
+       this%res_coeff = 1.49   !manning unit factor used in conveyance calculation
+       this%grav = 32.2
+       this%unit_weight_h2o = 62.4 ! lb/ft3
+       this%density_h2o = 1.94    ! slugs/ft3
+
+    CASE(METRIC_UNITS)
+       this%res_coeff = 1.0       !manning unit factor used in conveyance calculation
+       this%grav = 9.81
+       this%unit_weight_h2o = 9810.0  ! N/m3
+       this%density_h2o = 1000.0         ! kg/m3
+
+    END SELECT
+    
 
     
     ! figure out time constant
