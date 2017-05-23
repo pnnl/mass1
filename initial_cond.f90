@@ -27,6 +27,7 @@
 SUBROUTINE initial_cond
 
   USE utility
+  USE general_vars
   USE mass1_config
   USE point_vars
   USE transport_vars
