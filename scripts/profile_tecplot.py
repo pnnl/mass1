@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created May 23, 2017 by William A. Perkins
-# Last Change: 2017-05-24 12:23:06 d3g096
+# Last Change: 2017-05-24 13:39:26 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -253,7 +253,13 @@ while (True):
 
             for p in profile:
                 for v in fldname: 
-                    output.write("%10.4g " % (float(p[v])))
+                    if p[v] is not None:
+                        outv = float(p[v])
+                    else:
+                        outv = 0.0
+                        sys.stderr.write("%s: warning: substituting zero for bad %s value in zone %d\n" %
+                                         (program, v, nzone))
+                    output.write("%10.4g " % outv)
                 output.write("\n")
                 
                                  
