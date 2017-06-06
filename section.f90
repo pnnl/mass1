@@ -123,4 +123,8 @@ SUBROUTINE section(link,point,depth,area_temp,width,conveyance,dkdy,hydrad)
 
         END SELECT
 
+        area_temp = MAX(area_temp, 0.0D00)
+        width = MAX(width, 0.0D00)
+        conveyance = MAX(conveyance, 0.0D00)
+        hydrad = MAX(hydrad, 0.0D00)
 END SUBROUTINE section

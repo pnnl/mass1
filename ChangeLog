@@ -1,3 +1,13 @@
+2017-06-06  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* read_config.f90 (read_config): set dry depth values more
+	appropriate to real channels
+
+	* section.f90 (section): make sure section properties are
+	nonnegative when appropriate
+
+	* scripts/profile_extract.py (read_next_profile): fix column numbers
+
 2017-05-24  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* test/flow/lateral-fill: use tecplot to animate profile output
