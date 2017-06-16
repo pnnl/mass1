@@ -1,850 +1,7 @@
-#!MC 1400
-# Created by Tecplot 360 build 14.0.0.25097
+#!MC 1410
 $!VarSet |LFDSFN1| = '"profile1.dat"'
 $!VarSet |LFDSVL1| = '"link" "point" "pid" "Distance" "Stage" "Discharge" "Velocity" "Depth" "TDGConcentration" "Temperature" "TDGSaturation" "TDGPressure" "Thalweg" "Area" "TopWidth" "HydraulicRadius" "FroudeNumber" "CourantNumber" "DiffusionNumber" "FrictionSlope" "BedShear"'
 $!SETSTYLEBASE FACTORY
-$!GLOBALLINKING 
-  LINKCOLORMAPS = YES
-$!GLOBALCOLORMAP  1
-  CONTOURCOLORMAP = SMRAINBOW
-$!COLORMAPCONTROL 1 RESETTOFACTORY
-$!GLOBALCOLORMAP  1
-  SMRAINBOW
-    {
-    CONTROLPOINT 1
-      {
-      COLORMAPFRACTION = 0
-      LEADRGB
-        {
-        R = 0
-        G = 0
-        B = 255
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 0
-        B = 255
-        }
-      }
-    CONTROLPOINT 2
-      {
-      COLORMAPFRACTION = 0.25
-      LEADRGB
-        {
-        R = 0
-        G = 255
-        B = 255
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 255
-        B = 255
-        }
-      }
-    CONTROLPOINT 3
-      {
-      COLORMAPFRACTION = 0.5
-      LEADRGB
-        {
-        R = 0
-        G = 255
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 255
-        B = 0
-        }
-      }
-    CONTROLPOINT 4
-      {
-      COLORMAPFRACTION = 0.75
-      LEADRGB
-        {
-        R = 255
-        G = 255
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 255
-        G = 255
-        B = 0
-        }
-      }
-    CONTROLPOINT 5
-      {
-      COLORMAPFRACTION = 1
-      LEADRGB
-        {
-        R = 255
-        G = 0
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 255
-        G = 0
-        B = 0
-        }
-      }
-    }
-$!GLOBALCOLORMAP  2
-  CONTOURCOLORMAP = LGRAINBOW
-$!COLORMAPCONTROL 2 RESETTOFACTORY
-$!GLOBALCOLORMAP  2
-  LGRAINBOW
-    {
-    CONTROLPOINT 1
-      {
-      COLORMAPFRACTION = 0
-      LEADRGB
-        {
-        R = 0
-        G = 0
-        B = 255
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 0
-        B = 255
-        }
-      }
-    CONTROLPOINT 2
-      {
-      COLORMAPFRACTION = 0.1667
-      LEADRGB
-        {
-        R = 0
-        G = 255
-        B = 255
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 255
-        B = 255
-        }
-      }
-    CONTROLPOINT 3
-      {
-      COLORMAPFRACTION = 0.3333
-      LEADRGB
-        {
-        R = 0
-        G = 255
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 255
-        B = 0
-        }
-      }
-    CONTROLPOINT 4
-      {
-      COLORMAPFRACTION = 0.5
-      LEADRGB
-        {
-        R = 255
-        G = 255
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 255
-        G = 255
-        B = 0
-        }
-      }
-    CONTROLPOINT 5
-      {
-      COLORMAPFRACTION = 0.6667
-      LEADRGB
-        {
-        R = 255
-        G = 0
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 255
-        G = 0
-        B = 0
-        }
-      }
-    CONTROLPOINT 6
-      {
-      COLORMAPFRACTION = 0.8333
-      LEADRGB
-        {
-        R = 255
-        G = 0
-        B = 255
-        }
-      TRAILRGB
-        {
-        R = 255
-        G = 0
-        B = 255
-        }
-      }
-    CONTROLPOINT 7
-      {
-      COLORMAPFRACTION = 1
-      LEADRGB
-        {
-        R = 255
-        G = 255
-        B = 255
-        }
-      TRAILRGB
-        {
-        R = 255
-        G = 255
-        B = 255
-        }
-      }
-    }
-$!GLOBALCOLORMAP  3
-  CONTOURCOLORMAP = MODERN
-$!COLORMAPCONTROL 3 RESETTOFACTORY
-$!GLOBALCOLORMAP  3
-  MODERN
-    {
-    CONTROLPOINT 1
-      {
-      COLORMAPFRACTION = 0
-      LEADRGB
-        {
-        R = 100
-        G = 35
-        B = 100
-        }
-      TRAILRGB
-        {
-        R = 100
-        G = 35
-        B = 100
-        }
-      }
-    CONTROLPOINT 2
-      {
-      COLORMAPFRACTION = 0.1429
-      LEADRGB
-        {
-        R = 35
-        G = 35
-        B = 100
-        }
-      TRAILRGB
-        {
-        R = 255
-        G = 0
-        B = 255
-        }
-      }
-    CONTROLPOINT 3
-      {
-      COLORMAPFRACTION = 0.2857
-      LEADRGB
-        {
-        R = 35
-        G = 100
-        B = 100
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 0
-        B = 255
-        }
-      }
-    CONTROLPOINT 4
-      {
-      COLORMAPFRACTION = 0.4286
-      LEADRGB
-        {
-        R = 35
-        G = 100
-        B = 35
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 255
-        B = 255
-        }
-      }
-    CONTROLPOINT 5
-      {
-      COLORMAPFRACTION = 0.5714
-      LEADRGB
-        {
-        R = 100
-        G = 100
-        B = 35
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 255
-        B = 0
-        }
-      }
-    CONTROLPOINT 6
-      {
-      COLORMAPFRACTION = 0.7143
-      LEADRGB
-        {
-        R = 85
-        G = 46
-        B = 10
-        }
-      TRAILRGB
-        {
-        R = 255
-        G = 255
-        B = 0
-        }
-      }
-    CONTROLPOINT 7
-      {
-      COLORMAPFRACTION = 0.8571
-      LEADRGB
-        {
-        R = 100
-        G = 35
-        B = 35
-        }
-      TRAILRGB
-        {
-        R = 217
-        G = 117
-        B = 26
-        }
-      }
-    CONTROLPOINT 8
-      {
-      COLORMAPFRACTION = 1
-      LEADRGB
-        {
-        R = 255
-        G = 0
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 255
-        G = 0
-        B = 0
-        }
-      }
-    }
-$!GLOBALCOLORMAP  4
-  CONTOURCOLORMAP = GRAYSCALE
-$!COLORMAPCONTROL 4 RESETTOFACTORY
-$!GLOBALCOLORMAP  4
-  GRAYSCALE
-    {
-    CONTROLPOINT 1
-      {
-      COLORMAPFRACTION = 0
-      LEADRGB
-        {
-        R = 0
-        G = 0
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 0
-        B = 0
-        }
-      }
-    CONTROLPOINT 2
-      {
-      COLORMAPFRACTION = 0.125
-      LEADRGB
-        {
-        R = 32
-        G = 32
-        B = 32
-        }
-      TRAILRGB
-        {
-        R = 32
-        G = 32
-        B = 32
-        }
-      }
-    CONTROLPOINT 3
-      {
-      COLORMAPFRACTION = 0.25
-      LEADRGB
-        {
-        R = 64
-        G = 64
-        B = 64
-        }
-      TRAILRGB
-        {
-        R = 64
-        G = 64
-        B = 64
-        }
-      }
-    CONTROLPOINT 4
-      {
-      COLORMAPFRACTION = 0.375
-      LEADRGB
-        {
-        R = 96
-        G = 96
-        B = 96
-        }
-      TRAILRGB
-        {
-        R = 96
-        G = 96
-        B = 96
-        }
-      }
-    CONTROLPOINT 5
-      {
-      COLORMAPFRACTION = 0.5
-      LEADRGB
-        {
-        R = 128
-        G = 128
-        B = 128
-        }
-      TRAILRGB
-        {
-        R = 128
-        G = 128
-        B = 128
-        }
-      }
-    CONTROLPOINT 6
-      {
-      COLORMAPFRACTION = 0.625
-      LEADRGB
-        {
-        R = 160
-        G = 160
-        B = 160
-        }
-      TRAILRGB
-        {
-        R = 160
-        G = 160
-        B = 160
-        }
-      }
-    CONTROLPOINT 7
-      {
-      COLORMAPFRACTION = 0.75
-      LEADRGB
-        {
-        R = 192
-        G = 192
-        B = 192
-        }
-      TRAILRGB
-        {
-        R = 192
-        G = 192
-        B = 192
-        }
-      }
-    CONTROLPOINT 8
-      {
-      COLORMAPFRACTION = 0.875
-      LEADRGB
-        {
-        R = 224
-        G = 224
-        B = 224
-        }
-      TRAILRGB
-        {
-        R = 224
-        G = 224
-        B = 224
-        }
-      }
-    CONTROLPOINT 9
-      {
-      COLORMAPFRACTION = 1
-      LEADRGB
-        {
-        R = 255
-        G = 255
-        B = 255
-        }
-      TRAILRGB
-        {
-        R = 255
-        G = 255
-        B = 255
-        }
-      }
-    }
-$!GLOBALCOLORMAP  5
-  CONTOURCOLORMAP = SMRAINBOW
-$!COLORMAPCONTROL 5 RESETTOFACTORY
-$!GLOBALCOLORMAP  5
-  SMRAINBOW
-    {
-    CONTROLPOINT 1
-      {
-      COLORMAPFRACTION = 0
-      LEADRGB
-        {
-        R = 0
-        G = 0
-        B = 255
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 0
-        B = 255
-        }
-      }
-    CONTROLPOINT 2
-      {
-      COLORMAPFRACTION = 0.25
-      LEADRGB
-        {
-        R = 0
-        G = 255
-        B = 255
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 255
-        B = 255
-        }
-      }
-    CONTROLPOINT 3
-      {
-      COLORMAPFRACTION = 0.5
-      LEADRGB
-        {
-        R = 0
-        G = 255
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 255
-        B = 0
-        }
-      }
-    CONTROLPOINT 4
-      {
-      COLORMAPFRACTION = 0.75
-      LEADRGB
-        {
-        R = 255
-        G = 255
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 255
-        G = 255
-        B = 0
-        }
-      }
-    CONTROLPOINT 5
-      {
-      COLORMAPFRACTION = 1
-      LEADRGB
-        {
-        R = 255
-        G = 0
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 255
-        G = 0
-        B = 0
-        }
-      }
-    }
-$!GLOBALCOLORMAP  6
-  CONTOURCOLORMAP = SMRAINBOW
-$!COLORMAPCONTROL 6 RESETTOFACTORY
-$!GLOBALCOLORMAP  6
-  SMRAINBOW
-    {
-    CONTROLPOINT 1
-      {
-      COLORMAPFRACTION = 0
-      LEADRGB
-        {
-        R = 0
-        G = 0
-        B = 255
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 0
-        B = 255
-        }
-      }
-    CONTROLPOINT 2
-      {
-      COLORMAPFRACTION = 0.25
-      LEADRGB
-        {
-        R = 0
-        G = 255
-        B = 255
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 255
-        B = 255
-        }
-      }
-    CONTROLPOINT 3
-      {
-      COLORMAPFRACTION = 0.5
-      LEADRGB
-        {
-        R = 0
-        G = 255
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 255
-        B = 0
-        }
-      }
-    CONTROLPOINT 4
-      {
-      COLORMAPFRACTION = 0.75
-      LEADRGB
-        {
-        R = 255
-        G = 255
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 255
-        G = 255
-        B = 0
-        }
-      }
-    CONTROLPOINT 5
-      {
-      COLORMAPFRACTION = 1
-      LEADRGB
-        {
-        R = 255
-        G = 0
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 255
-        G = 0
-        B = 0
-        }
-      }
-    }
-$!GLOBALCOLORMAP  7
-  CONTOURCOLORMAP = SMRAINBOW
-$!COLORMAPCONTROL 7 RESETTOFACTORY
-$!GLOBALCOLORMAP  7
-  SMRAINBOW
-    {
-    CONTROLPOINT 1
-      {
-      COLORMAPFRACTION = 0
-      LEADRGB
-        {
-        R = 0
-        G = 0
-        B = 255
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 0
-        B = 255
-        }
-      }
-    CONTROLPOINT 2
-      {
-      COLORMAPFRACTION = 0.25
-      LEADRGB
-        {
-        R = 0
-        G = 255
-        B = 255
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 255
-        B = 255
-        }
-      }
-    CONTROLPOINT 3
-      {
-      COLORMAPFRACTION = 0.5
-      LEADRGB
-        {
-        R = 0
-        G = 255
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 255
-        B = 0
-        }
-      }
-    CONTROLPOINT 4
-      {
-      COLORMAPFRACTION = 0.75
-      LEADRGB
-        {
-        R = 255
-        G = 255
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 255
-        G = 255
-        B = 0
-        }
-      }
-    CONTROLPOINT 5
-      {
-      COLORMAPFRACTION = 1
-      LEADRGB
-        {
-        R = 255
-        G = 0
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 255
-        G = 0
-        B = 0
-        }
-      }
-    }
-$!GLOBALCOLORMAP  8
-  CONTOURCOLORMAP = SMRAINBOW
-$!COLORMAPCONTROL 8 RESETTOFACTORY
-$!GLOBALCOLORMAP  8
-  SMRAINBOW
-    {
-    CONTROLPOINT 1
-      {
-      COLORMAPFRACTION = 0
-      LEADRGB
-        {
-        R = 0
-        G = 0
-        B = 255
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 0
-        B = 255
-        }
-      }
-    CONTROLPOINT 2
-      {
-      COLORMAPFRACTION = 0.25
-      LEADRGB
-        {
-        R = 0
-        G = 255
-        B = 255
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 255
-        B = 255
-        }
-      }
-    CONTROLPOINT 3
-      {
-      COLORMAPFRACTION = 0.5
-      LEADRGB
-        {
-        R = 0
-        G = 255
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 0
-        G = 255
-        B = 0
-        }
-      }
-    CONTROLPOINT 4
-      {
-      COLORMAPFRACTION = 0.75
-      LEADRGB
-        {
-        R = 255
-        G = 255
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 255
-        G = 255
-        B = 0
-        }
-      }
-    CONTROLPOINT 5
-      {
-      COLORMAPFRACTION = 1
-      LEADRGB
-        {
-        R = 255
-        G = 0
-        B = 0
-        }
-      TRAILRGB
-        {
-        R = 255
-        G = 0
-        B = 0
-        }
-      }
-    }
 $!PLOTOPTIONS 
   SUBDIVIDEALLCELLS = NO
 $!GLOBALPAPER 
@@ -883,7 +40,7 @@ $!PAGE
     ORIENTPORTRAIT = NO
     SHOWGRID = YES
     SHOWRULER = NO
-    SHOWPAPER = NO
+    SHOWPAPER = YES
     PAPERSIZE = LETTER
     RULERSPACING = ONEINCH
     PAPERGRIDSPACING = QUARTERINCH
@@ -921,7 +78,7 @@ $!THREEDAXIS
 $!PLOTTYPE  = XYLINE
 $!FRAMENAME  = 'Frame 001'
 $!GLOBALTIME 
-  SOLUTIONTIME = 1
+  SOLUTIONTIME = 0
 $!DELETELINEMAPS 
 $!ACTIVELINEMAPS  =  [1-2]
 $!GLOBALLINEPLOT 
@@ -1019,7 +176,7 @@ $!XYLINEAXIS
   YDETAIL 1
     {
     RANGEMIN = 0
-    RANGEMAX = 6.5
+    RANGEMAX = 6.4000000000000003553
     GRSPACING = 1
     TICKLABEL
       {
@@ -1047,6 +204,62 @@ $!ATTACHTEXT
     }
   ANCHOR = HEADRIGHT
   TEXT = '&(ZONENAME[ACTIVEOFFSET=1])'
+$!ATTACHTEXT 
+  ANCHORPOS
+    {
+    X = 19.99251683711649
+    Y = 59.326337169939
+    }
+  TEXTSHAPE
+    {
+    ISBOLD = NO
+    HEIGHT = 10
+    }
+  ANCHOR = MIDLEFT
+  TEXT = 'Falling Stage (6.0 to 0.5)'
+$!ATTACHTEXT 
+  ANCHORPOS
+    {
+    X = 79.90770765776995
+    Y = 58.07379823967491
+    }
+  TEXTSHAPE
+    {
+    ISBOLD = NO
+    HEIGHT = 10
+    }
+  ANCHOR = RIGHT
+  TEXT = 'Zero Discharge'
+$!ATTACHGEOM 
+  POSITIONCOORDSYS = FRAME
+  ANCHORPOS
+    {
+    X = 19.91768520828137
+    Y = 56.29654705484084
+    }
+  ARROWHEADSTYLE = FILLED
+  ARROWHEADATTACHMENT = ATEND
+  ARROWHEADSIZE = 3
+  RAWDATA
+1
+2
+-0.785732083023 2.4437231943 
+-7.03564733267 -1.70298974922E-06 
+$!ATTACHGEOM 
+  POSITIONCOORDSYS = FRAME
+  ANCHORPOS
+    {
+    X = 87.85233586761611
+    Y = 56.75355570936358
+    }
+  ARROWHEADSTYLE = FILLED
+  ARROWHEADATTACHMENT = ATBEGINNING
+  ARROWHEADSIZE = 3
+  RAWDATA
+1
+2
+5.37977982162E-06 -1.20699397144E-06 
+-7.24619701505 1.92535407841 
 $!FRAMECONTROL ACTIVATEBYNUMBER
   FRAME = 1
 $!SETSTYLEBASE CONFIG

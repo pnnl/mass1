@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: 2017-05-24 12:04:22 d3g096
+# Last Change: 2017-06-16 12:25:05 d3g096
 # -------------------------------------------------------------
 # $Id$
 
@@ -52,5 +52,5 @@ $model
 
 "$python" ../../../scripts/profile_tecplot.py profile1.out > profile1.dat
 "$tecplot" -b -p ../../../scripts/xy-looper-png.mcr stage1.lay
-"$convert" -delay 50 -loop 0 looper-0*.png drain.gif
+"$convert" -delay 20 -loop 1 looper-0*.png drain.gif
 
