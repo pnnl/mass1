@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October 24, 2011 by William A. Perkins
-# Last Change: Tue Nov  1 09:01:10 2011 by William A. Perkins <d3g096@flophouse>
+# Last Change: 2017-06-01 13:27:09 d3g096
 # -------------------------------------------------------------
 
 from inspect import *
@@ -255,8 +255,9 @@ class Link(object):
         lattransbc = 0
         lattempbc = 0
         metzone = 1
+        lpi = 1.0
 
-        outfd.write("%8d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d /\n" %
+        outfd.write("%8d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5.1f /\n" %
                     (self.id,
                      ptopt,
                      self.npoints,
@@ -270,7 +271,8 @@ class Link(object):
                      metzone,
                      latbc,
                      lattransbc,
-                     lattempbc))
+                     lattempbc,
+                     lpi))
         if (len(self._dnlink) > 0):
             outfd.write("%8d" % (self._dnlink[0].id))
         else:

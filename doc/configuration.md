@@ -33,7 +33,7 @@ because they are no longer needed or computed internally.  Items
 |18 | 1 | int  | Boundary condition at outlet: 
 |   |   |      |  0 = stage, 1 = discharge
 |19 | 1 | int  | Maximum number of links (>= actual number of links)
-|20 | 1 | int  | ~~Maximum number of points on a link~~
+|20 | 1 | int  | Maximum number of points on a link
 |21 | 1 | int  | ~~Maximum number of values in a [BC file](bc.md)~~
 |22 | 1 | int  | Number of transport time sub-steps (0 = automatic)
 |23 | 1 | flag | Enable debugging output
@@ -46,12 +46,21 @@ because they are no longer needed or computed internally.  Items
 |30 | 1 | string | [TDG BC file](bc.md) name
 |31 | 1 | string | [Temperature BC file](bc.md) name
 |32 | 1 | string | [Meteorologic zone table file](met.md) name
-|20 | 1 | string | [Hydropower BC file](bc.md) name
-|20 | 1 | string | [TDG Coefficients file](tdg_coeff.md) name
-
-[^1]: Using decimal time in time series input no longer works, so
-don't try it. 
-[^2]: The metric units option is untested and probably doesn't work.
+|33 | 1 | string | [Hydropower BC file](bc.md) name
+|34 | 1 | string | [TDG Coefficients file](tdg_coeff.md) name
+|35 | 1 | string | Restart file from which initial conditions are read
+|36 | 1 | string | Hotstart file to write
+|37 | 1 | string | [Gage control file](gage.md) name
+|38 | 1 | string | [Profile control file](profile.md) name
+|39 | 1 | string | [Lateral inflow BC file](bc.md) name
+|40 | 1 | string | Simulation start date (mm-dd-yyyy)
+|41 | 1 | string | Simulation start time (HH:MM:SS)
+|42 | 1 | string | Simulation end date (mm-dd-yyyy)
+|43 | 1 | string | Simulation end time (HH:MM:SS)
+|44 | 1 | real   | Hydrodynamics time step
+|   | 2 | string | Optional time step units, one of: `hr`, `min`,
+`day`, and `sec`. `hr` is default.
+{45 | 1 | int    | Gage and profile output frequency (time steps)
 
 ## Example
 
@@ -108,4 +117,13 @@ MASS1 Configuration File - Version 0.83
 0.5	/	delta t in hours (0.5 for flow only; 0.02 for transport)
 336	/	printout frequency
 ```
+
+[^1]: Using decimal time in time series input no longer works, so
+don't try it. 
+
+[^2]: The metric units option is untested and probably doesn't work.
+
+[^3]: Units are hours unless units are specified.  The real value can
+be followed by a units label. The following are understood: `hr`,
+`min`, `day`, and `sec`.  
 

@@ -2,12 +2,14 @@
 ! file: pidlink.f90
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
-! Battelle Memorial Institute
-! Pacific Northwest Laboratory
+! Copyright (c) 2017 Battelle Memorial Institute
+! Licensed under modified BSD License. A copy of this license can be
+! found in the LICENSE file in the top level directory of this
+! distribution.
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October 10, 2001 by William A. Perkins
-! Last Change: Thu Dec  2 08:30:39 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+! Last Change: 2017-06-21 13:04:57 d3g096
 ! ----------------------------------------------------------------
 
 

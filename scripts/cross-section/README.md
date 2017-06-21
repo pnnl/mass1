@@ -29,8 +29,8 @@ cross sections can be contained in a file.
 
 These scripts understand the cross section format used by the CHARIMA
 code.  MASS1's format is slightly different.  Only the general cross
-section type is understood. MASS1's prismatic section types are not
-handled.
+section type is understood (type 50). MASS1's prismatic section types
+are not handled.
 
 To convert from MASS1 to CHARIMA format:
 

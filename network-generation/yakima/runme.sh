@@ -11,5 +11,5 @@ python ../generate.py \
     --basin-discharge=3500.0 \
     --mannings=0.0325 \
     --gage-output \
-    Yakima_network_info.dat
+    Yakima_network_info.dat.orig
 ../../mass1

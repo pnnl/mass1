@@ -11,7 +11,7 @@
   Extracts a single field from [gage output](../doc/gage.md) and makes
   a correctly formatted [boundary condition](../doc/bc.md) file. 
 
-* `mass1profile`
+* `mass1profile`:
 
 * `profile2cgns.py`
 

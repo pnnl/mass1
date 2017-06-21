@@ -1,9 +1,15 @@
-!-----------------------------------------------------------------------------
-!
-! module to read in and update meteorlogical data needed for air-water heat exchnage
-! and dissolved gas concentration to pressure/saturation conversions
-!
-!-----------------------------------------------------------------------------
+! ----------------------------------------------------------------
+! file: met_data_module.f90
+! ----------------------------------------------------------------
+! ----------------------------------------------------------------
+! Copyright (c) 2017 Battelle Memorial Institute
+! Licensed under modified BSD License. A copy of this license can be
+! found in the LICENSE file in the top level directory of this
+! distribution.
+! ----------------------------------------------------------------
+! ----------------------------------------------------------------
+! Last Change: 2017-06-21 13:04:30 d3g096
+! ----------------------------------------------------------------
 
 MODULE met_data_module
   

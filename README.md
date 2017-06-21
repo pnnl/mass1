@@ -1,6 +1,12 @@
 # Modular Aquatic Simulation System in One Dimension (MASS1)
 
+Copyright (c) 2017 Battelle Memorial Institute
+Licensed under modified BSD License. A copy of this license can be
+found in the [LICENSE](LICENSE) file in the top level directory of this
+distribution.
+
 Home Page: http://mass1.pnnl.gov
+Github repository: https://github.com/pnnl/mass1
 
 ## Description
 
@@ -121,6 +127,17 @@ interface.  All [input and output](doc/README.md) are plain text files.
 There is very little [documentation](doc/README.md), other than the
 code itself.  
 
+The first step in a MASS1 application is to define the topology of the
+river system to be simulated. The topological definition defines how
+the channel system is connected as well as the location and type of
+hydraulic control structures. The domain into a set of *links*, each
+representing a single river reach. The ends of each link either
+represent a boundary, at which river conditions are specified, or
+connect to one or more other links. Each link is further divided into
+series of computational points, where the hydrodynamic and transport
+equations are discretized.  
+
+
 When run, MASS1 expects to find a
-[configuration file](doc/configuration.md) named ```mass1.cfg```.  
+[configuration file](doc/configuration.md) named `mass1.cfg`.  
 
