@@ -19,11 +19,6 @@ MASS1 was developed by Pacific Northwest National Laboratory
 platforms specific to the developers.  Others may, or may not,
 find it useful.  
 
-MASS1 is a *command line* application. There is no graphical user
-interface.  [Input and output](doc/README.md) are plain text files.
-There is very little [documentation](doc/README.md), other than the
-code itself.  There is *no user support*.  
-
 ## Obtaining the Code
 
 The MASS1 source code is currently hosted on PNNL's internal Git
@@ -121,5 +116,11 @@ Similarly, for the Intel Fortran compiler:
 
 ## Usage
 
+MASS1 is a *command line* application. There is no graphical user
+interface.  All [input and output](doc/README.md) are plain text files.
+There is very little [documentation](doc/README.md), other than the
+code itself.  
 
+When run, MASS1 expects to find a
+[configuration file](doc/configuration.md) named ```mass1.cfg```.  
 

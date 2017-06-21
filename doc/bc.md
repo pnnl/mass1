@@ -1,7 +1,5 @@
 # Boundary Condition (BC) Input
 
-
-
 ## BC Table Files
 
 MASS1 boundary condition file are organized into the following
@@ -42,13 +40,20 @@ This is the link BC file from a Lake Roosevelt MASS1 application.
  9 "BCFiles/GCL-Discharge.dat"
 
 ```
-## BC Files
+
+## General BC Files
+
+Most 
 
 MASS1 interpolates between individual date/times. 
 
 ### Example
 
-### Hydro BC 
+```
 
-### PID Link BC
+```
+
+## Hydro BC 
+
+Hydro BC files are used for 
 

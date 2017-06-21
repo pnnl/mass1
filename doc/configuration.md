@@ -24,7 +24,7 @@ because they are no longer needed or computed internally.  Items
 |11 | 1 | flag | Enable temperature dispersion 
 |12 | 1 | flag | Enable atmospheric energy exchange (requires [met data](met.md))
 |13 | 1 | flag | If true, read initial conditions from a hotstart file
-|   |   |      | otherwise, read [initial conditions file]()
+|   |   |      | otherwise, read [initial conditions file](init.md)
 |14 | 1 | flag | Write a hotstart file at the end of simulation
 |15 | 1 | int  | Units option: 1 = English, ~~2 = metric~~[^2]
 |16 | 1 | int  | Time option: ~~0 = real~~[^1], 1 = date/time
