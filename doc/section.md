@@ -21,7 +21,7 @@
 
 
 
-![A general cross section example from Lake Roosevelt](section_12250.pang)
+![A general cross section example from Lake Roosevelt](section_12250.png)
 
 As it looks in the cross section file:
 ```
