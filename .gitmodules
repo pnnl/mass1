@@ -1,3 +1,5 @@
 [submodule "time_series"]
 	path = time_series
 	url = https://github.com/pnnl/time_series.git
+        branch = release/v1.0
+        
