@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October 24, 2011 by William A. Perkins
-# Last Change: Tue Nov  1 09:01:10 2011 by William A. Perkins <d3g096@flophouse>
+# Last Change: 2017-06-05 12:50:51 d3g096
 # -------------------------------------------------------------
 
 from inspect import *
@@ -255,8 +255,9 @@ class Link(object):
         lattransbc = 0
         lattempbc = 0
         metzone = 1
+        lpi = 3.5
 
-        outfd.write("%8d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d /\n" %
+        outfd.write("%8d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5.2f/\n" %
                     (self.id,
                      ptopt,
                      self.npoints,
@@ -270,7 +271,8 @@ class Link(object):
                      metzone,
                      latbc,
                      lattransbc,
-                     lattempbc))
+                     lattempbc,
+                     lpi))
         if (len(self._dnlink) > 0):
             outfd.write("%8d" % (self._dnlink[0].id))
         else:
@@ -358,7 +360,11 @@ def write_link_file(name, links):
 # -------------------------------------------------------------
 # write_link_bc
 # -------------------------------------------------------------
-def write_link_bc(name, qname, dsname, q0, z0, z1):
+def write_link_bc(name, qname, dsname, q0, z0, z1, drystart):
+    myz0 = z0
+    if (drystart):
+        myz0 = z1
+    
     bcout = open(name, mode="w")
 
     bcout.write("%8d \"%s\"\n" % (1, qname))
@@ -371,8 +377,8 @@ def write_link_bc(name, qname, dsname, q0, z0, z1):
     bcout.write("%8d \"%s\"\n" % (2, dsname))
     dsout = open(dsname, mode="w")
     dsout.write("# Downstream stage\n")
-    dsout.write("01-01-1900 00:00:00 %.6g / \n" % (z0))
-    dsout.write("02-01-2000 00:00:00 %.6g / \n" % (z0))
+    dsout.write("01-01-1900 00:00:00 %.6g / \n" % (myz0))
+    dsout.write("02-01-2000 00:00:00 %.6g / \n" % (myz0))
     dsout.write("06-01-2000 00:00:00 %.6g / \n" % (z1))
     dsout.write("01-01-3100 00:00:00 %.6g / \n" % (z1))
     dsout.close()
@@ -410,11 +416,15 @@ def write_lateral_inflows(name, base, basins, basinq):
 # -------------------------------------------------------------
 # write_initial_conditions
 # -------------------------------------------------------------
-def write_initial_conditions(name, links, z0):
+def write_initial_conditions(name, links, z0, z1, drystart):
+    myz0 = z0
+    if (drystart):
+        myz0 = z1
+        
     out = open(name, mode="w")
     for l in links:
         out.write("%8d %8.1f %8.1f %8.1f %8.1f\n" %
-                  (l.id, 0.0, z0, 35.0, 5.0))
+                  (l.id, 0.0, myz0, 35.0, 5.0))
     out.close()
         
 
@@ -473,7 +483,7 @@ no-restart-file         / Read Hotstart file name
 \"@GAGEF@\"    / gage control file name
 \"profile-control.dat\"   / profile file name
 \"@LATFLOWF@\"    / lateral inflow bs file name
-01-31-2000              / date run begins
+02-01-2000              / date run begins
 00:00:00                / time run begins
 07-31-2000              / date run ends
 23:59:59                / time run ends

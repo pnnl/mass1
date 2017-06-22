@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- mode: python; py-which-shell: "python2";-*-
+# -*- mode: python -*-
 # -------------------------------------------------------------
 # file: test.py
 # -------------------------------------------------------------
@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October 24, 2011 by William A. Perkins
-# Last Change: Tue Nov  1 09:08:13 2011 by William A. Perkins <d3g096@flophouse>
+# Last Change: 2017-06-05 12:32:38 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -104,7 +104,7 @@ program = os.path.basename(sys.argv[0])
 notchw = 2.0
 notchd = 3.0
 upq = 5.0
-q0 = 3479.0
+q0 = 0.0
 d0 = 10.0
 mannings = 0.0325
 
@@ -147,6 +147,10 @@ parser.add_option("-D", "--downstream-depth", type=float,
                   dest="depth", action="store", default=d0,
                   help="final downstream depth, cfs")
 
+parser.add_option("-r", "--dry-start", 
+                  dest="drystart", action="store_true", default=False,
+                  help="Make the initial conditions dry instead of completely flooded")
+
 parser.add_option("-n", "--mannings", type=float,
                   dest="n", action="store", default=mannings,
                   help="Manning's coefficient used for all links")
@@ -172,6 +176,7 @@ upq = options.upq
 q0 = options.discharge
 d0 = options.depth
 mannings = options.n
+drystart = options.drystart
 
 # -------------------------------------------------------------
 # main program
@@ -202,8 +207,9 @@ MASS1.write_point_file(points_file, links, -notchd)
 MASS1.write_section_file(sections_file, links, notchw, notchd)
 MASS1.write_lateral_inflows(lateralq_file, "lateral_q", basins, q0)
 MASS1.write_link_bc(linkbc_file, upstreamq_file, downstreambc_file,
-                    upq, maxelev, elev)
-MASS1.write_initial_conditions(initial_file, links, maxelev)
+                    upq, maxelev, elev, drystart)
+MASS1.write_initial_conditions(initial_file, links,
+                               maxelev, elev, drystart)
 
 npt = 0
 for l in links:
