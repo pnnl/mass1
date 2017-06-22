@@ -2,12 +2,14 @@
 # file: MASS1.py
 # -------------------------------------------------------------
 # -------------------------------------------------------------
-# Battelle Memorial Institute
-# Pacific Northwest Laboratory
+# Copyright (c) 2017 Battelle Memorial Institute
+# Licensed under modified BSD License. A copy of this license can be
+# found in the LICENSE file in the top level directory of this
+# distribution.
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October 24, 2011 by William A. Perkins
-# Last Change: 2017-06-05 12:50:51 d3g096
+# Last Change: 2017-06-22 13:19:28 d3g096
 # -------------------------------------------------------------
 
 from inspect import *
@@ -257,7 +259,7 @@ class Link(object):
         metzone = 1
         lpi = 3.5
 
-        outfd.write("%8d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5.2f/\n" %
+        outfd.write("%8d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5.1f /\n" %
                     (self.id,
                      ptopt,
                      self.npoints,

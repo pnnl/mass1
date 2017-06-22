@@ -2,12 +2,14 @@
 # file: Makefile.am
 # -------------------------------------------------------------
 # -------------------------------------------------------------
-# Battelle Memorial Institute
-# Pacific Northwest Laboratory
+# Copyright (c) 2017 Battelle Memorial Institute
+# Licensed under modified BSD License. A copy of this license can be
+# found in the LICENSE file in the top level directory of this
+# distribution.
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created June 22, 2005 by William A. Perkins
-# Last Change: 2016-11-15 07:16:50 d3g096
+# Last Change: 2017-06-22 09:19:23 d3g096
 # -------------------------------------------------------------
 # $Id$
 
