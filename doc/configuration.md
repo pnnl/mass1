@@ -58,9 +58,8 @@ because they are no longer needed or computed internally.  Items
 |42 | 1 | string | Simulation end date (mm-dd-yyyy)
 |43 | 1 | string | Simulation end time (HH:MM:SS)
 |44 | 1 | real   | Hydrodynamics time step
-|   | 2 | string | Optional time step units, one of: `hr`, `min`,
-`day`, and `sec`. `hr` is default.
-{45 | 1 | int    | Gage and profile output frequency (time steps)
+|   | 2 | string | Optional time step units, one of: `hr`, `min`, `day`, and `sec`. `hr` is default.
+|45 | 1 | int    | Gage and profile output frequency (time steps)
 
 ## Example
 
