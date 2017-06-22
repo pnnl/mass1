@@ -4,12 +4,14 @@
 # file: HECRASCHARIMA.pl
 # -------------------------------------------------------------
 # -------------------------------------------------------------
-# Battelle Memorial Institute
-# Pacific Northwest Laboratory
+# Copyright (c) 2017 Battelle Memorial Institute
+# Licensed under modified BSD License. A copy of this license can be
+# found in the LICENSE file in the top level directory of this
+# distribution.
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 25, 2005 by William A. Perkins
-# Last Change: Wed Mar  2 16:17:36 2011 by William A. Perkins <d3g096@bearflag.pnl.gov>
+# Last Change: 2017-06-22 11:41:17 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$

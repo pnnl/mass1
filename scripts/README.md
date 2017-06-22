@@ -1,5 +1,10 @@
 # MASS1 Utility Scripts
 
+These utilities are provided as-is. There is little or no
+documentation (except the code itself).  Some are still used often by the
+authors; others are quite old and in probably in need of maintenance.  
+
+
 * `bcsteps.py` 
 
   This is used to generate a stepped boundary condition file,

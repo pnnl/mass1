@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2017-06-21 14:44:20 d3g096
+! Last Change: 2017-06-21 15:04:12 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! SUBROUTINE banner
@@ -30,8 +30,9 @@ SUBROUTINE banner()
 11 FORMAT(&
         &T4, "Copyright (c) 2017 Battelle Memorial Institute", /,&
         &T4, "Licensed under modified BSD License. A copy of this license can be", /,&
-        &T4, "found in the LICENSE file in the top level directory of this", /,&
-        &T4, "distribution.", /)
+        &T4, "found in the LICENSE file in the top level directory of the source", /,&
+        &T4, "distribution.", /,&
+        &T4, "https://github.com/pnnl/mass1", /)
 
 15 FORMAT(&
         &T4, 'Modular Aquatic Simulation System 1D (MASS1)', /,&

@@ -2,12 +2,14 @@
 # file: section-fix.awk
 # -------------------------------------------------------------
 # -------------------------------------------------------------
-# Battelle Memorial Institute
-# Pacific Northwest Laboratory
+# Copyright (c) 2017 Battelle Memorial Institute
+# Licensed under modified BSD License. A copy of this license can be
+# found in the LICENSE file in the top level directory of this
+# distribution.
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created September 16, 1997 by William A. Perkins
-# Last Change: Fri Sep 19 12:52:36 1997 by William A. Perkins <perk@yama.pnl.gov>
+# Last Change: 2017-06-22 11:41:57 d3g096
 # -------------------------------------------------------------
 
 BEGIN {

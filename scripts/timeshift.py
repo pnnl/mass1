@@ -4,12 +4,14 @@
 # file: timeshift.py
 # -------------------------------------------------------------
 # -------------------------------------------------------------
-# Battelle Memorial Institute
-# Pacific Northwest Laboratory
+# Copyright (c) 2017 Battelle Memorial Institute
+# Licensed under modified BSD License. A copy of this license can be
+# found in the LICENSE file in the top level directory of this
+# distribution.
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March  9, 2016 by William A. Perkins
-# Last Change: 2016-03-09 07:21:24 d3g096
+# Last Change: 2017-06-22 11:46:54 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
