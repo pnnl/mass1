@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: 2017-06-12 09:55:29 d3g096
+# Last Change: 2017-06-22 15:08:47 d3g096
 # -------------------------------------------------------------
 # $Id$
 
@@ -35,5 +35,5 @@ gnuplot < plot-disch.gp > plot-disch.eps
 
 "$python" ../../../scripts/profile_tecplot.py profile1.out > profile1.dat
 "$tecplot" -b -p ../../../scripts/xy-looper-png.mcr stage1.lay
-"$convert" -delay 50 -loop 0 looper-0*.png drain.gif
+"$convert" -delay 20 -loop 1 looper-0*.png drain.gif
 

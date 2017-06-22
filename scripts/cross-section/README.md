@@ -29,8 +29,8 @@ cross sections can be contained in a file.
 
 These scripts understand the cross section format used by the CHARIMA
 code.  MASS1's format is slightly different.  Only the general cross
-section type is understood. MASS1's prismatic section types are not
-handled.
+section type is understood (type 50). MASS1's prismatic section types
+are not handled.
 
 To convert from MASS1 to CHARIMA format:
 
@@ -50,14 +50,3 @@ These utilities are provided as-is. There is little or no
 documentation (except the code itself).  Some are still used often by the
 authors; others are quite old and in probably in need of maintenance.  
 
-* `CHARIMAarea.pl`
-
-   This computes cross section area for each cross section in a
-   file at a specified elevation.  
-   
-* `CHARIMAextract.pl`
-
-   Extracts a subset of cross sections from a file.  A range of IDs or
-   river miles.  
-
-* `CHARIMAfill.pl` 

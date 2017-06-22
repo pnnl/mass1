@@ -4,12 +4,14 @@
 # file: CHARIMAthalweg.pl
 # -------------------------------------------------------------
 # -------------------------------------------------------------
-# Battelle Memorial Institute
-# Pacific Northwest Laboratory
+# Copyright (c) 2017 Battelle Memorial Institute
+# Licensed under modified BSD License. A copy of this license can be
+# found in the LICENSE file in the top level directory of this
+# distribution.
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created November 27, 1996 by William A. Perkins
-# Last Change: Mon Feb 21 08:03:55 2011 by William A. Perkins <d3g096@PE10900.pnl.gov>
+# Last Change: 2017-06-22 11:40:36 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$

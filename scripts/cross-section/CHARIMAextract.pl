@@ -14,8 +14,10 @@
 #
 # -------------------------------------------------------------
 # -------------------------------------------------------------
-# Battelle Memorial Institute
-# Pacific Northwest Laboratory
+# Copyright (c) 2017 Battelle Memorial Institute
+# Licensed under modified BSD License. A copy of this license can be
+# found in the LICENSE file in the top level directory of this
+# distribution.
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 10, 1997 by William A. Perkins

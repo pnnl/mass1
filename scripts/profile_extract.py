@@ -4,12 +4,14 @@
 # file: profile_extract.py
 # -------------------------------------------------------------
 # -------------------------------------------------------------
-# Battelle Memorial Institute
-# Pacific Northwest Laboratory
+# Copyright (c) 2017 Battelle Memorial Institute
+# Licensed under modified BSD License. A copy of this license can be
+# found in the LICENSE file in the top level directory of this
+# distribution.
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 15, 2011 by William A. Perkins
-# Last Change: 2016-11-15 07:55:33 d3g096
+# Last Change: 2017-06-22 11:43:34 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -124,22 +126,22 @@ def read_next_profile(profile, dometric):
         18,
         28,
         37,
-        51,
-        59,
-        68,
-        80,
-        88,
-        96,
-        104,
-        114,
-        126,
-        136,
-        144,
-        150,
-        156,
-        162,
-        172,
-        184
+        53,
+        63,
+        73,
+        85,
+        93,
+        101,
+        109,
+        119,
+        131,
+        141,
+        149,
+        155,
+        161,
+        167,
+        177,
+        189
         )
 
     fldconv = {

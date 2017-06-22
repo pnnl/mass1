@@ -1,0 +1,265 @@
+#!MC 1410
+$!VarSet |LFDSFN1| = '"profile1.dat"'
+$!VarSet |LFDSVL1| = '"link" "point" "pid" "Distance" "Stage" "Discharge" "Velocity" "Depth" "TDGConcentration" "Temperature" "TDGSaturation" "TDGPressure" "Thalweg" "Area" "TopWidth" "HydraulicRadius" "FroudeNumber" "CourantNumber" "DiffusionNumber" "FrictionSlope" "BedShear"'
+$!SETSTYLEBASE FACTORY
+$!PLOTOPTIONS 
+  SUBDIVIDEALLCELLS = NO
+$!GLOBALPAPER 
+  PAPERSIZEINFO
+    {
+    LETTER
+      {
+      WIDTH = 8.5
+      HEIGHT = 11
+      LEFTHARDCLIPOFFSET = 0.125
+      RIGHTHARDCLIPOFFSET = 0.125
+      TOPHARDCLIPOFFSET = 0.125
+      BOTTOMHARDCLIPOFFSET = 0.125
+      }
+    CUSTOM1
+      {
+      WIDTH = 11
+      HEIGHT = 17
+      }
+    CUSTOM2
+      {
+      WIDTH = 24
+      HEIGHT = 36
+      LEFTHARDCLIPOFFSET = 0.1
+      RIGHTHARDCLIPOFFSET = 0.1
+      TOPHARDCLIPOFFSET = 0.1
+      BOTTOMHARDCLIPOFFSET = 0.1
+      }
+    }
+$!PAGE 
+  NAME = ''
+  PAPERATTRIBUTES
+    {
+    BACKGROUNDCOLOR = WHITE
+    ISTRANSPARENT = YES
+    ORIENTPORTRAIT = NO
+    SHOWGRID = YES
+    SHOWRULER = NO
+    SHOWPAPER = YES
+    PAPERSIZE = LETTER
+    RULERSPACING = ONEINCH
+    PAPERGRIDSPACING = QUARTERINCH
+    REGIONINWORKAREA
+      {
+      X1 = 0.75
+      Y1 = 0.75
+      X2 = 10.25
+      Y2 = 7.75
+      }
+    }
+### Frame Number 1 ###
+$!READDATASET  '|LFDSFN1|'
+  INITIALPLOTTYPE = XYLINE
+  INCLUDETEXT = NO
+  INCLUDEGEOM = NO
+  ASSIGNSTRANDIDS = YES
+  VARLOADMODE = BYNAME
+  VARNAMELIST = '|LFDSVL1|'
+$!REMOVEVAR |LFDSVL1|
+$!REMOVEVAR |LFDSFN1|
+$!FRAMELAYOUT 
+  SHOWHEADER = NO
+  HEADERCOLOR = RED
+  XYPOS
+    {
+    X = 0.75
+    Y = 0.75
+    }
+  WIDTH = 9.5
+  HEIGHT = 7
+$!THREEDAXIS 
+  ASPECTRATIOLIMIT = 200
+  BOXASPECTRATIOLIMIT = 200
+$!PLOTTYPE  = XYLINE
+$!FRAMENAME  = 'Frame 001'
+$!GLOBALTIME 
+  SOLUTIONTIME = 0
+$!DELETELINEMAPS 
+$!ACTIVELINEMAPS  =  [1-2]
+$!GLOBALLINEPLOT 
+  DATALABELS
+    {
+    DISTANCESKIP = 5
+    }
+  LEGEND
+    {
+    SHOW = YES
+    BOX
+      {
+      BOXTYPE = NONE
+      MARGIN = 0
+      }
+    XYPOS
+      {
+      X = 83.356
+      Y = 15.738
+      }
+    ANCHORALIGNMENT = BOTTOMRIGHT
+    }
+$!LINEMAP  [1]
+  NAME = '&DV&'
+  ASSIGN
+    {
+    ZONE = 13
+    XAXISVAR = 4
+    YAXISVAR = 5
+    }
+  LINES
+    {
+    COLOR = RED
+    LINETHICKNESS = 0.4
+    }
+  SYMBOLS
+    {
+    COLOR = BLUE
+    FILLCOLOR = BLUE
+    }
+  BARCHARTS
+    {
+    COLOR = BLUE
+    FILLCOLOR = BLUE
+    }
+  ERRORBARS
+    {
+    COLOR = BLUE
+    }
+$!LINEMAP  [2]
+  NAME = '&DV&'
+  ASSIGN
+    {
+    ZONE = 13
+    XAXISVAR = 4
+    YAXISVAR = 13
+    }
+  LINES
+    {
+    COLOR = BLACK
+    }
+  SYMBOLS
+    {
+    COLOR = CUSTOM1
+    FILLCOLOR = CUSTOM1
+    }
+  BARCHARTS
+    {
+    COLOR = CUSTOM1
+    FILLCOLOR = CUSTOM1
+    }
+  ERRORBARS
+    {
+    COLOR = CUSTOM1
+    }
+$!XYLINEAXIS 
+  DEPXTOYRATIO = 1
+  GRIDAREA
+    {
+    DRAWBORDER = YES
+    }
+$!XYLINEAXIS 
+  XDETAIL 1
+    {
+    RANGEMIN = 0
+    RANGEMAX = 10660
+    GRSPACING = 2000
+    TITLE
+      {
+      TITLEMODE = USETEXT
+      TEXT = 'Distance, ft'
+      }
+    }
+$!XYLINEAXIS 
+  YDETAIL 1
+    {
+    RANGEMIN = 0
+    RANGEMAX = 6.4000000000000003553
+    GRSPACING = 1
+    TICKLABEL
+      {
+      NUMFORMAT
+        {
+        FORMATTING = FIXEDFLOAT
+        PRECISION = 1
+        }
+      }
+    TITLE
+      {
+      TITLEMODE = USETEXT
+      TEXT = 'Elevation, ft'
+      }
+    }
+$!ATTACHTEXT 
+  ANCHORPOS
+    {
+    X = 83.35647279549717
+    Y = 84.44615384615382
+    }
+  TEXTSHAPE
+    {
+    HEIGHT = 11
+    }
+  ANCHOR = HEADRIGHT
+  TEXT = '&(ZONENAME[ACTIVEOFFSET=1])'
+$!ATTACHTEXT 
+  ANCHORPOS
+    {
+    X = 19.99251683711649
+    Y = 59.326337169939
+    }
+  TEXTSHAPE
+    {
+    ISBOLD = NO
+    HEIGHT = 10
+    }
+  ANCHOR = MIDLEFT
+  TEXT = 'Constant Stage'
+$!ATTACHTEXT 
+  ANCHORPOS
+    {
+    X = 79.90770765776995
+    Y = 58.07379823967491
+    }
+  TEXTSHAPE
+    {
+    ISBOLD = NO
+    HEIGHT = 10
+    }
+  ANCHOR = RIGHT
+  TEXT = 'Varied Discharge (0 to 50 cfs)'
+$!ATTACHGEOM 
+  POSITIONCOORDSYS = FRAME
+  ANCHORPOS
+    {
+    X = 19.91768520828137
+    Y = 56.29654705484084
+    }
+  ARROWHEADSTYLE = FILLED
+  ARROWHEADATTACHMENT = ATEND
+  ARROWHEADSIZE = 3
+  RAWDATA
+1
+2
+-0.785732083023 2.4437231943 
+-7.03564733267 -1.70298974922E-06 
+$!ATTACHGEOM 
+  POSITIONCOORDSYS = FRAME
+  ANCHORPOS
+    {
+    X = 87.85233586761611
+    Y = 56.75355570936358
+    }
+  ARROWHEADSTYLE = FILLED
+  ARROWHEADATTACHMENT = ATBEGINNING
+  ARROWHEADSIZE = 3
+  RAWDATA
+1
+2
+5.37977982162E-06 -1.20699397144E-06 
+-7.24619701505 1.92535407841 
+$!FRAMECONTROL ACTIVATEBYNUMBER
+  FRAME = 1
+$!SETSTYLEBASE CONFIG

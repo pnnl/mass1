@@ -4,12 +4,14 @@
 # file: CHARIMAview.pl
 # -------------------------------------------------------------
 # -------------------------------------------------------------
-# Battelle Memorial Institute
-# Pacific Northwest Laboratory
+# Copyright (c) 2017 Battelle Memorial Institute
+# Licensed under modified BSD License. A copy of this license can be
+# found in the LICENSE file in the top level directory of this
+# distribution.
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 23, 2005 by William A. Perkins
-# Last Change: 2016-06-01 12:18:39 d3g096
+# Last Change: 2017-06-22 11:40:48 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$

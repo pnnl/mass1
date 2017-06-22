@@ -7,24 +7,20 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 22, 1999 by William A. Perkins
-# Last Change: 2017-01-17 12:02:19 d3g096
+# Last Change: 2017-06-12 11:22:08 d3g096
 # -------------------------------------------------------------
 # $Id$
 
+set xdata time
+set timefmt '%m-%d-%Y %H:%M:%S'
 
-set samples 2000
-set format x "%.1f"
-set xrange [0:12000]
-set xlabel 'Longitudinal Distance, ft'
+set format x "%d%b\n%H:%M"
 set format y "%.0f"
 set ylabel 'Discharge, cfs'
 set pointsize 0.7
-set yrange [0:100]
-# set timestamp
-set key below
+set timestamp
+unset key
 
-plot "profile1.out" using (10656 - $4):6 title 'Simulated' with lines lt 1, \
-     "<tail -n 105 profile1.out" using (10656 - $4):6 title 'Final Conditions' with points lt 7
-     
+plot "ts175.out" using 1:4 with lines lt 1
 
 
