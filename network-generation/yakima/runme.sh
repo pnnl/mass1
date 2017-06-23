@@ -13,4 +13,4 @@ python ../generate.py \
     --gage-output \
     --dry-start \
     Yakima_network_info.dat.orig
-../../mass1
+../../build/mass1
