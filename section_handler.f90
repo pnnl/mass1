@@ -2,12 +2,14 @@
 ! file: cross_section_handler.f90
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
-! Battelle Memorial Institute
-! Pacific Northwest Laboratory
+! Copyright (c) 2017 Battelle Memorial Institute
+! Licensed under modified BSD License. A copy of this license can be
+! found in the LICENSE file in the top level directory of this
+! distribution.
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  4, 2017 by William A. Perkins
-! Last Change: 2017-02-22 09:59:52 d3g096
+! Last Change: 2017-06-23 13:53:05 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE section_handler_module

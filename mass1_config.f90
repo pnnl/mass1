@@ -2,12 +2,14 @@
 ! file: mass1_config.f90
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
-! Battelle Memorial Institute
-! Pacific Northwest Laboratory
+! Copyright (c) 2017 Battelle Memorial Institute
+! Licensed under modified BSD License. A copy of this license can be
+! found in the LICENSE file in the top level directory of this
+! distribution.
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2017-05-19 09:15:45 d3g096
+! Last Change: 2017-06-23 13:52:22 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE mass1_config
