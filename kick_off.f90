@@ -48,8 +48,8 @@ SUBROUTINE kick_off
 
   ! This stuff needs to be set in config%read()
   
-  depth_minimum = 0.002           ! m
-  depth_threshold = 0.01          ! m
+  depth_minimum = 0.003           ! m
+  depth_threshold = 0.1          ! m
 
   SELECT CASE(config%units)
 

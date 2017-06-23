@@ -1,5 +1,8 @@
 2017-06-23  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* kick_off.f90 (kick_off): make the depth parameters the same as
+	master branch
+
 	* flow_sim.f90 (flow_sim): check to make sure area is greater than
 	zero before using it in the denominator
 
