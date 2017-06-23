@@ -111,7 +111,7 @@ SUBROUTINE flow_sim
            ! set geometric data for points i, i+1
            point_num = point
            depth = y(link,point) - thalweg(link,point) !remember y is ELEVATION
-           depth = MAX(depth, 0.0d00)
+           depth = MAX(depth, depth_minimum)
            
            CALL ptsection(link, point_num)%p%props(depth, &
                 &area_temp, hydrad, width, conveyance, dkdy)
@@ -127,14 +127,19 @@ SUBROUTINE flow_sim
            k1 = conveyance
            ky1 = dkdy
 
-           vel(link,point_num) = q1/a1
-           area_old(link,point_num) = a1
+           IF (a1 .GT. 0.0D00) THEN
+              vel(link,point_num) = q1/a1
+              area_old(link,point_num) = a1
+           ELSE 
+              vel(link,point_num) = 0.0
+              area_old(link,point_num) = 0.0
+           END IF
            q_old(link,point_num) = q1
            y_old(link,point_num) = y1
 
            point_num = point + 1
            depth = y(link,point+1) - thalweg(link,point+1)
-           depth = MAX(depth, 0.0D00)
+           depth = MAX(depth, depth_minimum)
 
            CALL ptsection(link, point_num)%p%props(depth, &
                 &area_temp, hydrad, width, conveyance, dkdy)
@@ -150,8 +155,13 @@ SUBROUTINE flow_sim
            k2 = conveyance
            ky2 = dkdy
 
-           vel(link,point_num) = q2/a2
-           area_old(link,point_num) = a2
+           IF (a2 .GT. 0.0) THEN
+              vel(link,point_num) = q2/a2
+              area_old(link,point_num) = a2
+           ELSE 
+              vel(link,point_num) = 0.0
+              area_old(link,point_num) = 0.0
+           END IF
            q_old(link,point_num) = q2
            y_old(link,point_num) = y2
 
@@ -303,33 +313,41 @@ SUBROUTINE flow_sim
            conveyance = config%res_coeff*kstrick(link,point)*conveyance
            dkdy = config%res_coeff*kstrick(link,point)*dkdy
 
-           area(link,point) = area_temp
+           IF (point .GE. maxpoints(link)) THEN
+              delta_x = ABS(x(link,point-1) - x(link,point))
+           ELSE
+              delta_x = ABS(x(link,point+1) - x(link,point))
+           END IF
+
            top_width(link,point) = width
            hyd_radius(link,point) = hydrad
-           froude_num(link,point) = &
-                &SQRT((q(link,point)**2*width)/(config%grav*area_temp**3))
+           IF (area_temp .GT. 0.0) THEN
+              area(link,point) = area_temp
+              froude_num(link,point) = &
+                   &SQRT((q(link,point)**2*width)/(config%grav*area_temp**3))
+              friction_slope(link,point) =&
+                   & ((q(link,point)*manning(link,point))/&
+                   & (config%res_coeff*area_temp*(hydrad**2.0)**0.3333333))**2.0
+              courant_num(link, point) = &
+                   &ABS(q(link,point))/area_temp*config%time%delta_t/delta_x
+           ELSE 
+              area(link,point) = 0.0
+              froude_num(link,point) = 0.0
+              friction_slope(link,point) = 0.0
+              courant_num(link, point) = 0.0
+           END IF
+
+           bed_shear(link,point) = &
+                &config%unit_weight_h2o*hydrad*friction_slope(link,point)
+
+           diffuse_num(link, point) = &
+                &2.0*k_diff(link,point)*config%time%delta_t/delta_x/delta_x
 
            IF (froude_num(link, point) .GE. 1.0) THEN
               WRITE (msg, '("warning: supercritial (Fr=", F5.1, ") indicated at link ", I3, ", point ", I3)')&
                    &froude_num(link, point), link, point
               CALL status_message(msg)
            END IF
-
-           friction_slope(link,point) =&
-                & ((q(link,point)*manning(link,point))/&
-                & (config%res_coeff*area_temp*(hydrad**2.0)**0.3333333))**2.0
-           bed_shear(link,point) = &
-                &config%unit_weight_h2o*hydrad*friction_slope(link,point)
-
-           IF (point .GE. maxpoints(link)) THEN
-              delta_x = ABS(x(link,point-1) - x(link,point))
-           ELSE
-              delta_x = ABS(x(link,point+1) - x(link,point))
-           END IF
-           courant_num(link, point) = &
-                &ABS(q(link,point))/area_temp*config%time%delta_t/delta_x
-           diffuse_num(link, point) = &
-                &2.0*k_diff(link,point)*config%time%delta_t/delta_x/delta_x
 
         END DO
      END SELECT
