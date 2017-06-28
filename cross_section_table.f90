@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  6, 2017 by William A. Perkins
-! Last Change: 2017-06-23 13:51:10 d3g096
+! Last Change: 2017-06-27 08:46:50 d3g096
 ! ----------------------------------------------------------------
 PROGRAM trapezoid_test
   USE utility
@@ -17,7 +17,7 @@ PROGRAM trapezoid_test
   IMPLICIT NONE
 
   CLASS (xsection_t), POINTER :: x
-  DOUBLE PRECISION, PARAMETER :: ymax = 20, dy = 0.5
+  DOUBLE PRECISION, PARAMETER :: ymax = 100, dy = 0.5
   INTEGER, PARAMETER :: iunit = 5, ounit = 6
   INTEGER :: ierr
 

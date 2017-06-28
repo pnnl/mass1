@@ -37,7 +37,7 @@ SUBROUTINE nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
 
   IMPLICIT NONE
 
-  DOUBLE PRECISION :: a,b,c,d,g,ap,bp,cp,dp,gp,bcval
+  DOUBLE PRECISION :: a,b,c,d,g,ap,bp,cp,dp,gp,bcval, p
   DOUBLE PRECISION :: eps = 1.0e-9
   INTEGER :: link,point
   DOUBLE PRECISION :: twid, cw, hwmin, ycrest, oldycrest
@@ -143,7 +143,7 @@ SUBROUTINE nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
    
      d = y(link,point) - thalweg(link,point)
 
-     CALL ptsection(link, point)%p%props(d, a, twid, c, g, gp)
+     CALL ptsection(link, point)%p%props(d, a, twid, p, c, g, gp)
      
      a = 0.0
      b = 1.0

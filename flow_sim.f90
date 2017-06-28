@@ -62,9 +62,8 @@ SUBROUTINE flow_sim
 
   DOUBLE PRECISION :: a,b,c,d,g,ap,bp,cp,dp,gp,denom
   DOUBLE PRECISION :: latq_old,latq_new
-  DOUBLE PRECISION :: depth,area_temp,width,conveyance,dkdy,hydrad
+  DOUBLE PRECISION :: depth,area_temp,width,perim,conveyance,dkdy,hydrad
   DOUBLE PRECISION :: bcval,dy,dq,y_new_time, q_new_time
-  DOUBLE PRECISION :: temp
   DOUBLE PRECISION :: delta_x
 
   INTEGER :: i,point_num,link,point
@@ -114,7 +113,7 @@ SUBROUTINE flow_sim
            depth = MAX(depth, depth_minimum)
            
            CALL ptsection(link, point_num)%p%props(depth, &
-                &area_temp, hydrad, width, conveyance, dkdy)
+                &area_temp, hydrad, width, perim, conveyance, dkdy)
            conveyance = config%res_coeff*kstrick(link,point_num)*conveyance
            dkdy = config%res_coeff*kstrick(link,point_num)*dkdy
 
@@ -142,7 +141,7 @@ SUBROUTINE flow_sim
            depth = MAX(depth, depth_minimum)
 
            CALL ptsection(link, point_num)%p%props(depth, &
-                &area_temp, hydrad, width, conveyance, dkdy)
+                &area_temp, hydrad, width, perim, conveyance, dkdy)
            conveyance = config%res_coeff*kstrick(link,point_num)*conveyance
            dkdy = config%res_coeff*kstrick(link,point_num)*dkdy
 
@@ -309,7 +308,7 @@ SUBROUTINE flow_sim
            depth = y(link,point) - thalweg(link,point)
 
            CALL ptsection(link, point)%p%props(depth, &
-                &area_temp, hydrad, width, conveyance, dkdy)
+                &area_temp, hydrad, width, perim, conveyance, dkdy)
            conveyance = config%res_coeff*kstrick(link,point)*conveyance
            dkdy = config%res_coeff*kstrick(link,point)*dkdy
 

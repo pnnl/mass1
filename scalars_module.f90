@@ -241,7 +241,7 @@ SUBROUTINE tvd_interp(time, htime0, htime1)
 
            CALL ptsection(link,point)%p%props(val, &
                 &area(link,point), val0, width(link,point), &
-                &val0, val0)
+                &val0, val0, val0)
 
            ! val0 = DBLE(harea_old(link, point))
            ! val1 = DBLE(harea(link, point))
