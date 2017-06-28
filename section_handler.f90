@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  4, 2017 by William A. Perkins
-! Last Change: 2017-06-28 07:51:22 d3g096
+! Last Change: 2017-06-28 11:50:17 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE section_handler_module
@@ -32,6 +32,7 @@ MODULE section_handler_module
      PROCEDURE :: pop => section_list_pop
      PROCEDURE :: clear => section_list_clear
      PROCEDURE :: find => section_list_find
+     PROCEDURE :: current => section_list_current
   END type section_list
 
   INTERFACE section_list
@@ -125,31 +126,46 @@ CONTAINS
   FUNCTION section_list_find(this, id) RESULT(xsect)
     IMPLICIT NONE
     CLASS (xsection_t), POINTER :: xsect
-    CLASS (section_list), INTENT(IN) :: this
+    CLASS (section_list), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: id
-    TYPE (dlist_node), POINTER :: node
+
+    CALL this%begin()
+    xsect => this%current()
+    DO WHILE (ASSOCIATED(xsect)) 
+       IF (xsect%id .EQ. id) THEN
+          EXIT
+       END IF
+       CALL this%next()
+       xsect => this%current()
+    END DO
+    RETURN
+  END FUNCTION section_list_find
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION section_list_current
+  ! ----------------------------------------------------------------
+  FUNCTION section_list_current(this) RESULT(xsect)
+
+    IMPLICIT NONE
+
+    CLASS (xsection_t), POINTER :: xsect
+    CLASS (section_list), INTENT(IN) :: this
     TYPE (xsection_ptr), POINTER :: ptr
     CLASS(*), POINTER :: p
-    
+
     NULLIFY(xsect)
-    node => this%head
-    DO WHILE (ASSOCIATED(node)) 
-       p => node%data
+    IF (ASSOCIATED(this%cursor)) THEN
+       p => this%cursor%data
        IF (ASSOCIATED(p)) THEN
           SELECT TYPE (p)
           TYPE IS (xsection_ptr)
              ptr => p
              xsect => ptr%p
-             IF (xsect%id .EQ. id) THEN
-                EXIT
-             END IF
           END SELECT
-          NULLIFY(xsect)
        END IF
-       node => node%next
-    END DO
-    RETURN
-  END FUNCTION section_list_find
+    END IF
+  END FUNCTION section_list_current
+
 
   ! ----------------------------------------------------------------
   !  FUNCTION new_section_list
@@ -198,12 +214,10 @@ CONTAINS
   ! ----------------------------------------------------------------
   SUBROUTINE section_handler_write_geometry(this, fname)
     IMPLICIT NONE
-    CLASS (section_handler), INTENT(IN) :: this
+    CLASS (section_handler), INTENT(INOUT) :: this
     CHARACTER(LEN=*), INTENT(IN) :: fname
-    CLASS (xsection_ptr), POINTER :: ptr
-    CLASS (*), POINTER :: p
+    CLASS (xsection_t), POINTER :: sect
     CHARACTER(LEN=256) :: msg
-    TYPE (dlist_node), POINTER :: node
     INTEGER, PARAMETER :: iounit = 24
     INTEGER :: count, ioerr
 
@@ -214,18 +228,14 @@ CONTAINS
     CALL status_message(msg)
     CALL open_new(fname, iounit)
 
-    node => this%xslist%head
-    DO WHILE (ASSOCIATED(node)) 
-       p => node%data
-       IF (ASSOCIATED(p)) THEN
-          SELECT TYPE (p)
-          TYPE IS (xsection_ptr)
-             ptr => p
-             CALL ptr%p%print(iounit, ioerr)
-          END SELECT
-       END IF
-       node => node%next
+    CALL this%xslist%begin()
+    sect => this%xslist%current()
+    DO WHILE (ASSOCIATED(sect)) 
+       CALL sect%print(iounit, ioerr)
+       CALL this%xslist%next()
+       sect => this%xslist%current()
     END DO
+
     CLOSE(iounit)
 
   END SUBROUTINE section_handler_write_geometry
@@ -236,7 +246,7 @@ CONTAINS
   FUNCTION section_handler_find(this, id) RESULT(xsect)
     IMPLICIT NONE
     CLASS (xsection_t), POINTER :: xsect
-    CLASS (section_handler), INTENT(IN) :: this
+    CLASS (section_handler), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: id
     CHARACTER(LEN=256) :: msg
     
@@ -263,7 +273,7 @@ CONTAINS
   SUBROUTINE section_handler_props(this, sectid, &
        &depth, area, hydrad, topwidth, perim, conveyance, dkdy)
     IMPLICIT NONE
-    CLASS (section_handler), INTENT(IN) :: this
+    CLASS (section_handler), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: sectid
     DOUBLE PRECISION, INTENT(IN) :: depth
     DOUBLE PRECISION, INTENT(OUT) :: area, hydrad, topwidth, perim, conveyance, dkdy

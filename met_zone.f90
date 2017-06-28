@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 21, 2017 by William A. Perkins
-! Last Change: 2017-06-23 13:52:27 d3g096
+! Last Change: 2017-06-28 11:13:32 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE met_zone
@@ -76,6 +76,7 @@ MODULE met_zone
      PROCEDURE :: clear => met_list_clear
      PROCEDURE :: find => met_list_find
      PROCEDURE :: update => met_list_update
+     PROCEDURE :: current => met_list_current
   END type met_zone_list
 
   INTERFACE met_zone_list
@@ -259,29 +260,17 @@ CONTAINS
   FUNCTION met_list_find(this, id) RESULT (zone)
     IMPLICIT NONE
     TYPE (met_zone_t), POINTER :: zone
-    CLASS (met_zone_list), INTENT(IN) :: this
+    CLASS (met_zone_list), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: id
     
-    TYPE (met_zone_ptr), POINTER :: ptr
-    TYPE (dlist_node), POINTER :: node
-    CLASS (*), POINTER :: p
-    
-    NULLIFY(zone)
-    node => this%head
-    DO WHILE (ASSOCIATED(node)) 
-       p => node%data
-       IF (ASSOCIATED(p)) THEN
-          SELECT TYPE (p)
-          TYPE IS (met_zone_ptr)
-             ptr => p
-             zone => ptr%p
-             IF (zone%id .EQ. id) THEN
-                EXIT
-             END IF
-          END SELECT
-          NULLIFY(zone)
+    CALL this%begin()
+    zone => this%current()
+    DO WHILE (ASSOCIATED(zone)) 
+       IF (zone%id .EQ. id) THEN
+          EXIT
        END IF
-       node => node%next
+       CALL this%next()
+       zone => this%current()
     END DO
   END FUNCTION met_list_find
 
@@ -295,23 +284,39 @@ CONTAINS
 
     TYPE (met_zone_ptr), POINTER :: ptr
     TYPE (met_zone_t), POINTER :: zone
-    TYPE (dlist_node), POINTER :: node
-    CLASS (*), POINTER :: p
     
-    node => this%head
-    DO WHILE (ASSOCIATED(node)) 
-       p => node%data
+    CALL this%begin()
+    zone => this%current()
+    DO WHILE (ASSOCIATED(zone)) 
+       CALL zone%update(datetime)
+       CALL this%next()
+       zone => this%current()
+    END DO
+  END SUBROUTINE met_list_update
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION met_list_current
+  ! ----------------------------------------------------------------
+  FUNCTION met_list_current(this) RESULT (zone)
+    IMPLICIT NONE
+    TYPE (met_zone_t), POINTER :: zone
+    CLASS (met_zone_list), INTENT(INOUT) :: this
+    TYPE (met_zone_ptr), POINTER :: ptr
+    CLASS (*), POINTER :: p
+
+    NULLIFY(zone)
+    IF (ASSOCIATED(this%cursor)) THEN
+       p => this%cursor%data
        IF (ASSOCIATED(p)) THEN
           SELECT TYPE (p)
           TYPE IS (met_zone_ptr)
              ptr => p
              zone => ptr%p
-             CALL zone%update(datetime)
           END SELECT
        END IF
-       node => node%next
-    END DO
-  END SUBROUTINE met_list_update
+    END IF
+  END FUNCTION met_list_current
+
 
 
   ! ----------------------------------------------------------------

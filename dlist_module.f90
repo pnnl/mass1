@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 21, 2017 by William A. Perkins
-! Last Change: 2017-06-23 13:51:28 d3g096
+! Last Change: 2017-06-28 11:01:46 d3g096
 ! ----------------------------------------------------------------
 MODULE dlist_module
 
@@ -148,7 +148,7 @@ CONTAINS
     IMPLICIT NONE
     CLASS (dlist), INTENT(INOUT) :: this
 
-    this%cursor = this%head
+    this%cursor => this%head
   END SUBROUTINE dlist_begin
 
   ! ----------------------------------------------------------------

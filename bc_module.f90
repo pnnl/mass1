@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January 17, 2017 by William A. Perkins
-! Last Change: 2017-06-23 13:50:38 d3g096
+! Last Change: 2017-06-28 10:59:59 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE bc_module
@@ -114,6 +114,7 @@ MODULE bc_module
      PROCEDURE :: clear => bc_list_clear
      PROCEDURE :: find => bc_list_find
      PROCEDURE :: update => bc_list_update
+     PROCEDURE :: current => bc_list_current
   END type bc_list
 
   INTERFACE bc_list
@@ -337,28 +338,40 @@ CONTAINS
     IMPLICIT NONE
     CLASS (bc_list) :: this
     DOUBLE PRECISION, INTENT(IN) :: time
-    TYPE (dlist_node), POINTER :: node
+    CLASS (bc_t), POINTER :: bc
+
+    CALL this%begin()
+    bc => this%current()
+    DO WHILE (ASSOCIATED(bc)) 
+       CALL bc%update(time)
+       CALL this%next()
+       bc => this%current()
+    END DO
+  END SUBROUTINE bc_list_update
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION bc_list_current
+  ! ----------------------------------------------------------------
+  FUNCTION bc_list_current(this) RESULT(bc)
+    IMPLICIT NONE
+    CLASS (bc_t), POINTER :: bc
+    CLASS (bc_list) :: this
     TYPE (bc_ptr), POINTER :: ptr
     CLASS(*), POINTER :: p
-    CLASS (bc_t), POINTER :: bc
-    
-    node => this%head
-    DO WHILE (ASSOCIATED(node)) 
-       p => node%data
+
+    NULLIFY(bc)
+    IF (ASSOCIATED(this%cursor)) THEN
+       p => this%cursor%data
        IF (ASSOCIATED(p)) THEN
           SELECT TYPE (p)
           TYPE IS (bc_ptr)
              ptr => p
              bc => ptr%p
-             CALL bc%update(time)
           END SELECT
        END IF
-       node => node%next
-    END DO
-
-  END SUBROUTINE bc_list_update
-
-
+    END IF
+  END FUNCTION bc_list_current
+  
   ! ----------------------------------------------------------------
   ! SUBROUTINE bc_manager_read
   ! ----------------------------------------------------------------

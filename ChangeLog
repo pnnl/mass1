@@ -1,5 +1,16 @@
 2017-06-28  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* bc_module.f90 (bc_list_current, bc_list_update): use the dlist
+	cursor
+
+	* dlist_module.f90 (dlist_begin): fix pointer assignment
+
+	* met_zone.f90 (met_list_current, met_list_update)
+	(met_list_find): use the dlist cursor
+
+	* section_handler.f90 (section_handler_write_geometry)
+	(section_list_find, section_list_current): use the dlist cursor
+
 	* cross_section.f90 (cross_section_table): include wetted
 	perimeter in output table
 
