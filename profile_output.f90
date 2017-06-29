@@ -212,7 +212,7 @@ CONTAINS
           point = profile_point(i,j)
           depth = y(link,point) - thalweg(link,point)
 
-          IF (config%met_required) THEN
+          IF (config%do_gas .AND. config%met_required) THEN
              baro_press = metzone(link)%p%current%bp
           ELSE 
              baro_press = 760.0

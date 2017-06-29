@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  2, 2017 by William A. Perkins
-! Last Change: 2017-06-23 13:50:52 d3g096
+! Last Change: 2017-06-29 10:37:49 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE confluence_module
@@ -136,19 +136,46 @@ CONTAINS
     DOUBLE PRECISION :: uconc
     CLASS (confluence_t), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(IN) :: c(:, 0:)
-    DOUBLE PRECISION :: qi, ci
-    INTEGER :: i, ulink, upmax
+    DOUBLE PRECISION :: qi, qin, qout, ci, cavg
+    INTEGER :: i, nc, ulink, upmax
 
+    qin = 0.0
+    qout = 0.0
     uconc = 0.0
+    cavg = 0
+    n = 0
+
     DO i = 1, this%n_ulink
        ulink = this%ulink(i)
        upmax = maxpoints(ulink)
        qi = q(ulink, upmax)
-       ci = c(ulink, upmax)
-       uconc = uconc + qi*ci
+       IF (qi .GE. 0.0) THEN
+          ci = c(ulink, upmax)
+          uconc = uconc + qi*ci
+          qin = qin + qi
+       ELSE
+          qout = qout - qi
+       END IF
+       cavg = cavg + c(ulink, upmax)
+       nc = nc + 1
     END DO
+
     qi = q(this%dlink, 1)
-    uconc = uconc/qi
+    ci = c(this%dlink, 1)
+    cavg = cavg + ci
+    cavg = cavg/REAL(nc+1)
+    IF (qi .LT. 0.0) THEN
+       qin = qin - qi
+       uconc = uconc - qi*ci
+    ELSE
+       qout = qout + qi
+    END IF
+
+    IF (qout .GT. 0.0) THEN
+       uconc = uconc/qout
+    ELSE
+       uconc = cavg
+    END IF
   END FUNCTION confluence_conc
 
 

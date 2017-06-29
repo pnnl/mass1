@@ -1,3 +1,11 @@
+2017-06-29  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* profile_output.f90 (profile_output): NEVER use barometric
+	pressure from met data unless TDG is simulated
+
+	* confluence_module.f90 (confluence_conc): account for reverse
+	flow 
+
 2017-06-28  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* bc_module.f90 (bc_list_current, bc_list_update): use the dlist
