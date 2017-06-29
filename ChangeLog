@@ -1,3 +1,9 @@
+2017-06-29  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* link_module.f90 (link_manager_connect): write code to connect
+	network w/ confluences (compiles)
+	(confluence_conc): start coding of confluence routines (compiles)
+
 2017-06-28  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* bc_module.f90 (bc_list_current, bc_list_update): use the dlist
