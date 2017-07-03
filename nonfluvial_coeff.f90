@@ -30,6 +30,7 @@
 SUBROUTINE nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
 
   USE mass1_config
+  USE cross_section
   USE section_handler_module
   USE point_vars
   USE link_vars, ONLY : linktype, crest
@@ -42,6 +43,7 @@ SUBROUTINE nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
   INTEGER :: link,point
   DOUBLE PRECISION :: twid, cw, hwmin, ycrest, oldycrest
   DOUBLE PRECISION :: maxtravel, sensitivity
+  TYPE (xsection_prop) :: props
   
   maxtravel = 20.0*config%time%delta_t/3600.0
   sensitivity = 0.01
@@ -143,7 +145,9 @@ SUBROUTINE nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
    
      d = y(link,point) - thalweg(link,point)
 
-     CALL ptsection(link, point)%p%props(d, a, twid, p, c, g, gp)
+     CALL ptsection(link, point)%p%props(d, props)
+
+     twid = props%topwidth
      
      a = 0.0
      b = 1.0

@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2017-06-30 09:04:28 d3g096
+# Last Change: 2017-07-03 11:33:04 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -185,6 +185,7 @@ add_executable(svgrptest svgrp-test.f90 svgrp.f90)
 add_executable(link_test 
   link_test.f90 
   link_module.f90
+  linear_link_module.f90
   dlist_module.f90
   bc_module.f90
 )

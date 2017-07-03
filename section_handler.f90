@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  4, 2017 by William A. Perkins
-! Last Change: 2017-06-28 11:50:17 d3g096
+! Last Change: 2017-07-03 10:15:01 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE section_handler_module
@@ -270,19 +270,18 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE section_handler_props
   ! ----------------------------------------------------------------
-  SUBROUTINE section_handler_props(this, sectid, &
-       &depth, area, hydrad, topwidth, perim, conveyance, dkdy)
+  SUBROUTINE section_handler_props(this, sectid, depth, props)
     IMPLICIT NONE
     CLASS (section_handler), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: sectid
     DOUBLE PRECISION, INTENT(IN) :: depth
-    DOUBLE PRECISION, INTENT(OUT) :: area, hydrad, topwidth, perim, conveyance, dkdy
+    TYPE (xsection_prop), INTENT(OUT) :: props
     CLASS (xsection_t), POINTER :: xsect
     CHARACTER(LEN=256) :: msg
     
     xsect => this%find(sectid)
     IF (ASSOCIATED(xsect)) THEN
-       CALL xsect%props(depth, area, hydrad, topwidth, perim, conveyance, dkdy)
+       CALL xsect%props(depth, props)
     ELSE 
        WRITE(msg, *) 'Section ', sectid, ' not found'
        CALL error_message(msg)

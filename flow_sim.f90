@@ -52,6 +52,7 @@ SUBROUTINE flow_sim
 
   USE mass1_config
   USE general_vars
+  USE cross_section
   USE link_vars
   USE point_vars
   USE fluvial_coeffs
@@ -65,6 +66,8 @@ SUBROUTINE flow_sim
   DOUBLE PRECISION :: depth,area_temp,width,perim,conveyance,dkdy,hydrad
   DOUBLE PRECISION :: bcval,dy,dq,y_new_time, q_new_time
   DOUBLE PRECISION :: delta_x
+  TYPE (xsection_prop) :: props
+
 
   INTEGER :: i,point_num,link,point
 
@@ -112,10 +115,13 @@ SUBROUTINE flow_sim
            depth = y(link,point) - thalweg(link,point) !remember y is ELEVATION
            depth = MAX(depth, depth_minimum)
            
-           CALL ptsection(link, point_num)%p%props(depth, &
-                &area_temp, hydrad, width, perim, conveyance, dkdy)
-           conveyance = config%res_coeff*kstrick(link,point_num)*conveyance
-           dkdy = config%res_coeff*kstrick(link,point_num)*dkdy
+           CALL ptsection(link, point_num)%p%props(depth, props)
+           area_temp = props%area
+           hydrad = props%hydrad
+           width = props%topwidth
+           perim = props%wetperim
+           conveyance = config%res_coeff*kstrick(link,point_num)*props%conveyance
+           dkdy = config%res_coeff*kstrick(link,point_num)*props%dkdy
 
            d1 = depth
            fr1 = froude_num(link,point)
@@ -140,10 +146,13 @@ SUBROUTINE flow_sim
            depth = y(link,point+1) - thalweg(link,point+1)
            depth = MAX(depth, depth_minimum)
 
-           CALL ptsection(link, point_num)%p%props(depth, &
-                &area_temp, hydrad, width, perim, conveyance, dkdy)
-           conveyance = config%res_coeff*kstrick(link,point_num)*conveyance
-           dkdy = config%res_coeff*kstrick(link,point_num)*dkdy
+           CALL ptsection(link, point_num)%p%props(depth, props)
+           area_temp = props%area
+           hydrad = props%hydrad
+           width = props%topwidth
+           perim = props%wetperim
+           conveyance = config%res_coeff*kstrick(link,point_num)*props%conveyance
+           dkdy = config%res_coeff*kstrick(link,point_num)*props%dkdy
 
            d2 = depth
            fr2 = froude_num(link,point+1)
@@ -307,10 +316,14 @@ SUBROUTINE flow_sim
            CALL depth_check(thalweg(link, point), y(link,point), q(link,point))
            depth = y(link,point) - thalweg(link,point)
 
-           CALL ptsection(link, point)%p%props(depth, &
-                &area_temp, hydrad, width, perim, conveyance, dkdy)
-           conveyance = config%res_coeff*kstrick(link,point)*conveyance
-           dkdy = config%res_coeff*kstrick(link,point)*dkdy
+           CALL ptsection(link, point_num)%p%props(depth, props)
+           area_temp = props%area
+           hydrad = props%hydrad
+           width = props%topwidth
+           perim = props%wetperim
+           conveyance = config%res_coeff*kstrick(link,point_num)*props%conveyance
+           dkdy = config%res_coeff*kstrick(link,point_num)*props%dkdy
+
 
            IF (point .GE. maxpoints(link)) THEN
               delta_x = ABS(x(link,point-1) - x(link,point))

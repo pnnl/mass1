@@ -1,5 +1,22 @@
 2017-07-03  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* linear_link_module.f90: add
+
+	* flow_sim.f90 (flow_sim): adapt to new cross section props
+	interface
+
+	* nonfluvial_coeff.f90 (nonfluvial_coeff): adapt to new cross
+	section props interface
+
+	* scalars_module.f90 (tvd_interp): adapt to new cross section
+	props interface
+
+	* section_handler.f90 (section_handler_props): adapt to new cross
+	section props interface
+
+	* cross_section.f90 (cross_section): use a derived type to more
+	generally store cross section properties
+
 	* gastemp/CMakeLists.txt: add copyright
 
 	* banner.f90.in (banner): print out code branch

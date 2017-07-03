@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2017-06-29 13:16:51 d3g096
+! Last Change: 2017-07-03 13:18:19 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -34,29 +34,67 @@ MODULE link_module
   ! ----------------------------------------------------------------
   ! TYPE link_t
   ! ----------------------------------------------------------------
-  TYPE, PUBLIC :: link_t
+  TYPE, ABSTRACT, PUBLIC :: link_t
      INTEGER :: id
      INTEGER :: dsid
      TYPE (bc_ptr) :: usbc, dsbc
      TYPE (confluence_ptr) :: ucon, dcon
    CONTAINS
 
+     PROCEDURE (init_proc), DEFERRED :: initialize
+     PROCEDURE (destroy_proc), DEFERRED :: destroy
+
      ! the up/down routines are required by confluence
 
-     PROCEDURE :: q_up => link_q_up      ! should be deferred
-     PROCEDURE :: q_down => link_q_down  ! should be deferred
-     PROCEDURE :: y_up => link_y_up      ! should be deferred
-     PROCEDURE :: y_down => link_y_down  ! should be deferred
-     PROCEDURE :: c_up => link_c_up      ! should be deferred
-     PROCEDURE :: c_down => link_c_down  ! should be deferred
+     PROCEDURE (up_down_proc), DEFERRED :: q_up
+     PROCEDURE (up_down_proc), DEFERRED :: q_down
+     PROCEDURE (up_down_proc), DEFERRED :: y_up
+     PROCEDURE (up_down_proc), DEFERRED :: y_down
+     PROCEDURE (c_up_down_proc), DEFERRED :: c_up
+     PROCEDURE (c_up_down_proc), DEFERRED :: c_down
+
+     ! hydrodynamics are computed with two sweeps
+
+     PROCEDURE (sweep_proc), DEFERRED :: forward_sweep
+     PROCEDURE (sweep_proc), DEFERRED :: backward_sweep
 
 
-     PROCEDURE :: destroy => link_destroy! should be deferred
   END type link_t
 
-  INTERFACE link_t
-     MODULE PROCEDURE new_link_t
-  END INTERFACE link_t
+  ABSTRACT INTERFACE
+     SUBROUTINE init_proc(this, id, dsid)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(INOUT) :: this
+       INTEGER, INTENT(IN) :: id, dsid
+     END SUBROUTINE init_proc
+
+     DOUBLE PRECISION FUNCTION up_down_proc(this)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(IN) :: this
+     END FUNCTION up_down_proc
+     
+     DOUBLE PRECISION FUNCTION c_up_down_proc(this, ispecies)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(IN) :: this
+       INTEGER, INTENT(IN) :: ispecies
+     END FUNCTION c_up_down_proc
+     
+     SUBROUTINE sweep_proc(this)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(INOUT) :: this
+     END SUBROUTINE sweep_proc
+
+     SUBROUTINE destroy_proc(this)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(INOUT) :: this
+     END SUBROUTINE destroy_proc
+
+  END INTERFACE
 
   ! ----------------------------------------------------------------
   ! TYPE link_ptr
@@ -119,102 +157,23 @@ MODULE link_module
   
 CONTAINS
 
-  ! ----------------------------------------------------------------
-  !  FUNCTION new_link_t
-  ! ----------------------------------------------------------------
-  FUNCTION new_link_t(id, dsid) RESULT(link)
-    IMPLICIT NONE
-    INTEGER, INTENT(IN) :: id, dsid
-    TYPE (link_t) :: link
+  ! ! ----------------------------------------------------------------
+  ! !  FUNCTION new_link_t
+  ! ! ----------------------------------------------------------------
+  ! FUNCTION new_link_t(id, dsid) RESULT(link)
+  !   IMPLICIT NONE
+  !   INTEGER, INTENT(IN) :: id, dsid
+  !   TYPE (link_t) :: link
 
-    link%id = id
-    link%dsid = dsid
-    NULLIFY(link%usbc%p)
-    NULLIFY(link%dsbc%p)
-    NULLIFY(link%ucon%p)
-    NULLIFY(link%dcon%p)
+  !   link%id = id
+  !   link%dsid = dsid
+  !   NULLIFY(link%usbc%p)
+  !   NULLIFY(link%dsbc%p)
+  !   NULLIFY(link%ucon%p)
+  !   NULLIFY(link%dcon%p)
 
-  END FUNCTION new_link_t
+  ! END FUNCTION new_link_t
 
-
-  ! ----------------------------------------------------------------
-  ! DOUBLE PRECISION FUNCTION link_q_up
-  ! ----------------------------------------------------------------
-  DOUBLE PRECISION FUNCTION link_q_up(this)
-    IMPLICIT NONE
-    CLASS (link_t), INTENT(IN) :: this
-    
-    link_q_up = 0.0
-  END FUNCTION link_q_up
-
-
-  ! ----------------------------------------------------------------
-  ! DOUBLE PRECISION FUNCTION link_q_down
-  ! ----------------------------------------------------------------
-  DOUBLE PRECISION FUNCTION link_q_down(this)
-    IMPLICIT NONE
-    CLASS (link_t), INTENT(IN) :: this
-    
-    link_q_down = 0.0
-  END FUNCTION link_q_down
-
-
-  ! ----------------------------------------------------------------
-  ! DOUBLE PRECISION FUNCTION link_y_up
-  ! ----------------------------------------------------------------
-  DOUBLE PRECISION FUNCTION link_y_up(this)
-    IMPLICIT NONE
-    CLASS (link_t), INTENT(IN) :: this
-    
-    link_y_up = 0.0
-  END FUNCTION link_y_up
-
-
-  ! ----------------------------------------------------------------
-  ! DOUBLE PRECISION FUNCTION link_y_down
-  ! ----------------------------------------------------------------
-  DOUBLE PRECISION FUNCTION link_y_down(this)
-    IMPLICIT NONE
-    CLASS (link_t), INTENT(IN) :: this
-    
-    link_y_down = 0.0
-  END FUNCTION link_y_down
-
-
-  ! ----------------------------------------------------------------
-  ! DOUBLE PRECISION FUNCTION link_c_up
-  ! ----------------------------------------------------------------
-  DOUBLE PRECISION FUNCTION link_c_up(this, ispecies)
-    IMPLICIT NONE
-    CLASS (link_t), INTENT(IN) :: this
-    INTEGER, INTENT(IN) :: ispecies
-
-    link_c_up = 0.0
-  END FUNCTION link_c_up
-
-
-  ! ----------------------------------------------------------------
-  ! DOUBLE PRECISION FUNCTION link_c_down
-  ! ----------------------------------------------------------------
-  DOUBLE PRECISION FUNCTION link_c_down(this, ispecies)
-    IMPLICIT NONE
-    CLASS (link_t), INTENT(IN) :: this
-    INTEGER, INTENT(IN) :: ispecies
-    
-    link_c_down = 0.0
-  END FUNCTION link_c_down
-
-
-
-  ! ----------------------------------------------------------------
-  ! SUBROUTINE link_destroy
-  ! ----------------------------------------------------------------
-  SUBROUTINE link_destroy(this)
-    IMPLICIT NONE
-    CLASS (link_t), INTENT(INOUT) :: this
-    
-
-  END SUBROUTINE link_destroy
 
   ! ----------------------------------------------------------------
   !  FUNCTION new_link_list
@@ -510,9 +469,6 @@ CONTAINS
   !  FUNCTION confluence_elev
   ! ----------------------------------------------------------------
   FUNCTION confluence_elev(this) RESULT(dsy)
-    USE link_vars
-    USE point_vars
-    USE flow_coeffs
 
     IMPLICIT NONE
     DOUBLE PRECISION :: dsy

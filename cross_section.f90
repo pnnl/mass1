@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2017-06-28 08:10:39 d3g096
+! Last Change: 2017-07-03 10:13:52 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -19,6 +19,19 @@ MODULE cross_section
   USE utility
 
   IMPLICIT NONE
+
+  ! ----------------------------------------------------------------
+  ! TYPE xsection_prop
+  ! ----------------------------------------------------------------
+  TYPE, PUBLIC ::  xsection_prop
+     DOUBLE PRECISION :: depth
+     DOUBLE PRECISION :: area
+     DOUBLE PRECISION :: topwidth
+     DOUBLE PRECISION :: hydrad
+     DOUBLE PRECISION :: wetperim
+     DOUBLE PRECISION :: conveyance
+     DOUBLE PRECISION :: dkdy
+  END type xsection_prop
 
   ! ----------------------------------------------------------------
   ! TYPE xsection_t
@@ -41,12 +54,12 @@ MODULE cross_section
        INTEGER, INTENT(OUT) :: ioerr
      END SUBROUTINE read_proc
      
-     SUBROUTINE props_proc(this, depth, area, hydrad, topwidth, perim, conveyance, dkdy)
-       IMPORT :: xsection_t
+     SUBROUTINE props_proc(this, depth, props)
+       IMPORT :: xsection_t, xsection_prop
        IMPLICIT NONE
        CLASS(xsection_t), INTENT(IN) :: this
        DOUBLE PRECISION, INTENT(IN) :: depth 
-       DOUBLE PRECISION, INTENT(OUT) :: area, hydrad, topwidth, perim, conveyance, dkdy
+       TYPE (xsection_prop), INTENT(OUT) :: props
      END SUBROUTINE props_proc
 
      SUBROUTINE print_proc(this, iounit, ioerr)
@@ -104,19 +117,6 @@ MODULE cross_section
   END type rectangular_flood_section
 
   ! ----------------------------------------------------------------
-  ! TYPE general_section_prop
-  ! ----------------------------------------------------------------
-  TYPE, PRIVATE :: general_section_prop
-     DOUBLE PRECISION :: depth
-     DOUBLE PRECISION :: area
-     DOUBLE PRECISION :: topwidth
-     DOUBLE PRECISION :: hydradius
-     DOUBLE PRECISION :: wetperim
-     DOUBLE PRECISION :: conveyance
-     DOUBLE PRECISION :: dkdy
-  END type general_section_prop
-
-  ! ----------------------------------------------------------------
   ! TYPE general_section
   ! ----------------------------------------------------------------
   TYPE, PUBLIC, EXTENDS(xsection_t) :: general_section
@@ -126,7 +126,7 @@ MODULE cross_section
      INTEGER :: nlevel          ! number of section prop levels
      DOUBLE PRECISION :: delta_y
      LOGICAL :: nonmono
-     TYPE(general_section_prop), ALLOCATABLE, DIMENSION(:) :: prop
+     TYPE(xsection_prop), ALLOCATABLE, DIMENSION(:) :: prop
 
      INTEGER :: nwidth          ! number of unique depth/width pairs
      DOUBLE PRECISION :: ymin, ymax
@@ -174,24 +174,24 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE rectangular_props
   ! ----------------------------------------------------------------
-  SUBROUTINE rectangular_props(this, depth, area, hydrad, &
-       &topwidth, perim, conveyance, dkdy)
+  SUBROUTINE rectangular_props(this, depth, props)
     IMPLICIT NONE
     CLASS(rectangular_section), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(IN) :: depth
-    DOUBLE PRECISION, INTENT(OUT) :: area, hydrad, topwidth, perim, conveyance, dkdy
+    TYPE (xsection_prop), INTENT(OUT) :: props
 
-    perim = this%bottom_width + 2.0*depth
-    area = depth*this%bottom_width
-    topwidth = this%bottom_width
-    IF (area .GT. 0.0) THEN
-       hydrad = area/perim
-       conveyance = (area**(5./3.))/(perim**(2./3.))
-       dkdy =  conveyance*(5.0*this%bottom_width/area - 4.0/perim)/3.0
+    props%depth = depth
+    props%wetperim = this%bottom_width + 2.0*depth
+    props%area = depth*this%bottom_width
+    props%topwidth = this%bottom_width
+    IF (props%area .GT. 0.0) THEN
+       props%hydrad = props%area/props%wetperim
+       props%conveyance = (props%area**(5./3.))/(props%wetperim**(2./3.))
+       props%dkdy =  props%conveyance*(5.0*this%bottom_width/props%area - 4.0/props%wetperim)/3.0
     ELSE 
-       hydrad = 0.0
-       conveyance = 0.0
-       dkdy = 0.0
+       props%hydrad = 0.0
+       props%conveyance = 0.0
+       props%dkdy = 0.0
     END IF
   END SUBROUTINE rectangular_props
 
@@ -225,26 +225,28 @@ CONTAINS
   !
   ! Taken from Table 2-1 in Chow
   ! ----------------------------------------------------------------
-  SUBROUTINE trapezoidal_props(this, depth, area, hydrad, topwidth, perim, conveyance, dkdy)
+  SUBROUTINE trapezoidal_props(this, depth, props)
     IMPLICIT NONE
     CLASS (trapezoidal_section), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(IN) :: depth 
-    DOUBLE PRECISION, INTENT(OUT) :: area, hydrad, topwidth, perim, conveyance, dkdy
+    TYPE (xsection_prop), INTENT(OUT) :: props
 
     ! to make thing a little more readable
     DOUBLE PRECISION :: b, z, dAdy, dPdy
     b = this%bottom_width
     z = this%sidez
     
-    area = (b + z*depth)*depth
-    perim = b + 2.0*depth*SQRT(1 + z*z)
-    hydrad = area/perim
-    topwidth = b + 2.0*z*depth
-    conveyance = area*hydrad**(2.0/3.0)
-    ! or conveyance = area**(5.0/3.0)/perim
+    props%depth = depth
+    props%area = (b + z*depth)*depth
+    props%wetperim = b + 2.0*depth*SQRT(1 + z*z)
+    props%hydrad = props%area/props%wetperim
+    props%topwidth = b + 2.0*z*depth
+    props%conveyance = props%area*props%hydrad**(2.0/3.0)
+    ! or conveyance = area**(5.0/3.0)/wetperim
     dAdy = b + 2*z*depth
     dPdy = 2*SQRT(1 + z*z)
-    dkdy = (5.0/3.0)*dAdy*hydrad**(2.0/3.0) - (2.0/3.0)*hydrad**(5.0/3.0)*dPdy
+    props%dkdy = (5.0/3.0)*dAdy*props%hydrad**(2.0/3.0) - &
+         &(2.0/3.0)*props%hydrad**(5.0/3.0)*dPdy
 
   END SUBROUTINE trapezoidal_props
 
@@ -266,25 +268,24 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE rectangular_flood_props
   ! ----------------------------------------------------------------
-  SUBROUTINE rectangular_flood_props(this, depth, area, hydrad, &
-       &topwidth, perim, conveyance, dkdy)
+  SUBROUTINE rectangular_flood_props(this, depth, props)
 
     IMPLICIT NONE
     CLASS(rectangular_flood_section), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(IN) :: depth
-    DOUBLE PRECISION, INTENT(OUT) :: area, hydrad, topwidth, perim, conveyance, dkdy
+    TYPE (xsection_prop), INTENT(OUT) :: props
     
     IF (depth .LE. this%depth_main) THEN
-       CALL rectangular_props(this, depth, area, hydrad, &
-            &topwidth, perim, conveyance, dkdy)
+       CALL rectangular_props(this, depth, props)
     ELSE
-       area = this%depth_main*this%bottom_width + &
+       props%depth = depth
+       props%area = this%depth_main*this%bottom_width + &
             &(depth - this%depth_main)*this%bottom_width_flood
-       perim = 2*depth + this%bottom_width_flood
-       topwidth = this%bottom_width_flood
-       hydrad = area/perim
-       conveyance = (area**(5./3.))/(perim**(2./3.))
-       dkdy = conveyance*(5.0*topwidth/area - 4.0/perim)/3.0
+       props%wetperim = 2*depth + this%bottom_width_flood
+       props%topwidth = this%bottom_width_flood
+       props%hydrad = props%area/props%wetperim
+       props%conveyance = (props%area**(5./3.))/(props%wetperim**(2./3.))
+       props%dkdy = props%conveyance*(5.0*props%topwidth/props%area - 4.0/props%wetperim)/3.0
     ENDIF
   END SUBROUTINE rectangular_flood_props
 
@@ -412,7 +413,7 @@ CONTAINS
     this%prop(i)%depth = 0.0
     this%prop(i)%area = 0.0
     this%prop(i)%topwidth = 0.0
-    this%prop(i)%hydradius = 0.0
+    this%prop(i)%hydrad = 0.0
     this%prop(i)%wetperim = 0.0
     this%prop(i)%conveyance = 0.0
     this%prop(i)%dkdy = 0.0
@@ -434,9 +435,9 @@ CONTAINS
        this%prop(i)%wetperim = &
             &this%prop(i-1)%wetperim + &
             &SQRT(4*this%delta_y**2 + (this%prop(i)%topwidth - this%prop(i-1)%topwidth)**2)
-       this%prop(i)%hydradius = this%prop(i)%area/this%prop(i)%wetperim
+       this%prop(i)%hydrad = this%prop(i)%area/this%prop(i)%wetperim
        this%prop(i)%conveyance = &
-            &this%prop(i)%area*this%prop(i)%hydradius**(2.0/3.0)
+            &this%prop(i)%area*this%prop(i)%hydrad**(2.0/3.0)
     END DO
 
     ! adjust the geo-conveyance to be sure that it
@@ -470,7 +471,7 @@ CONTAINS
     IMPLICIT NONE
     CLASS(general_section), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(IN) :: depth
-    TYPE (general_section_prop), INTENT(INOUT) :: p
+    TYPE (xsection_prop), INTENT(INOUT) :: p
 
     INTEGER :: j
     DOUBLE PRECISION :: factor
@@ -486,11 +487,11 @@ CONTAINS
     p%area = factor*(this%prop(j+1)%area - this%prop(j)%area) + this%prop(j)%area
     p%topwidth = factor*(this%prop(j+1)%topwidth - this%prop(j)%topwidth) + this%prop(j)%topwidth
     p%wetperim = factor*(this%prop(j+1)%wetperim - this%prop(j)%wetperim) + this%prop(j)%wetperim
-    ! p%hydradius = factor*(this%prop(j+1)%hydradius - this%prop(j)%hydradius) + this%prop(j)%hydradius
+    ! p%hydrad = factor*(this%prop(j+1)%hydrad - this%prop(j)%hydrad) + this%prop(j)%hydrad
     IF (p%wetperim .GT. 0.0) THEN 
-       p%hydradius = p%area/p%wetperim
+       p%hydrad = p%area/p%wetperim
     ELSE 
-       p%hydradius = 0.0
+       p%hydrad = 0.0
     END IF
     p%conveyance = factor*(this%prop(j+1)%conveyance - this%prop(j)%conveyance) + this%prop(j)%conveyance
     p%dkdy = (this%prop(j+1)%conveyance - this%prop(j)%conveyance)/this%delta_y
@@ -519,21 +520,13 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE general_props
   ! ----------------------------------------------------------------
-  SUBROUTINE general_props(this, depth, area, hydrad, &
-       &topwidth, perim, conveyance, dkdy)
+  SUBROUTINE general_props(this, depth, props)
     IMPLICIT NONE
     CLASS(general_section), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(IN) :: depth 
-    DOUBLE PRECISION, INTENT(OUT) :: area, hydrad, topwidth, perim, conveyance, dkdy
+    TYPE (xsection_prop), INTENT(OUT) :: props
 
-    TYPE (general_section_prop) :: prop
-    CALL this%interp(depth, prop)
-    area = prop%area
-    hydrad = prop%hydradius
-    topwidth = prop%topwidth
-    perim = prop%wetperim
-    conveyance = prop%conveyance
-    dkdy = prop%dkdy
+    CALL this%interp(depth, props)
 
   END SUBROUTINE general_props
 
@@ -578,7 +571,7 @@ CONTAINS
     DO i= 1, this%nlevel
        WRITE(iounit, 1010, IOSTAT=ioerr) i, &
             &this%prop(i)%depth, this%prop(i)%topwidth, this%prop(i)%area, &
-            &this%prop(i)%wetperim, this%prop(i)%hydradius, this%prop(i)%conveyance
+            &this%prop(i)%wetperim, this%prop(i)%hydrad, this%prop(i)%conveyance
     END DO
     WRITE(iounit, *, IOSTAT=ioerr)''
 
@@ -672,8 +665,8 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: ymax, dy
     
     DOUBLE PRECISION :: y
-    DOUBLE PRECISION :: area, hydrad, topwidth, perim, conveyance, dkdy
     INTEGER :: i, steps
+    TYPE (xsection_prop) :: props
     
 
     WRITE(iounit, *)
@@ -686,8 +679,9 @@ CONTAINS
     y = 0
     DO i = 0, steps
        y = REAL(i)*dy
-       CALL xsect%props(y, area, hydrad, topwidth, perim, conveyance, dkdy)
-       WRITE(iounit, 15) y, topwidth, area, perim, hydrad, conveyance, dkdy
+       CALL xsect%props(y, props)
+       WRITE(iounit, 15) y, props%topwidth, props%area, props%wetperim, &
+            &props%hydrad, props%conveyance, props%dkdy
     END DO
     WRITE(iounit, 10)
     WRITE(iounit, *)

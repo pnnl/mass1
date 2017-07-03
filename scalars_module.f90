@@ -185,6 +185,7 @@ END FUNCTION tvd_steps
 SUBROUTINE tvd_interp(time, htime0, htime1)
 
   USE mass1_config
+  USE cross_section
   USE section_handler_module
   USE link_vars, ONLY: maxpoints, linktype
   USE point_vars, ONLY: thalweg, &
@@ -200,6 +201,8 @@ SUBROUTINE tvd_interp(time, htime0, htime1)
   INTEGER :: link, point
   EXTERNAL dlinear_interp
   DOUBLE PRECISION dlinear_interp
+  TYPE (xsection_prop) :: props
+
 
   htime_begin = config%time%begin
   htime_end = config%time%end
@@ -239,9 +242,9 @@ SUBROUTINE tvd_interp(time, htime0, htime1)
 
            val = y(link,point) - thalweg(link,point)
 
-           CALL ptsection(link,point)%p%props(val, &
-                &area(link,point), val0, width(link,point), &
-                &val0, val0, val0)
+           CALL ptsection(link,point)%p%props(val, props)
+           area(link,point) = props%area
+           width(link,point) = props%topwidth
 
            ! val0 = DBLE(harea_old(link, point))
            ! val1 = DBLE(harea(link, point))
