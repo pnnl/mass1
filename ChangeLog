@@ -1,3 +1,11 @@
+2017-07-03  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* gastemp/CMakeLists.txt: add copyright
+
+	* banner.f90.in (banner): print out code branch
+
+	* CMakeLists.txt: find out which git branch is being used
+
 2017-06-29  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* profile_output.f90 (profile_output): NEVER use barometric

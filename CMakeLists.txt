@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2017-06-28 09:43:33 d3g096
+# Last Change: 2017-06-30 09:04:28 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -61,6 +61,14 @@ endif ()
 find_package(Git)
 
 if (GIT_EXECUTABLE) 
+
+  execute_process(
+    COMMAND git rev-parse --abbrev-ref HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE MASS1_BRANCH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+
   execute_process(
     COMMAND ${GIT_EXECUTABLE} describe --always --abbrev=6 --dirty
     WORKING_DIRECTORY "${MASS1_SOURCE_DIR}"
@@ -74,6 +82,7 @@ if (GIT_EXECUTABLE)
     OUTPUT_STRIP_TRAILING_WHITESPACE
     )
 else(GIT_EXECUTABLE)
+  set(MASS1_BRANCH "Unknown")
   set(MASS1_REVISION "Unknown")
   set(MASS1_REVISION_DATE "Unknown")
 endif(GIT_EXECUTABLE)

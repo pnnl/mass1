@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2017-06-22 15:07:00 d3g096
+! Last Change: 2017-06-30 09:03:20 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! SUBROUTINE banner
@@ -19,7 +19,7 @@ SUBROUTINE banner()
   IMPLICIT NONE
   WRITE (*, 10)
   WRITE(*, 11)
-  WRITE (*, 15) '@MASS1_REVISION@ (@MASS1_REVISION_DATE@)'
+  WRITE (*, 15) '@MASS1_BRANCH@: @MASS1_REVISION@ (@MASS1_REVISION_DATE@)'
 10 FORMAT(&
      &T4, " ____    ____       _       ______    ______    __     ", /,&
      &T4, "|_   \  /   _|     / \    .' ____ \ .' ____ \  /  |    ", /,&
@@ -32,13 +32,13 @@ SUBROUTINE banner()
         &T4, "Licensed under modified BSD License. A copy of this license can be", /,&
         &T4, "found in the LICENSE file in the top level directory of the source", /,&
         &T4, "distribution.", /,&
-        &T4, "https://github.com/pnnl/mass1", /)
+        &T4, "https://github.com/pnnl/mass1", /, /)
 
 15 FORMAT(&
         &T4, 'Modular Aquatic Simulation System 1D (MASS1)', /,&
         &T4, 'Pacific Northwest National Laboratory', /,&
         &T4, 'Hydrology Group', /,&
-        &T4, 'Revision: ', A, /, &
+        &T4, 'Code Revision: ', A, /, &
         &T4, 'Contact:', /,&
         &T8, 'Dr. Marshall C. Richmond (marshall.richmond@pnnl.gov)', /,&
         &T8, 'William A. Perkins (william.perkins@pnnl.gov)', /)
