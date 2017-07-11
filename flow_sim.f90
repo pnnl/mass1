@@ -316,13 +316,13 @@ SUBROUTINE flow_sim
            CALL depth_check(thalweg(link, point), y(link,point), q(link,point))
            depth = y(link,point) - thalweg(link,point)
 
-           CALL ptsection(link, point_num)%p%props(depth, props)
+           CALL ptsection(link, point)%p%props(depth, props)
            area_temp = props%area
            hydrad = props%hydrad
            width = props%topwidth
            perim = props%wetperim
-           conveyance = config%res_coeff*kstrick(link,point_num)*props%conveyance
-           dkdy = config%res_coeff*kstrick(link,point_num)*props%dkdy
+           conveyance = config%res_coeff*kstrick(link,point)*props%conveyance
+           dkdy = config%res_coeff*kstrick(link,point)*props%dkdy
 
 
            IF (point .GE. maxpoints(link)) THEN
