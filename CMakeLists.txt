@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2017-07-03 11:33:04 d3g096
+# Last Change: 2017-07-12 14:27:04 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -184,12 +184,38 @@ add_executable(svgrptest svgrp-test.f90 svgrp.f90)
 # -------------------------------------------------------------
 add_executable(link_test 
   link_test.f90 
+  point_module.f90
   link_module.f90
   linear_link_module.f90
   dlist_module.f90
   bc_module.f90
+  modules.f90
+  mass1_config.f90
 )
 target_link_libraries(link_test ts)
+
+# -------------------------------------------------------------
+# the new mass1
+# -------------------------------------------------------------
+add_executable(mass1_new
+  mass1_new.f90
+  "${CMAKE_CURRENT_BINARY_DIR}/banner.f90"
+  bc_module.f90
+  bc_module.f90
+  cross_section.f90
+  dlist_module.f90
+  linear_link_module.f90
+  link_module.f90
+  mass1_config.f90
+  met_zone.f90
+  modules.f90
+  network.f90
+  point_module.f90
+  section_handler.f90
+  linear_interp.f90
+  svgrp.f90
+)
+target_link_libraries(mass1_new gastemp ts)
 
 # -------------------------------------------------------------
 # custom test target

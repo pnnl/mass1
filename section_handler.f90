@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  4, 2017 by William A. Perkins
-! Last Change: 2017-07-03 10:15:01 d3g096
+! Last Change: 2017-07-12 14:09:24 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE section_handler_module
@@ -56,6 +56,8 @@ MODULE section_handler_module
   INTERFACE section_handler
      MODULE PROCEDURE new_section_handler
   END INTERFACE section_handler
+
+  PUBLIC new_section_handler
 
   TYPE (section_handler), PUBLIC :: sections
 

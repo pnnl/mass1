@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 21, 2017 by William A. Perkins
-! Last Change: 2017-06-28 11:13:32 d3g096
+! Last Change: 2017-07-12 14:25:22 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE met_zone
@@ -99,6 +99,8 @@ MODULE met_zone
   INTERFACE met_zone_manager_t
      MODULE PROCEDURE new_met_zone_manager
   END INTERFACE met_zone_manager_t
+
+  PUBLIC new_met_zone_manager
 
   TYPE (met_zone_manager_t), PUBLIC :: met_zone_manager
 
@@ -282,7 +284,6 @@ CONTAINS
     CLASS (met_zone_list), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: datetime
 
-    TYPE (met_zone_ptr), POINTER :: ptr
     TYPE (met_zone_t), POINTER :: zone
     
     CALL this%begin()

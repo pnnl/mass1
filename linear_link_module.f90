@@ -7,40 +7,22 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2017-07-03 15:04:52 d3g096
+! Last Change: 2017-07-12 10:34:20 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
 ! ----------------------------------------------------------------
 MODULE linear_link_module
+  USE mass1_config
   USE link_module
+  USE point_module
   USE bc_module
   USE cross_section
+  USE general_vars, ONLY: depth_threshold, depth_minimum
 
   IMPLICIT NONE
 
   PRIVATE
-
-  TYPE, PUBLIC :: point_hydro_state
-     DOUBLE PRECISION :: y, q, area
-     DOUBLE PRECISION :: lateral_inflow
-     DOUBLE PRECISION :: froude_num
-     DOUBLE PRECISION :: friction_slope, bed_shear
-     DOUBLE PRECISION :: courant_num, diffuse_num
-  END type point_hydro_state
-
-  TYPE :: point_sweep_coeff
-     DOUBLE PRECISION :: e,f,l,m,n
-  END type point_sweep_coeff
-
-  TYPE :: point_t
-     DOUBLE PRECISION :: x, thalweg
-     DOUBLE PRECISION :: manning, k_diff
-     CLASS (xsection_ptr), POINTER :: xsection
-     TYPE (xsection_prop) :: xsprop
-     TYPE (point_hydro_state) :: hstate
-     TYPE (point_sweep_coeff) :: sweep
-  END type point_t
 
   TYPE :: coeff
      DOUBLE PRECISION :: a, b, c, d, g
@@ -89,7 +71,7 @@ CONTAINS
     CLASS (linear_link_t), INTENT(IN) :: this
     INTEGER :: n
     n = 1
-    linear_link_q_up = this%pt(n)%hstate%q
+    linear_link_q_up = this%pt(n)%hnow%q
   END FUNCTION linear_link_q_up
 
 
@@ -101,7 +83,7 @@ CONTAINS
     CLASS (linear_link_t), INTENT(IN) :: this
     INTEGER :: n
     n = this%npoints
-    linear_link_q_down = this%pt(n)%hstate%q
+    linear_link_q_down = this%pt(n)%hnow%q
   END FUNCTION linear_link_q_down
 
 
@@ -113,7 +95,7 @@ CONTAINS
     CLASS (linear_link_t), INTENT(IN) :: this
     INTEGER :: n
     n = 1
-    linear_link_y_up = this%pt(n)%hstate%y
+    linear_link_y_up = this%pt(n)%hnow%y
   END FUNCTION linear_link_y_up
 
 
@@ -125,7 +107,7 @@ CONTAINS
     CLASS (linear_link_t), INTENT(IN) :: this
     INTEGER :: n
     n = this%npoints
-    linear_link_y_down = this%pt(n)%hstate%y
+    linear_link_y_down = this%pt(n)%hnow%y
   END FUNCTION linear_link_y_down
 
 
@@ -176,7 +158,13 @@ CONTAINS
     INTEGER :: point
     DOUBLE PRECISION :: bcval, denom
     TYPE (coeff) :: c, cp
-    
+
+    ! save previous hydrodynamic state and update cross section properties
+    DO point = 1, this%npoints
+       this%pt(point)%hold = this%pt(point)%hnow
+       CALL this%pt(point)%section_update()
+    END DO
+
     point = 1
     IF (ASSOCIATED(this%ucon%p)) THEN
        this%pt(point)%sweep%e = this%ucon%p%coeff_e()
@@ -188,7 +176,7 @@ CONTAINS
           bcval = 0.0
        END IF
        this%pt(point)%sweep%e = 0.0
-       this%pt(point)%sweep%f = bcval - this%pt(point)%hstate%q
+       this%pt(point)%sweep%f = bcval - this%pt(point)%hnow%q
     END IF
 
     DO point = 1, this%npoints - 1
@@ -225,10 +213,10 @@ CONTAINS
     
     IF (ASSOCIATED(this%dcon%p)) THEN
 
-       dy = this%dcon%p%elev() - this%pt(point)%hstate%y
+       dy = this%dcon%p%elev() - this%pt(point)%hnow%y
        dq = this%pt(point)%sweep%e*dy + this%pt(point)%sweep%f
-       this%pt(point)%hstate%y = this%pt(point)%hstate%y + dy
-       this%pt(point)%hstate%q = this%pt(point)%hstate%q + dq
+       this%pt(point)%hnow%y = this%pt(point)%hnow%y + dy
+       this%pt(point)%hnow%q = this%pt(point)%hnow%q + dq
 
     ELSE IF (ASSOCIATED(this%dsbc%p)) THEN
 
@@ -242,10 +230,12 @@ CONTAINS
        dy = this%pt(point)%sweep%l*dy + this%pt(point)%sweep%m*dq + this%pt(point)%sweep%n
        dq = this%pt(point)%sweep%e*dy + this%pt(point)%sweep%f
 
-       this%pt(point)%hstate%y = this%pt(point)%hstate%y + dy
-       this%pt(point)%hstate%q = this%pt(point)%hstate%q + dq
+       this%pt(point)%hnow%y = this%pt(point)%hnow%y + dy
+       this%pt(point)%hnow%q = this%pt(point)%hnow%q + dq
        
     END DO
+
+    
 
   END SUBROUTINE linear_link_backward
 

@@ -1,3 +1,18 @@
+2017-07-12  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* network.f90 (network): add
+
+	* mass1_new.f90 (mass1): start a new MASS1 main program that uses
+	a single network
+
+	* linear_link_module.f90 (linear_link_module): take point types
+	and make a new module
+
+	* point_module.f90 (point_module): extract point types from link
+	module and make its own
+
+	* CMakeLists.txt: add mass1_new executable
+
 2017-07-11  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* flow_sim.f90 (flow_sim): incorrect point index was being used 
