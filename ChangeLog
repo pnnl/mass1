@@ -1,5 +1,7 @@
 2017-07-14  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* test/flow/normal-hydro: add a case for link type 6
+
 	* scripts/cross-section/XSection.pm (read_section): trim of trailing
 	white space necessary, maybe
 
