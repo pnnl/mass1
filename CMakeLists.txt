@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2017-07-12 14:27:04 d3g096
+# Last Change: 2017-07-13 09:50:51 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -204,6 +204,7 @@ add_executable(mass1_new
   bc_module.f90
   cross_section.f90
   dlist_module.f90
+  fluvial_link_module.f90
   linear_link_module.f90
   link_module.f90
   mass1_config.f90

@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2017-07-12 14:35:51 d3g096
+! Last Change: 2017-07-13 12:44:06 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -38,6 +38,7 @@ MODULE network_module
    CONTAINS
      PROCEDURE :: readbcs => network_read_bcs
      PROCEDURE :: read => network_read
+     PROCEDURE :: flow => network_flow
      PROCEDURE :: destroy => network_destroy
   END type network
 
@@ -161,6 +162,16 @@ CONTAINS
   END SUBROUTINE network_initialize
 
 
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE network_flow
+  ! ----------------------------------------------------------------
+  SUBROUTINE network_flow(this)
+    IMPLICIT NONE
+    CLASS (network), INTENT(INOUT) :: this
+
+    CALL this%links%flow_sim(this%config%time%time, this%config%time%delta_t)
+
+  END SUBROUTINE network_flow
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE network_destroy

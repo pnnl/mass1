@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2017-07-12 11:56:45 d3g096
+! Last Change: 2017-07-13 13:00:20 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -55,8 +55,9 @@ MODULE link_module
 
      ! hydrodynamics are computed with two sweeps
 
-     PROCEDURE (sweep_proc), DEFERRED :: forward_sweep
-     PROCEDURE (sweep_proc), DEFERRED :: backward_sweep
+     PROCEDURE (fsweep_proc), DEFERRED :: forward_sweep
+     PROCEDURE (bsweep_proc), DEFERRED :: backward_sweep
+     PROCEDURE (hupdate_proc), DEFERRED :: hydro_update
 
 
   END type link_t
@@ -82,11 +83,25 @@ MODULE link_module
        INTEGER, INTENT(IN) :: ispecies
      END FUNCTION c_up_down_proc
      
-     SUBROUTINE sweep_proc(this)
+     SUBROUTINE fsweep_proc(this, deltat)
        IMPORT :: link_t
        IMPLICIT NONE
        CLASS (link_t), INTENT(INOUT) :: this
-     END SUBROUTINE sweep_proc
+       DOUBLE PRECISION, INTENT(IN) :: deltat
+     END SUBROUTINE fsweep_proc
+
+     SUBROUTINE bsweep_proc(this)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(INOUT) :: this
+     END SUBROUTINE bsweep_proc
+
+     SUBROUTINE hupdate_proc(this, res_coeff)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(INOUT) :: this
+       DOUBLE PRECISION, INTENT(IN) :: res_coeff
+     END SUBROUTINE hupdate_proc
 
      SUBROUTINE destroy_proc(this)
        IMPORT :: link_t
@@ -128,6 +143,7 @@ MODULE link_module
    CONTAINS
      PROCEDURE :: find => link_manager_find
      PROCEDURE :: connect => link_manager_connect
+     PROCEDURE :: flow_sim => link_manager_flow_sim
      PROCEDURE :: destroy => link_manager_destroy
   END type link_manager_t
 
@@ -406,6 +422,38 @@ CONTAINS
     INTEGER, INTENT(IN) :: linkid
     link => this%links%find(linkid)
   END FUNCTION link_manager_find
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_flow_sim
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_flow_sim(this, deltat, res_coeff)
+
+    IMPLICIT NONE
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: deltat, res_coeff
+
+    CLASS (link_t), POINTER :: link
+
+    CALL this%links%begin()
+    link => this%links%current()
+    DO WHILE (ASSOCIATED(link))
+       CALL link%forward_sweep(deltat)
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+
+    CALL this%links%begin()
+    link => this%links%current()
+    DO WHILE (ASSOCIATED(link))
+       CALL link%backward_sweep()
+       CALL link%hydro_update(res_coeff)
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+    
+
+  END SUBROUTINE link_manager_flow_sim
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_destroy

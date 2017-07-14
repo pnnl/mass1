@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2017-07-12 10:34:41 d3g096
+! Last Change: 2017-07-14 13:52:17 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -47,6 +47,7 @@ MODULE point_module
    CONTAINS
      PROCEDURE :: section_update => point_section_update
      PROCEDURE :: depth_check => point_depth_check
+     PROCEDURE :: hydro_update => point_hydro_update
      PROCEDURE :: assign => point_assign
   END type point_t
 
@@ -55,18 +56,19 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE point_section_update
   ! ----------------------------------------------------------------
-  SUBROUTINE point_section_update(this)
+  SUBROUTINE point_section_update(this, res_coeff)
 
     IMPLICIT NONE
     CLASS (point_t), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: res_coeff
     DOUBLE PRECISION :: depth
 
     depth = this%hnow%y - this%thalweg
     CALL this%xsection%p%props(depth, this%xsprop)
     this%xsprop%conveyance = &
-         &config%res_coeff*this%kstrick*this%xsprop%conveyance
+         &res_coeff*this%kstrick*this%xsprop%conveyance
     this%xsprop%dkdy = &
-         &config%res_coeff*this%kstrick*this%xsprop%dkdy
+         &res_coeff*this%kstrick*this%xsprop%dkdy
     IF (this%xsprop%area .GT. 0.0D00) THEN
        this%hnow%v = this%hnow%q/this%xsprop%area
     ELSE 
@@ -97,6 +99,21 @@ CONTAINS
     fr = this%hnow%froude_num
 
   END SUBROUTINE point_assign
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE point_hydro_update
+  ! ----------------------------------------------------------------
+  SUBROUTINE point_hydro_update(this, res_coeff)
+
+    IMPLICIT NONE
+    CLASS (point_t), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: res_coeff
+
+    this%hold = this%hnow
+    CALL this%section_update(res_coeff)
+
+  END SUBROUTINE point_hydro_update
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE point_depth_check

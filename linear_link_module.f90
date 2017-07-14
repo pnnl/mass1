@@ -7,13 +7,12 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2017-07-12 10:34:20 d3g096
+! Last Change: 2017-07-13 13:01:17 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
 ! ----------------------------------------------------------------
 MODULE linear_link_module
-  USE mass1_config
   USE link_module
   USE point_module
   USE bc_module
@@ -24,14 +23,13 @@ MODULE linear_link_module
 
   PRIVATE
 
-  TYPE :: coeff
+  TYPE, PUBLIC :: coeff
      DOUBLE PRECISION :: a, b, c, d, g
   END type coeff
 
   TYPE, PUBLIC, EXTENDS(link_t) :: linear_link_t
      INTEGER :: npoints
      INTEGER :: input_option
-     DOUBLE PRECISION :: lpiexp
      TYPE (point_t), DIMENSION(:),ALLOCATABLE :: pt
    CONTAINS
      PROCEDURE :: initialize => linear_link_initialize
@@ -44,6 +42,7 @@ MODULE linear_link_module
      PROCEDURE :: coeff => linear_link_coeff
      PROCEDURE :: forward_sweep => linear_link_forward
      PROCEDURE :: backward_sweep => linear_link_backward
+     PROCEDURE :: hydro_update => linear_link_hupdate
      PROCEDURE :: destroy => linear_link_destroy
   END type linear_link_t
 
@@ -135,10 +134,11 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE linear_link_coeff
   ! ----------------------------------------------------------------
-  SUBROUTINE linear_link_coeff(this, pt1, pt2, c, cp)
+  SUBROUTINE linear_link_coeff(this, dt, pt1, pt2, c, cp)
 
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: dt
     TYPE (point_t), INTENT(IN) :: pt1, pt2
     TYPE (coeff), INTENT(OUT) :: c, cp
 
@@ -150,20 +150,15 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE linear_link_forward
   ! ----------------------------------------------------------------
-  SUBROUTINE linear_link_forward(this)
+  SUBROUTINE linear_link_forward(this, deltat)
 
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: deltat
 
     INTEGER :: point
     DOUBLE PRECISION :: bcval, denom
     TYPE (coeff) :: c, cp
-
-    ! save previous hydrodynamic state and update cross section properties
-    DO point = 1, this%npoints
-       this%pt(point)%hold = this%pt(point)%hnow
-       CALL this%pt(point)%section_update()
-    END DO
 
     point = 1
     IF (ASSOCIATED(this%ucon%p)) THEN
@@ -180,7 +175,7 @@ CONTAINS
     END IF
 
     DO point = 1, this%npoints - 1
-       CALL this%coeff(this%pt(point), this%pt(point + 1), c, cp)
+       CALL this%coeff(deltat, this%pt(point), this%pt(point + 1), c, cp)
        denom = (c%c*cp%d - cp%c*c%d)
        this%pt(point)%sweep%l = (c%a*cp%d - cp%a*c%d)/denom
        this%pt(point)%sweep%m = (c%b*cp%d - cp%b*c%d)/denom
@@ -239,6 +234,23 @@ CONTAINS
 
   END SUBROUTINE linear_link_backward
 
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE linear_link_hupdate
+  ! ----------------------------------------------------------------
+  SUBROUTINE linear_link_hupdate(this, res_coeff)
+
+    IMPLICIT NONE
+    CLASS (linear_link_t), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: res_coeff
+
+    INTEGER :: p
+
+    DO p = 1, this%npoints
+       CALL this%pt(p)%hydro_update(res_coeff)
+    END DO
+
+  END SUBROUTINE linear_link_hupdate
 
 
 
