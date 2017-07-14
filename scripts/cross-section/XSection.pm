@@ -11,7 +11,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created November 19, 1996 by William A. Perkins
-# Last Change: 2017-06-22 11:42:15 d3g096
+# Last Change: 2017-07-14 12:55:26 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -381,6 +381,7 @@ sub read_section {
   while ($npts > 0) {
     return 0 unless defined($rec = <$fd>);
     chop $rec;
+    $rec =~ s/\s+$//;
     while (length($rec) > 0 && $npts > 0) {
       $x = substr($rec,0,10); $rec = substr($rec,10);
       $z = substr($rec,0,10); $rec = substr($rec,10);
