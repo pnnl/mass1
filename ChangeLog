@@ -1,3 +1,13 @@
+2017-07-14  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* doc/point.md: clarification of point numbering
+
+	* test/flow/fill-us/section.dat: add an alternative section with a 
+	notch
+
+	* test/flow/fill/section.dat: add an alternative section with a
+	notch 
+
 2017-06-27  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* section.f90 (section): take some steps to catch bad

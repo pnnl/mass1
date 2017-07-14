@@ -2,7 +2,8 @@
 
 The point file contains information for individual points along
 links.  Point data for all links is included in a single file.  It's
-best to end each line with a slash (`/`).  
+best to end each line with a slash (`/`).  There are two options for
+specifying the points for a link.
 
 ## Individual Point Format (Link Input Option=1)
 
@@ -20,10 +21,12 @@ Field | Type | Description | Typical Units
 6 | real | Longitudinal dispersion coefficient | ft<sup>2</sup>/s
 7 | real | ~~Surface transfer coefficient~~ |
 
-The point index is as an array index internally, so it needs to start
-with 1 and increment by 1. Units will depend on the
-[configuration](configuration.md) units options.  The surface transfer
-coefficient is no longer used and can be omitted if a `/` is appended to the line.  
+The point index is ignored and computed internally. *It is assumed the
+points are ordered correctly and the correct number are in the
+file*. Points should be listed from upstream to downstream.  Location units
+will depend on the [configuration](configuration.md) units options.
+The surface transfer coefficient is no longer used and
+can be omitted if a `/` is appended to the line.   
 
 ## Uniform Point Format (Link Input Option=2)
 
