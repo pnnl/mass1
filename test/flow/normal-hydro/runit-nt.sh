@@ -1,6 +1,7 @@
 #! /bin/sh
 # -------------------------------------------------------------
-# file: runit.sh
+# file: runit-nt.sh
+# intended to be run with Cygnus Win 32 BASH on NT
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Battelle Memorial Institute
@@ -8,32 +9,24 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: 2017-07-14 14:36:29 d3g096
+# Last Change: Tue Mar  7 21:45:01 2000 by William A. Perkins <perk@mack.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
 set -x
 set -e
 
-model=${MODEL-../../../build/mass1}
+model=../../../Release/mass1_v082
 
 $model
 
 (echo \
     set terminal postscript landscape color solid \"Helvetica\" 14\; \
+    set title \"Normal Flow: 1000 cfs\"\; \
     load \"plot.gp\"\; ) | \
         gnuplot > plot.ps
 (echo \
-    set terminal postscript eps color solid \"Helvetica\" 22 \; \
+    set terminal postscript eps color solid \"Helvetica\" 14 \; \
+    set title \"Normal Flow: 1000 cfs\"\; \
     load \"plot.gp\"\; ) | \
-        gnuplot > plot.eps
-
-(echo \
-    set terminal postscript landscape color solid \"Helvetica\" 14\; \
-    load \"plot-elev.gp\"\; ) | \
-        gnuplot > plot-elev.ps
-(echo \
-    set terminal postscript eps color solid \"Helvetica\" 22 \; \
-    load \"plot-elev.gp\"\; ) | \
-        gnuplot > plot-elev.eps
-
+        gnuplot > plot.ps

@@ -1,3 +1,20 @@
+2017-07-14  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* test/flow/normal-hydro: add a case for link type 6
+
+	* scripts/cross-section/XSection.pm (read_section): trim of trailing
+	white space necessary, maybe
+
+	* scripts/cross-section/CHARIMAnotch.pl: add verbose option
+
+	* doc/point.md: clarification of point numbering
+
+	* test/flow/fill-us/section.dat: add an alternative section with a 
+	notch
+
+	* test/flow/fill/section.dat: add an alternative section with a
+	notch 
+
 2017-07-12  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* network.f90 (network): add
@@ -84,6 +101,11 @@
 
 	* cross_section.f90 (props_proc): include wetted perimeter in
 	returned properties
+
+2017-06-27  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* section.f90 (section): take some steps to catch bad
+	extrapolation of hydraulic radius
 
 2017-06-26  William A. Perkins  <william.perkins@pnnl.gov>
 
