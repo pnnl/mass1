@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2017-07-13 13:01:17 d3g096
+! Last Change: 2017-07-20 08:09:52 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -215,6 +215,7 @@ CONTAINS
 
     ELSE IF (ASSOCIATED(this%dsbc%p)) THEN
 
+       bcval = this%dsbc%p%current_value
 
     ELSE 
        CALL error_message("This should not happen in linear_link_backward", &

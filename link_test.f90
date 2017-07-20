@@ -9,10 +9,10 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 26, 2017 by William A. Perkins
-! Last Change: 2017-06-30 09:12:07 d3g096
+! Last Change: 2017-07-20 08:10:48 d3g096
 ! ----------------------------------------------------------------
 PROGRAM link_test  
-  USE link_module
+  USE link_manager_module
   IMPLICIT NONE
 
   TYPE (link_manager_t) :: lman

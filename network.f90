@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2017-07-13 12:44:06 d3g096
+! Last Change: 2017-07-20 08:00:32 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -18,7 +18,7 @@ MODULE network_module
 
   USE utility
   USE mass1_config
-  USE link_module
+  USE link_manager_module
   USE bc_module
   USE section_handler_module
   USE met_zone
@@ -119,6 +119,7 @@ CONTAINS
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE network_read
+
   ! ----------------------------------------------------------------
   SUBROUTINE network_read(this, base)
     IMPLICIT NONE

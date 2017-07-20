@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2017-07-13 09:50:51 d3g096
+# Last Change: 2017-07-20 08:12:22 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -185,8 +185,9 @@ add_executable(svgrptest svgrp-test.f90 svgrp.f90)
 add_executable(link_test 
   link_test.f90 
   point_module.f90
-  link_module.f90
   linear_link_module.f90
+  link_module.f90
+  link_manager_module.f90
   dlist_module.f90
   bc_module.f90
   modules.f90
@@ -207,6 +208,8 @@ add_executable(mass1_new
   fluvial_link_module.f90
   linear_link_module.f90
   link_module.f90
+  link_manager_module.f90
+  nonfluvial_link_module.f90
   mass1_config.f90
   met_zone.f90
   modules.f90

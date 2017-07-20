@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2017-07-14 13:52:17 d3g096
+! Last Change: 2017-07-17 14:27:30 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -86,7 +86,7 @@ CONTAINS
   SUBROUTINE point_assign(this, y, d, q, a, b, k, ky, fr)
 
     IMPLICIT NONE
-    CLASS (point_t), INTENT(INOUT) :: this
+    CLASS (point_t), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(OUT) :: y, d, q, a, b, k, ky, fr
 
     y = this%hnow%y
