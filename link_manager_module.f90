@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2017-07-20 08:11:27 d3g096
+! Last Change: 2017-07-20 13:45:20 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -27,6 +27,7 @@ MODULE link_manager_module
   TYPE, PUBLIC :: link_manager_t
      TYPE (link_list) :: links
      CLASS (link_t), POINTER :: dslink
+     INTEGER :: maxorder
    CONTAINS
      PROCEDURE :: find => link_manager_find
      PROCEDURE :: connect => link_manager_connect
@@ -64,7 +65,7 @@ CONTAINS
     INTEGER :: ierr
     INTEGER :: nds
     TYPE (confluence_t), POINTER :: con
-    CHARACTER(LEN=1024) :: msg
+    CHARACTER(LEN=1024) :: msg, lbl
 
     ierr = 0
 
@@ -122,27 +123,37 @@ CONTAINS
             &fatal=.TRUE.)
     END IF
 
+    ! compute computational order
+
+    this%maxorder = this%dslink%set_order(0)
+    IF (this%maxorder .NE. this%links%size()) THEN
+       CALL error_message("link_manager_connect: this should not happen")
+    END IF
+
     ! spit out connectivity and order information 
 
     CALL this%links%begin()
-    link => this%links%current()
-    
-    ! DO WHILE (ASSOCIATED(link))
-    !  WRITE(msg, '("link ", I4, "(order = ", I4, ") upstream links:")') &
-    !       &link%id, 0
-    !  IF (ASSOCIATED(link%ucon%p)) THEN
-    !     DO i = 1, ucon(link)%p%n_ulink
-    !        WRITE(lbl, '(I4)') ucon(link)%p%ulink(i)
-    !        msg = TRIM(msg) // " " // TRIM(lbl)
-    !     END DO
-    !  ELSE 
-    !     msg = TRIM(msg) // " none"
-    !  END IF
-    !  CALL status_message(msg)
-    ! END DO
+    dlink => this%links%current()
 
-    
-
+    DO WHILE (ASSOCIATED(dlink))
+       WRITE(msg, '("link ", I4, "(order = ", I4, ") upstream links:")') &
+            &dlink%id, dlink%order
+       IF (ASSOCIATED(dlink%ucon%p)) THEN
+          CALL dlink%ucon%p%ulink%begin()
+          link => dlink%ucon%p%ulink%current()
+          DO WHILE (ASSOCIATED(link))
+             WRITE(lbl, '(I4)') link%id
+             msg = TRIM(msg) // " " // TRIM(lbl)
+             CALL dlink%ucon%p%ulink%next()
+             link => dlink%ucon%p%ulink%current()
+          END DO
+       ELSE 
+          msg = TRIM(msg) // " none"
+       END IF
+       CALL status_message(msg)
+       CALL this%links%next()
+       dlink => this%links%current()
+    END DO
   END SUBROUTINE link_manager_connect
 
 
@@ -167,24 +178,32 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: deltat, res_coeff
 
     CLASS (link_t), POINTER :: link
+    INTEGER :: l
 
-    CALL this%links%begin()
-    link => this%links%current()
-    DO WHILE (ASSOCIATED(link))
-       CALL link%forward_sweep(deltat)
-       CALL this%links%next()
+    DO l = 1, this%maxorder
+       CALL this%links%begin()
        link => this%links%current()
+       DO WHILE (ASSOCIATED(link))
+          IF (link%order .EQ. l) THEN
+             CALL link%forward_sweep(deltat)
+          END IF
+          CALL this%links%next()
+          link => this%links%current()
+       END DO
     END DO
 
-    CALL this%links%begin()
-    link => this%links%current()
-    DO WHILE (ASSOCIATED(link))
-       CALL link%backward_sweep()
-       CALL link%hydro_update(res_coeff)
-       CALL this%links%next()
+    DO l = this%maxorder, 1, -1
+       CALL this%links%begin()
        link => this%links%current()
+       DO WHILE (ASSOCIATED(link))
+          IF (link%order .EQ. l) THEN
+             CALL link%backward_sweep()
+             CALL link%hydro_update(res_coeff)
+          END IF
+          CALL this%links%next()
+          link => this%links%current()
+       END DO
     END DO
-    
 
   END SUBROUTINE link_manager_flow_sim
 

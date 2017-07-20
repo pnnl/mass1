@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2017-07-20 08:13:01 d3g096
+! Last Change: 2017-07-20 08:53:56 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -44,6 +44,8 @@ MODULE link_module
 
      PROCEDURE (init_proc), DEFERRED :: initialize
      PROCEDURE (destroy_proc), DEFERRED :: destroy
+
+     PROCEDURE, NON_OVERRIDABLE :: set_order => link_set_order
 
      ! the up/down routines are required by confluence
 
@@ -148,6 +150,7 @@ MODULE link_module
      PROCEDURE :: coeff_f => confluence_coeff_f
      PROCEDURE :: elev => confluence_elev
      PROCEDURE :: conc => confluence_conc
+     PROCEDURE :: set_order => confluence_set_order
   END type confluence_t
 
   INTERFACE confluence_t
@@ -400,5 +403,50 @@ CONTAINS
        uconc = cavg/REAL(n+1)
     END IF
   END FUNCTION confluence_conc
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION confluence_set_order
+  ! ----------------------------------------------------------------
+  RECURSIVE FUNCTION confluence_set_order(this, order0) RESULT(order)
+
+    IMPLICIT NONE
+    INTEGER :: order
+    CLASS (confluence_t), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: order0
+    CLASS (link_t), POINTER :: link
+    INTEGER :: o
+
+    o = order0
+
+    CALL this%ulink%begin()
+    link => this%ulink%current()
+    DO WHILE (ASSOCIATED(link))
+       o = link%set_order(o)
+    END DO
+    order = o
+
+  END FUNCTION confluence_set_order
+
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION link_set_order
+  ! ----------------------------------------------------------------
+  RECURSIVE FUNCTION link_set_order(this, order0) RESULT(order)
+    IMPLICIT NONE
+    INTEGER :: order
+    CLASS (link_t), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: order0
+    INTEGER :: o
+
+    o = order0
+    IF (ASSOCIATED(this%ucon%p)) THEN
+       o = this%ucon%p%set_order(o)
+    END IF
+    this%order = o
+    order = o + 1
+
+  END FUNCTION link_set_order
+
+
 
 END MODULE link_module
