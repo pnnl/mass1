@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2017-07-20 08:12:22 d3g096
+# Last Change: 2017-07-20 14:47:11 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -180,22 +180,6 @@ target_link_libraries(cross_section_table ts)
 add_executable(svgrptest svgrp-test.f90 svgrp.f90)
 
 # -------------------------------------------------------------
-# link_test
-# -------------------------------------------------------------
-add_executable(link_test 
-  link_test.f90 
-  point_module.f90
-  linear_link_module.f90
-  link_module.f90
-  link_manager_module.f90
-  dlist_module.f90
-  bc_module.f90
-  modules.f90
-  mass1_config.f90
-)
-target_link_libraries(link_test ts)
-
-# -------------------------------------------------------------
 # the new mass1
 # -------------------------------------------------------------
 add_executable(mass1_new
@@ -207,8 +191,8 @@ add_executable(mass1_new
   dlist_module.f90
   fluvial_link_module.f90
   linear_link_module.f90
-  link_module.f90
   link_manager_module.f90
+  link_module.f90
   nonfluvial_link_module.f90
   mass1_config.f90
   met_zone.f90

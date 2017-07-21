@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2017-07-20 13:45:20 d3g096
+! Last Change: 2017-07-20 15:12:47 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -19,6 +19,9 @@
 MODULE link_manager_module
   USE utility
   USE link_module
+  USE fluvial_link_module
+  USE nonfluvial_link_module
+  USE bc_module
   IMPLICIT NONE
 
   ! ----------------------------------------------------------------
@@ -29,6 +32,7 @@ MODULE link_manager_module
      CLASS (link_t), POINTER :: dslink
      INTEGER :: maxorder
    CONTAINS
+     PROCEDURE :: read => link_manager_read
      PROCEDURE :: find => link_manager_find
      PROCEDURE :: connect => link_manager_connect
      PROCEDURE :: flow_sim => link_manager_flow_sim
@@ -51,6 +55,96 @@ CONTAINS
     TYPE (link_manager_t) :: man
     man%links = new_link_list()
   END FUNCTION new_link_manager
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_read
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_read(this, lname, bcman)
+
+    IMPLICIT NONE
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    CHARACTER (LEN=*), INTENT(IN) :: lname
+    CLASS (bc_manager_t), INTENT(IN) :: bcman
+    CLASS (link_t), POINTER :: link
+    INTEGER, PARAMETER :: lunit = 21
+    INTEGER :: recno, ierr
+    INTEGER :: lid, iopt, npt, lorder, ltype
+    INTEGER :: nds, dsbc, gbc, tbc, mzone, lbc, lgbc, ltbc, lpi
+    INTEGER :: dsid
+    CHARACTER (LEN=1024) :: msg
+
+    ierr = 0
+    recno = 0
+
+    CALL open_existing(lname, lunit, fatal=.TRUE.)
+    ! FIXME: CALL print_output("LINKS ", 0.0)
+    
+    DO WHILE (.TRUE.) 
+       recno = recno + 1
+       READ(lunit,*,END=100,ERR=200) lid, iopt, npt, lorder, ltype, &
+            &nds, lbc, dsbc, gbc, tbc, mzone, lbc, lgbc, ltbc, lpi
+       READ(lunit,*,END=100,ERR=200) dsid
+       
+       SELECT CASE (ltype)
+       CASE (1)
+          ALLOCATE(fluvial_link :: link)
+       CASE DEFAULT
+          WRITE(msg, *) TRIM(lname), ': link record ', recno, &
+               &': link type unknown (', ltype, ')'
+          CALL error_message(msg)
+          ierr = ierr + 1
+       END SELECT
+
+       link%id = lid
+       link%dsid = dsid
+
+       ! find the "link" bc, if any
+
+       IF (lbc .NE. 0) THEN
+          link%usbc%p => bcman%find(LINK_BC_TYPE, lbc)
+          IF (.NOT. ASSOCIATED(link%usbc%p) ) THEN
+             WRITE (msg, *) TRIM(lname), ': link ', lid, ': unknown link BC id: ', lbc
+             CALL error_message(msg)
+             ierr = ierr + 1
+          END IF
+       END IF
+
+       ! find the downstream bc, if any
+
+       IF (dsbc .NE. 0) THEN
+          link%dsbc%p => bcman%find(LINK_BC_TYPE, dsbc)
+          IF (.NOT. ASSOCIATED(link%dsbc%p) ) THEN
+             WRITE (msg, *) TRIM(lname), ': link ', lid, &
+                  &': unknown downstream BC id: ', dsbc
+             CALL error_message(msg)
+             ierr = ierr + 1
+          END IF
+       END IF
+       
+       CALL this%links%push(link)
+       
+    END DO
+
+100 CONTINUE
+
+    CLOSE (lunit)
+
+    IF (ierr .GT. 0) THEN
+       msg = TRIM(lname) // ': too many errors in link file'
+       CALL error_message(msg, fatal=.TRUE.)
+    END IF
+
+    RETURN
+
+200 CONTINUE
+
+    CLOSE (lunit)
+
+    WRITE(msg, *) TRIM(lname) // ': error in or near link record ', recno
+    CALL error_message(msg, fatal=.TRUE.)
+
+  END SUBROUTINE link_manager_read
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_connect
