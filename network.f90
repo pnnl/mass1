@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2017-07-20 08:00:32 d3g096
+! Last Change: 2017-07-21 08:43:55 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -82,7 +82,7 @@ CONTAINS
     ENDIF
 
     IF(this%config%do_gas)THEN
-       CALL bc_manager%read(TRANS_BC_TYPE, this%config%transbc_file)
+       CALL this%bcs%read(TRANS_BC_TYPE, this%config%transbc_file)
        IF(this%config%debug_print) WRITE(11,*)'done reading gas transport table'
 
        ! CALL allocate_tdg_coeff(this%config%maxlinks,utility_status_iounit, utility_error_iounit)
@@ -104,7 +104,7 @@ CONTAINS
     ENDIF
 
     IF(this%config%do_temp)THEN
-       CALL bc_manager%read(TEMP_BC_TYPE, this%config%tempbc_file)
+       CALL this%bcs%read(TEMP_BC_TYPE, this%config%tempbc_file)
        IF(this%config%debug_print) WRITE(11,*)'done reading temp transport table'
     ENDIF
 
@@ -112,6 +112,8 @@ CONTAINS
     IF (this%config%met_required) THEN
        CALL this%met%read(this%config%weather_file)
     END IF
+
+    
 
 
   END SUBROUTINE network_read_bcs
@@ -147,6 +149,8 @@ CONTAINS
     CALL this%config%read()
     CALL this%readbcs()
     CALL this%sections%read(this%config%section_file)
+    CALL this%links%read(this%config%link_file, this%bcs)
+    CALL this%links%connect()
 
   END SUBROUTINE network_read
 

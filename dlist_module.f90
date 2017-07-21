@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 21, 2017 by William A. Perkins
-! Last Change: 2017-06-28 11:01:46 d3g096
+! Last Change: 2017-07-21 13:12:14 d3g096
 ! ----------------------------------------------------------------
 MODULE dlist_module
 
@@ -37,6 +37,7 @@ MODULE dlist_module
      TYPE (dlist_node), POINTER :: head
      TYPE (dlist_node), POINTER :: tail
      TYPE (dlist_node), POINTER :: cursor
+     TYPE (dlist_node), POINTER :: saved_cursor
    CONTAINS 
      PROCEDURE, NON_OVERRIDABLE :: size => dlist_size
      PROCEDURE, NON_OVERRIDABLE :: begin => dlist_begin
@@ -44,6 +45,8 @@ MODULE dlist_module
      PROCEDURE, NON_OVERRIDABLE :: genpush => dlist_push
      PROCEDURE, NON_OVERRIDABLE :: genpop => dlist_pop
      PROCEDURE, NON_OVERRIDABLE :: gencurrent => dlist_current
+     PROCEDURE, NON_OVERRIDABLE :: save => dlist_save
+     PROCEDURE, NON_OVERRIDABLE :: restore => dlist_restore
      PROCEDURE :: clear => dlist_clear
   END type dlist
 
@@ -177,7 +180,30 @@ CONTAINS
     END IF
   END FUNCTION dlist_current
 
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE dlist_save
+  ! ----------------------------------------------------------------
+  SUBROUTINE dlist_save(this)
+    IMPLICIT NONE
+    CLASS (dlist), INTENT(INOUT) :: this
 
+    this%saved_cursor => this%cursor
+
+  END SUBROUTINE dlist_save
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE dlist_restore
+  ! ----------------------------------------------------------------
+  SUBROUTINE dlist_restore(this)
+
+    IMPLICIT NONE
+
+    CLASS (dlist), INTENT(INOUT) :: this
+    
+    this%cursor => this%saved_cursor
+    NULLIFY(this%saved_cursor)
+
+  END SUBROUTINE dlist_restore
 
   ! ----------------------------------------------------------------
   !  FUNCTION new_dlist

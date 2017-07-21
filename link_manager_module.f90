@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2017-07-20 15:12:47 d3g096
+! Last Change: 2017-07-21 13:46:43 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -68,9 +68,7 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     INTEGER, PARAMETER :: lunit = 21
     INTEGER :: recno, ierr
-    INTEGER :: lid, iopt, npt, lorder, ltype
-    INTEGER :: nds, dsbc, gbc, tbc, mzone, lbc, lgbc, ltbc, lpi
-    INTEGER :: dsid
+    TYPE (link_input_data) :: ldata
     CHARACTER (LEN=1024) :: msg
 
     ierr = 0
@@ -81,48 +79,46 @@ CONTAINS
     
     DO WHILE (.TRUE.) 
        recno = recno + 1
-       READ(lunit,*,END=100,ERR=200) lid, iopt, npt, lorder, ltype, &
-            &nds, lbc, dsbc, gbc, tbc, mzone, lbc, lgbc, ltbc, lpi
-       READ(lunit,*,END=100,ERR=200) dsid
+       CALL ldata%defaults()
+       READ(lunit,*,END=100,ERR=200) &
+            & ldata%linkid, &
+            & ldata%inopt, &
+            & ldata%npt, &
+            & ldata%lorder, &
+            & ldata%ltype, &
+            & ldata%nup, &
+            & ldata%dsbcid, &
+            & ldata%gbcid, &
+            & ldata%tbcid, &
+            & ldata%mzone, &
+            & ldata%lbcid, &
+            & ldata%lgbcid, &
+            & ldata%ltbcid, &
+            & ldata%lpiexp
+       READ(lunit,*,ERR=200) ldata%dsid
+
+       WRITE(msg, *) TRIM(lname), ": record ", recno, &
+            &": id = ", ldata%linkid, ", dsid = ", ldata%dsid
+       CALL status_message(msg)
        
-       SELECT CASE (ltype)
+       SELECT CASE (ldata%ltype)
        CASE (1)
           ALLOCATE(fluvial_link :: link)
        CASE DEFAULT
           WRITE(msg, *) TRIM(lname), ': link record ', recno, &
-               &': link type unknown (', ltype, ')'
+               &': link type unknown (', ldata%ltype, ')'
           CALL error_message(msg)
           ierr = ierr + 1
        END SELECT
 
-       link%id = lid
-       link%dsid = dsid
-
-       ! find the "link" bc, if any
-
-       IF (lbc .NE. 0) THEN
-          link%usbc%p => bcman%find(LINK_BC_TYPE, lbc)
-          IF (.NOT. ASSOCIATED(link%usbc%p) ) THEN
-             WRITE (msg, *) TRIM(lname), ': link ', lid, ': unknown link BC id: ', lbc
-             CALL error_message(msg)
-             ierr = ierr + 1
-          END IF
+       IF (link%initialize(ldata, bcman) .NE. 0) THEN
+          WRITE(msg, *) TRIM(lname), ': link record ', recno, &
+               & ', link id = ', ldata%linkid, ': error'
+          CALL error_message(msg)
+          ierr = ierr + 1
        END IF
-
-       ! find the downstream bc, if any
-
-       IF (dsbc .NE. 0) THEN
-          link%dsbc%p => bcman%find(LINK_BC_TYPE, dsbc)
-          IF (.NOT. ASSOCIATED(link%dsbc%p) ) THEN
-             WRITE (msg, *) TRIM(lname), ': link ', lid, &
-                  &': unknown downstream BC id: ', dsbc
-             CALL error_message(msg)
-             ierr = ierr + 1
-          END IF
-       END IF
-       
        CALL this%links%push(link)
-       
+       NULLIFY(link)
     END DO
 
 100 CONTINUE
@@ -133,6 +129,9 @@ CONTAINS
        msg = TRIM(lname) // ': too many errors in link file'
        CALL error_message(msg, fatal=.TRUE.)
     END IF
+
+    WRITE(msg, *) TRIM(lname), ': successfully read ', this%links%size(), ' links'
+    CALL status_message(msg)
 
     RETURN
 
@@ -163,6 +162,9 @@ CONTAINS
 
     ierr = 0
 
+    WRITE(msg, *) 'Connecting ', this%links%size(), ' links ...'
+    CALL status_message(msg)
+
     CALL this%links%begin()
     link => this%links%current()
     
@@ -173,14 +175,40 @@ CONTAINS
        link => this%links%current()
     END DO
 
+    ! find the downstream link: there can be only one, highlander
+
     nds = 0
 
     CALL this%links%begin()
     link => this%links%current()
     
     DO WHILE (ASSOCIATED(link))
+       IF (link%dsid .LE. 0) THEN 
+          this%dslink => link
+          nds = nds + 1
+       END IF
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+
+    IF (nds .EQ. 0) THEN
+       CALL error_message("No downstream link found, there must be one")
+       ierr = ierr + 1
+    ELSE IF (nds .GT. 1) THEN
+       CALL error_message("Too many ownstream links found, there can be only one")
+       ierr = ierr + 1
+    END IF
+
+    ! connect each link with it's downstream neighbor
+
+    CALL this%links%begin()
+    link => this%links%current()
+    
+    DO WHILE (ASSOCIATED(link))
        IF (link%dsid .GT. 0) THEN 
-          dlink => this%find(link%dsid)
+          CALL this%links%save()
+          dlink => this%links%find(link%dsid)
+          CALL this%links%restore()
           IF (.NOT. ASSOCIATED(dlink)) THEN
              WRITE(msg, '("link , I4, : invalid downstream link id (",I4,")")')&
                   & link%id, link%dsid
@@ -194,9 +222,6 @@ CONTAINS
              NULLIFY(con)
           END IF
           CALL dlink%ucon%p%ulink%push(link)
-       ELSE 
-          this%dslink => link
-          nds = nds + 1
        END IF
        
        CALL this%links%next()
@@ -204,14 +229,6 @@ CONTAINS
     END DO
 
     
-    IF (nds .EQ. 0) THEN
-       CALL error_message("No downstream link found, there must be one")
-       ierr = ierr + 1
-    ELSE IF (nds .GT. 1) THEN
-       CALL error_message("Too many ownstream links found, there can be only one")
-       ierr = ierr + 1
-    END IF
-
     IF (ierr .GT. 0) THEN
        CALL error_message("Network connectivity errors, cannot continue", &
             &fatal=.TRUE.)
@@ -219,8 +236,8 @@ CONTAINS
 
     ! compute computational order
 
-    this%maxorder = this%dslink%set_order(0)
-    IF (this%maxorder .NE. this%links%size()) THEN
+    this%maxorder = this%dslink%set_order(1)
+    IF (this%maxorder-1 .NE. this%links%size()) THEN
        CALL error_message("link_manager_connect: this should not happen")
     END IF
 

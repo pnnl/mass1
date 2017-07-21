@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2017-07-20 08:53:56 d3g096
+! Last Change: 2017-07-21 13:19:06 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -30,6 +30,19 @@ MODULE link_module
   TYPE, PUBLIC :: confluence_ptr
      TYPE (confluence_t), POINTER :: p
   END type confluence_ptr
+
+  ! ----------------------------------------------------------------
+  ! TYPE link_input_data
+  ! Fields expected in link input data
+  ! ----------------------------------------------------------------
+  TYPE, PUBLIC :: link_input_data
+    INTEGER :: linkid, inopt, npt, lorder, ltype
+    INTEGER :: nup, dsid
+    INTEGER :: dsbcid, gbcid, tbcid, mzone, lbcid, lgbcid, ltbcid
+    DOUBLE PRECISION :: lpiexp
+  CONTAINS 
+    PROCEDURE :: defaults => link_input_defaults
+  END type link_input_data
 
   ! ----------------------------------------------------------------
   ! TYPE link_t
@@ -66,12 +79,14 @@ MODULE link_module
   END type link_t
 
   ABSTRACT INTERFACE
-     SUBROUTINE init_proc(this, id, dsid)
-       IMPORT :: link_t
+     FUNCTION init_proc(this, ldata, bcman) RESULT(ierr)
+       IMPORT :: link_t, link_input_data, bc_manager_t
        IMPLICIT NONE
+       INTEGER :: ierr
        CLASS (link_t), INTENT(INOUT) :: this
-       INTEGER, INTENT(IN) :: id, dsid
-     END SUBROUTINE init_proc
+       CLASS (link_input_data), INTENT(IN) :: ldata
+       CLASS (bc_manager_t), INTENT(IN) :: bcman
+     END FUNCTION init_proc
 
      DOUBLE PRECISION FUNCTION up_down_proc(this)
        IMPORT :: link_t
@@ -163,6 +178,33 @@ MODULE link_module
 
 CONTAINS
 
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_input_defaults
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_input_defaults(this)
+    IMPLICIT NONE
+    CLASS (link_input_data), INTENT(INOUT) :: this
+
+    this%linkid = 0
+    this%inopt = 1
+    this%npt = 0
+    this%lorder = 0
+    this%ltype = 0
+    this%nup = 0
+    this%dsbcid = 0
+    this%gbcid = 0
+    this%tbcid = 0
+    this%mzone = 0
+    this%lbcid = 0
+    this%lgbcid = 0
+    this%ltbcid = 0
+    this%lpiexp = 0.0
+
+    this%dsid = 0
+
+  END SUBROUTINE link_input_defaults
+
+
   ! ! ----------------------------------------------------------------
   ! !  FUNCTION new_link_t
   ! ! ----------------------------------------------------------------
@@ -179,6 +221,21 @@ CONTAINS
   !   NULLIFY(link%dcon%p)
 
   ! END FUNCTION new_link_t
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION link_initialize
+  ! ----------------------------------------------------------------
+  FUNCTION link_initialize(this, ldata, bcman) RESULT(ierr)
+
+    IMPLICIT NONE
+    INTEGER :: ierr
+    CLASS (link_t), INTENT(INOUT) :: this
+    CLASS (link_input_data), INTENT(IN) :: ldata
+    CLASS (bc_manager_t), INTENT(IN) :: bcman
+    CHARACTER (LEN=1024) :: msg
+
+
+  END FUNCTION link_initialize
 
   ! ----------------------------------------------------------------
   !  FUNCTION new_link_list
@@ -422,6 +479,8 @@ CONTAINS
     link => this%ulink%current()
     DO WHILE (ASSOCIATED(link))
        o = link%set_order(o)
+       CALL this%ulink%next()
+       link => this%ulink%current()
     END DO
     order = o
 

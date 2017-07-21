@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2017-07-20 08:09:52 d3g096
+! Last Change: 2017-07-21 13:34:32 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -49,17 +49,49 @@ MODULE linear_link_module
 CONTAINS
 
   ! ----------------------------------------------------------------
-  ! SUBROUTINE linear_link_initialize
+  !  FUNCTION linear_link_initialize
   ! ----------------------------------------------------------------
-  SUBROUTINE linear_link_initialize(this, id, dsid)
+  FUNCTION linear_link_initialize(this, ldata, bcman) RESULT(ierr)
+
     IMPLICIT NONE
+    INTEGER :: ierr
     CLASS (linear_link_t), INTENT(INOUT) :: this
-    INTEGER, INTENT(IN) :: id, dsid
+    CLASS (link_input_data), INTENT(IN) :: ldata
+    CLASS (bc_manager_t), INTENT(IN) :: bcman
+    CHARACTER (LEN=1024) :: msg
 
-    this%id = id
-    this%dsid = dsid
+    ierr = 0
+    this%id = ldata%linkid
+    this%dsid = ldata%dsid
 
-  END SUBROUTINE linear_link_initialize
+    ! find the "link" bc, if any; children can set this and it will be preserved
+
+    IF (.NOT. ASSOCIATED(this%usbc%p)) THEN
+       IF (ldata%lbcid .NE. 0) THEN
+          this%usbc%p => bcman%find(LINK_BC_TYPE, ldata%lbcid)
+          IF (.NOT. ASSOCIATED(this%usbc%p) ) THEN
+             WRITE (msg, *) 'link ', ldata%linkid, ': unknown link BC id: ', ldata%lbcid
+             CALL error_message(msg)
+             ierr = ierr + 1
+          END IF
+       END IF
+    END IF
+
+    ! find the downstream bc, if any; children can set this and it will be preserved
+
+    IF (.NOT. ASSOCIATED(this%dsbc%p)) THEN
+       IF (ldata%dsbcid .NE. 0) THEN
+          this%dsbc%p => bcman%find(LINK_BC_TYPE, ldata%dsbcid)
+          IF (.NOT. ASSOCIATED(this%dsbc%p) ) THEN
+             WRITE (msg, *) 'link ', ldata%linkid, &
+                  &': unknown downstream BC id: ', ldata%dsbcid
+             CALL error_message(msg)
+             ierr = ierr + 1
+          END IF
+       END IF
+    END IF
+
+  END FUNCTION linear_link_initialize
 
 
   ! ----------------------------------------------------------------
@@ -263,7 +295,7 @@ CONTAINS
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(INOUT) :: this
 
-    DEALLOCATE(this%pt)
+    ! DEALLOCATE(this%pt)
 
   END SUBROUTINE linear_link_destroy
 

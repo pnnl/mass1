@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2017-07-19 13:59:53 d3g096
+! Last Change: 2017-07-21 13:41:01 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -16,6 +16,7 @@ MODULE fluvial_link_module
 
   USE bc_module
   USE point_module
+  USE link_module
   USE linear_link_module
 
   IMPLICIT NONE
@@ -29,6 +30,7 @@ MODULE fluvial_link_module
      DOUBLE PRECISION :: latq, latqold
      DOUBLE PRECISION :: lpiexp
    CONTAINS
+     PROCEDURE :: initialize => fluvial_link_initialize
      PROCEDURE :: coeff => fluvial_link_coeff
      PROCEDURE :: hydro_update => fluvial_link_hupdate
   END type fluvial_link
@@ -37,6 +39,23 @@ MODULE fluvial_link_module
   DOUBLE PRECISION, PARAMETER :: theta = 1.0
 
 CONTAINS
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION fluvial_link_initialize
+  ! ----------------------------------------------------------------
+  FUNCTION fluvial_link_initialize(this, ldata, bcman) RESULT(ierr)
+
+    IMPLICIT NONE
+    INTEGER :: ierr
+    CLASS (fluvial_link), INTENT(INOUT) :: this
+    CLASS (link_input_data), INTENT(IN) :: ldata
+    CLASS (bc_manager_t), INTENT(IN) :: bcman
+    CHARACTER (LEN=1024) :: msg
+
+    ierr = this%linear_link_t%initialize(ldata, bcman)
+
+  END FUNCTION fluvial_link_initialize
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE fluvial_link_coeff
