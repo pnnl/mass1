@@ -1,3 +1,8 @@
+2017-07-26  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* coeff.f90 (fluvial_coeff): oops: value of beta not returned to
+	default -- fixed
+
 2017-07-14  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* test/flow/normal-hydro: add a case for link type 6
