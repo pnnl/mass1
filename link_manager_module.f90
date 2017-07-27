@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2017-07-27 07:29:25 d3g096
+! Last Change: 2017-07-27 08:59:53 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -18,6 +18,7 @@
 ! ----------------------------------------------------------------
 MODULE link_manager_module
   USE utility
+  USE mass1_config
   USE link_module
   USE fluvial_link_module
   USE nonfluvial_link_module
@@ -60,14 +61,14 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_readpts
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_readpts(this, pname)
+  SUBROUTINE link_manager_readpts(this, theconfig)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
-    CHARACTER (LEN=*), INTENT(IN) :: pname
+    TYPE (configuration_t), INTENT(INOUT) :: theconfig
     CLASS (link_t), POINTER :: link
-    INTEGER :: linkid, lastid, lineno, ierr
-    INTEGER, PARAMETER :: lunit = 22
+    INTEGER :: linkid, lastid, lineno, ierr, iostat
+    INTEGER, PARAMETER :: punit = 22
     CHARACTER (LEN=1024) :: msg
 
     
@@ -75,54 +76,56 @@ CONTAINS
     ierr = 0
     lastid = 0
 
-    CALL open_existing(pname, lunit, fatal=.TRUE.)
+    CALL open_existing(theconfig%point_file, punit, fatal=.TRUE.)
   
     ! FIXME: CALL print_output("POINTS", 0.0)
 
     DO WHILE(.TRUE.)
-       READ(lunit,*, END=100, ERR=200) linkid
+
+       READ(punit,*, IOSTAT=iostat) linkid
+
        lineno = lineno + 1
 
+       IF (IS_IOSTAT_END(iostat)) THEN
+          EXIT
+       ELSE IF (iostat .NE. 0) THEN
+          WRITE(msg, *) TRIM(theconfig%point_file) // ': read error near line ', lineno
+          CALL error_message(msg, fatal=.TRUE.)
+       END IF
+
        IF (linkid .EQ. lastid) THEN
-          WRITE(msg, *) TRIM(pname), ': error, line', lineno, &
-               &': extra point for link ', linkid
+          WRITE(msg, *) TRIM(theconfig%point_file), ': error, line', lineno, &
+               &': extra point for link ', linkid, ' ?'
           CALL error_message(msg)
           ierr = ierr + 1
           CYCLE
        END IF
-       
+
        link => this%find(linkid)
        IF (.NOT. ASSOCIATED(link)) THEN
-          WRITE(msg,*) TRIM(pname), ': error, line ', lineno, &
-               &': unknown link id: ', linkid
-          CALL error_message(msg)
+          IF (linkid .NE. lastid) THEN
+             WRITE(msg,*) TRIM(theconfig%point_file), ': error, line ', lineno, &
+                  &': unknown link id: ', linkid
+             CALL error_message(msg)
+          END IF
           ierr = ierr + 1
           CYCLE
        END IF
      
-       BACKSPACE(lunit)
+       lastid = linkid
+
+       BACKSPACE(punit)
        lineno = lineno - 1
        
-       WRITE(msg,*) TRIM(pname), ': line ', lineno, &
-            &': reading/building points for link ', link%id
-       CALL status_message(msg)
-
-       IF (link%readpts(lunit, lineno) .NE. 0) THEN
-          WRITE(msg,*) TRIM(pname), ': error, line ', lineno, &
+       IF (link%readpts(theconfig, punit, lineno) .NE. 0) THEN
+          WRITE(msg,*) TRIM(theconfig%point_file), ': error, line ', lineno, &
             &': problem with points for link ', link%id
           CALL error_message(msg)
           ierr = ierr + 1
        END IF
     END DO
-
-100 CLOSE(lunit)
+    CLOSE(punit)
     RETURN
-
-200 CONTINUE
-    CLOSE (lunit)
-
-    WRITE(msg, *) TRIM(pname) // ': read error near line ', lineno
-    CALL error_message(msg, fatal=.TRUE.)
 
   END SUBROUTINE link_manager_readpts
 
@@ -130,28 +133,28 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_read
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_read(this, lname, pname, bcman)
+  SUBROUTINE link_manager_read(this, theconfig, bcman)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
-    CHARACTER (LEN=*), INTENT(IN) :: lname, pname
+    TYPE (configuration_t), INTENT(INOUT) :: theconfig
     CLASS (bc_manager_t), INTENT(IN) :: bcman
     CLASS (link_t), POINTER :: link
     INTEGER, PARAMETER :: lunit = 21
-    INTEGER :: recno, ierr
+    INTEGER :: recno, ierr, iostat
     TYPE (link_input_data) :: ldata
     CHARACTER (LEN=1024) :: msg
 
     ierr = 0
     recno = 0
 
-    CALL open_existing(lname, lunit, fatal=.TRUE.)
+    CALL open_existing(theconfig%link_file, lunit, fatal=.TRUE.)
     ! FIXME: CALL print_output("LINKS ", 0.0)
     
     DO WHILE (.TRUE.) 
        recno = recno + 1
        CALL ldata%defaults()
-       READ(lunit,*,END=100,ERR=200) &
+       READ(lunit,*, IOSTAT=iostat) &
             & ldata%linkid, &
             & ldata%inopt, &
             & ldata%npt, &
@@ -166,9 +169,31 @@ CONTAINS
             & ldata%lgbcid, &
             & ldata%ltbcid, &
             & ldata%lpiexp
-       READ(lunit,*,ERR=200) ldata%dsid
 
-       WRITE(msg, *) TRIM(lname), ": record ", recno, &
+       IF (IS_IOSTAT_END(iostat)) THEN
+          EXIT
+       ELSE IF (iostat .NE. 0) THEN
+          WRITE(msg, *) TRIM(theconfig%link_file) // &
+               &': error in or near link record ', recno
+          CALL error_message(msg, fatal=.TRUE.)
+       END IF
+       
+       READ(lunit,*, IOSTAT=iostat) ldata%dsid
+
+       IF (IS_IOSTAT_END(iostat)) THEN
+          WRITE(msg, *) TRIM(theconfig%link_file), ': link record ', recno, &
+               & ', link id = ', ldata%linkid, &
+               &', is incomplete (second line missing)'
+          CALL error_message(msg)
+          ierr = ierr + 1
+          EXIT
+       ELSE IF (iostat .NE. 0) THEN
+          WRITE(msg, *) TRIM(theconfig%link_file) // &
+               &': error in or near link record ', recno
+          CALL error_message(msg, fatal=.TRUE.)
+       END IF
+
+       WRITE(msg, *) TRIM(theconfig%link_file), ": record ", recno, &
             &": id = ", ldata%linkid, ", dsid = ", ldata%dsid
        CALL status_message(msg)
        
@@ -176,14 +201,14 @@ CONTAINS
        CASE (1)
           ALLOCATE(fluvial_link :: link)
        CASE DEFAULT
-          WRITE(msg, *) TRIM(lname), ': link record ', recno, &
+          WRITE(msg, *) TRIM(theconfig%link_file), ': link record ', recno, &
                &': link type unknown (', ldata%ltype, ')'
           CALL error_message(msg)
           ierr = ierr + 1
        END SELECT
 
        IF (link%initialize(ldata, bcman) .NE. 0) THEN
-          WRITE(msg, *) TRIM(lname), ': link record ', recno, &
+          WRITE(msg, *) TRIM(theconfig%link_file), ': link record ', recno, &
                & ', link id = ', ldata%linkid, ': error'
           CALL error_message(msg)
           ierr = ierr + 1
@@ -192,26 +217,20 @@ CONTAINS
        NULLIFY(link)
     END DO
 
-100 CONTINUE
-
     CLOSE (lunit)
 
     IF (ierr .GT. 0) THEN
-       msg = TRIM(lname) // ': too many errors in link file'
+       msg = TRIM(theconfig%link_file) // ': too many errors in link file'
        CALL error_message(msg, fatal=.TRUE.)
     END IF
 
-    WRITE(msg, *) TRIM(lname), ': successfully read ', this%links%size(), ' links'
+    WRITE(msg, *) TRIM(theconfig%link_file), &
+         &': successfully read ', this%links%size(), ' links'
     CALL status_message(msg)
 
+    CALL this%readpts(theconfig)
+
     RETURN
-
-200 CONTINUE
-
-    CLOSE (lunit)
-
-    WRITE(msg, *) TRIM(lname) // ': error in or near link record ', recno
-    CALL error_message(msg, fatal=.TRUE.)
 
   END SUBROUTINE link_manager_read
 

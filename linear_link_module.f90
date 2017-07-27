@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2017-07-27 07:26:39 d3g096
+! Last Change: 2017-07-27 09:02:34 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -17,6 +17,7 @@ MODULE linear_link_module
   USE point_module
   USE bc_module
   USE cross_section
+  USE mass1_config
   USE general_vars, ONLY: depth_threshold, depth_minimum
 
   IMPLICIT NONE
@@ -63,7 +64,11 @@ CONTAINS
 
     ierr = 0
     this%id = ldata%linkid
+    this%npoints = ldata%npt
     this%dsid = ldata%dsid
+    this%input_option = ldata%inopt
+
+    ALLOCATE(this%pt(this%npoints))
 
     ! find the "link" bc, if any; children can set this and it will be preserved
 
@@ -97,14 +102,165 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION linear_link_readpts
   ! ----------------------------------------------------------------
-  FUNCTION linear_link_readpts(this, punit, lineno) RESULT(ierr)
+  FUNCTION linear_link_readpts(this, theconfig, punit, lineno) RESULT(ierr)
     IMPLICIT NONE
     INTEGER :: ierr
     CLASS (linear_link_t), INTENT(INOUT) :: this
+    TYPE (configuration_t), INTENT(IN) :: theconfig
     INTEGER, INTENT(IN) :: punit
     INTEGER, INTENT(INOUT) :: lineno
-
+    CLASS (link_t), POINTER :: link
+    INTEGER :: iostat
+    CHARACTER (LEN=1024) :: msg
+    INTEGER :: linkid, pnum, sectid, i
+    DOUBLE PRECISION :: x, thalweg, manning, kdiff, ksurf
+    DOUBLE PRECISION :: length, delta_x, slope, start_el, end_el
+    CLASS (xsection_t), POINTER :: xsect
     ierr = 0
+
+    WRITE(msg, *) "Reading/building points for link = ", this%id, &
+         &", input option = ", this%input_option, &
+         &", points = ", this%npoints
+    CALL status_message(msg)
+
+    SELECT CASE(this%input_option)
+    CASE(1)                    ! point based input
+       DO i=1,this%npoints
+          READ(punit, *, IOSTAT=iostat)&
+               &linkid, &
+               &pnum, &
+               &x, &
+               &sectid, &
+               &thalweg, &
+               &manning, &
+               &kdiff, &
+               &ksurf
+
+          IF (IS_IOSTAT_END(iostat)) THEN
+             WRITE(msg, *) 'Premature end of file near line ', lineno, &
+                  &' reading points for link ', this%id
+             ierr = ierr + 1
+             RETURN
+          ELSE IF (iostat .NE. 0) THEN
+             WRITE(msg, *) 'Read error near line ', lineno, &
+                  &' reading points for link ', this%id
+             ierr = ierr + 1
+             RETURN
+          END IF
+
+          lineno = lineno + 1
+
+          SELECT CASE(theconfig%channel_length_units)
+          CASE(CHANNEL_FOOT) ! length is in feet
+             x = x
+          CASE(CHANNEL_METER) ! length is in meters
+             x = x*3.2808
+          CASE(CHANNEL_MILE) ! length is in miles
+             x = x*5280.0
+          CASE(CHANNEL_KM) ! length in kilometers
+             x = x*0.6211*5280.0
+          END SELECT
+
+
+          this%pt(i)%x = x
+          this%pt(i)%thalweg = thalweg
+          IF (manning .LE. 0.0) THEN
+             WRITE(msg, *) 'link ', this%id, ', point ', pnum, &
+                  &': error: invalid value for mannings coefficient: ', &
+                  &manning
+             ierr = ierr + 1
+             CYCLE
+          END IF
+          this%pt(i)%manning = manning
+          this%pt(i)%kstrick = 1.0/this%pt(i)%manning
+          this%pt(i)%k_diff = kdiff
+
+          ! ksurf is ignored
+
+          ! FIXME: 
+          ! this%pt(i)%xsection%p => sections%find(sectid)
+          ! IF (.NOT. ASSOCIATED(this%pt(i)%xsection%p)) THEN
+          !    WRITE(msg, *) "Cannot find cross section ", sectid, &
+          !         &" for link = ", this%id, ", point = ", pnum
+          !    CALL error_message(msg, fatal=.TRUE.)
+          ! END IF
+       END DO
+
+    CASE(2)                    ! link based input
+
+       READ(punit, *, IOSTAT=iostat) &
+            &linkid, &
+            &length, &
+            &start_el, &
+            &end_el, &
+            &sectid, &
+            &manning, &
+            &kdiff, &
+            &ksurf
+
+       SELECT CASE(theconfig%channel_length_units)
+       CASE(CHANNEL_FOOT) ! length is in feet
+          length = length
+       CASE(CHANNEL_METER) ! length is in meters
+          length = length*3.2808
+       CASE(CHANNEL_MILE) ! length is in miles
+          length = length*5280.0
+       CASE(CHANNEL_KM) ! length in kilometers
+          length = length*0.6211*5280.0
+       END SELECT
+
+       SELECT CASE(theconfig%units)
+       CASE(METRIC_UNITS)
+          start_el = start_el*3.2808
+          end_el = end_el*3.2808
+       END SELECT
+
+       IF (manning .LE. 0.0) THEN
+          WRITE(msg, *) 'link ', this%id,  &
+               &': error: invalid value for mannings coefficient: ', &
+               &manning
+          CALL error_message(msg)
+          ierr = ierr + 1
+          RETURN
+       END IF
+
+       delta_x = length/(this%npoints - 1)
+       slope = (start_el - end_el)/length
+
+       ! FIXME
+       ! xsect =>  sections%find(sectid)
+       ! IF (.NOT. ASSOCIATED(xsect)) THEN
+       !    WRITE(msg, *) "Cannot find cross section ", sectid, &
+       !         &" for link = ", this%id
+       !    CALL error_message(msg)
+       !    ierr = ierr + 1
+       !    CYCLE
+       ! END IF
+
+       DO i=1, this%npoints
+          IF (i .EQ. 1)THEN
+             this%pt(i)%x = 0.0
+             this%pt(i)%thalweg = start_el
+          ELSE
+             this%pt(i)%x = this%pt(i-1)%x + delta_x
+             this%pt(i)%thalweg = this%pt(i-1)%thalweg - slope*delta_x
+          ENDIF
+
+          this%pt(i)%manning = manning
+          this%pt(i)%kstrick = 1.0/this%pt(i)%manning
+          this%pt(i)%k_diff = kdiff
+
+          ! ksurf is ignored
+
+       END DO
+
+    CASE DEFAULT
+       
+       WRITE (msg, *) 'link ', this%id, &
+            &': error: unknown input option: ', this%input_option
+       CALL error_message(msg)
+       ierr = ierr + 1
+    END SELECT
 
   END FUNCTION linear_link_readpts
 

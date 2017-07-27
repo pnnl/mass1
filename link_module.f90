@@ -9,16 +9,17 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2017-07-26 14:57:16 d3g096
+! Last Change: 2017-07-27 08:03:33 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
 ! ----------------------------------------------------------------
 MODULE link_module
 
+  USE utility
   USE dlist_module
   USE bc_module
-  USE utility
+  USE mass1_config
 
   IMPLICIT NONE
 
@@ -89,11 +90,12 @@ MODULE link_module
        CLASS (bc_manager_t), INTENT(IN) :: bcman
      END FUNCTION init_proc
 
-     FUNCTION readpts_proc(this, punit, lineno) RESULT (ierr)
-       IMPORT :: link_t
+     FUNCTION readpts_proc(this, theconfig, punit, lineno) RESULT (ierr)
+       IMPORT :: link_t, configuration_t
        IMPLICIT NONE
        INTEGER :: ierr
        CLASS (link_t), INTENT(INOUT) :: this
+       TYPE (configuration_t), INTENT(IN) :: theconfig
        INTEGER, INTENT(IN) :: punit
        INTEGER, INTENT(INOUT) :: lineno
 
