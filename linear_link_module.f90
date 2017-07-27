@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2017-07-21 13:34:32 d3g096
+! Last Change: 2017-07-27 07:26:39 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -33,6 +33,7 @@ MODULE linear_link_module
      TYPE (point_t), DIMENSION(:),ALLOCATABLE :: pt
    CONTAINS
      PROCEDURE :: initialize => linear_link_initialize
+     PROCEDURE :: readpts => linear_link_readpts
      PROCEDURE :: q_up => linear_link_q_up
      PROCEDURE :: q_down => linear_link_q_down
      PROCEDURE :: y_up => linear_link_y_up
@@ -92,6 +93,21 @@ CONTAINS
     END IF
 
   END FUNCTION linear_link_initialize
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION linear_link_readpts
+  ! ----------------------------------------------------------------
+  FUNCTION linear_link_readpts(this, punit, lineno) RESULT(ierr)
+    IMPLICIT NONE
+    INTEGER :: ierr
+    CLASS (linear_link_t), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: punit
+    INTEGER, INTENT(INOUT) :: lineno
+
+    ierr = 0
+
+  END FUNCTION linear_link_readpts
+
 
 
   ! ----------------------------------------------------------------

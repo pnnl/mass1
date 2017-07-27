@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2017-07-21 13:46:43 d3g096
+! Last Change: 2017-07-27 07:29:25 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -33,6 +33,7 @@ MODULE link_manager_module
      INTEGER :: maxorder
    CONTAINS
      PROCEDURE :: read => link_manager_read
+     PROCEDURE, PRIVATE :: readpts => link_manager_readpts
      PROCEDURE :: find => link_manager_find
      PROCEDURE :: connect => link_manager_connect
      PROCEDURE :: flow_sim => link_manager_flow_sim
@@ -57,13 +58,83 @@ CONTAINS
   END FUNCTION new_link_manager
 
   ! ----------------------------------------------------------------
-  ! SUBROUTINE link_manager_read
+  ! SUBROUTINE link_manager_readpts
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_read(this, lname, bcman)
+  SUBROUTINE link_manager_readpts(this, pname)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
-    CHARACTER (LEN=*), INTENT(IN) :: lname
+    CHARACTER (LEN=*), INTENT(IN) :: pname
+    CLASS (link_t), POINTER :: link
+    INTEGER :: linkid, lastid, lineno, ierr
+    INTEGER, PARAMETER :: lunit = 22
+    CHARACTER (LEN=1024) :: msg
+
+    
+    lineno = 0
+    ierr = 0
+    lastid = 0
+
+    CALL open_existing(pname, lunit, fatal=.TRUE.)
+  
+    ! FIXME: CALL print_output("POINTS", 0.0)
+
+    DO WHILE(.TRUE.)
+       READ(lunit,*, END=100, ERR=200) linkid
+       lineno = lineno + 1
+
+       IF (linkid .EQ. lastid) THEN
+          WRITE(msg, *) TRIM(pname), ': error, line', lineno, &
+               &': extra point for link ', linkid
+          CALL error_message(msg)
+          ierr = ierr + 1
+          CYCLE
+       END IF
+       
+       link => this%find(linkid)
+       IF (.NOT. ASSOCIATED(link)) THEN
+          WRITE(msg,*) TRIM(pname), ': error, line ', lineno, &
+               &': unknown link id: ', linkid
+          CALL error_message(msg)
+          ierr = ierr + 1
+          CYCLE
+       END IF
+     
+       BACKSPACE(lunit)
+       lineno = lineno - 1
+       
+       WRITE(msg,*) TRIM(pname), ': line ', lineno, &
+            &': reading/building points for link ', link%id
+       CALL status_message(msg)
+
+       IF (link%readpts(lunit, lineno) .NE. 0) THEN
+          WRITE(msg,*) TRIM(pname), ': error, line ', lineno, &
+            &': problem with points for link ', link%id
+          CALL error_message(msg)
+          ierr = ierr + 1
+       END IF
+    END DO
+
+100 CLOSE(lunit)
+    RETURN
+
+200 CONTINUE
+    CLOSE (lunit)
+
+    WRITE(msg, *) TRIM(pname) // ': read error near line ', lineno
+    CALL error_message(msg, fatal=.TRUE.)
+
+  END SUBROUTINE link_manager_readpts
+
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_read
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_read(this, lname, pname, bcman)
+
+    IMPLICIT NONE
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    CHARACTER (LEN=*), INTENT(IN) :: lname, pname
     CLASS (bc_manager_t), INTENT(IN) :: bcman
     CLASS (link_t), POINTER :: link
     INTEGER, PARAMETER :: lunit = 21

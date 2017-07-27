@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2017-07-21 13:19:06 d3g096
+! Last Change: 2017-07-26 14:57:16 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -56,6 +56,7 @@ MODULE link_module
    CONTAINS
 
      PROCEDURE (init_proc), DEFERRED :: initialize
+     PROCEDURE (readpts_proc), DEFERRED :: readpts
      PROCEDURE (destroy_proc), DEFERRED :: destroy
 
      PROCEDURE, NON_OVERRIDABLE :: set_order => link_set_order
@@ -87,6 +88,17 @@ MODULE link_module
        CLASS (link_input_data), INTENT(IN) :: ldata
        CLASS (bc_manager_t), INTENT(IN) :: bcman
      END FUNCTION init_proc
+
+     FUNCTION readpts_proc(this, punit, lineno) RESULT (ierr)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       INTEGER :: ierr
+       CLASS (link_t), INTENT(INOUT) :: this
+       INTEGER, INTENT(IN) :: punit
+       INTEGER, INTENT(INOUT) :: lineno
+
+     END FUNCTION readpts_proc
+
 
      DOUBLE PRECISION FUNCTION up_down_proc(this)
        IMPORT :: link_t
