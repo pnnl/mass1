@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2017-07-21 13:41:01 d3g096
+! Last Change: 2017-07-27 12:38:17 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -18,6 +18,7 @@ MODULE fluvial_link_module
   USE point_module
   USE link_module
   USE linear_link_module
+  USE utility
 
   IMPLICIT NONE
 
@@ -34,6 +35,11 @@ MODULE fluvial_link_module
      PROCEDURE :: coeff => fluvial_link_coeff
      PROCEDURE :: hydro_update => fluvial_link_hupdate
   END type fluvial_link
+
+  TYPE, PUBLIC, EXTENDS(fluvial_link) :: fluvial_hydro_link
+     CONTAINS
+       PROCEDURE :: initialize => fluvial_hydro_link_initialize
+  END type fluvial_hydro_link
 
   DOUBLE PRECISION, PARAMETER :: alpha = 1.0
   DOUBLE PRECISION, PARAMETER :: theta = 1.0
@@ -53,6 +59,16 @@ CONTAINS
     CHARACTER (LEN=1024) :: msg
 
     ierr = this%linear_link_t%initialize(ldata, bcman)
+
+    IF (ldata%lbcid .GT. 0) THEN
+       this%latbc%p => bcman%find(LATFLOW_BC_TYPE, ldata%lbcid)
+       IF (.NOT. ASSOCIATED(this%latbc%p)) THEN
+          WRITE (msg, *) 'link ', ldata%linkid, ': unknown lateral inflow id: ', &
+               &ldata%lbcid
+          CALL error_message(msg)
+          ierr = ierr + 1
+       END IF
+    END IF
 
   END FUNCTION fluvial_link_initialize
 
@@ -161,5 +177,36 @@ CONTAINS
     CALL this%linear_link_t%hydro_update(res_coeff)
 
   END SUBROUTINE fluvial_link_hupdate
+
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION fluvial_hydro_link_initialize
+  ! ----------------------------------------------------------------
+  FUNCTION fluvial_hydro_link_initialize(this, ldata, bcman) RESULT(ierr)
+
+    IMPLICIT NONE
+    INTEGER :: ierr
+    CLASS (fluvial_hydro_link), INTENT(INOUT) :: this
+    CLASS (link_input_data), INTENT(IN) :: ldata
+    CLASS (bc_manager_t), INTENT(IN) :: bcman
+    CHARACTER (LEN=1024) :: msg
+
+    IF (ldata%bcid .GT. 0) THEN
+       this%usbc%p => bcman%find(HYDRO_BC_TYPE, ldata%bcid)
+       IF (.NOT. ASSOCIATED(this%usbc%p) ) THEN
+          WRITE (msg, *) 'link ', ldata%linkid, ': unknown hydro BC id: ', ldata%bcid
+          CALL error_message(msg)
+          ierr = ierr + 1
+       END IF
+    ELSE 
+       WRITE (msg, *) 'hydro link ', ldata%linkid, ' requires a hydro BC, none specified'
+       CALL error_message(msg)
+       ierr = ierr + 1
+    END IF
+
+    ierr = ierr + this%fluvial_link%initialize(ldata, bcman)
+  END FUNCTION fluvial_hydro_link_initialize
+
+  
 
 END MODULE fluvial_link_module

@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2017-07-27 08:59:53 d3g096
+! Last Change: 2017-07-27 12:40:00 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -161,6 +161,7 @@ CONTAINS
             & ldata%lorder, &
             & ldata%ltype, &
             & ldata%nup, &
+            & ldata%bcid, &
             & ldata%dsbcid, &
             & ldata%gbcid, &
             & ldata%tbcid, &
@@ -196,15 +197,41 @@ CONTAINS
        WRITE(msg, *) TRIM(theconfig%link_file), ": record ", recno, &
             &": id = ", ldata%linkid, ", dsid = ", ldata%dsid
        CALL status_message(msg)
+
+       ! set any unneeded BC ids to zero
+       IF (.NOT. theconfig%do_latflow) THEN
+          ldata%lbcid = 0
+          ldata%lgbcid = 0
+          ldata%ltbcid = 0
+       END IF
+       IF (.NOT. theconfig%do_temp) THEN
+          ldata%tbcid = 0
+          ldata%ltbcid = 0
+       END IF
+       IF (.NOT. theconfig%do_gas) THEN
+          ldata%gbcid = 0
+          ldata%lgbcid = 0
+       END IF
        
        SELECT CASE (ldata%ltype)
        CASE (1)
           ALLOCATE(fluvial_link :: link)
+       CASE (21)
+          ALLOCATE(fluvial_hydro_link :: link)
+       CASE (2)
+          ALLOCATE(discharge_link :: link)
+       CASE (6)
+          ALLOCATE(hydro_link :: link)
+       CASE (3)
+          ALLOCATE(ustage_link :: link)
+       CASE (5)
+          ALLOCATE(trib_inflow_link :: link)
        CASE DEFAULT
           WRITE(msg, *) TRIM(theconfig%link_file), ': link record ', recno, &
                &': link type unknown (', ldata%ltype, ')'
           CALL error_message(msg)
           ierr = ierr + 1
+          CYCLE
        END SELECT
 
        IF (link%initialize(ldata, bcman) .NE. 0) THEN

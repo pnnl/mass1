@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2017-07-27 08:03:33 d3g096
+! Last Change: 2017-07-27 10:22:46 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -39,7 +39,7 @@ MODULE link_module
   TYPE, PUBLIC :: link_input_data
     INTEGER :: linkid, inopt, npt, lorder, ltype
     INTEGER :: nup, dsid
-    INTEGER :: dsbcid, gbcid, tbcid, mzone, lbcid, lgbcid, ltbcid
+    INTEGER :: bcid, dsbcid, gbcid, tbcid, mzone, lbcid, lgbcid, ltbcid
     DOUBLE PRECISION :: lpiexp
   CONTAINS 
     PROCEDURE :: defaults => link_input_defaults

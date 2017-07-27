@@ -7,14 +7,17 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 17, 2017 by William A. Perkins
-! Last Change: 2017-07-17 13:50:42 d3g096
+! Last Change: 2017-07-27 12:41:38 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE nonfluvial_link_module
 ! ----------------------------------------------------------------
 MODULE nonfluvial_link_module
+  USE utility
   USE point_module
+  USE link_module
   USE linear_link_module
+  USE bc_module
   IMPLICIT NONE
 
   PRIVATE 
@@ -35,6 +38,7 @@ MODULE nonfluvial_link_module
   ! ----------------------------------------------------------------
   TYPE, PUBLIC, EXTENDS(discharge_link) :: hydro_link
    CONTAINS
+     PROCEDURE :: initialize => hydro_link_initialize
      PROCEDURE :: coeff => hydro_link_coeff
   END type hydro_link
 
@@ -98,6 +102,35 @@ CONTAINS
     cp%g = pt1%hnow%q - bcval
 
   END SUBROUTINE discharge_link_coeff
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION hydro_link_initialize
+  ! ----------------------------------------------------------------
+  FUNCTION hydro_link_initialize(this, ldata, bcman) RESULT(ierr)
+
+    IMPLICIT NONE
+    INTEGER :: ierr
+    CLASS (hydro_link), INTENT(INOUT) :: this
+    CLASS (link_input_data), INTENT(IN) :: ldata
+    CLASS (bc_manager_t), INTENT(IN) :: bcman
+    CHARACTER (LEN=1024) :: msg
+
+    IF (ldata%bcid .GT. 0) THEN
+       this%usbc%p => bcman%find(HYDRO_BC_TYPE, ldata%bcid)
+       IF (.NOT. ASSOCIATED(this%usbc%p) ) THEN
+          WRITE (msg, *) 'link ', ldata%linkid, ': unknown hydro BC id: ', ldata%bcid
+          CALL error_message(msg)
+          ierr = ierr + 1
+       END IF
+    ELSE 
+       WRITE (msg, *) 'hydro link ', ldata%linkid, ' requires a hydro BC, none specified'
+       CALL error_message(msg)
+       ierr = ierr + 1
+    END IF
+    
+    ierr = ierr + this%linear_link_t%initialize(ldata, bcman)
+  END FUNCTION hydro_link_initialize
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE hydro_link_coeff

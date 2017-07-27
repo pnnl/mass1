@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2017-07-27 09:02:34 d3g096
+! Last Change: 2017-07-27 10:23:04 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -73,10 +73,10 @@ CONTAINS
     ! find the "link" bc, if any; children can set this and it will be preserved
 
     IF (.NOT. ASSOCIATED(this%usbc%p)) THEN
-       IF (ldata%lbcid .NE. 0) THEN
-          this%usbc%p => bcman%find(LINK_BC_TYPE, ldata%lbcid)
+       IF (ldata%bcid .NE. 0) THEN
+          this%usbc%p => bcman%find(LINK_BC_TYPE, ldata%bcid)
           IF (.NOT. ASSOCIATED(this%usbc%p) ) THEN
-             WRITE (msg, *) 'link ', ldata%linkid, ': unknown link BC id: ', ldata%lbcid
+             WRITE (msg, *) 'link ', ldata%linkid, ': unknown link BC id: ', ldata%bcid
              CALL error_message(msg)
              ierr = ierr + 1
           END IF
