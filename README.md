@@ -148,3 +148,13 @@ equations are discretized.
 When run, MASS1 expects to find a
 [configuration file](doc/configuration.md) named `mass1.cfg`.  
 
+## Citation
+
+If you use MASS1, please cite 
+
+   Richmond, M.C., Perkins, W.A., 2009. Efficient calculation of
+   dewatered and entrapped areas using hydrodynamic modeling and
+   GIS. *Environmental Modelling & Software* 24,
+   1447–1456. doi:10.1016/j.envsoft.2009.06.001 
+
+For examples of MASS1 use, see the [bibliography](doc/bibliography.md). 
