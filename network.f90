@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2017-07-21 08:43:55 d3g096
+! Last Change: 2017-07-27 07:30:04 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -149,7 +149,7 @@ CONTAINS
     CALL this%config%read()
     CALL this%readbcs()
     CALL this%sections%read(this%config%section_file)
-    CALL this%links%read(this%config%link_file, this%bcs)
+    CALL this%links%read(this%config%link_file, this%config%point_file, this%bcs)
     CALL this%links%connect()
 
   END SUBROUTINE network_read
