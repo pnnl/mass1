@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2017-07-17 14:27:30 d3g096
+! Last Change: 2017-07-27 14:59:49 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -40,7 +40,7 @@ MODULE point_module
   TYPE, PUBLIC :: point_t
      DOUBLE PRECISION :: x, thalweg
      DOUBLE PRECISION :: manning, k_diff, kstrick
-     CLASS (xsection_ptr), POINTER :: xsection
+     TYPE (xsection_ptr) :: xsection
      TYPE (xsection_prop) :: xsprop
      TYPE (point_hydro_state) :: hnow, hold
      TYPE (point_sweep_coeff) :: sweep

@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2017-07-27 10:23:04 d3g096
+! Last Change: 2017-07-28 08:06:41 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -17,6 +17,7 @@ MODULE linear_link_module
   USE point_module
   USE bc_module
   USE cross_section
+  USE section_handler_module
   USE mass1_config
   USE general_vars, ONLY: depth_threshold, depth_minimum
 
@@ -102,11 +103,12 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION linear_link_readpts
   ! ----------------------------------------------------------------
-  FUNCTION linear_link_readpts(this, theconfig, punit, lineno) RESULT(ierr)
+  FUNCTION linear_link_readpts(this, theconfig, sectman, punit, lineno) RESULT(ierr)
     IMPLICIT NONE
     INTEGER :: ierr
     CLASS (linear_link_t), INTENT(INOUT) :: this
     TYPE (configuration_t), INTENT(IN) :: theconfig
+    CLASS (section_handler), INTENT(INOUT) :: sectman
     INTEGER, INTENT(IN) :: punit
     INTEGER, INTENT(INOUT) :: lineno
     CLASS (link_t), POINTER :: link
@@ -177,13 +179,14 @@ CONTAINS
 
           ! ksurf is ignored
 
-          ! FIXME: 
-          ! this%pt(i)%xsection%p => sections%find(sectid)
-          ! IF (.NOT. ASSOCIATED(this%pt(i)%xsection%p)) THEN
-          !    WRITE(msg, *) "Cannot find cross section ", sectid, &
-          !         &" for link = ", this%id, ", point = ", pnum
-          !    CALL error_message(msg, fatal=.TRUE.)
-          ! END IF
+          xsect => sectman%find(sectid)
+          IF (.NOT. ASSOCIATED(xsect)) THEN
+             WRITE(msg, *) "link ", this%id, ", point = ", pnum, &
+                  &": error: cannot find cross section ", sectid
+             CALL error_message(msg)
+          END IF
+          this%pt(i)%xsection%p => xsect
+
        END DO
 
     CASE(2)                    ! link based input
@@ -221,21 +224,17 @@ CONTAINS
                &manning
           CALL error_message(msg)
           ierr = ierr + 1
-          RETURN
        END IF
 
        delta_x = length/(this%npoints - 1)
        slope = (start_el - end_el)/length
 
-       ! FIXME
-       ! xsect =>  sections%find(sectid)
-       ! IF (.NOT. ASSOCIATED(xsect)) THEN
-       !    WRITE(msg, *) "Cannot find cross section ", sectid, &
-       !         &" for link = ", this%id
-       !    CALL error_message(msg)
-       !    ierr = ierr + 1
-       !    CYCLE
-       ! END IF
+       xsect =>  sectman%find(sectid)
+       IF (.NOT. ASSOCIATED(xsect)) THEN
+          WRITE(msg, *) "link ", this%id, "error: cannot find cross section ", sectid
+          CALL error_message(msg)
+          ierr = ierr + 1
+       END IF
 
        DO i=1, this%npoints
           IF (i .EQ. 1)THEN
@@ -249,7 +248,7 @@ CONTAINS
           this%pt(i)%manning = manning
           this%pt(i)%kstrick = 1.0/this%pt(i)%manning
           this%pt(i)%k_diff = kdiff
-
+          this%pt(i)%xsection%p => xsect
           ! ksurf is ignored
 
        END DO

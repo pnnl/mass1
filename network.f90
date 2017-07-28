@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2017-07-27 07:56:07 d3g096
+! Last Change: 2017-07-27 14:26:04 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -149,7 +149,7 @@ CONTAINS
     CALL this%config%read()
     CALL this%readbcs()
     CALL this%sections%read(this%config%section_file)
-    CALL this%links%read(this%config, this%bcs)
+    CALL this%links%read(this%config, this%bcs, this%sections)
     CALL this%links%connect()
 
   END SUBROUTINE network_read
@@ -162,7 +162,6 @@ CONTAINS
     IMPLICIT NONE
     CLASS (network), INTENT(INOUT) :: this
 
-    CALL this%links%connect();
 
   END SUBROUTINE network_initialize
 

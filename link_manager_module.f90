@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2017-07-27 12:40:00 d3g096
+! Last Change: 2017-07-27 14:25:35 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -23,6 +23,8 @@ MODULE link_manager_module
   USE fluvial_link_module
   USE nonfluvial_link_module
   USE bc_module
+  USE section_handler_module
+
   IMPLICIT NONE
 
   ! ----------------------------------------------------------------
@@ -61,11 +63,12 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_readpts
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_readpts(this, theconfig)
+  SUBROUTINE link_manager_readpts(this, theconfig, sectman)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
     TYPE (configuration_t), INTENT(INOUT) :: theconfig
+    CLASS (section_handler), INTENT(INOUT) :: sectman
     CLASS (link_t), POINTER :: link
     INTEGER :: linkid, lastid, lineno, ierr, iostat
     INTEGER, PARAMETER :: punit = 22
@@ -117,7 +120,7 @@ CONTAINS
        BACKSPACE(punit)
        lineno = lineno - 1
        
-       IF (link%readpts(theconfig, punit, lineno) .NE. 0) THEN
+       IF (link%readpts(theconfig, sectman, punit, lineno) .NE. 0) THEN
           WRITE(msg,*) TRIM(theconfig%point_file), ': error, line ', lineno, &
             &': problem with points for link ', link%id
           CALL error_message(msg)
@@ -133,13 +136,14 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_read
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_read(this, theconfig, bcman)
+  SUBROUTINE link_manager_read(this, theconfig, bcman, sectman)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
     TYPE (configuration_t), INTENT(INOUT) :: theconfig
     CLASS (bc_manager_t), INTENT(IN) :: bcman
     CLASS (link_t), POINTER :: link
+    CLASS (section_handler), INTENT(INOUT) :: sectman
     INTEGER, PARAMETER :: lunit = 21
     INTEGER :: recno, ierr, iostat
     TYPE (link_input_data) :: ldata
@@ -255,7 +259,7 @@ CONTAINS
          &': successfully read ', this%links%size(), ' links'
     CALL status_message(msg)
 
-    CALL this%readpts(theconfig)
+    CALL this%readpts(theconfig, sectman)
 
     RETURN
 

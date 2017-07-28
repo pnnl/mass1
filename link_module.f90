@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2017-07-27 10:22:46 d3g096
+! Last Change: 2017-07-28 07:45:17 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -20,6 +20,7 @@ MODULE link_module
   USE dlist_module
   USE bc_module
   USE mass1_config
+  USE section_handler_module
 
   IMPLICIT NONE
 
@@ -90,12 +91,13 @@ MODULE link_module
        CLASS (bc_manager_t), INTENT(IN) :: bcman
      END FUNCTION init_proc
 
-     FUNCTION readpts_proc(this, theconfig, punit, lineno) RESULT (ierr)
-       IMPORT :: link_t, configuration_t
+     FUNCTION readpts_proc(this, theconfig, sectman, punit, lineno) RESULT (ierr)
+       IMPORT :: link_t, configuration_t, section_handler
        IMPLICIT NONE
        INTEGER :: ierr
        CLASS (link_t), INTENT(INOUT) :: this
        TYPE (configuration_t), INTENT(IN) :: theconfig
+       CLASS (section_handler), INTENT(INOUT) :: sectman
        INTEGER, INTENT(IN) :: punit
        INTEGER, INTENT(INOUT) :: lineno
 

@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 17, 2017 by William A. Perkins
-! Last Change: 2017-07-27 12:41:38 d3g096
+! Last Change: 2017-07-27 14:25:47 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE nonfluvial_link_module
@@ -114,6 +114,8 @@ CONTAINS
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
     CHARACTER (LEN=1024) :: msg
+
+    ierr = 0
 
     IF (ldata%bcid .GT. 0) THEN
        this%usbc%p => bcman%find(HYDRO_BC_TYPE, ldata%bcid)
