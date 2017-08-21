@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January 17, 2017 by William A. Perkins
-! Last Change: 2017-06-28 10:59:59 d3g096
+! Last Change: 2017-08-21 13:03:13 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE bc_module
@@ -175,7 +175,7 @@ CONTAINS
     CLASS(simple_bc_t), INTENT(INOUT) :: this
     CHARACTER(LEN=*), INTENT(IN) :: fname
     INTEGER, PARAMETER :: iunit = 55
-    this%tbl => time_series_read(fname, iunit)
+    this%tbl => time_series_read(fname, fields=1, unit=iunit)
   END SUBROUTINE simple_bc_read
 
   ! ----------------------------------------------------------------
