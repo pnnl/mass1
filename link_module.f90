@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2017-07-28 07:45:17 d3g096
+! Last Change: 2017-08-21 10:06:02 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -72,6 +72,12 @@ MODULE link_module
      PROCEDURE (c_up_down_proc), DEFERRED :: c_up
      PROCEDURE (c_up_down_proc), DEFERRED :: c_down
 
+     ! state initialization
+
+     PROCEDURE (set_initial_proc), DEFERRED :: set_initial
+     PROCEDURE (read_restart_proc), DEFERRED :: read_restart
+     PROCEDURE (write_restart_proc), DEFERRED :: write_restart
+
      ! hydrodynamics are computed with two sweeps
 
      PROCEDURE (fsweep_proc), DEFERRED :: forward_sweep
@@ -117,6 +123,27 @@ MODULE link_module
        INTEGER, INTENT(IN) :: ispecies
      END FUNCTION c_up_down_proc
      
+     SUBROUTINE set_initial_proc(this, stage, discharge, c)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(INOUT) :: this
+       DOUBLE PRECISION, INTENT(IN) :: stage, discharge, c(:)
+     END SUBROUTINE set_initial_proc
+
+     SUBROUTINE read_restart_proc(this, iunit)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(INOUT) :: this
+       INTEGER, INTENT(IN) :: iunit
+     END SUBROUTINE read_restart_proc
+
+     SUBROUTINE write_restart_proc(this, iunit)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(IN) :: this
+       INTEGER, INTENT(IN) :: iunit
+     END SUBROUTINE write_restart_proc
+
      SUBROUTINE fsweep_proc(this, deltat)
        IMPORT :: link_t
        IMPLICIT NONE

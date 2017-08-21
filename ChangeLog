@@ -1,3 +1,18 @@
+2017-08-21  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* mass1_new.f90 (mass1): read network initial state 
+
+	* linear_link_module.f90 (linear_link_module)
+	(linear_link_read_restart, linear_link_write_restart): add
+	routines to read/write state
+
+	* link_module.f90 (link_module): declare routines to read initial
+	state 
+
+	* network.f90 (network_set_initial, network_read_restart)
+	(network_initialize): add methods to initialize network
+	(hydrodynamic) state
+
 2017-07-26  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* doc/bibliography.md: added

@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2017-07-12 14:08:34 d3g096
+! Last Change: 2017-08-21 11:35:17 d3g096
 ! ----------------------------------------------------------------
 PROGRAM mass1
   USE utility
@@ -36,8 +36,7 @@ PROGRAM mass1
   CALL banner()
 
   CALL thenet%read(".")
-
-
+  CALL thenet%initialize()
 
   CALL thenet%destroy()
 

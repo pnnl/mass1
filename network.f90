@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2017-07-27 14:26:04 d3g096
+! Last Change: 2017-08-21 12:19:34 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -38,6 +38,9 @@ MODULE network_module
    CONTAINS
      PROCEDURE :: readbcs => network_read_bcs
      PROCEDURE :: read => network_read
+     PROCEDURE :: set_initial => network_set_initial
+     PROCEDURE :: read_restart => network_read_restart
+     PROCEDURE :: initialize => network_initialize
      PROCEDURE :: flow => network_flow
      PROCEDURE :: destroy => network_destroy
   END type network
@@ -155,13 +158,115 @@ CONTAINS
   END SUBROUTINE network_read
 
   ! ----------------------------------------------------------------
+  ! SUBROUTINE network_set_initial
+  ! ----------------------------------------------------------------
+  SUBROUTINE network_set_initial(this)
+
+    IMPLICIT NONE
+    CLASS (network), INTENT(INOUT) :: this
+    INTEGER :: linkid, recno, iostat, ierr
+    CLASS (link_t), POINTER :: link
+    DOUBLE PRECISION :: stage, discharge
+    DOUBLE PRECISION, ALLOCATABLE :: c(:)
+    INTEGER, PARAMETER :: iunit = 25
+    CHARACTER (LEN=1024) :: msg
+
+    ! FIXME: transport
+    ALLOCATE(c(2))
+
+    ierr = 0
+    recno = 0
+
+    CALL open_existing(this%config%initial_file, iunit)
+    
+    ! FIXME: test to make sure all links are initialized
+    DO WHILE (.TRUE.)
+       recno = recno + 1
+       READ (iunit, *, IOSTAT=iostat) linkid, stage, discharge, c(1), c(2)
+       IF (IS_IOSTAT_END(iostat)) THEN
+          EXIT
+       ELSE IF (iostat .NE. 0) THEN
+          WRITE(msg, *) TRIM(this%config%initial_file),&
+               &': read error near line ', recno
+          CALL error_message(msg)
+          ierr = ierr + 1
+          EXIT
+       END IF
+
+       NULLIFY(link)
+       link => this%links%find(linkid)
+
+       IF (ASSOCIATED(link)) THEN
+          WRITE(msg, *) TRIM(this%config%initial_file), &
+               &': setting initial conditions for link ', link%id
+          CALL status_message(msg)
+          CALL link%set_initial(stage, discharge, c)
+       ELSE 
+          WRITE(msg, *) TRIM(this%config%initial_file),&
+               &': error, line ', recno, &
+               &': unknown link id (', linkid, ')'
+          CALL error_message(msg)
+          ierr = ierr + 1
+       END IF
+    END DO
+
+    CLOSE(iunit)
+
+    IF (ierr .GT. 0) THEN
+       WRITE(msg, *) TRIM(this%config%initial_file), &
+            &': too many errors reading initial conditions'
+       CALL error_message(msg, fatal=.TRUE.)
+    END IF
+
+  END SUBROUTINE network_set_initial
+
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE network_read_restart
+  ! ----------------------------------------------------------------
+  SUBROUTINE network_read_restart(this)
+
+    IMPLICIT NONE
+    CLASS (network), INTENT(INOUT) :: this
+    CLASS (link_t), POINTER :: link
+    INTEGER, PARAMETER :: runit = 31
+    CHARACTER (LEN=1024) :: msg
+
+    CALL open_existing(this%config%restart_load_file, runit, form='UNFORMATTED')
+
+    WRITE(msg, *) 'reading restart from ', TRIM(this%config%restart_load_file)
+    CALL status_message(msg)
+
+    CALL this%links%links%begin()
+    link => this%links%links%current()
+
+    DO WHILE (ASSOCIATED(link)) 
+       WRITE(msg, *) 'reading intial state for link ', link%id
+       CALL status_message(msg)
+       CALL link%read_restart(runit)
+       CALL this%links%links%next()
+       link => this%links%links%current()
+    END DO
+
+    WRITE (msg, *) 'done reading restart from ', TRIM(this%config%restart_load_file)
+    CALL status_message(msg)
+    CLOSE(runit)
+
+  END SUBROUTINE network_read_restart
+
+  ! ----------------------------------------------------------------
   ! SUBROUTINE network_initialize
   ! ----------------------------------------------------------------
   SUBROUTINE network_initialize(this)
 
     IMPLICIT NONE
-    CLASS (network), INTENT(INOUT) :: this
+     CLASS (network), INTENT(INOUT) :: this
 
+    IF (this%config%do_hotstart) THEN
+       CALL this%read_restart()
+    ELSE
+       CALL this%set_initial()
+    END IF
 
   END SUBROUTINE network_initialize
 

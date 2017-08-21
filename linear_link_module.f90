@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2017-07-28 08:06:41 d3g096
+! Last Change: 2017-08-21 12:10:25 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -42,6 +42,9 @@ MODULE linear_link_module
      PROCEDURE :: y_down => linear_link_y_down
      PROCEDURE :: c_up => linear_link_c_up
      PROCEDURE :: c_down => linear_link_c_down
+     PROCEDURE :: set_initial => linear_link_set_initial
+     PROCEDURE :: read_restart => linear_link_read_restart
+     PROCEDURE :: write_restart => linear_link_write_restart
      PROCEDURE :: coeff => linear_link_coeff
      PROCEDURE :: forward_sweep => linear_link_forward
      PROCEDURE :: backward_sweep => linear_link_backward
@@ -111,7 +114,6 @@ CONTAINS
     CLASS (section_handler), INTENT(INOUT) :: sectman
     INTEGER, INTENT(IN) :: punit
     INTEGER, INTENT(INOUT) :: lineno
-    CLASS (link_t), POINTER :: link
     INTEGER :: iostat
     CHARACTER (LEN=1024) :: msg
     INTEGER :: linkid, pnum, sectid, i
@@ -141,11 +143,13 @@ CONTAINS
           IF (IS_IOSTAT_END(iostat)) THEN
              WRITE(msg, *) 'Premature end of file near line ', lineno, &
                   &' reading points for link ', this%id
+             CALL error_message(msg)
              ierr = ierr + 1
              RETURN
           ELSE IF (iostat .NE. 0) THEN
              WRITE(msg, *) 'Read error near line ', lineno, &
                   &' reading points for link ', this%id
+             CALL error_message(msg)
              ierr = ierr + 1
              RETURN
           END IF
@@ -170,6 +174,7 @@ CONTAINS
              WRITE(msg, *) 'link ', this%id, ', point ', pnum, &
                   &': error: invalid value for mannings coefficient: ', &
                   &manning
+             CALL error_message(msg)
              ierr = ierr + 1
              CYCLE
           END IF
@@ -333,6 +338,92 @@ CONTAINS
     INTEGER, INTENT(IN) :: ispecies
     linear_link_c_down = 0.0
   END FUNCTION linear_link_c_down
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE linear_link_set_initial
+  ! ----------------------------------------------------------------
+  SUBROUTINE linear_link_set_initial(this, stage, discharge, c)
+    IMPLICIT NONE
+    CLASS (linear_link_t), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: stage, discharge, c(:)
+    INTEGER :: i
+    
+    DO i = 1, this%npoints
+       this%pt(i)%hnow%y = stage
+       this%pt(i)%hold%y = stage
+       this%pt(i)%hnow%q = discharge
+       this%pt(i)%hold%q = discharge
+    END DO
+
+  END SUBROUTINE linear_link_set_initial
+
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE linear_link_read_restart
+  ! ----------------------------------------------------------------
+  SUBROUTINE linear_link_read_restart(this, iunit)
+
+    IMPLICIT NONE
+    CLASS (linear_link_t), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: iunit
+    INTEGER :: i, junk, iostat, ierr
+    DOUBLE PRECISION :: c(2)
+    CHARACTER (LEN=1024) :: msg
+
+    ! FIXME: transport
+    c = 0.0
+    ierr = 0
+
+    DO i = 1, this%npoints
+       READ(iunit, IOSTAT=iostat) this%id, junk, &
+            &this%pt(i)%hnow%q, &
+            &this%pt(i)%hnow%y, &
+            &c(1), c(2)
+       IF (IS_IOSTAT_END(iostat)) THEN
+          WRITE(msg, *) 'link ', this%id, &
+               &': premature end of file reading restart for point ', i
+          CALL error_message(msg)
+          ierr = ierr + 1
+          EXIT
+       ELSE IF (iostat .NE. 0) THEN
+          WRITE(msg, *) 'link ', this%id, &
+               &': error reading restart for point ', i
+          CALL error_message(msg)
+          ierr = ierr + 1
+          EXIT
+       END IF
+    END DO
+
+    IF (ierr .GT. 0) THEN
+       WRITE(msg, *) 'problem reading restart for link', this%id
+       CALL error_message(msg, fatal=.TRUE.)
+    END IF
+
+  END SUBROUTINE linear_link_read_restart
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE linear_link_write_restart
+  ! ----------------------------------------------------------------
+  SUBROUTINE linear_link_write_restart(this, iunit)
+
+    IMPLICIT NONE
+    CLASS (linear_link_t), INTENT(IN) :: this
+    INTEGER, INTENT(IN) :: iunit
+    INTEGER :: i
+    DOUBLE PRECISION :: c
+
+    ! FIXME: transport
+    c = 0.0
+
+    DO i = 1, this%npoints
+       WRITE(iunit) this%id, i, &
+            &this%pt(i)%hnow%q, &
+            &this%pt(i)%hnow%y, &
+            &c, c
+    END DO
+  END SUBROUTINE linear_link_write_restart
+
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE linear_link_coeff
