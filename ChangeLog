@@ -1,5 +1,8 @@
 2017-08-21  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* link_manager_module.f90 (link_manager_read): just make a fluvial
+	link for type 20 for now
+
 	* bc_module.f90 (simple_bc_read): needed to specify the number of
 	fields 
 

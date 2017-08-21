@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2017-07-27 14:25:35 d3g096
+! Last Change: 2017-08-21 13:16:08 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -219,6 +219,9 @@ CONTAINS
        
        SELECT CASE (ldata%ltype)
        CASE (1)
+          ALLOCATE(fluvial_link :: link)
+       CASE (20) 
+          ! FIXME: transport
           ALLOCATE(fluvial_link :: link)
        CASE (21)
           ALLOCATE(fluvial_hydro_link :: link)
