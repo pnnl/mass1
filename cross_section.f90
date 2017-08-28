@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2017-07-03 10:13:52 d3g096
+! Last Change: 2017-08-28 07:40:56 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -115,6 +115,18 @@ MODULE cross_section
      PROCEDURE :: read => rectangular_flood_read
      PROCEDURE :: props => rectangular_flood_props
   END type rectangular_flood_section
+
+  ! ----------------------------------------------------------------
+  ! TYPE triangular_section
+  ! ----------------------------------------------------------------
+  TYPE, PUBLIC, EXTENDS(xsection_t) :: triangular_section
+     DOUBLE PRECISION :: sidez
+   CONTAINS
+     PROCEDURE :: read => triangular_read
+     PROCEDURE :: props => triangular_props
+     PROCEDURE :: print => triangular_print
+     PROCEDURE :: destroy => triangular_destroy
+  END type triangular_section
 
   ! ----------------------------------------------------------------
   ! TYPE general_section
@@ -288,6 +300,76 @@ CONTAINS
        props%dkdy = props%conveyance*(5.0*props%topwidth/props%area - 4.0/props%wetperim)/3.0
     ENDIF
   END SUBROUTINE rectangular_flood_props
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE triangular_read
+  ! ----------------------------------------------------------------
+  SUBROUTINE triangular_read(this, iounit, ioerr)
+
+    IMPLICIT NONE
+    CLASS (triangular_section), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: iounit
+    INTEGER, INTENT(OUT) :: ioerr
+
+    READ(iounit,*,IOSTAT=ioerr) this%sidez
+
+  END SUBROUTINE triangular_read
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE triangular_print
+  ! ----------------------------------------------------------------
+  SUBROUTINE triangular_print(this, iounit, ioerr)
+    IMPLICIT NONE
+    CLASS(triangular_section), INTENT(IN) :: this
+    INTEGER, INTENT(IN) :: iounit
+    INTEGER, INTENT(OUT) :: ioerr
+    ioerr = iounit
+    ioerr = 0
+    ! do nothing
+    RETURN
+  END SUBROUTINE triangular_print
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE triangular_destroy
+  ! ----------------------------------------------------------------
+  SUBROUTINE triangular_destroy(this)
+    IMPLICIT NONE
+    CLASS(triangular_section), INTENT(INOUT) :: this
+
+    ! do nothing
+
+  END SUBROUTINE triangular_destroy
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE triangular_props
+  ! ----------------------------------------------------------------
+  SUBROUTINE triangular_props(this, depth, props)
+    IMPLICIT NONE
+    CLASS(triangular_section), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: depth
+    TYPE (xsection_prop), INTENT(OUT) :: props
+    DOUBLE PRECISION :: z, dAdy, dPdy
+
+    z = this%sidez
+
+    props%depth = depth
+    props%wetperim = 2.0*depth*SQRT(1 + z*z)
+    props%area = z*depth*depth
+    props%topwidth = 0.5*z*depth
+    IF (props%area .GT. 0.0) THEN
+       props%hydrad = props%area/props%wetperim
+       props%conveyance = props%area*props%hydrad**(2.0/3.0)
+       ! or conveyance = area**(5.0/3.0)/wetperim
+       dAdy = 2.0*z*depth
+       dPdy = 2.0*SQRT(1 + z*z)
+       props%dkdy = (5.0/3.0)*dAdy*props%hydrad**(2.0/3.0) - &
+            &(2.0/3.0)*props%hydrad**(5.0/3.0)*dPdy
+    ELSE 
+       props%hydrad = 0.0
+       props%conveyance = 0.0
+       props%dkdy = 0.0
+    END IF
+  END SUBROUTINE triangular_props
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE general_build
@@ -625,6 +707,8 @@ CONTAINS
        ALLOCATE(rectangular_flood_section :: xsect)
     CASE (3)
        ALLOCATE(trapezoidal_section :: xsect)
+    CASE (4)
+       ALLOCATE(triangular_section :: xsect)
     CASE (50)
        ALLOCATE(general_section :: xsect)
     CASE DEFAULT

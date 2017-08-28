@@ -14,8 +14,8 @@ contains the section identifier and type (1). The second line contains
 the section width and must be terminated with a `/`.  Here is an
 example rectangular cross section:
 ```
-3 1
-3000.0 /
+3       1   /
+3000.0      /
 ```
 
 ### Rectangular w/ Flood Plain
@@ -27,8 +27,30 @@ In the example below, the base rectangular section is 3000.0 units
 wide and 10.0 units deep.  The flood plain is 6000 units wide.  
 
 ```
-3 2
-10.0 3000.0 6000.0 /
+3       2           /
+10.0 3000.0 6000.0  /
+```
+
+### Trapezoidal
+
+A trapezoidal cross section is specified with two lines.  The first
+contains the section identifier and type (3).  In the example below,
+the base width is 32.8 feet and the side slope is 1/2.0.  
+
+```
+100     3           /
+ 32.8      2.0      /
+```
+
+### Triangular
+
+A triangular cross section is also specified by two lines.  The first
+contains the section identifier and type (4).  In the example below,
+the channel side slope is 1/2.0.
+
+```
+100     4   /
+  2.0       /
 ```
 
 ## General Cross Section

@@ -1,3 +1,11 @@
+2017-08-28  Perkins  <d3g096@WE32673>
+
+	* cross_section_table.dat: add a triangular section
+
+	* doc/section.md: document trapezoidal and triangular section types
+
+	* cross_section.f90 (cross_section): add triangular section
+
 2017-08-21  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* link_manager_module.f90 (link_manager_read): just make a fluvial

@@ -1,5 +1,7 @@
 100     3         / Trapezoidal Section
  32.8      2.0    /
+110     4         / Triangular Section
+  2.0             /
 150     1         /
  100.0            /
 200     50      1 / Same section as general section
