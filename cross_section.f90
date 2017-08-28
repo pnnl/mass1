@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2017-08-28 07:40:56 d3g096
+! Last Change: 2017-08-28 14:15:47 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -127,6 +127,21 @@ MODULE cross_section
      PROCEDURE :: print => triangular_print
      PROCEDURE :: destroy => triangular_destroy
   END type triangular_section
+
+  ! ----------------------------------------------------------------
+  ! TYPE parabolic_section
+  !
+  ! The bottom elevation, y = k*x^2, where x is the distance from the
+  ! cross section center, where y = 0.  
+  ! ----------------------------------------------------------------
+  TYPE, PUBLIC, EXTENDS(xsection_t) :: parabolic_section
+     DOUBLE PRECISION :: k
+   CONTAINS
+     PROCEDURE :: read => parabolic_read
+     PROCEDURE :: props => parabolic_props
+     PROCEDURE :: print => parabolic_print
+     PROCEDURE :: destroy => parabolic_destroy
+  END type parabolic_section
 
   ! ----------------------------------------------------------------
   ! TYPE general_section
@@ -370,6 +385,92 @@ CONTAINS
        props%dkdy = 0.0
     END IF
   END SUBROUTINE triangular_props
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE parabolic_read
+  ! ----------------------------------------------------------------
+  SUBROUTINE parabolic_read(this, iounit, ioerr)
+
+    IMPLICIT NONE
+    CLASS (parabolic_section), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: iounit
+    INTEGER, INTENT(OUT) :: ioerr
+
+    READ(iounit,*,IOSTAT=ioerr) this%k
+
+  END SUBROUTINE parabolic_read
+
+  
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE parabolic_print
+  ! ----------------------------------------------------------------
+  SUBROUTINE parabolic_print(this, iounit, ioerr)
+    IMPLICIT NONE
+    CLASS(parabolic_section), INTENT(IN) :: this
+    INTEGER, INTENT(IN) :: iounit
+    INTEGER, INTENT(OUT) :: ioerr
+    ioerr = iounit
+    ioerr = 0
+    ! do nothing
+    RETURN
+  END SUBROUTINE parabolic_print
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE parabolic_destroy
+  ! ----------------------------------------------------------------
+  SUBROUTINE parabolic_destroy(this)
+    IMPLICIT NONE
+    CLASS(parabolic_section), INTENT(INOUT) :: this
+
+    ! do nothing
+
+  END SUBROUTINE parabolic_destroy
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE parabolic_props
+  ! ----------------------------------------------------------------
+  SUBROUTINE parabolic_props(this, depth, props)
+    IMPLICIT NONE
+    CLASS(parabolic_section), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: depth
+    TYPE (xsection_prop), INTENT(OUT) :: props
+    DOUBLE PRECISION :: y, z, T, dTdy, dAdy, dPdy
+    CHARACTER (LEN=1024) :: msg
+
+    y = depth
+
+
+    IF (y .GT. 0.0) THEN
+       props%depth = depth
+       T = 2*SQRT(y/this%k)
+       z = 4.0*y/T
+       dTdY = SQRT(this%k/y)
+       props%topwidth = T
+       ! approximate: props%wetperim = T + 8.0/3.0*y*y/T
+       props%wetperim = 0.5*T*(SQRT(1 + z*z) + 1/z*LOG(z + SQRT(1 + z*Z)))
+       props%area = 2.0/3.0*T*y
+       props%hydrad = props%area/props%wetperim
+       props%conveyance = props%area*props%hydrad**(2.0/3.0)
+       ! or conveyance = area**(5.0/3.0)/wetperim
+       dAdy = 2.0/3.0*(dTdy*y + T)
+       ! approximate: dPdy = dTdy + 16.0/3.0*y/T - 8.0/3.0*y*y/T/T*dTdy
+       dPdy = 0.5*(y/this%k + 4*y*y)**(-0.5)*(1.0/this%k + 8.0*y) + &
+            &0.5/this%k*(SQRT(this%k/y) + 2.0*this%k/SQRT(1.0 + 4.0*y*this%k))/&
+            &(2.0*SQRT(y*this%k) + SQRT(1.0 + 4.0*y*this%k))
+       props%dkdy = (5.0/3.0)*dAdy*props%hydrad**(2.0/3.0) - &
+            &(2.0/3.0)*props%hydrad**(5.0/3.0)*dPdy
+       ! IF (4.0*y/T .GT. 1.0) THEN
+       !    WRITE (msg, *) 'WARNING: parabolic section ', this%id, &
+       !         &': conditions for wetted perimeter approximation exceeded'
+       !    CALL status_message(msg)
+       ! END IF
+    ELSE 
+       props%hydrad = 0.0
+       props%conveyance = 0.0
+       props%dkdy = 0.0
+    END IF
+  END SUBROUTINE parabolic_props
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE general_build
@@ -709,6 +810,8 @@ CONTAINS
        ALLOCATE(trapezoidal_section :: xsect)
     CASE (4)
        ALLOCATE(triangular_section :: xsect)
+    CASE (6)
+       ALLOCATE(parabolic_section :: xsect)
     CASE (50)
        ALLOCATE(general_section :: xsect)
     CASE DEFAULT

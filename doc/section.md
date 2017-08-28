@@ -5,7 +5,10 @@ required will vary depending on cross section type.  In all
 cross records, the first field of the first line is an integer cross
 section identifier and the second field is the cross section type.  
 
+
+
 ## Prismatic Cross Sections
+
 
 ### Rectangular
 
@@ -51,6 +54,21 @@ the channel side slope is 1/2.0.
 ```
 100     4   /
   2.0       /
+```
+
+
+### Parabolic
+
+The bottom elevation of a parabolic cross section is defined as *y =
+kx<sup>2</sup>*, where *x* is the distance from the cross section
+center.  A parabolic cross section is also specified by two lines. The first
+contains the section identifier and type (6).  The second contains
+only the factor *k*.  In the example below, *k* is 0.0625. The section
+would have a top width of 8 with a depth of 1.  
+
+```
+100     6   /
+  0.065     /
 ```
 
 ## General Cross Section

@@ -1,5 +1,11 @@
 2017-08-28  Perkins  <d3g096@WE32673>
 
+	* doc/section.md: add parabolic section
+
+	* cross_section_table.dat: add a parabolic section
+
+	* cross_section.f90 (cross_section): add a parabolic section
+
 	* cross_section_table.dat: add a triangular section
 
 	* doc/section.md: document trapezoidal and triangular section types

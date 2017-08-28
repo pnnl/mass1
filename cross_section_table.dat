@@ -2,6 +2,8 @@
  32.8      2.0    /
 110     4         / Triangular Section
   2.0             /
+120     6         / Parabolic Section
+  0.0625          /
 150     1         /
  100.0            /
 200     50      1 / Same section as general section
