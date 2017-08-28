@@ -25,9 +25,10 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created June 22, 2005 by William A. Perkins
-# Last Change: 2017-06-22 09:19:23 d3g096
+# Last Change: 2017-08-24 09:37:27 d3g096
 # -------------------------------------------------------------
 # $Id$
+
 
 VPATH = @srcdir@
 am__is_gnu_make = test -n '$(MAKEFILE_LIST)' && test -n '$(MAKELEVEL)'
@@ -128,7 +129,8 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
+am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)" \
+	"$(DESTDIR)$(scriptdir)" "$(DESTDIR)$(xsscriptdir)"
 SCRIPTS = $(bin_SCRIPTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -160,6 +162,7 @@ am__can_run_installinfo = \
 man1dir = $(mandir)/man1
 NROFF = nroff
 MANS = $(man_MANS)
+DATA = $(script_DATA) $(xsscript_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -318,12 +321,41 @@ top_srcdir = @top_srcdir@
 @CONFIG_PERL_TRUE@	$(perl_DateManip_mans)
 
 bin_SCRIPTS = \
-	$(perl_scripts) \
-	profile2cgns.py \
-	profile_extract.py
+	$(perl_scripts)
 
 man_MANS = \
 	$(perl_mans)
+
+scriptdir = $(datadir)/$(PACKAGE)/scripts
+script_DATA = \
+	README.md \
+	profile2cgns.py \
+	profile_extract.py \
+	profile_tecplot.py \
+	xy-looper.mcr \
+	xy-looper-png.mcr \
+	timeshift.py \
+	read.R \
+	bcsteps.py
+
+xsscriptdir = $(scriptdir)/cross-section
+xsscript_DATA = \
+	cross-section/CHARIMAarea.pl		\
+	cross-section/CHARIMAextract.pl		\
+	cross-section/CHARIMAfill.pl		\
+	cross-section/CHARIMAinsert.pl		\
+	cross-section/CHARIMAnotch.pl		\
+	cross-section/CHARIMArenum.pl		\
+	cross-section/CHARIMAthalweg.pl		\
+	cross-section/CHARIMAview.pl		\
+	cross-section/HEC2area.pl		\
+	cross-section/HEC2CHARIMA.pl		\
+	cross-section/HECRASCHARIMA.pl		\
+	cross-section/README.md			\
+	cross-section/section-fix.awk		\
+	cross-section/section-unfix.awk		\
+	cross-section/XSection.pm		\
+	cross-section/XSECTprops.pl
 
 CLEANFILES = $(perl_scripts) $(man_MANS)
 EXTRA_DIST = $(man_MANS)
@@ -438,6 +470,48 @@ uninstall-man1:
 	} | sed -e 's,.*/,,;h;s,.*\.,,;s,^[^1][0-9a-z]*$$,1,;x' \
 	      -e 's,\.[0-9a-z]*$$,,;$(transform);G;s,\n,.,'`; \
 	dir='$(DESTDIR)$(man1dir)'; $(am__uninstall_files_from_dir)
+install-scriptDATA: $(script_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(script_DATA)'; test -n "$(scriptdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(scriptdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(scriptdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(scriptdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(scriptdir)" || exit $$?; \
+	done
+
+uninstall-scriptDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(script_DATA)'; test -n "$(scriptdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(scriptdir)'; $(am__uninstall_files_from_dir)
+install-xsscriptDATA: $(xsscript_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(xsscript_DATA)'; test -n "$(xsscriptdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(xsscriptdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(xsscriptdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(xsscriptdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(xsscriptdir)" || exit $$?; \
+	done
+
+uninstall-xsscriptDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(xsscript_DATA)'; test -n "$(xsscriptdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(xsscriptdir)'; $(am__uninstall_files_from_dir)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -595,10 +669,10 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(SCRIPTS) $(MANS)
+all-am: Makefile $(SCRIPTS) $(MANS) $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"; do \
+	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(scriptdir)" "$(DESTDIR)$(xsscriptdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -652,7 +726,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-man
+install-data-am: install-man install-scriptDATA install-xsscriptDATA
 
 install-dvi: install-dvi-recursive
 
@@ -696,7 +770,8 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binSCRIPTS uninstall-man
+uninstall-am: uninstall-binSCRIPTS uninstall-man uninstall-scriptDATA \
+	uninstall-xsscriptDATA
 
 uninstall-man: uninstall-man1
 
@@ -710,11 +785,13 @@ uninstall-man: uninstall-man1
 	install-dvi-am install-exec install-exec-am install-html \
 	install-html-am install-info install-info-am install-man \
 	install-man1 install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic pdf \
-	pdf-am ps ps-am tags tags-am uninstall uninstall-am \
-	uninstall-binSCRIPTS uninstall-man uninstall-man1
+	install-ps-am install-scriptDATA install-strip \
+	install-xsscriptDATA installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-generic pdf pdf-am ps ps-am tags \
+	tags-am uninstall uninstall-am uninstall-binSCRIPTS \
+	uninstall-man uninstall-man1 uninstall-scriptDATA \
+	uninstall-xsscriptDATA
 
 
 @CONFIG_PERL_DATEMANIP_TRUE@@CONFIG_PERL_TRUE@mass1bc: mass1bc.in Makefile

@@ -7,14 +7,14 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 10, 2010 by William A. Perkins
-# Last Change: Fri Dec 10 08:38:55 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+# Last Change: 2017-08-24 09:40:11 d3g096
 # -------------------------------------------------------------
 
 SUBDIRS =
 
 AM_FCFLAGS = 
 
-lib_LIBRARIES = libgastemp.a
+noinst_LIBRARIES = libgastemp.a
 
 libgastemp_a_SOURCES = \
 	gas_coeffs_module.f90 \

@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created June 22, 2005 by William A. Perkins
-# Last Change: 2017-06-22 09:19:23 d3g096
+# Last Change: 2017-08-24 09:37:27 d3g096
 # -------------------------------------------------------------
 # $Id$
 
@@ -50,12 +50,43 @@ perl_mans = \
 endif
 
 bin_SCRIPTS = \
-	$(perl_scripts) \
-	profile2cgns.py \
-	profile_extract.py
+	$(perl_scripts)
 
 man_MANS = \
 	$(perl_mans)
+
+scriptdir = $(datadir)/$(PACKAGE)/scripts
+script_DATA = 	\
+	README.md \
+	profile2cgns.py \
+	profile_extract.py \
+	profile_tecplot.py \
+	xy-looper.mcr \
+	xy-looper-png.mcr \
+	timeshift.py \
+	read.R \
+	bcsteps.py
+
+xsscriptdir = $(scriptdir)/cross-section
+xsscript_DATA =					\
+	cross-section/CHARIMAarea.pl		\
+	cross-section/CHARIMAextract.pl		\
+	cross-section/CHARIMAfill.pl		\
+	cross-section/CHARIMAinsert.pl		\
+	cross-section/CHARIMAnotch.pl		\
+	cross-section/CHARIMArenum.pl		\
+	cross-section/CHARIMAthalweg.pl		\
+	cross-section/CHARIMAview.pl		\
+	cross-section/HEC2area.pl		\
+	cross-section/HEC2CHARIMA.pl		\
+	cross-section/HECRASCHARIMA.pl		\
+	cross-section/README.md			\
+	cross-section/section-fix.awk		\
+	cross-section/section-unfix.awk		\
+	cross-section/XSection.pm		\
+	cross-section/XSECTprops.pl
+
+
 
 CLEANFILES = $(perl_scripts) $(man_MANS)
 EXTRA_DIST = $(man_MANS)
