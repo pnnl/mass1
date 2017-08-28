@@ -6,6 +6,16 @@
 
 	* cross_section.f90 (cross_section): add triangular section
 
+	* scripts/mass1bc.in: update to newer Date::Manip initialization
+
+	* scripts/mass1profile.in: update to newer Date::Manip initialization
+
+2017-08-28  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* scripts/Makefile.am (xsscript_DATA): install cross section
+	scripts in .../share/mass1
+
+	* gastemp/Makefile.am: do not install the TDG/temperature library 
 2017-08-21  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* link_manager_module.f90 (link_manager_read): just make a fluvial
