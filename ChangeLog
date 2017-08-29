@@ -3,6 +3,12 @@
 	* scripts/mass1profile.in: fix problem with deprecated array
 	references 
 
+2017-08-28  Perkins  <d3g096@WE32673>
+
+	* scripts/mass1bc.in: update to newer Date::Manip initialization
+
+	* scripts/mass1profile.in: update to newer Date::Manip initialization
+
 2017-08-28  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* scripts/Makefile.am (xsscript_DATA): install cross section

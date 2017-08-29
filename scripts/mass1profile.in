@@ -11,7 +11,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created April 13, 1998 by 
-# Last Change: 2017-08-29 09:57:36 d3g096
+# Last Change: 2017-08-29 10:20:32 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -152,7 +152,7 @@ $usage =
 
                                 # initialize Date::Manip 
 
-Date::Manip::Date_Init("TZ=PST");
+Date::Manip::Date_Init('SetDate=now,UTC');
 
                                 # this will hold the data for which
                                 # statistics are computed

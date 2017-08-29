@@ -15,7 +15,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October  4, 1999 by William A. Perkins
-# Last Change: 2017-06-22 11:43:06 d3g096
+# Last Change: 2017-08-28 08:32:42 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -133,7 +133,8 @@ my %fieldnames =
  tdgpress => "TDG Pressure"
 );
 
-Date::Manip::Date_Init("TZ=PST");
+Date::Manip::Date_Init('SetDate=now,UTC');
+#Date::Manip::Date_Init("TZ=-08:00");
 
 my $field = undef;
 my $offset = undef;
