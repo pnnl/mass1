@@ -1,3 +1,12 @@
+2017-08-29  Perkins  <d3g096@WE32673>
+
+	* scripts/CMakeLists.txt: install scripts in share directory
+
+	* cross_section_table.dat: add a triangular_rounded_section 
+
+	* cross_section.f90 (cross_section): add
+	triangular_rounded_section 
+
 2017-08-28  Perkins  <d3g096@WE32673>
 
 	* doc/section.md: add parabolic section

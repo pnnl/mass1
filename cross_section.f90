@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2017-08-28 14:15:47 d3g096
+! Last Change: 2017-08-29 07:57:50 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -127,6 +127,16 @@ MODULE cross_section
      PROCEDURE :: print => triangular_print
      PROCEDURE :: destroy => triangular_destroy
   END type triangular_section
+
+  ! ----------------------------------------------------------------
+  ! TYPE triangular_rounded_section
+  ! ----------------------------------------------------------------
+  TYPE, PUBLIC, EXTENDS(triangular_section) :: triangular_rounded_section
+     DOUBLE PRECISION :: bottom_radius
+   CONTAINS
+     PROCEDURE :: read => triangular_rounded_read
+     PROCEDURE :: props => triangular_rounded_props
+  END type triangular_rounded_section
 
   ! ----------------------------------------------------------------
   ! TYPE parabolic_section
@@ -385,6 +395,56 @@ CONTAINS
        props%dkdy = 0.0
     END IF
   END SUBROUTINE triangular_props
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE triangular_rounded_read
+  ! ----------------------------------------------------------------
+  SUBROUTINE triangular_rounded_read(this, iounit, ioerr)
+
+    IMPLICIT NONE
+    CLASS (triangular_rounded_section), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: iounit
+    INTEGER, INTENT(OUT) :: ioerr
+
+    READ(iounit,*,IOSTAT=ioerr) this%sidez, this%bottom_radius
+
+  END SUBROUTINE triangular_rounded_read
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE triangular_rounded_props
+  ! ----------------------------------------------------------------
+  SUBROUTINE triangular_rounded_props(this, depth, props)
+    IMPLICIT NONE
+    CLASS(triangular_rounded_section), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: depth
+    TYPE (xsection_prop), INTENT(OUT) :: props
+    DOUBLE PRECISION :: z, r, y, T, dAdy, dPdy, pi, acotz
+
+    y = depth
+    z = this%sidez
+    r = this%bottom_radius
+    pi=4.D0*DATAN(1.D0)
+    acotz = pi/2.0 - DATAN(z)
+
+    props%depth = y
+    IF (y .GT. 0.0) THEN
+       T = 2.0*(z*(y-r)+r*SQRT(1.0+z*z))
+       props%area = T*T/4.0/z - r*r/z*(1.0 - z*acotz)
+       props%wetperim = T/z*SQRT(1 + z*z) - 2.0*r/z*(1 - z*acotz)
+       props%topwidth = T
+       props%hydrad = props%area/props%wetperim
+       props%conveyance = props%area*props%hydrad**(2.0/3.0)
+       ! or conveyance = area**(5.0/3.0)/wetperim
+       dAdy = 2.0*z*depth
+       dPdy = 2.0*SQRT(1 + z*z)
+       props%dkdy = (5.0/3.0)*dAdy*props%hydrad**(2.0/3.0) - &
+            &(2.0/3.0)*props%hydrad**(5.0/3.0)*dPdy
+    ELSE 
+       props%hydrad = 0.0
+       props%conveyance = 0.0
+       props%dkdy = 0.0
+    END IF
+  END SUBROUTINE triangular_rounded_props
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE parabolic_read
@@ -812,6 +872,8 @@ CONTAINS
        ALLOCATE(triangular_section :: xsect)
     CASE (6)
        ALLOCATE(parabolic_section :: xsect)
+    CASE (14)
+       ALLOCATE(triangular_rounded_section :: xsect)
     CASE (50)
        ALLOCATE(general_section :: xsect)
     CASE DEFAULT
