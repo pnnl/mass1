@@ -1,7 +1,7 @@
 # Cross-section Management Tools
 
-This directory contains several scripts for the manipulation of cross
-section data.  
+This directory contains several scripts for the manipulation of
+*general* cross section data.  
 
 ## Requirements
 
@@ -50,3 +50,19 @@ These utilities are provided as-is. There is little or no
 documentation (except the code itself).  Some are still used often by the
 authors; others are quite old and in probably in need of maintenance.  
 
+* `CHARIMAarea.pl`
+* `CHARIMAextract.pl`
+* `CHARIMAfill.pl`
+* `CHARIMAinsert.pl`
+* `CHARIMAnotch.pl`
+* `CHARIMArenum.pl`
+* `CHARIMAthalweg.pl`
+* `CHARIMAview.pl`
+* `HEC2area.pl`
+* `HEC2CHARIMA.pl`
+* `HECRASCHARIMA.pl`
+* `README.md`
+* `section-fix.awk`
+* `section-unfix.awk`
+* `XSection.pm`
+* `XSECTprops.pl`

@@ -7,6 +7,11 @@
 	* cross_section.f90 (cross_section): add
 	triangular_rounded_section 
 
+2017-08-29  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* scripts/mass1profile.in: fix problem with deprecated array
+	references 
+
 2017-08-28  Perkins  <d3g096@WE32673>
 
 	* doc/section.md: add parabolic section
