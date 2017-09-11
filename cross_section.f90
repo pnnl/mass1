@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2017-08-29 07:57:50 d3g096
+! Last Change: 2017-09-11 10:27:26 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -85,15 +85,25 @@ MODULE cross_section
   END type xsection_ptr
 
   ! ----------------------------------------------------------------
+  ! TYPE prismatic_section
+  ! Provides null methods not use by prismatic sections (print, destroy)
+  ! ----------------------------------------------------------------
+  TYPE, PRIVATE, EXTENDS(xsection_t) :: prismatic_section_t
+   CONTAINS
+     PROCEDURE :: read => prismatic_read
+     PROCEDURE :: props => prismatic_props
+     PROCEDURE :: print => prismatic_print
+     PROCEDURE :: destroy => prismatic_destroy
+  END type prismatic_section_t
+
+  ! ----------------------------------------------------------------
   ! TYPE rectangular_section
   ! ----------------------------------------------------------------
-  TYPE, PUBLIC, EXTENDS(xsection_t) :: rectangular_section
+  TYPE, PUBLIC, EXTENDS(prismatic_section_t) :: rectangular_section
      DOUBLE PRECISION :: bottom_width
    CONTAINS
      PROCEDURE :: read => rectangular_read
      PROCEDURE :: props => rectangular_props
-     PROCEDURE :: print => rectangular_print
-     PROCEDURE :: destroy => rectangular_destroy
   END type rectangular_section
 
   ! ----------------------------------------------------------------
@@ -119,13 +129,11 @@ MODULE cross_section
   ! ----------------------------------------------------------------
   ! TYPE triangular_section
   ! ----------------------------------------------------------------
-  TYPE, PUBLIC, EXTENDS(xsection_t) :: triangular_section
+  TYPE, PUBLIC, EXTENDS(prismatic_section_t) :: triangular_section
      DOUBLE PRECISION :: sidez
    CONTAINS
      PROCEDURE :: read => triangular_read
      PROCEDURE :: props => triangular_props
-     PROCEDURE :: print => triangular_print
-     PROCEDURE :: destroy => triangular_destroy
   END type triangular_section
 
   ! ----------------------------------------------------------------
@@ -144,14 +152,24 @@ MODULE cross_section
   ! The bottom elevation, y = k*x^2, where x is the distance from the
   ! cross section center, where y = 0.  
   ! ----------------------------------------------------------------
-  TYPE, PUBLIC, EXTENDS(xsection_t) :: parabolic_section
+  TYPE, PUBLIC, EXTENDS(prismatic_section_t) :: parabolic_section
      DOUBLE PRECISION :: k
    CONTAINS
      PROCEDURE :: read => parabolic_read
      PROCEDURE :: props => parabolic_props
-     PROCEDURE :: print => parabolic_print
-     PROCEDURE :: destroy => parabolic_destroy
   END type parabolic_section
+
+  ! ----------------------------------------------------------------
+  ! TYPE compound_section
+  ! ----------------------------------------------------------------
+  TYPE, PRIVATE, EXTENDS(prismatic_section_t) :: compound_section_t
+     INTEGER :: nsect
+     TYPE (xsection_ptr), ALLOCATABLE :: sect(:)
+     DOUBLE PRECISION, ALLOCATABLE :: selev(:)
+  CONTAINS  
+     PROCEDURE :: props => compound_props
+     PROCEDURE :: destroy => compound_destroy
+  END type compound_section_t
 
   ! ----------------------------------------------------------------
   ! TYPE general_section
@@ -182,19 +200,58 @@ MODULE cross_section
 CONTAINS
 
   ! ----------------------------------------------------------------
-  ! SUBROUTINE rectangular_print
+  ! SUBROUTINE prismatic_read
   ! ----------------------------------------------------------------
-  SUBROUTINE rectangular_print(this, iounit, ioerr)
+  SUBROUTINE prismatic_read(this, iounit, ioerr)
     IMPLICIT NONE
-    CLASS(rectangular_section), INTENT(IN) :: this
+    CLASS(prismatic_section_t), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: iounit
+    INTEGER, INTENT(OUT) :: ioerr
+    
+    ioerr = 0
+    CALL error_message("prismatic_read: this should not happen", fatal=.TRUE.)
+
+  END SUBROUTINE prismatic_read
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE prismatic_props
+  ! ----------------------------------------------------------------
+  SUBROUTINE prismatic_props(this, depth, props)
+    IMPLICIT NONE
+    CLASS(prismatic_section_t), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: depth
+    TYPE (xsection_prop), INTENT(OUT) :: props
+
+    props%depth = depth
+
+    CALL error_message("prismatic_props: this should not happen", fatal=.TRUE.)
+
+  END SUBROUTINE prismatic_props
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE prismatic_print
+  ! ----------------------------------------------------------------
+  SUBROUTINE prismatic_print(this, iounit, ioerr)
+    IMPLICIT NONE
+    CLASS(prismatic_section_t), INTENT(IN) :: this
     INTEGER, INTENT(IN) :: iounit
     INTEGER, INTENT(OUT) :: ioerr
     ioerr = iounit
     ioerr = 0
     ! do nothing
     RETURN
-  END SUBROUTINE rectangular_print
+  END SUBROUTINE prismatic_print
 
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE prismatic_destroy
+  ! ----------------------------------------------------------------
+  SUBROUTINE prismatic_destroy(this)
+    IMPLICIT NONE
+    CLASS(prismatic_section_t), INTENT(INOUT) :: this
+
+    ! do nothing
+
+  END SUBROUTINE prismatic_destroy
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE rectangular_read
@@ -231,17 +288,6 @@ CONTAINS
        props%dkdy = 0.0
     END IF
   END SUBROUTINE rectangular_props
-
-  ! ----------------------------------------------------------------
-  ! SUBROUTINE rectangular_destroy
-  ! ----------------------------------------------------------------
-  SUBROUTINE rectangular_destroy(this)
-    IMPLICIT NONE
-    CLASS(rectangular_section), INTENT(INOUT) :: this
-
-    ! do nothing
-
-  END SUBROUTINE rectangular_destroy
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE trapezoidal_read
@@ -341,31 +387,6 @@ CONTAINS
   END SUBROUTINE triangular_read
 
   ! ----------------------------------------------------------------
-  ! SUBROUTINE triangular_print
-  ! ----------------------------------------------------------------
-  SUBROUTINE triangular_print(this, iounit, ioerr)
-    IMPLICIT NONE
-    CLASS(triangular_section), INTENT(IN) :: this
-    INTEGER, INTENT(IN) :: iounit
-    INTEGER, INTENT(OUT) :: ioerr
-    ioerr = iounit
-    ioerr = 0
-    ! do nothing
-    RETURN
-  END SUBROUTINE triangular_print
-
-  ! ----------------------------------------------------------------
-  ! SUBROUTINE triangular_destroy
-  ! ----------------------------------------------------------------
-  SUBROUTINE triangular_destroy(this)
-    IMPLICIT NONE
-    CLASS(triangular_section), INTENT(INOUT) :: this
-
-    ! do nothing
-
-  END SUBROUTINE triangular_destroy
-
-  ! ----------------------------------------------------------------
   ! SUBROUTINE triangular_props
   ! ----------------------------------------------------------------
   SUBROUTINE triangular_props(this, depth, props)
@@ -460,33 +481,6 @@ CONTAINS
 
   END SUBROUTINE parabolic_read
 
-  
-
-  ! ----------------------------------------------------------------
-  ! SUBROUTINE parabolic_print
-  ! ----------------------------------------------------------------
-  SUBROUTINE parabolic_print(this, iounit, ioerr)
-    IMPLICIT NONE
-    CLASS(parabolic_section), INTENT(IN) :: this
-    INTEGER, INTENT(IN) :: iounit
-    INTEGER, INTENT(OUT) :: ioerr
-    ioerr = iounit
-    ioerr = 0
-    ! do nothing
-    RETURN
-  END SUBROUTINE parabolic_print
-
-  ! ----------------------------------------------------------------
-  ! SUBROUTINE parabolic_destroy
-  ! ----------------------------------------------------------------
-  SUBROUTINE parabolic_destroy(this)
-    IMPLICIT NONE
-    CLASS(parabolic_section), INTENT(INOUT) :: this
-
-    ! do nothing
-
-  END SUBROUTINE parabolic_destroy
-
   ! ----------------------------------------------------------------
   ! SUBROUTINE parabolic_props
   ! ----------------------------------------------------------------
@@ -531,6 +525,69 @@ CONTAINS
        props%dkdy = 0.0
     END IF
   END SUBROUTINE parabolic_props
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE compound_props
+  ! ----------------------------------------------------------------
+  SUBROUTINE compound_props(this, depth, props)
+    IMPLICIT NONE
+    CLASS(compound_section_t), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: depth
+    TYPE (xsection_prop), INTENT(OUT) :: props
+    DOUBLE PRECISION :: y, d, z, T, dTdy, dAdy, dPdy
+    INTEGER :: i
+    TYPE (xsection_prop) :: p0
+    CHARACTER (LEN=1024) :: msg
+
+    props%depth = depth
+    props%area = 0.0
+    props%conveyance = 0.0
+    props%wetperim = 0.0
+    props%topwidth = 0.0
+
+    y = depth
+
+    DO i = 1, this%nsect
+       IF (y .LE. this%selev(i)) EXIT
+       d = y - this%selev(i)
+       IF (i .GT. 1) THEN
+          d = MIN(d, y - this%selev(i-1))
+       END IF
+       CALL this%sect(i)%p%props(d, p0)
+       props%wetperim = props%wetperim + p0%wetperim - props%topwidth
+       props%area = props%area + p0%area
+       props%topwidth = p0%topwidth
+       props%conveyance = props%conveyance + p0%conveyance
+       props%dkdy = p0%dkdy
+       y = y - this%selev(i)
+    END DO
+
+    IF (props%wetperim .GT. 0.0) THEN
+       props%hydrad = props%area/props%wetperim
+    END IF
+
+  END SUBROUTINE compound_props
+
+    ! ----------------------------------------------------------------
+  ! SUBROUTINE compound_destroy
+  ! ----------------------------------------------------------------
+  SUBROUTINE compound_destroy(this)
+    IMPLICIT NONE
+    CLASS(compound_section_t), INTENT(INOUT) :: this
+    INTEGER :: istatus 
+    CHARACTER (LEN=1024) :: msg
+
+    DEALLOCATE(this%sect, this%selev, STAT=istatus)
+    IF (istatus .NE. 0) THEN
+       WRITE(msg, *) 'compound_destroy: error deallocating compound section' , &
+            &this%id 
+       CALL error_message(msg)
+    END IF
+
+  END SUBROUTINE compound_destroy
+
+
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE general_build

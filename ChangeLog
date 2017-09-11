@@ -1,3 +1,11 @@
+2017-09-11  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* cross_section.f90 (cross_section): add prismatic and compound
+	section base types; subclass existing prismatic sections on the
+	prismatic base class
+
+	* doc/section.md: document some more prismatic section types
+
 2017-08-29  Perkins  <d3g096@WE32673>
 
 	* scripts/CMakeLists.txt: install scripts in share directory

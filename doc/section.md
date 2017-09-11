@@ -17,8 +17,8 @@ contains the section identifier and type (1). The second line contains
 the section width and must be terminated with a `/`.  Here is an
 example rectangular cross section:
 ```
-3       1   /
-3000.0      /
+150     1         / Rectangular Section
+ 100.0            /
 ```
 
 ### Rectangular w/ Flood Plain
@@ -41,21 +41,35 @@ contains the section identifier and type (3).  In the example below,
 the base width is 32.8 feet and the side slope is 1/2.0.  
 
 ```
-100     3           /
- 32.8      2.0      /
+100     3         / Trapezoidal Section
+ 32.8      2.0    /
 ```
 
 ### Triangular
 
 A triangular cross section is also specified by two lines.  The first
-contains the section identifier and type (4).  In the example below,
+contains the section identifier and type (4).  The second contains the
+run for 1 unit of rise in the channel side slope.  In the example below,
 the channel side slope is 1/2.0.
 
 ```
-100     4   /
-  2.0       /
+110     4         / Triangular Section
+  2.0             /
 ```
 
+### Rounded Triangular
+
+A triangular section with the bottom rounded to a circular with
+specified radius *r*.  It's specified with by two lines. The first
+contains the section identifier and type (14).  The second contains
+the side slope run, as in the triangular section, and the bottom
+radius.  The example below is the same as the triangular section
+example, but with a circular bottom with radius of 4.  
+
+```
+220    14         / Rounded Triangular Section
+  2.0   4.0       / 
+```
 
 ### Parabolic
 
@@ -67,8 +81,8 @@ only the factor *k*.  In the example below, *k* is 0.0625. The section
 would have a top width of 8 with a depth of 1.  
 
 ```
-100     6   /
-  0.065     /
+120     6         / Parabolic Section
+  0.0625          /
 ```
 
 ## General Cross Section
