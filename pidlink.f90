@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October 10, 2001 by William A. Perkins
-! Last Change: 2017-06-22 15:08:35 d3g096
+! Last Change: 2018-01-05 14:27:46 d3g096
 ! ----------------------------------------------------------------
 
 
@@ -375,14 +375,15 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE pidlink_coeff
   ! ----------------------------------------------------------------
-  SUBROUTINE pidlink_coeff(link, point, setpt, a, b, c, d, g, ap, bp, cp, dp, gp)
+  SUBROUTINE pidlink_coeff(link, point, setpt, cf)
 
+    USE fluvial_coeffs
     USE point_vars, ONLY: q, y
 
     IMPLICIT NONE
     INTEGER, INTENT(IN) :: link, point
     DOUBLE PRECISION, INTENT(IN) :: setpt
-    DOUBLE PRECISION, INTENT(OUT) ::  a, b, c, d, g, ap, bp, cp, dp, gp
+    TYPE(coeff), INTENT(OUT) ::  cf
     TYPE (pidlink_rec), POINTER :: rec
 
     DOUBLE PRECISION :: lag, eval, lval
@@ -392,54 +393,54 @@ CONTAINS
 
                                 ! continuity is the same in all cases
 
-    a = 0.0
-    b = 1.0
-    c = 0.0
-    d = 1.0
-    g = q(link, point) - q(link, point + 1)
+    cf%a = 0.0
+    cf%b = 1.0
+    cf%c = 0.0
+    cf%d = 1.0
+    cf%g = q(link, point) - q(link, point + 1)
 
     rec%errsum = rec%errsum + (y(link, point) -  rec%oldsetpt)*config%time%step
     lag = pidlink_lagged_flow(rec)
 
                                 ! momentum coefficients 
     
-    ap = 0.0
-    bp = 0.0
+    cf%ap = 0.0
+    cf%bp = 0.0
 
 
     IF (rec%followflow) THEN
                                 ! when using discharge as the error term
 
-       cp = -1.0
+       cf%cp = -1.0
        eval = q(link, point)
        lval = y(link, point)
        IF (rec%ti .GT. 0.0) THEN
-          dp = rec%kc*(1.0 + config%time%step/rec%ti + rec%tr/config%time%step)
+          cf%dp = rec%kc*(1.0 + config%time%step/rec%ti + rec%tr/config%time%step)
        ELSE
-          dp = rec%kc*(1.0 + rec%tr/config%time%step)
+          cf%dp = rec%kc*(1.0 + rec%tr/config%time%step)
        END IF
 
     ELSE
                                 ! when using stage as the error term
 
-       dp = -1.0
+       cf%dp = -1.0
        eval = y(link, point)
        lval = q(link, point)
        IF (rec%ti .GT. 0.0) THEN
-          cp = rec%kc*(1.0 + config%time%step/rec%ti + rec%tr/config%time%step)
+          cf%cp = rec%kc*(1.0 + config%time%step/rec%ti + rec%tr/config%time%step)
        ELSE
-          cp = rec%kc*(1.0 + rec%tr/config%time%step)
+          cf%cp = rec%kc*(1.0 + rec%tr/config%time%step)
        END IF
 
     END IF
 
     IF (rec%ti .GT. 0.0) THEN
-       gp = lag - lval + &
+       cf%gp = lag - lval + &
             & rec%kc*eval*(1.0 + config%time%step/rec%ti) - &
             & rec%kc*setpt*(1.0 + config%time%step/rec%ti + rec%tr/config%time%step) + &
             & rec%kc/rec%ti*rec%errsum + rec%kc*rec%tr/config%time%step*rec%oldsetpt
     ELSE
-       gp = lag - lval + &
+       cf%gp = lag - lval + &
             & rec%kc*eval - &
             & rec%kc*setpt*(1.0 + rec%tr/config%time%step) + &
             & rec%kc*rec%tr/config%time%step*rec%oldsetpt

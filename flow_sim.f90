@@ -61,11 +61,13 @@ SUBROUTINE flow_sim
 
   IMPLICIT NONE
 
-  DOUBLE PRECISION :: a,b,c,d,g,ap,bp,cp,dp,gp,denom
+  DOUBLE PRECISION :: denom
   DOUBLE PRECISION :: latq_old,latq_new
   DOUBLE PRECISION :: depth,area_temp,width,perim,conveyance,dkdy,hydrad
   DOUBLE PRECISION :: bcval,dy,dq,y_new_time, q_new_time
   DOUBLE PRECISION :: delta_x
+  TYPE (fluvial_state) :: s1, s2
+  TYPE (coeff) :: cf
   TYPE (xsection_prop) :: props
 
 
@@ -95,9 +97,9 @@ SUBROUTINE flow_sim
 
      IF (.NOT. ASSOCIATED(ucon(link)%p)) THEN  ! must be an upstream most link
         bcval = usbc(link)%p%current_value
-        q1 = q(link,point)
+        s1%q = q(link,point)
         e(link,point) = 0.0
-        f(link,point) = bcval - q1
+        f(link,point) = bcval - s1%q
 
      ELSE
         e(link,point) = ucon(link)%p%coeff_e()
@@ -123,24 +125,24 @@ SUBROUTINE flow_sim
            conveyance = config%res_coeff*kstrick(link,point_num)*props%conveyance
            dkdy = config%res_coeff*kstrick(link,point_num)*props%dkdy
 
-           d1 = depth
-           fr1 = froude_num(link,point)
-           y1 = y(link,point)
-           q1 = q(link,point)
-           a1 = area_temp
-           b1 = width
-           k1 = conveyance
-           ky1 = dkdy
+           s1%d = depth
+           s1%y = y(link,point)
+           s1%q = q(link,point)
+           s1%a = area_temp
+           s1%b = width
+           s1%k = conveyance
+           s1%ky = dkdy
+           s1%fr = froude_num(link,point)
 
-           IF (a1 .GT. 0.0D00) THEN
-              vel(link,point_num) = q1/a1
-              area_old(link,point_num) = a1
+           IF (s1%a .GT. 0.0D00) THEN
+              vel(link,point_num) = s1%q/s1%a
+              area_old(link,point_num) = s1%a
            ELSE 
               vel(link,point_num) = 0.0
               area_old(link,point_num) = 0.0
            END IF
-           q_old(link,point_num) = q1
-           y_old(link,point_num) = y1
+           q_old(link,point_num) = s1%q
+           y_old(link,point_num) = s1%y
 
            point_num = point + 1
            depth = y(link,point+1) - thalweg(link,point+1)
@@ -154,24 +156,24 @@ SUBROUTINE flow_sim
            conveyance = config%res_coeff*kstrick(link,point_num)*props%conveyance
            dkdy = config%res_coeff*kstrick(link,point_num)*props%dkdy
 
-           d2 = depth
-           fr2 = froude_num(link,point+1)
-           y2 = y(link,point+1)
-           q2 = q(link,point+1)
-           a2 = area_temp
-           b2 = width
-           k2 = conveyance
-           ky2 = dkdy
+           s2%d = depth
+           s2%y = y(link,point+1)
+           s2%q = q(link,point+1)
+           s2%a = area_temp
+           s2%b = width
+           s2%k = conveyance
+           s2%ky = dkdy
+           s2%fr = froude_num(link,point+1)
 
-           IF (a2 .GT. 0.0) THEN
-              vel(link,point_num) = q2/a2
-              area_old(link,point_num) = a2
+           IF (s2%a .GT. 0.0) THEN
+              vel(link,point_num) = s2%q/s2%a
+              area_old(link,point_num) = s2%a
            ELSE 
               vel(link,point_num) = 0.0
               area_old(link,point_num) = 0.0
            END IF
-           q_old(link,point_num) = q2
-           y_old(link,point_num) = y2
+           q_old(link,point_num) = s2%q
+           y_old(link,point_num) = s2%y
 
            delta_x = ABS(x(link,point+1) - x(link,point))
 
@@ -192,7 +194,7 @@ SUBROUTINE flow_sim
               latq_new = 0.0
            ENDIF
 
-           CALL fluvial_coeff(a,b,c,d,g,ap,bp,cp,dp,gp,delta_x,&
+           CALL fluvial_coeff(s1, s2, cf, delta_x,&
                 &config%time%delta_t,config%grav,&
                 &latq_old,latq_new,lpiexp(link))
 
@@ -206,20 +208,21 @@ SUBROUTINE flow_sim
            ! FIXME: test usbc association before using
            bcval = usbc(link)%p%current_value
 
-           CALL nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
+           CALL nonfluvial_coeff(link,point,bcval,cf)
 
            q_old(link, :) = q(link, :)
 
         END IF
 
-        denom = (c*dp - cp*d)
-        l(link,point) = (a*dp - ap*d)/denom
-        m(link,point) = (b*dp - bp*d)/denom
-        n(link,point) = (d*gp - dp*g)/denom
+        denom = (cf%c*cf%dp - cf%cp*cf%d)
+        l(link,point) = (cf%a*cf%dp - cf%ap*cf%d)/denom
+        m(link,point) = (cf%b*cf%dp - cf%bp*cf%d)/denom
+        n(link,point) = (cf%d*cf%gp - cf%dp*cf%g)/denom
 
-        denom = b - m(link,point)*(c + d*e(link,point))
-        e(link,point+1) = (l(link,point)*(c + d*e(link,point)) - a)/denom
-        f(link,point+1) = (n(link,point)*(c + d*e(link,point)) +d*f(link,point) + g)/denom
+        denom = cf%b - m(link,point)*(cf%c + cf%d*e(link,point))
+        e(link,point+1) = (l(link,point)*(cf%c + cf%d*e(link,point)) - cf%a)/denom
+        f(link,point+1) = (n(link,point)*(cf%c + cf%d*e(link,point)) + &
+             &cf%d*f(link,point) + cf%g)/denom
 
      END DO points
 
@@ -244,16 +247,16 @@ SUBROUTINE flow_sim
         CASE(1)
            ! given downstream stage y(t)
 
-           y1 = y(link,point)
+           s1%y = y(link,point)
            y_new_time = bcval
 
-           dy = y_new_time - y1
+           dy = y_new_time - s1%y
            dq = e(link,point)*dy + f(link,point)
         CASE(2)
            ! given Q(t)
-           q1 = q(link,point)
+           s1%q = q(link,point)
            q_new_time = bcval
-           dq = q_new_time - q1
+           dq = q_new_time - s1%q
            dy = (dq - f(link,point))/e(link,point)
         END SELECT
 

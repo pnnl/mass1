@@ -27,9 +27,10 @@
 !***************************************************************
 !
 
-SUBROUTINE nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
+SUBROUTINE nonfluvial_coeff(link,point,bcval,cf)
 
   USE mass1_config
+  USE fluvial_coeffs
   USE cross_section
   USE section_handler_module
   USE point_vars
@@ -37,12 +38,14 @@ SUBROUTINE nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
   USE pidlink
 
   IMPLICIT NONE
-
-  DOUBLE PRECISION :: a,b,c,d,g,ap,bp,cp,dp,gp,bcval, p
+  INTEGER, INTENT(IN) :: link,point
+  DOUBLE PRECISION, INTENT(IN) :: bcval
+  TYPE (coeff), INTENT(OUT) :: cf
+  
   DOUBLE PRECISION :: eps = 1.0e-9
-  INTEGER :: link,point
   DOUBLE PRECISION :: twid, cw, hwmin, ycrest, oldycrest
   DOUBLE PRECISION :: maxtravel, sensitivity
+  DOUBLE PRECISION :: depth
   TYPE (xsection_prop) :: props
   
   maxtravel = 20.0*config%time%delta_t/3600.0
@@ -53,87 +56,87 @@ SUBROUTINE nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
      !--------------------------------------------------------------------
      ! Imposed Flow Rate Q(t)
   CASE(2)
-     a = 0.0
-     b = 1.0
-     c = 0.0 !eps
-     d = 1.0
-     g = q(link,point) - q(link,point+1)
+     cf%a = 0.0
+     cf%b = 1.0
+     cf%c = 0.0 !eps
+     cf%d = 1.0
+     cf%g = q(link,point) - q(link,point+1)
      !g = bcval - q(link,point+1)
      
-     ap = 0.0
-     bp = 0.0
-     cp = eps
-     dp = 1.0
+     cf%ap = 0.0
+     cf%bp = 0.0
+     cf%cp = eps
+     cf%dp = 1.0
      !gp = bcval - q(link,point)
-     gp = q(link,point) - bcval
+     cf%gp = q(link,point) - bcval
 
      ! Imposed Discharge w/ PID process control
   CASE(12)
-     CALL pidlink_coeff(link, point, bcval, a, b, c, d, g, ap, bp, cp, dp, gp)
+     CALL pidlink_coeff(link, point, bcval, cf)
      
      ! Imposed Upstream Stage Yus(t)
   CASE(3)
-     a = 0.0
-     b = 1.0
-     c = 0.0
-     d = 1.0
-     g = q(link,point) - q(link,point+1)
+     cf%a = 0.0
+     cf%b = 1.0
+     cf%c = 0.0
+     cf%d = 1.0
+     cf%g = q(link,point) - q(link,point+1)
      
-     ap = 0.0
-     bp = 0.0
-     cp = 1.0
-     dp = eps
-     gp = y(link,point) - bcval
+     cf%ap = 0.0
+     cf%bp = 0.0
+     cf%cp = 1.0
+     cf%dp = eps
+     cf%gp = y(link,point) - bcval
      
      ! Imposed Stage w/ PID process control
   CASE(13)
-     CALL pidlink_coeff(link, point, bcval, a, b, c, d, g, ap, bp, cp, dp, gp)
+     CALL pidlink_coeff(link, point, bcval, cf)
      
      ! Imposed Downstream Stage Yds(t)
   CASE(4)
-     a = 1.0
-     b = eps
-     c = 0.0
-     d = 0.0
-     g = bcval - y(link,point+1)
+     cf%a = 1.0
+     cf%b = eps
+     cf%c = 0.0
+     cf%d = 0.0
+     cf%g = bcval - y(link,point+1)
      
-     ap = 0.0
-     bp = 1.0
-     cp = 0.0
-     dp = 1.0
-     gp = q(link,point) - q(link,point+1)
+     cf%ap = 0.0
+     cf%bp = 1.0
+     cf%cp = 0.0
+     cf%dp = 1.0
+     cf%gp = q(link,point) - q(link,point+1)
      
 
      ! Tributary Inflow at a point Qtrib(t)
   CASE(5)
-     a = 0.0
-     b = 1.0
-     c = 0.0
-     d = 1.0
-     g = q(link,point) + bcval - q(link,point+1)
+     cf%a = 0.0
+     cf%b = 1.0
+     cf%c = 0.0
+     cf%d = 1.0
+     cf%g = q(link,point) + bcval - q(link,point+1)
      
-     ap = 1.0
-     bp = 0.0
-     cp = 1.0
-     dp = 0.0
-     gp = y(link,point) - y(link,point+1)
+     cf%ap = 1.0
+     cf%bp = 0.0
+     cf%cp = 1.0
+     cf%dp = 0.0
+     cf%gp = y(link,point) - y(link,point+1)
 
      ! Hydroelectric Powerhouse with Qgen(t) and Qspill(t)
      ! (same as case(2) just add the Q together in flow_sim
   CASE(6)
-     a = 0.0
-     b = 1.0
-     c = 0.0 !eps
-     d = 1.0
-     g = q(link,point) - q(link,point+1)
+     cf%a = 0.0
+     cf%b = 1.0
+     cf%c = 0.0 !eps
+     cf%d = 1.0
+     cf%g = q(link,point) - q(link,point+1)
      !g = bcval - q(link,point+1)
      
-     ap = 0.0
-     bp = 0.0
-     cp = eps
-     dp = 1.0
+     cf%ap = 0.0
+     cf%bp = 0.0
+     cf%cp = eps
+     cf%dp = 1.0
      !gp = bcval - q(link,point)
-     gp = q(link,point) - bcval
+     cf%gp = q(link,point) - bcval
 
   CASE (7)
      ! a special sharp-crested weir: assumes a length equal to the
@@ -143,22 +146,22 @@ SUBROUTINE nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
      ! use the section top width as the crest length, call section to
      ! get it (throw everything else away
    
-     d = y(link,point) - thalweg(link,point)
+     depth = y(link,point) - thalweg(link,point)
 
-     CALL ptsection(link, point)%p%props(d, props)
+     CALL ptsection(link, point)%p%props(depth, props)
 
      twid = props%topwidth
      
-     a = 0.0
-     b = 1.0
-     c = 0.0
-     d = 1.0
-     g = q(link,point) - q(link,point+1)
+     cf%a = 0.0
+     cf%b = 1.0
+     cf%c = 0.0
+     cf%d = 1.0
+     cf%g = q(link,point) - q(link,point+1)
      
      
-     ap = 0.0
-     bp = 0.0
-     dp = 1.0
+     cf%ap = 0.0
+     cf%bp = 0.0
+     cf%dp = 1.0
      
      SELECT CASE(config%units)
      CASE (ENGLISH_UNITS)
@@ -203,13 +206,13 @@ SUBROUTINE nonfluvial_coeff(link,point,bcval,a,b,c,d,g,ap,bp,cp,dp,gp)
      ! ycrest = 0.5*(ycrest + oldycrest)
      
      IF (y(link,point) > ycrest) THEN
-        gp = cw*twid*(y(link,point) - ycrest)**(1.5)
-        cp = -1.5*cw*twid*SQRT(y(link,point) - ycrest)
+        cf%gp = cw*twid*(y(link,point) - ycrest)**(1.5)
+        cf%cp = -1.5*cw*twid*SQRT(y(link,point) - ycrest)
      ELSE
-        gp = cw*twid*(hwmin)**(1.5)
-        cp = -1.5*cw*twid*SQRT(hwmin)
+        cf%gp = cw*twid*(hwmin)**(1.5)
+        cf%cp = -1.5*cw*twid*SQRT(hwmin)
      ENDIF
-     gp = q(link,point) - gp
+     cf%gp = q(link,point) - cf%gp
      
      
      crest(link) = ycrest

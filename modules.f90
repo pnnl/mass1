@@ -86,10 +86,17 @@ END MODULE flow_coeffs
 !----------------------------------------------------------
 MODULE fluvial_coeffs
 
-  ! REAL, SAVE :: alpha=1.0,beta=0.5,theta=1.0,q1,q2,a1,a2,b1,b2,k1,k2	&
-  !               ,ky1,ky2,y2,y1
-  DOUBLE PRECISION, SAVE :: alpha=1.0,beta=0.5,theta=1.0,q1,q2,a1,a2,b1,b2,k1,k2,ky1,ky2,y2,y1
-  DOUBLE PRECISION, SAVE :: d1, d2, fr1, fr2
+  TYPE, PUBLIC :: fluvial_state
+     DOUBLE PRECISION :: d, y, q, a, b, k, ky, fr
+     DOUBLE PRECISION :: latq_old, latq_new
+  END TYPE fluvial_state
+
+  TYPE, PUBLIC :: coeff
+     DOUBLE PRECISION :: a, b, c, d, g
+     DOUBLE PRECISION :: ap, bp, cp, dp, gp
+  END TYPE coeff
+
+  DOUBLE PRECISION, SAVE :: alpha=1.0,beta=0.5,theta=1.0
 
 END MODULE fluvial_coeffs
 
