@@ -196,7 +196,7 @@ SUBROUTINE flow_sim
 
            CALL fluvial_coeff(s1, s2, cf, delta_x,&
                 &config%time%delta_t,config%grav,&
-                &latq_old,latq_new,lpiexp(link))
+                &latq_old,latq_new,lpiexp(link), depth_threshold)
 
 
            ! nonfluvial internal links ----------------------------

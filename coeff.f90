@@ -28,10 +28,11 @@
 !***************************************************************
 !
 
-SUBROUTINE fluvial_coeff(s1,s2,cf,dx,dt,gr,latq_old,latq_new,lpiexp)
+SUBROUTINE fluvial_coeff(s1,s2,cf,dx,dt,gr,latq_old,latq_new,&
+     &lpiexp, depth_threshold)
 
   USE fluvial_coeffs
-  USE general_vars
+  ! USE general_vars
 
   IMPLICIT NONE
 
@@ -39,7 +40,7 @@ SUBROUTINE fluvial_coeff(s1,s2,cf,dx,dt,gr,latq_old,latq_new,lpiexp)
   TYPE (coeff), INTENT(OUT) :: cf
   DOUBLE PRECISION, INTENT(IN) :: latq_old,latq_new
   DOUBLE PRECISION, INTENT(IN) :: dx, dt, gr
-  DOUBLE PRECISION, INTENT(IN) :: lpiexp
+  DOUBLE PRECISION, INTENT(IN) :: lpiexp, depth_threshold
 
   DOUBLE PRECISION :: gp1,gp2,gp3,gp4
   DOUBLE PRECISION :: sigma, fravg
