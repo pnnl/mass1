@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2017-08-21 12:19:34 d3g096
+! Last Change: 2018-01-08 14:00:33 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -17,6 +17,7 @@
 MODULE network_module
 
   USE utility
+  USE date_time
   USE mass1_config
   USE link_manager_module
   USE bc_module
@@ -42,6 +43,7 @@ MODULE network_module
      PROCEDURE :: read_restart => network_read_restart
      PROCEDURE :: initialize => network_initialize
      PROCEDURE :: flow => network_flow
+     PROCEDURE :: run => network_run
      PROCEDURE :: destroy => network_destroy
   END type network
 
@@ -78,7 +80,7 @@ CONTAINS
        CALL this%bcs%read(HYDRO_BC_TYPE, this%config%hydrobc_file)
     END IF
     IF(this%config%debug_print)WRITE(11,*)'link BC data done'
-    
+
     IF(this%config%do_latflow)THEN
        CALL this%bcs%read(LATFLOW_BC_TYPE, this%config%lateral_file)
        IF(this%config%debug_print)WRITE(11,*)'lateral inflow BC data done'
@@ -116,7 +118,7 @@ CONTAINS
        CALL this%met%read(this%config%weather_file)
     END IF
 
-    
+
 
 
   END SUBROUTINE network_read_bcs
@@ -133,7 +135,7 @@ CONTAINS
     INTEGER :: istatus
     CHARACTER(LEN=path_length) :: cwd, mybase
 
-    
+
     istatus = getcwd(cwd)       ! FIXME: GNU specfic
     IF (istatus .NE. 0) THEN 
        CALL error_message("network_read: cannot get current working directory")
@@ -178,7 +180,7 @@ CONTAINS
     recno = 0
 
     CALL open_existing(this%config%initial_file, iunit)
-    
+
     ! FIXME: test to make sure all links are initialized
     DO WHILE (.TRUE.)
        recno = recno + 1
@@ -260,7 +262,7 @@ CONTAINS
   SUBROUTINE network_initialize(this)
 
     IMPLICIT NONE
-     CLASS (network), INTENT(INOUT) :: this
+    CLASS (network), INTENT(INOUT) :: this
 
     IF (this%config%do_hotstart) THEN
        CALL this%read_restart()
@@ -283,6 +285,52 @@ CONTAINS
   END SUBROUTINE network_flow
 
   ! ----------------------------------------------------------------
+  ! SUBROUTINE network_run
+  ! ----------------------------------------------------------------
+  SUBROUTINE network_run(this)
+
+    IMPLICIT NONE
+    CLASS (network), INTENT(INOUT) :: this
+    INTEGER :: nstep
+    CHARACTER (LEN=20) :: date_string, time_string
+
+    nstep = 0
+    this%config%time%time = this%config%time%begin
+
+    DO WHILE(this%config%time%time .LT. this%config%time%end)
+
+       ! print out initial conditions
+
+       ! IF (time == config%time%begin) THEN
+       !    IF (config%do_printout) CALL print_output("RESULT", time)
+       !    IF (config%do_profileout) CALL profile_output
+       !    IF (config%do_gageout) CALL gage_output
+       ! END IF
+
+       CALL this%bcs%update(this%config%time%time)
+       CALL this%met%update(this%config%time%time)
+
+       IF (config%do_flow) THEN
+          CALL this%flow()
+       ENDIF
+
+
+       ! update time step here so correct
+       ! time is placed in output
+
+       ! model_time = model_time + time_step
+       nstep = nstep + 1
+       this%config%time%time = this%config%time%begin + nstep*this%config%time%step
+
+       CALL decimal_to_date(this%config%time%time, date_string, time_string)
+       WRITE(*,*) 'Done Crunching through ** Date: ', &
+            &TRIM(date_string),'  Time: ', TRIM(time_string)
+    END DO
+
+  END SUBROUTINE network_run
+
+
+  ! ----------------------------------------------------------------
   ! SUBROUTINE network_destroy
   ! ----------------------------------------------------------------
   SUBROUTINE network_destroy(this)
@@ -300,4 +348,4 @@ CONTAINS
 
 
 END MODULE network_module
-  
+
