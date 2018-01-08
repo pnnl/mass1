@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  2, 2017 by William A. Perkins
-! Last Change: 2017-06-29 10:37:49 d3g096
+! Last Change: 2018-01-08 10:03:24 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE confluence_module
@@ -70,7 +70,6 @@ CONTAINS
   FUNCTION confluence_coeff_e(this) RESULT(ue)
     USE link_vars
     USE point_vars
-    USE flow_coeffs
     IMPLICIT NONE
     DOUBLE PRECISION :: ue
     CLASS (confluence_t), INTENT(IN) :: this
@@ -89,7 +88,6 @@ CONTAINS
   FUNCTION confluence_coeff_f(this) RESULT(uf)
     USE link_vars
     USE point_vars
-    USE flow_coeffs
 
     IMPLICIT NONE
     DOUBLE PRECISION :: uf
@@ -114,7 +112,6 @@ CONTAINS
   FUNCTION confluence_elev(this) RESULT(dsy)
     USE link_vars
     USE point_vars
-    USE flow_coeffs
 
     IMPLICIT NONE
     DOUBLE PRECISION :: dsy
@@ -130,7 +127,6 @@ CONTAINS
   FUNCTION confluence_conc(this, c) RESULT(uconc)
     USE link_vars
     USE point_vars
-    USE flow_coeffs
 
     IMPLICIT NONE
     DOUBLE PRECISION :: uconc

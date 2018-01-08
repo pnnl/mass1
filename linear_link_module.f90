@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2017-08-21 12:10:25 d3g096
+! Last Change: 2018-01-08 11:03:20 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -20,14 +20,11 @@ MODULE linear_link_module
   USE section_handler_module
   USE mass1_config
   USE general_vars, ONLY: depth_threshold, depth_minimum
+  USE flow_coeff
 
   IMPLICIT NONE
 
   PRIVATE
-
-  TYPE, PUBLIC :: coeff
-     DOUBLE PRECISION :: a, b, c, d, g
-  END type coeff
 
   TYPE, PUBLIC, EXTENDS(link_t) :: linear_link_t
      INTEGER :: npoints
@@ -428,13 +425,13 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE linear_link_coeff
   ! ----------------------------------------------------------------
-  SUBROUTINE linear_link_coeff(this, dt, pt1, pt2, c, cp)
+  SUBROUTINE linear_link_coeff(this, dt, pt1, pt2, cf)
 
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(IN) :: dt
     TYPE (point_t), INTENT(IN) :: pt1, pt2
-    TYPE (coeff), INTENT(OUT) :: c, cp
+    TYPE (coeff), INTENT(OUT) :: cf
 
     CALL error_message("This should not happen: linear_link_coeff should be overridden", &
          &fatal=.TRUE.)
@@ -452,7 +449,7 @@ CONTAINS
 
     INTEGER :: point
     DOUBLE PRECISION :: bcval, denom
-    TYPE (coeff) :: c, cp
+    TYPE (coeff) :: cf
 
     point = 1
     IF (ASSOCIATED(this%ucon%p)) THEN
@@ -469,18 +466,18 @@ CONTAINS
     END IF
 
     DO point = 1, this%npoints - 1
-       CALL this%coeff(deltat, this%pt(point), this%pt(point + 1), c, cp)
-       denom = (c%c*cp%d - cp%c*c%d)
-       this%pt(point)%sweep%l = (c%a*cp%d - cp%a*c%d)/denom
-       this%pt(point)%sweep%m = (c%b*cp%d - cp%b*c%d)/denom
-       this%pt(point)%sweep%n = (c%d*cp%g - cp%d*c%g)/denom
+       CALL this%coeff(deltat, this%pt(point), this%pt(point + 1), cf)
+       denom = (cf%c*cf%dp - cf%cp*cf%d)
+       this%pt(point)%sweep%l = (cf%a*cf%dp - cf%ap*cf%d)/denom
+       this%pt(point)%sweep%m = (cf%b*cf%dp - cf%bp*cf%d)/denom
+       this%pt(point)%sweep%n = (cf%d*cf%gp - cf%dp*cf%g)/denom
 
-       denom = c%b - this%pt(point)%sweep%m*(c%c + c%d*this%pt(point)%sweep%e)
+       denom = cf%b - this%pt(point)%sweep%m*(cf%c + cf%d*this%pt(point)%sweep%e)
        this%pt(point+1)%sweep%e = &
-            &(this%pt(point)%sweep%l*(c%c + c%d*this%pt(point)%sweep%e) - c%a)/denom
+            &(this%pt(point)%sweep%l*(cf%c + cf%d*this%pt(point)%sweep%e) - cf%a)/denom
        this%pt(point+1)%sweep%f = &
-            &(this%pt(point)%sweep%n*(c%c + c%d*this%pt(point)%sweep%e) + &
-            &c%d*this%pt(point)%sweep%f + c%g)/denom
+            &(this%pt(point)%sweep%n*(cf%c + cf%d*this%pt(point)%sweep%e) + &
+            &cf%d*this%pt(point)%sweep%f + cf%g)/denom
 
     END DO
 

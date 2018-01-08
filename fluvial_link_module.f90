@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2017-07-27 12:38:17 d3g096
+! Last Change: 2018-01-08 11:13:53 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -19,6 +19,7 @@ MODULE fluvial_link_module
   USE link_module
   USE linear_link_module
   USE utility
+  USE flow_coeff
 
   IMPLICIT NONE
 
@@ -76,13 +77,12 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE fluvial_link_coeff
   ! ----------------------------------------------------------------
-  SUBROUTINE fluvial_link_coeff(this, dt, pt1, pt2, c, cp)
-
+  SUBROUTINE fluvial_link_coeff(this, dt, pt1, pt2, cf)
     IMPLICIT NONE
     CLASS (fluvial_link), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(IN) :: dt
     TYPE (point_t), INTENT(IN) :: pt1, pt2
-    TYPE (coeff), INTENT(OUT) :: c, cp
+    TYPE (coeff), INTENT(OUT) :: cf
 
     DOUBLE PRECISION :: y1, y2, d1, d2, q1, q2, a1, a2, b1, b2, k1, k2, ky1, ky2
     DOUBLE PRECISION :: fr1, fr2
@@ -97,11 +97,11 @@ CONTAINS
 
     dx = ABS(pt1%x - pt2%x)
 
-    c%a = b2/2.0/dt
-    c%b = theta/dx
-    c%c = -b1/2.0/dt
-    c%d = c%b
-    c%g = (q1 - q2)/dx + theta*this%latq + (1 - theta)*this%latqold
+    cf%a = b2/2.0/dt
+    cf%b = theta/dx
+    cf%c = -b1/2.0/dt
+    cf%d = cf%b
+    cf%g = (q1 - q2)/dx + theta*this%latq + (1 - theta)*this%latqold
 
     !--------------------------------------------------------
     ! momemtum equation coefficients
@@ -130,7 +130,7 @@ CONTAINS
     END IF
 
 
-    cp%a = alpha*theta*sigma*(-q2*b2*(q2-q1)/dx/a2**2           &
+    cf%a = alpha*theta*sigma*(-q2*b2*(q2-q1)/dx/a2**2           &
          + b2*(q2/a2**2)*(a2-a1)*(q2/a2+q1/a1)/dx/2.0   &
          - b2*(q2/a2 + q1/a1)**2/dx/4.0)                            &
          + gr*theta*(b2*(y2-y1)/dx/2.0 + (a2+a1)/2.0/dx   &
@@ -138,7 +138,7 @@ CONTAINS
          *abs(q2)/k2**2)/2.0                                                              &
          -(1.0 - beta)*q2*abs(q2)*(ky2/k2**3)*(a2+a1))
 
-    cp%c = alpha*theta*sigma*(b1*q1*(q2-q1)/dx/a1**2       &
+    cf%c = alpha*theta*sigma*(b1*q1*(q2-q1)/dx/a1**2       &
          - b1*(q1/a1**2)*(a2-a1)*(q2/a2+q1/a1)/dx/2.0  &
          - b1*(q2/a2+q1/a1)**2/dx/4.0)                             &
          + gr*theta*(-b1*(y2-y1)/dx/2.0 + (a2+a1)/2.0/dx  &
@@ -146,11 +146,11 @@ CONTAINS
          *abs(q2)/k2**2)/2.0                                                              &
          + beta*q1*abs(q1)*(ky1/k1**3)*(a2+a1))
 
-    cp%b = sigma*1.0/2.0/dt+alpha*theta*sigma*(2.0*q2/a2+q1*(1.0/a1-1.0/a2) &
+    cf%b = sigma*1.0/2.0/dt+alpha*theta*sigma*(2.0*q2/a2+q1*(1.0/a1-1.0/a2) &
          -0.5*(1.0-a1/a2)*(q2/a2+q1/a1))/dx                                              &
          +gr*theta*(1.0- beta)*abs(q2)*(a2+a1)/k2**2
 
-    cp%d = -sigma*1.0/2.0/dt-alpha*theta*sigma*(-2.0*q1/a1+q2*(1.0/a1-1.0/a2) &
+    cf%d = -sigma*1.0/2.0/dt-alpha*theta*sigma*(-2.0*q1/a1+q2*(1.0/a1-1.0/a2) &
          -0.5*(a2/a1-1.0)*(q2/a2 + q1/a1))/dx                                      &
          -gr*theta*beta*(a2+a1)*abs(q1)/k1**2
 
@@ -159,7 +159,7 @@ CONTAINS
     gp3 = -gr*(a2+a1)*(y2-y1)/2.0/dx
     gp4 = -gr*(a2+a1)*(beta*q1*abs(q1)/k1**2+(1.0-beta)*q2  &
          *abs(q2)/k2**2)/2.0
-    cp%g = gp1+gp2+gp3+gp4
+    cf%g = gp1+gp2+gp3+gp4
 
   END SUBROUTINE fluvial_link_coeff
 

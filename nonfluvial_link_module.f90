@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 17, 2017 by William A. Perkins
-! Last Change: 2017-07-27 14:25:47 d3g096
+! Last Change: 2018-01-08 11:20:36 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE nonfluvial_link_module
@@ -17,6 +17,7 @@ MODULE nonfluvial_link_module
   USE point_module
   USE link_module
   USE linear_link_module
+  USE flow_coeff
   USE bc_module
   IMPLICIT NONE
 
@@ -77,29 +78,29 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE discharge_link_coeff
   ! ----------------------------------------------------------------
-  SUBROUTINE discharge_link_coeff(this, dt, pt1, pt2, c, cp)
+  SUBROUTINE discharge_link_coeff(this, dt, pt1, pt2, cf)
 
     IMPLICIT NONE
     CLASS (discharge_link), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(IN) :: dt
     TYPE (point_t), INTENT(IN) :: pt1, pt2
-    TYPE (coeff), INTENT(OUT) :: c, cp
+    TYPE (coeff), INTENT(OUT) :: cf
 
     DOUBLE PRECISION :: bcval
 
     bcval = this%usbc%p%current_value
 
-    c%a = 0.0
-    c%b = 1.0
-    c%c = 0.0 !eps
-    c%d = 1.0
-    c%g = pt1%hnow%q - pt2%hnow%q
+    cf%a = 0.0
+    cf%b = 1.0
+    cf%c = 0.0 !eps
+    cf%d = 1.0
+    cf%g = pt1%hnow%q - pt2%hnow%q
 
-    cp%a = 0.0
-    cp%b = 0.0
-    cp%c = eps
-    cp%d = 1.0
-    cp%g = pt1%hnow%q - bcval
+    cf%ap = 0.0
+    cf%bp = 0.0
+    cf%cp = eps
+    cf%dp = 1.0
+    cf%gp = pt1%hnow%q - bcval
 
   END SUBROUTINE discharge_link_coeff
 
@@ -137,101 +138,101 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE hydro_link_coeff
   ! ----------------------------------------------------------------
-  SUBROUTINE hydro_link_coeff(this, dt, pt1, pt2, c, cp)
+  SUBROUTINE hydro_link_coeff(this, dt, pt1, pt2, cf)
 
     IMPLICIT NONE
     CLASS (hydro_link), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(IN) :: dt
     TYPE (point_t), INTENT(IN) :: pt1, pt2
-    TYPE (coeff), INTENT(OUT) :: c, cp
+    TYPE (coeff), INTENT(OUT) :: cf
     
-    CALL this%discharge_link%coeff(dt, pt1, pt2, c, cp)
+    CALL this%discharge_link%coeff(dt, pt1, pt2, cf)
 
   END SUBROUTINE hydro_link_coeff
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE ustage_link_coeff
   ! ----------------------------------------------------------------
-  SUBROUTINE ustage_link_coeff(this, dt, pt1, pt2, c, cp)
+  SUBROUTINE ustage_link_coeff(this, dt, pt1, pt2, cf)
 
     IMPLICIT NONE
     CLASS (ustage_link), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(IN) :: dt
     TYPE (point_t), INTENT(IN) :: pt1, pt2
-    TYPE (coeff), INTENT(OUT) :: c, cp
+    TYPE (coeff), INTENT(OUT) :: cf
 
     DOUBLE PRECISION :: bcval
     bcval = this%usbc%p%current_value
 
-    c%a = 0.0
-    c%b = 1.0
-    c%c = 0.0
-    c%d = 1.0
-    c%g = pt1%hnow%q - pt2%hnow%q
+    cf%a = 0.0
+    cf%b = 1.0
+    cf%c = 0.0
+    cf%d = 1.0
+    cf%g = pt1%hnow%q - pt2%hnow%q
     
-    cp%a = 0.0
-    cp%b = 0.0
-    cp%c = 1.0
-    cp%d = eps
-    cp%g = pt1%hnow%y - bcval
+    cf%ap = 0.0
+    cf%bp = 0.0
+    cf%cp = 1.0
+    cf%dp = eps
+    cf%gp = pt1%hnow%y - bcval
 
   END SUBROUTINE ustage_link_coeff
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE dstage_link_coeff
   ! ----------------------------------------------------------------
-  SUBROUTINE dstage_link_coeff(this, dt, pt1, pt2, c, cp)
+  SUBROUTINE dstage_link_coeff(this, dt, pt1, pt2, cf)
 
     IMPLICIT NONE
     CLASS (dstage_link), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(IN) :: dt
     TYPE (point_t), INTENT(IN) :: pt1, pt2
-    TYPE (coeff), INTENT(OUT) :: c, cp
+    TYPE (coeff), INTENT(OUT) :: cf
 
     DOUBLE PRECISION :: bcval
     bcval = this%usbc%p%current_value
 
-    c%a = 1.0
-    c%b = eps
-    c%c = 0.0
-    c%d = 0.0
-    c%g = bcval - pt2%hnow%y
+    cf%a = 1.0
+    cf%b = eps
+    cf%c = 0.0
+    cf%d = 0.0
+    cf%g = bcval - pt2%hnow%y
 
-    cp%a = 0.0
-    cp%b = 1.0
-    cp%c = 0.0
-    cp%d = 1.0
+    cf%ap = 0.0
+    cf%bp = 1.0
+    cf%cp = 0.0
+    cf%dp = 1.0
 
-    cp%g = pt1%hnow%q - pt2%hnow%q
+    cf%gp = pt1%hnow%q - pt2%hnow%q
 
   END SUBROUTINE dstage_link_coeff
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE trib_inflow_link_coeff
   ! ----------------------------------------------------------------
-  SUBROUTINE trib_inflow_link_coeff(this, dt, pt1, pt2, c, cp)
+  SUBROUTINE trib_inflow_link_coeff(this, dt, pt1, pt2, cf)
 
     IMPLICIT NONE
 
     CLASS (trib_inflow_link), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(IN) :: dt
     TYPE (point_t), INTENT(IN) :: pt1, pt2
-    TYPE (coeff), INTENT(OUT) :: c, cp
+    TYPE (coeff), INTENT(OUT) :: cf
 
     DOUBLE PRECISION :: bcval
     bcval = this%usbc%p%current_value
 
-     c%a = 0.0
-     c%b = 1.0
-     c%c = 0.0
-     c%d = 1.0
-     c%g = pt1%hnow%q + bcval - pt2%hnow%q
+     cf%a = 0.0
+     cf%b = 1.0
+     cf%c = 0.0
+     cf%d = 1.0
+     cf%g = pt1%hnow%q + bcval - pt2%hnow%q
      
-     cp%a = 1.0
-     cp%b = 0.0
-     cp%c = 1.0
-     cp%d = 0.0
-     cp%g = pt1%hnow%y - pt2%hnow%y
+     cf%ap = 1.0
+     cf%bp = 0.0
+     cf%cp = 1.0
+     cf%dp = 0.0
+     cf%gp = pt1%hnow%y - pt2%hnow%y
 
   END SUBROUTINE trib_inflow_link_coeff
 

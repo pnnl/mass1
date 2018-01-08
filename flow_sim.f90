@@ -56,7 +56,6 @@ SUBROUTINE flow_sim
   USE link_vars
   USE point_vars
   USE fluvial_coeffs
-  USE flow_coeffs
   USE confluence_module
 
   IMPLICIT NONE

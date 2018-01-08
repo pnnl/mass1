@@ -32,7 +32,6 @@ SUBROUTINE array_alloc
 ! $DEBUG
 
 USE mass1_config
-USE flow_coeffs
 USE link_vars
 USE point_vars
 USE transport_vars

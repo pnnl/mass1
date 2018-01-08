@@ -71,17 +71,11 @@ MODULE point_vars
   DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: courant_num, diffuse_num
   INTEGER, DIMENSION(:,:),ALLOCATABLE, SAVE :: section_number
 
+  DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: e,f,l,m,n
+
   TYPE (xsection_ptr), DIMENSION(:,:), ALLOCATABLE, SAVE :: ptsection
 
 END MODULE point_vars
-
-!----------------------------------------------------------
-MODULE flow_coeffs
-
-  DOUBLE PRECISION, DIMENSION(:,:),ALLOCATABLE, SAVE :: e,f,l,m,n
-
-END MODULE flow_coeffs
-
 
 !---------------------------------------------------------
 MODULE transport_vars

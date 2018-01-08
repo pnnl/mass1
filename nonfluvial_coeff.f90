@@ -30,6 +30,7 @@
 SUBROUTINE nonfluvial_coeff(link,point,bcval,cf)
 
   USE mass1_config
+  USE flow_coeff
   USE fluvial_coeffs
   USE cross_section
   USE section_handler_module
