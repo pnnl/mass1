@@ -83,23 +83,6 @@ MODULE flow_coeffs
 END MODULE flow_coeffs
 
 
-!----------------------------------------------------------
-MODULE fluvial_coeffs
-
-  TYPE, PUBLIC :: fluvial_state
-     DOUBLE PRECISION :: d, y, q, a, b, k, ky, fr
-     DOUBLE PRECISION :: latq_old, latq_new
-  END TYPE fluvial_state
-
-  TYPE, PUBLIC :: coeff
-     DOUBLE PRECISION :: a, b, c, d, g
-     DOUBLE PRECISION :: ap, bp, cp, dp, gp
-  END TYPE coeff
-
-  DOUBLE PRECISION, SAVE :: alpha=1.0,beta=0.5,theta=1.0
-
-END MODULE fluvial_coeffs
-
 !---------------------------------------------------------
 MODULE transport_vars
 
