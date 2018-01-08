@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2018-01-08 10:55:48 d3g096
+# Last Change: 2018-01-08 12:18:18 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -188,6 +188,7 @@ add_executable(mass1_new
   "${CMAKE_CURRENT_BINARY_DIR}/banner.f90"
   bc_module.f90
   bc_module.f90
+  coeff.f90
   cross_section.f90
   dlist_module.f90
   fluvial_link_module.f90
