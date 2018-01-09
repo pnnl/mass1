@@ -41,7 +41,7 @@ MODULE profile_output_module
   USE scalars
 
   IMPLICIT NONE
-  
+
   INTEGER, PARAMETER, PRIVATE :: maxpro=10, iobase=40
 
   INTEGER, SAVE, PRIVATE :: num_profiles
@@ -69,28 +69,28 @@ CONTAINS
     INTEGER :: len1, spot1, spot2
 
     INTEGER, PARAMETER :: punit = 34
-   
-        count = 0
+
+    count = 0
     profile_max = 0
 
     CALL open_existing(config%profile_file, punit, fatal=.TRUE.)
 
-        DO WHILE(.TRUE.)
+    DO WHILE(.TRUE.)
        count=count+1    
        READ(punit,*,END=100)profile_num_links(count),profile_x_units(count),x_pro_start(count)  
        READ(punit,*)profile(count,1:profile_num_links(count))   
-        END DO
-100     CLOSE(punit)
+    END DO
+100 CLOSE(punit)
 
     IF (count .gt. 0) count = count - 1
-        num_profiles=count
+    num_profiles=count
 
     ! open the files for each profile
 
-        DO i=1,num_profiles
+    DO i=1,num_profiles
        count = iobase + i
 
-                                !this does not work with Lahey
+       !this does not work with Lahey
        fname = ''  
        fname(1:7) = 'profile'
        WRITE(string1,*)i
@@ -101,33 +101,33 @@ CONTAINS
        spot1 = spot2 + 1
        spot2 = spot1 + LEN_TRIM('.out')
        fname(spot1:spot2) = '.out'
-    
-                                ! this does not work on SGI or Absoft
+
+       ! this does not work on SGI or Absoft
 
        ! fname = ''
        ! WRITE (fname, '(''profile'', I0.1, ''.out'')') i
 
        OPEN(count,file=fname)
-        END DO
+    END DO
 
     ! compute the relative x distance from start to end on each
     ! profile. 
 
-        DO i=1,num_profiles
+    DO i=1,num_profiles
        profile_max_points(i) = 0
        DO j=1,profile_num_links(i)
           link = profile(i,j)
           profile_max_points(i) =  profile_max_points(i) + maxpoints(link)
        END DO
        profile_max = MAX(profile_max_points(i),profile_max)
-        END DO
+    END DO
 
-        ALLOCATE(x_profile(maxpro,profile_max),profile_link(maxpro,profile_max),profile_point(maxpro,profile_max))
+    ALLOCATE(x_profile(maxpro,profile_max),profile_link(maxpro,profile_max),profile_point(maxpro,profile_max))
 
     ! figure out how the relative x distance along the profile
     ! figure out correspondence with profile point to link,point
 
-        DO i=1,num_profiles
+    DO i=1,num_profiles
        count = 0
 
        IF(profile_x_units(i) == 'RM')THEN
@@ -158,10 +158,10 @@ CONTAINS
              x_profile(i,j) = x_profile(i,j)/5280.0
           END DO
        END IF
-       
-        END DO
 
-    
+    END DO
+
+
 
   END SUBROUTINE profile_read
 
@@ -203,7 +203,7 @@ CONTAINS
             5x,'thalweg el',2x,'area ',2x,'top width',2x,'hyd rad',2x,'Fr #',2x,'Cr #',2x,'D #',2x,'frict slope', &
             2x,'bed shear')
        WRITE(count,1110)
-       
+
        lastlink = -1
 
        DO j=1,profile_max_points(i)
@@ -245,9 +245,9 @@ CONTAINS
 1000      FORMAT(i5,1x,i5,1x,i5,1x,f9.3,1x,f8.3,2x,f14.4,2x,f8.3,2x,f8.3,2x,f10.2,2x,f6.2,2x,f6.2,2x,f6.1,2x, &
                f8.2,2x,es10.2,2x, &
                f8.2,2x,f6.2,f6.2,f6.2,f6.2,es10.2,2x,es10.2)
-          
+
           lastlink=link
-          
+
        END DO
 
     END DO
