@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2018-01-08 11:03:20 d3g096
+! Last Change: 2018-01-09 08:54:45 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -29,7 +29,7 @@ MODULE linear_link_module
   TYPE, PUBLIC, EXTENDS(link_t) :: linear_link_t
      INTEGER :: npoints
      INTEGER :: input_option
-     TYPE (point_t), DIMENSION(:),ALLOCATABLE :: pt
+     TYPE (point_t), DIMENSION(:),POINTER :: pt
    CONTAINS
      PROCEDURE :: initialize => linear_link_initialize
      PROCEDURE :: readpts => linear_link_readpts
@@ -46,6 +46,7 @@ MODULE linear_link_module
      PROCEDURE :: forward_sweep => linear_link_forward
      PROCEDURE :: backward_sweep => linear_link_backward
      PROCEDURE :: hydro_update => linear_link_hupdate
+     PROCEDURE :: point => linear_link_point
      PROCEDURE :: destroy => linear_link_destroy
   END type linear_link_t
 
@@ -545,6 +546,25 @@ CONTAINS
   END SUBROUTINE linear_link_hupdate
 
 
+  ! ----------------------------------------------------------------
+  !  FUNCTION linear_link_point
+  ! ----------------------------------------------------------------
+  FUNCTION linear_link_point(this, idx) RESULT(pt)
+    IMPLICIT NONE
+    TYPE (point_t), POINTER :: pt
+    CLASS (linear_link_t), INTENT(IN) :: this
+    INTEGER, INTENT(IN) :: idx
+    CHARACTER (LEN=1024) :: msg
+    
+    NULLIFY(pt)
+    IF (idx .GE. 0 .AND. idx .LE. this%npoints) THEN
+       pt => this%pt(idx)
+    ELSE 
+       WRITE(msg, *) 'Invalid point index (', idx, ') for link ', &
+            &this%id, ', npoint = ', this%npoints
+       CALL error_message(msg, FATAL=.FALSE.)
+    END IF
+  END FUNCTION linear_link_point
 
     
   ! ----------------------------------------------------------------

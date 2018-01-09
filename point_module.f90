@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2017-07-27 14:59:49 d3g096
+! Last Change: 2018-01-09 08:28:03 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -50,6 +50,13 @@ MODULE point_module
      PROCEDURE :: hydro_update => point_hydro_update
      PROCEDURE :: assign => point_assign
   END type point_t
+
+  ! ----------------------------------------------------------------
+  ! TYPE point_ptr
+  ! ----------------------------------------------------------------
+  TYPE, PUBLIC :: point_ptr
+     TYPE (point_t), POINTER :: p
+  END type point_ptr
 
 CONTAINS
 

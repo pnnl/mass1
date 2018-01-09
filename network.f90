@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2018-01-08 14:00:33 d3g096
+! Last Change: 2018-01-09 14:29:17 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -23,6 +23,7 @@ MODULE network_module
   USE bc_module
   USE section_handler_module
   USE met_zone
+  USE gage_module
 
   IMPLICIT NONE
 
@@ -35,7 +36,7 @@ MODULE network_module
      TYPE (met_zone_manager_t) :: met
      TYPE (section_handler) :: sections
      TYPE (link_manager_t) :: links
-
+     TYPE (gage_manager) :: gages
    CONTAINS
      PROCEDURE :: readbcs => network_read_bcs
      PROCEDURE :: read => network_read
@@ -156,6 +157,9 @@ CONTAINS
     CALL this%sections%read(this%config%section_file)
     CALL this%links%read(this%config, this%bcs, this%sections)
     CALL this%links%connect()
+    IF (this%config%do_gageout) THEN
+       CALL this%gages%read(this%config%gage_file, this%links)
+    END IF
 
   END SUBROUTINE network_read
 
@@ -270,6 +274,8 @@ CONTAINS
        CALL this%set_initial()
     END IF
 
+    CALL this%links%hyupdate(this%config%res_coeff)
+
   END SUBROUTINE network_initialize
 
 
@@ -297,15 +303,12 @@ CONTAINS
     nstep = 0
     this%config%time%time = this%config%time%begin
 
+    ! make sure initial conditions are in the output
+    IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
+
     DO WHILE(this%config%time%time .LT. this%config%time%end)
 
        ! print out initial conditions
-
-       ! IF (time == config%time%begin) THEN
-       !    IF (config%do_printout) CALL print_output("RESULT", time)
-       !    IF (config%do_profileout) CALL profile_output
-       !    IF (config%do_gageout) CALL gage_output
-       ! END IF
 
        CALL this%bcs%update(this%config%time%time)
        CALL this%met%update(this%config%time%time)
@@ -314,7 +317,6 @@ CONTAINS
           CALL this%flow()
        ENDIF
 
-
        ! update time step here so correct
        ! time is placed in output
 
@@ -322,13 +324,16 @@ CONTAINS
        nstep = nstep + 1
        this%config%time%time = this%config%time%begin + nstep*this%config%time%step
 
+       IF (MOD(nstep, this%config%print_freq) == 0) THEN
+          IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
+       END IF
+          
        CALL decimal_to_date(this%config%time%time, date_string, time_string)
        WRITE(*,*) 'Done Crunching through ** Date: ', &
             &TRIM(date_string),'  Time: ', TRIM(time_string)
     END DO
 
   END SUBROUTINE network_run
-
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE network_destroy

@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2017-08-21 13:16:08 d3g096
+! Last Change: 2018-01-09 14:30:58 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -40,6 +40,7 @@ MODULE link_manager_module
      PROCEDURE :: find => link_manager_find
      PROCEDURE :: connect => link_manager_connect
      PROCEDURE :: flow_sim => link_manager_flow_sim
+     PROCEDURE :: hyupdate => link_manager_hyupdate
      PROCEDURE :: destroy => link_manager_destroy
   END type link_manager_t
 
@@ -441,6 +442,27 @@ CONTAINS
     END DO
 
   END SUBROUTINE link_manager_flow_sim
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_hyupdate
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_hyupdate(this, res_coeff)
+
+    IMPLICIT NONE
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: res_coeff
+    CLASS (link_t), POINTER :: link
+    
+    CALL this%links%begin()
+    link => this%links%current()
+
+    DO WHILE (ASSOCIATED(link))
+       CALL link%hydro_update(res_coeff)
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+
+  END SUBROUTINE link_manager_hyupdate
 
 
   ! ----------------------------------------------------------------

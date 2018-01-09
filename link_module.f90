@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2017-08-21 10:06:02 d3g096
+! Last Change: 2018-01-09 08:39:48 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -21,6 +21,7 @@ MODULE link_module
   USE bc_module
   USE mass1_config
   USE section_handler_module
+  USE point_module
 
   IMPLICIT NONE
 
@@ -84,6 +85,9 @@ MODULE link_module
      PROCEDURE (bsweep_proc), DEFERRED :: backward_sweep
      PROCEDURE (hupdate_proc), DEFERRED :: hydro_update
 
+     ! get a point on a link (if any)
+
+     PROCEDURE (point_proc), DEFERRED :: point
 
   END type link_t
 
@@ -163,6 +167,19 @@ MODULE link_module
        CLASS (link_t), INTENT(INOUT) :: this
        DOUBLE PRECISION, INTENT(IN) :: res_coeff
      END SUBROUTINE hupdate_proc
+
+     ! ----------------------------------------------------------------
+     !  FUNCTION point_proc
+     ! ----------------------------------------------------------------
+     FUNCTION point_proc(this, idx) RESULT(pt)
+       IMPORT :: link_t
+       IMPORT :: point_t
+       IMPLICIT NONE
+       TYPE (point_t), POINTER :: pt
+       CLASS (link_t), INTENT(IN) :: this
+       INTEGER, INTENT(IN) :: idx
+     END FUNCTION point_proc
+
 
      SUBROUTINE destroy_proc(this)
        IMPORT :: link_t
