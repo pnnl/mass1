@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2018-01-09 14:29:17 d3g096
+! Last Change: 2018-01-10 10:20:39 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -333,6 +333,12 @@ CONTAINS
             &TRIM(date_string),'  Time: ', TRIM(time_string)
     END DO
 
+    ! always write the last state, if not done already
+    IF (MOD(nstep, this%config%print_freq) == 0) THEN
+       IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
+    END IF
+
+
   END SUBROUTINE network_run
 
   ! ----------------------------------------------------------------
@@ -343,6 +349,7 @@ CONTAINS
     IMPLICIT NONE
     CLASS (network), INTENT(INOUT) :: this
 
+    CALL this%gages%destroy()
     CALL this%bcs%destroy()
     CALL this%sections%destroy()
     CALL this%links%destroy()

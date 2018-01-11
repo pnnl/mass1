@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2018-01-09 08:54:45 d3g096
+! Last Change: 2018-01-10 13:28:05 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -33,6 +33,7 @@ MODULE linear_link_module
    CONTAINS
      PROCEDURE :: initialize => linear_link_initialize
      PROCEDURE :: readpts => linear_link_readpts
+     PROCEDURE :: points => linear_link_points
      PROCEDURE :: q_up => linear_link_q_up
      PROCEDURE :: q_down => linear_link_q_down
      PROCEDURE :: y_up => linear_link_y_up
@@ -266,6 +267,16 @@ CONTAINS
 
   END FUNCTION linear_link_readpts
 
+  ! ----------------------------------------------------------------
+  !  FUNCTION linear_link_points
+  ! ----------------------------------------------------------------
+  FUNCTION linear_link_points(this) RESULT(n)
+
+    IMPLICIT NONE
+    CLASS (linear_link_t), INTENT(IN) :: this
+    INTEGER :: n
+    n = this%npoints
+  END FUNCTION linear_link_points
 
 
   ! ----------------------------------------------------------------
@@ -574,7 +585,7 @@ CONTAINS
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(INOUT) :: this
 
-    ! DEALLOCATE(this%pt)
+    DEALLOCATE(this%pt)
 
   END SUBROUTINE linear_link_destroy
 

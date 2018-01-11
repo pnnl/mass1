@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2018-01-09 08:39:48 d3g096
+! Last Change: 2018-01-10 14:45:08 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -60,6 +60,7 @@ MODULE link_module
 
      PROCEDURE (init_proc), DEFERRED :: initialize
      PROCEDURE (readpts_proc), DEFERRED :: readpts
+     PROCEDURE  :: points => link_points
      PROCEDURE (destroy_proc), DEFERRED :: destroy
 
      PROCEDURE, NON_OVERRIDABLE :: set_order => link_set_order
@@ -87,7 +88,7 @@ MODULE link_module
 
      ! get a point on a link (if any)
 
-     PROCEDURE (point_proc), DEFERRED :: point
+     PROCEDURE :: point => link_point
 
   END type link_t
 
@@ -112,7 +113,6 @@ MODULE link_module
        INTEGER, INTENT(INOUT) :: lineno
 
      END FUNCTION readpts_proc
-
 
      DOUBLE PRECISION FUNCTION up_down_proc(this)
        IMPORT :: link_t
@@ -167,19 +167,6 @@ MODULE link_module
        CLASS (link_t), INTENT(INOUT) :: this
        DOUBLE PRECISION, INTENT(IN) :: res_coeff
      END SUBROUTINE hupdate_proc
-
-     ! ----------------------------------------------------------------
-     !  FUNCTION point_proc
-     ! ----------------------------------------------------------------
-     FUNCTION point_proc(this, idx) RESULT(pt)
-       IMPORT :: link_t
-       IMPORT :: point_t
-       IMPLICIT NONE
-       TYPE (point_t), POINTER :: pt
-       CLASS (link_t), INTENT(IN) :: this
-       INTEGER, INTENT(IN) :: idx
-     END FUNCTION point_proc
-
 
      SUBROUTINE destroy_proc(this)
        IMPORT :: link_t
@@ -296,6 +283,30 @@ CONTAINS
 
 
   END FUNCTION link_initialize
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION link_points
+  ! ----------------------------------------------------------------
+  FUNCTION link_points(this) RESULT(n)
+
+    IMPLICIT NONE
+    CLASS (link_t), INTENT(IN) :: this
+    INTEGER :: n
+    n = 0
+
+  END FUNCTION link_points
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION link_point
+  ! ----------------------------------------------------------------
+  FUNCTION link_point(this, idx) RESULT(pt)
+    IMPLICIT NONE
+    TYPE (point_t), POINTER :: pt
+    CLASS (link_t), INTENT(IN) :: this
+    INTEGER, INTENT(IN) :: idx
+
+    NULLIFY(pt)
+  END FUNCTION link_point
 
   ! ----------------------------------------------------------------
   !  FUNCTION new_link_list

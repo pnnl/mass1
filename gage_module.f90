@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  8, 2018 by William A. Perkins
-! Last Change: 2018-01-09 13:56:37 d3g096
+! Last Change: 2018-01-10 13:20:08 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -68,6 +68,7 @@ MODULE gage_module
    CONTAINS
      PROCEDURE :: read => gage_manager_read
      PROCEDURE :: output => gage_manager_output
+     PROCEDURE :: destroy => gage_manager_destroy
   END type gage_manager
   
 CONTAINS
@@ -278,7 +279,6 @@ CONTAINS
 200 CONTINUE
     WRITE (msg, *) TRIM(fname), ", line ", line, ": I/O error in gage control file"
     CALL error_message(msg, FATAL=.TRUE.)
-    CLOSE(gcunit)
 100 CONTINUE
     CLOSE(gcunit)
     RETURN
@@ -308,5 +308,17 @@ CONTAINS
     END DO
 
   END SUBROUTINE gage_manager_output
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE gage_manager_destroy
+  ! ----------------------------------------------------------------
+  SUBROUTINE gage_manager_destroy(this)
+
+    IMPLICIT NONE
+    CLASS (gage_manager), INTENT(INOUT) :: this
+    CALL this%gages%clear()
+
+  END SUBROUTINE gage_manager_destroy
+
 
 END MODULE gage_module
