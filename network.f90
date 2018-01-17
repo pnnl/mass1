@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2018-01-10 10:20:39 d3g096
+! Last Change: 2018-01-17 09:19:36 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -24,6 +24,7 @@ MODULE network_module
   USE section_handler_module
   USE met_zone
   USE gage_module
+  USE profile_module
 
   IMPLICIT NONE
 
@@ -37,6 +38,7 @@ MODULE network_module
      TYPE (section_handler) :: sections
      TYPE (link_manager_t) :: links
      TYPE (gage_manager) :: gages
+     TYPE (profile_manager) :: profiles
    CONTAINS
      PROCEDURE :: readbcs => network_read_bcs
      PROCEDURE :: read => network_read
@@ -157,9 +159,10 @@ CONTAINS
     CALL this%sections%read(this%config%section_file)
     CALL this%links%read(this%config, this%bcs, this%sections)
     CALL this%links%connect()
-    IF (this%config%do_gageout) THEN
-       CALL this%gages%read(this%config%gage_file, this%links)
-    END IF
+    IF (this%config%do_gageout) &
+         &CALL this%gages%read(this%config%gage_file, this%links)
+    IF (this%config%do_profileout) &
+         &CALL this%profiles%read(this%config%profile_file, this%links)
 
   END SUBROUTINE network_read
 
@@ -188,7 +191,7 @@ CONTAINS
     ! FIXME: test to make sure all links are initialized
     DO WHILE (.TRUE.)
        recno = recno + 1
-       READ (iunit, *, IOSTAT=iostat) linkid, stage, discharge, c(1), c(2)
+       READ (iunit, *, IOSTAT=iostat) linkid, discharge, stage, c(1), c(2)
        IF (IS_IOSTAT_END(iostat)) THEN
           EXIT
        ELSE IF (iostat .NE. 0) THEN
@@ -305,6 +308,7 @@ CONTAINS
 
     ! make sure initial conditions are in the output
     IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
+    IF (this%config%do_profileout) CALL this%profiles%output(this%config%time%time)
 
     DO WHILE(this%config%time%time .LT. this%config%time%end)
 
@@ -326,6 +330,7 @@ CONTAINS
 
        IF (MOD(nstep, this%config%print_freq) == 0) THEN
           IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
+          IF (this%config%do_profileout) CALL this%profiles%output(this%config%time%time)
        END IF
           
        CALL decimal_to_date(this%config%time%time, date_string, time_string)
@@ -336,6 +341,7 @@ CONTAINS
     ! always write the last state, if not done already
     IF (MOD(nstep, this%config%print_freq) == 0) THEN
        IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
+       IF (this%config%do_profileout) CALL this%profiles%output(this%config%time%time)
     END IF
 
 

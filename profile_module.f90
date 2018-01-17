@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created January 10, 2018 by William A. Perkins
-  ! Last Change: 2018-01-10 14:44:36 d3g096
+  ! Last Change: 2018-01-17 09:29:18 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE profile_module
@@ -59,12 +59,18 @@ MODULE profile_module
   TYPE, PRIVATE :: profile_t
      INTEGER :: id
      TYPE (profile_pt_list) :: pts
-     CHARACTER (LEN=1024), PRIVATE :: filename
+     CHARACTER (LEN=1024), PRIVATE :: filename = ""
+     LOGICAL :: firstwrite = .TRUE.
    CONTAINS
      PROCEDURE :: fill => profile_fill
+     PROCEDURE :: name => profile_name
      PROCEDURE :: output => profile_output
      PROCEDURE :: destroy => profile_destroy
   END type profile_t
+
+  INTERFACE profile_t
+     MODULE PROCEDURE new_profile_t
+  END INTERFACE profile_t
 
   ! ----------------------------------------------------------------
   ! TYPE profile_ptr
@@ -72,6 +78,10 @@ MODULE profile_module
   TYPE, PRIVATE :: profile_ptr
      CLASS (profile_t), POINTER :: p
   END type profile_ptr
+
+  INTERFACE profile_ptr
+     MODULE PROCEDURE new_profile_ptr
+  END INTERFACE profile_ptr
 
   ! ----------------------------------------------------------------
   ! TYPE profile_list
@@ -193,6 +203,29 @@ CONTAINS
   END FUNCTION profile_pt_list_current
 
   ! ----------------------------------------------------------------
+  !  FUNCTION new_profile_t
+  ! ----------------------------------------------------------------
+  FUNCTION new_profile_t(id)
+    IMPLICIT NONE
+    INTEGER, INTENT(IN) :: id
+    TYPE (profile_t) :: new_profile_t
+    new_profile_t%id = id
+    CALL new_profile_t%pts%clear()
+    new_profile_t%filename = ""
+    new_profile_t%firstwrite = .TRUE.
+  END FUNCTION new_profile_t
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION new_profile_ptr
+  ! ----------------------------------------------------------------
+  FUNCTION new_profile_ptr() 
+    IMPLICIT NONE
+    TYPE (profile_ptr) :: new_profile_ptr
+    NULLIFY(new_profile_ptr%p)
+  END FUNCTION new_profile_ptr
+
+
+  ! ----------------------------------------------------------------
   ! SUBROUTINE profile_fill
   ! ----------------------------------------------------------------
   SUBROUTINE profile_fill(this, linkman, num_links, plink, xstart, xunits)
@@ -205,16 +238,15 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: xstart
     CHARACTER (LEN=*), INTENT(IN) :: xunits
 
-    INTEGER :: l, p, ierr
+    INTEGER :: l, p, n, ierr
     CLASS (link_t), POINTER :: link
-    CLASS (point_t), POINTER :: pt
     CLASS (profile_pt), POINTER :: prfpt
-    DOUBLE PRECISION :: x0, x
+    DOUBLE PRECISION :: xprf, xold
     CHARACTER (LEN=1024) :: msg
 
     ierr = 0
-    x0 = xstart
-    IF (xunits .EQ. 'RM') x0 = x0*5280.0
+    xprf = xstart
+    IF (xunits .EQ. 'RM') xprf = xprf*5280.0
 
     DO l = 1, num_links
        link => linkman%find(plink(l))
@@ -224,16 +256,52 @@ CONTAINS
           ierr = ierr + 1
           CYCLE
        END IF
-       DO p = 1, link%points()
+       n = link%points()
+       DO p = 1, n
           ALLOCATE(prfpt)
+          prfpt%link_id = link%id
+          prfpt%point_idx = p
           prfpt%pt => link%point(p)
-          
+          IF (p .GT. 1) THEN
+             xprf = xprf + (prfpt%pt%x - xold)
+          END IF
+          xold = prfpt%pt%x
+          prfpt%profx = xprf
+          CALL this%pts%push(prfpt)
+          NULLIFY(prfpt)
        END DO
     END DO
-    
+
+    IF (xunits .EQ. 'RM') THEN
+       CALL this%pts%begin()
+       prfpt => this%pts%current()
+       DO WHILE (ASSOCIATED(prfpt)) 
+          prfpt%profx = prfpt%profx/5280.0
+          CALL this%pts%next()
+          prfpt => this%pts%current()
+          NULLIFY(prfpt)
+       END DO
+    END IF
 
   END SUBROUTINE profile_fill
 
+  ! ----------------------------------------------------------------
+  !  FUNCTION profile_name
+  ! ----------------------------------------------------------------
+  FUNCTION profile_name(this) RESULT(name)
+
+    IMPLICIT NONE
+    CLASS (profile_t), INTENT(INOUT) :: this
+    CHARACTER (LEN=1024) :: name
+    CHARACTER (LEN=256) :: s
+
+    IF (LEN(TRIM(this%filename)) .EQ. 0) THEN
+       WRITE(s, *) this%id
+       s = ADJUSTL(s)
+       this%filename = 'profile_' // TRIM(s) // '.out'
+    END IF
+    name = this%filename
+  END FUNCTION profile_name
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE profile_output
@@ -244,15 +312,55 @@ CONTAINS
     CLASS (profile_t), INTENT(INOUT) :: this
     CHARACTER (LEN=*), INTENT(IN) :: date_string, time_string
 
+    INTEGER, PARAMETER :: punit = 41
     CLASS (profile_pt), POINTER :: pt
+    INTEGER :: j
+    DOUBLE PRECISION :: depth
+
+    IF (this%firstwrite) THEN
+       CALL open_new(this%name(), punit)
+    ELSE 
+       OPEN(punit, FILE=this%name(), ACTION="WRITE", POSITION="APPEND")
+    END IF
+    this%firstwrite = .FALSE.
+
+    ! profile header
+    WRITE(punit, 1110)
+    WRITE(punit, 1010) this%id, date_string, time_string
+    WRITE(punit, 1005)
+    WRITE(punit, 1110)
 
     CALL this%pts%begin()
     pt => this%pts%current()
 
+    j = 0
+
     DO WHILE (ASSOCIATED(pt))
+       j = j + 1
+       depth = pt%pt%hnow%y - pt%pt%thalweg
+
+       WRITE(punit,1000) &
+            &pt%link_id, pt%point_idx, j, pt%profx, &
+            &pt%pt%hnow%y, pt%pt%hnow%q, pt%pt%hnow%v, depth, &
+            &0.0, 0.0, 0.0, 0.0, &
+            &pt%pt%thalweg, pt%pt%xsprop%area, pt%pt%xsprop%topwidth,&
+            &pt%pt%xsprop%hydrad, pt%pt%hnow%froude_num, pt%pt%hnow%courant_num,&
+            &pt%pt%hnow%diffuse_num, pt%pt%hnow%friction_slope, pt%pt%hnow%bed_shear
        CALL this%pts%next()
        pt => this%pts%current()
     END DO
+
+    CLOSE(punit)
+
+1110 FORMAT('#',160('-'))
+1010 FORMAT('#Profile Number - ',i3,'   for Date: ',a10,'  Time: ',a8,'  Max number of points on profile = ',i6/)
+1005 FORMAT('#link',8x,'point',2x,'distance',2x,'water elev',3x,'discharge',5x,'vel',2x,'depth', &
+          6x,'conc',6x,'temp' ,2x,'%Sat',3x,'TDG P', &
+          5x,'thalweg el',2x,'area ',2x,'top width',2x,'hyd rad',2x,'Fr #',2x,'Cr #',2x,'D #',2x,'frict slope', &
+          2x,'bed shear')
+1000      FORMAT(i5,1x,i5,1x,i5,1x,f9.3,1x,f8.3,2x,f14.4,2x,f8.3,2x,f8.3,2x,f10.2,2x,f6.2,2x,f6.2,2x,f6.1,2x, &
+               f8.2,2x,es10.2,2x, &
+               f8.2,2x,f6.2,f6.2,f6.2,f6.2,es10.2,2x,es10.2)
 
   END SUBROUTINE profile_output
 
