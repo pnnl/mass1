@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created January 10, 2018 by William A. Perkins
-  ! Last Change: 2018-01-18 08:02:35 d3g096
+  ! Last Change: 2018-01-18 13:06:40 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE profile_module
@@ -34,6 +34,10 @@ MODULE profile_module
    CONTAINS
      PROCEDURE :: destroy => profile_pt_destroy
   END type profile_pt
+
+  INTERFACE profile_pt
+     MODULE PROCEDURE new_profile_pt
+  END INTERFACE profile_pt
 
   ! ----------------------------------------------------------------
   ! TYPE profile_pt_ptr
@@ -115,6 +119,21 @@ MODULE profile_module
   
 
 CONTAINS
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION new_profile_pt
+  ! ----------------------------------------------------------------
+  FUNCTION new_profile_pt()
+
+    IMPLICIT NONE
+    TYPE (profile_pt) :: new_profile_pt
+    new_profile_pt%link_id = 0
+    new_profile_pt%point_idx = 0
+    new_profile_pt%profx = 0.0
+    NULLIFY(new_profile_pt%pt)
+
+  END FUNCTION new_profile_pt
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE profile_pt_destroy
@@ -228,7 +247,7 @@ CONTAINS
     INTEGER, INTENT(IN) :: id
     TYPE (profile_t) :: new_profile_t
     new_profile_t%id = id
-    CALL new_profile_t%pts%clear()
+    new_profile_t%pts = profile_pt_list()
     new_profile_t%filename = ""
     new_profile_t%firstwrite = .TRUE.
   END FUNCTION new_profile_t
@@ -504,7 +523,7 @@ CONTAINS
     CHARACTER (LEN=8) :: xunits
     DOUBLE PRECISION :: xstart
     INTEGER :: plink(maxlink)
-    CLASS (profile_t), POINTER :: profile
+    TYPE (profile_t), POINTER :: profile
     CHARACTER (LEN=1024) :: msg
 
     line = 0
@@ -519,7 +538,7 @@ CONTAINS
        pid = pid + 1
 
        ALLOCATE(profile)
-       profile%id = pid
+       profile = profile_t(pid)
        CALL profile%fill(linkman, numlinks, plink, xstart, xunits)
 
        CALL this%profs%push(profile)
