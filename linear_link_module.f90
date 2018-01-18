@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2018-01-10 13:28:05 d3g096
+! Last Change: 2018-01-17 14:47:46 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -500,12 +500,14 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE linear_link_backward
   ! ----------------------------------------------------------------
-  SUBROUTINE linear_link_backward(this)
+  SUBROUTINE linear_link_backward(this, dsbc_type)
 
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: dsbc_type
     DOUBLE PRECISION :: bcval, dy, dq
     INTEGER :: point
+    
 
     point = this%npoints
     
@@ -513,17 +515,27 @@ CONTAINS
 
        dy = this%dcon%p%elev() - this%pt(point)%hnow%y
        dq = this%pt(point)%sweep%e*dy + this%pt(point)%sweep%f
-       this%pt(point)%hnow%y = this%pt(point)%hnow%y + dy
-       this%pt(point)%hnow%q = this%pt(point)%hnow%q + dq
 
     ELSE IF (ASSOCIATED(this%dsbc%p)) THEN
 
        bcval = this%dsbc%p%current_value
-
+       SELECT CASE(dsbc_type)
+       CASE(1)
+          ! given downstream stage
+          dy = bcval - this%pt(point)%hnow%y
+          dq = this%pt(point)%sweep%e*dy + this%pt(point)%sweep%f
+       CASE(2)
+          ! given downstream discharge
+          dq = bcval - this%pt(point)%hnow%q
+          dy = (dq - this%pt(point)%sweep%f)/this%pt(point)%sweep%e
+       END SELECT
     ELSE 
        CALL error_message("This should not happen in linear_link_backward", &
             &fatal=.TRUE.)
     END IF
+
+    this%pt(point)%hnow%y = this%pt(point)%hnow%y + dy
+    this%pt(point)%hnow%q = this%pt(point)%hnow%q + dq
 
     DO point = this%npoints - 1, 1, -1
        dy = this%pt(point)%sweep%l*dy + this%pt(point)%sweep%m*dq + this%pt(point)%sweep%n

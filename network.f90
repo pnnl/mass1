@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2018-01-17 09:19:36 d3g096
+! Last Change: 2018-01-18 07:25:08 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -289,7 +289,8 @@ CONTAINS
     IMPLICIT NONE
     CLASS (network), INTENT(INOUT) :: this
 
-    CALL this%links%flow_sim(this%config%time%time, this%config%time%delta_t)
+    CALL this%links%flow_sim(this%config%time%time, &
+         &this%config%time%delta_t, this%config%dsbc_type)
 
   END SUBROUTINE network_flow
 
@@ -302,8 +303,11 @@ CONTAINS
     CLASS (network), INTENT(INOUT) :: this
     INTEGER :: nstep
     CHARACTER (LEN=20) :: date_string, time_string
+    LOGICAL :: dooutput
 
     nstep = 0
+    dooutput = .FALSE.
+
     this%config%time%time = this%config%time%begin
 
     ! make sure initial conditions are in the output
@@ -317,7 +321,7 @@ CONTAINS
        CALL this%bcs%update(this%config%time%time)
        CALL this%met%update(this%config%time%time)
 
-       IF (config%do_flow) THEN
+       IF (this%config%do_flow) THEN
           CALL this%flow()
        ENDIF
 
@@ -328,7 +332,9 @@ CONTAINS
        nstep = nstep + 1
        this%config%time%time = this%config%time%begin + nstep*this%config%time%step
 
-       IF (MOD(nstep, this%config%print_freq) == 0) THEN
+       dooutput = (MOD(nstep, this%config%print_freq) == 0)
+       
+       IF (dooutput) THEN
           IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
           IF (this%config%do_profileout) CALL this%profiles%output(this%config%time%time)
        END IF
@@ -339,7 +345,7 @@ CONTAINS
     END DO
 
     ! always write the last state, if not done already
-    IF (MOD(nstep, this%config%print_freq) == 0) THEN
+    IF (.NOT. dooutput) THEN
        IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
        IF (this%config%do_profileout) CALL this%profiles%output(this%config%time%time)
     END IF

@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2018-01-10 14:45:08 d3g096
+! Last Change: 2018-01-17 14:51:21 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -155,10 +155,11 @@ MODULE link_module
        DOUBLE PRECISION, INTENT(IN) :: deltat
      END SUBROUTINE fsweep_proc
 
-     SUBROUTINE bsweep_proc(this)
+     SUBROUTINE bsweep_proc(this, dsbc_type)
        IMPORT :: link_t
        IMPLICIT NONE
        CLASS (link_t), INTENT(INOUT) :: this
+       INTEGER, INTENT(IN) :: dsbc_type
      END SUBROUTINE bsweep_proc
 
      SUBROUTINE hupdate_proc(this, res_coeff)

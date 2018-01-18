@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2018-01-09 14:30:58 d3g096
+! Last Change: 2018-01-17 14:51:25 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -407,11 +407,12 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_flow_sim
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_flow_sim(this, deltat, res_coeff)
+  SUBROUTINE link_manager_flow_sim(this, deltat, res_coeff, dsbc_type)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: deltat, res_coeff
+    INTEGER, INTENT(IN) :: dsbc_type
 
     CLASS (link_t), POINTER :: link
     INTEGER :: l
@@ -433,7 +434,7 @@ CONTAINS
        link => this%links%current()
        DO WHILE (ASSOCIATED(link))
           IF (link%order .EQ. l) THEN
-             CALL link%backward_sweep()
+             CALL link%backward_sweep(dsbc_type)
              CALL link%hydro_update(res_coeff)
           END IF
           CALL this%links%next()
