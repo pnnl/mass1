@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2018-01-10 13:27:12 d3g096
+! Last Change: 2018-01-18 11:47:01 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -79,6 +79,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   SUBROUTINE fluvial_link_coeff(this, dt, pt1, pt2, cf)
     USE fluvial_coeffs
+    USE general_vars
     IMPLICIT NONE
     CLASS (fluvial_link), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(IN) :: dt
@@ -93,7 +94,9 @@ CONTAINS
     DOUBLE PRECISION :: beta, fravg, gp1, gp2, gp3, gp4, sigma
 
     ! FIXME: These need to come from the configuration:
-    DOUBLE PRECISION :: gr, depth_threshold
+    DOUBLE PRECISION :: gr
+
+    gr = 32.2
 
     CALL pt1%assign(y1, d1, q1, a1, b1, k1, ky1, fr1)
     CALL pt2%assign(y2, d2, q2, a2, b2, k2, ky2, fr2)
@@ -124,15 +127,14 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE fluvial_link_hupdate
   ! ----------------------------------------------------------------
-  SUBROUTINE fluvial_link_hupdate(this, res_coeff)
+  SUBROUTINE fluvial_link_hupdate(this, res_coeff, grav, dt)
+    USE general_vars, ONLY: depth_minimum
 
     IMPLICIT NONE
     CLASS (fluvial_link), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: res_coeff
+    DOUBLE PRECISION, INTENT(IN) :: res_coeff, grav, dt
 
-    ! do depth check here
-
-    CALL this%linear_link_t%hydro_update(res_coeff)
+    CALL this%linear_link_t%hydro_update(res_coeff, grav, dt)
 
   END SUBROUTINE fluvial_link_hupdate
 

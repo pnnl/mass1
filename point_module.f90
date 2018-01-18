@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2018-01-09 08:28:03 d3g096
+! Last Change: 2018-01-18 12:06:57 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -110,14 +110,38 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE point_hydro_update
   ! ----------------------------------------------------------------
-  SUBROUTINE point_hydro_update(this, res_coeff)
+  SUBROUTINE point_hydro_update(this, res_coeff, grav, deltat, deltax)
+    USE general_vars, ONLY: depth_minimum
 
     IMPLICIT NONE
     CLASS (point_t), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: res_coeff
+    DOUBLE PRECISION, INTENT(IN) :: res_coeff, grav, deltat, deltax
+
+    DOUBLE PRECISION :: depth
 
     this%hold = this%hnow
     CALL this%section_update(res_coeff)
+
+    ASSOCIATE (h => this%hnow, xs => this%xsprop)
+
+      depth = h%y - this%thalweg
+      IF (depth .LT. depth_minimum) THEN
+         h%y = this%thalweg + depth_minimum
+      END IF
+
+      IF (xs%area .GT. 0.0) THEN
+         h%froude_num = &
+              &SQRT((h%q*h%q*xs%topwidth)/(grav*xs%area**3))
+         h%friction_slope = &
+              &((h%q*this%manning)/(res_coeff*xs%area*(xs%hydrad**2)**0.3333333))**2.0
+         h%courant_num = &
+              &ABS(h%q)/xs%area*deltat/deltax
+      ELSE 
+         h%froude_num = 0.0
+         h%friction_slope = 0.0
+         h%courant_num = 0.0
+      END IF
+    END ASSOCIATE
 
   END SUBROUTINE point_hydro_update
 

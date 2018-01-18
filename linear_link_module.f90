@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2018-01-17 14:47:46 d3g096
+! Last Change: 2018-01-18 11:48:37 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -554,16 +554,22 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE linear_link_hupdate
   ! ----------------------------------------------------------------
-  SUBROUTINE linear_link_hupdate(this, res_coeff)
+  SUBROUTINE linear_link_hupdate(this, res_coeff, grav, dt)
 
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: res_coeff
+    DOUBLE PRECISION, INTENT(IN) :: res_coeff, grav, dt
 
     INTEGER :: p
-
+    DOUBLE PRECISION :: dx
+    
     DO p = 1, this%npoints
-       CALL this%pt(p)%hydro_update(res_coeff)
+       IF (p .GE. this%npoints) THEN
+          dx = ABS(this%pt(p-1)%x - this%pt(p)%x)
+       ELSE 
+          dx = ABS(this%pt(p+1)%x - this%pt(p)%x)
+       END IF
+       CALL this%pt(p)%hydro_update(res_coeff, grav, dt, dx)
     END DO
 
   END SUBROUTINE linear_link_hupdate

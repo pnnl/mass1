@@ -9,13 +9,14 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2018-01-08 13:09:42 d3g096
+! Last Change: 2018-01-18 10:09:34 d3g096
 ! ----------------------------------------------------------------
 PROGRAM mass1
   USE utility
   USE date_time
   USE time_series
   USE network_module
+  USE general_vars
   IMPLICIT NONE
 
   TYPE (network) :: thenet

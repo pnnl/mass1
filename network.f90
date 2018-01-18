@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2018-01-18 07:25:08 d3g096
+! Last Change: 2018-01-18 11:57:56 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -132,6 +132,7 @@ CONTAINS
 
   ! ----------------------------------------------------------------
   SUBROUTINE network_read(this, base)
+    USE general_vars
     IMPLICIT NONE
     CLASS (network), INTENT(INOUT) :: this
     CHARACTER (LEN=*), INTENT(IN) :: base
@@ -155,6 +156,21 @@ CONTAINS
     this%basedir = cwd
 
     CALL this%config%read()
+
+    ! things that should be in the configuration
+
+    depth_minimum = 0.003           ! m
+    depth_threshold = 0.1          ! m
+    
+    SELECT CASE(this%config%units)
+       
+    CASE(ENGLISH_UNITS)
+       depth_minimum = depth_minimum/0.3048
+       depth_threshold = depth_threshold/0.3048
+       
+    END SELECT
+
+
     CALL this%readbcs()
     CALL this%sections%read(this%config%section_file)
     CALL this%links%read(this%config, this%bcs, this%sections)
@@ -277,7 +293,8 @@ CONTAINS
        CALL this%set_initial()
     END IF
 
-    CALL this%links%hyupdate(this%config%res_coeff)
+    CALL this%links%hyupdate(this%config%res_coeff, &
+         &this%config%grav, this%config%time%delta_t)
 
   END SUBROUTINE network_initialize
 
@@ -289,8 +306,9 @@ CONTAINS
     IMPLICIT NONE
     CLASS (network), INTENT(INOUT) :: this
 
-    CALL this%links%flow_sim(this%config%time%time, &
-         &this%config%time%delta_t, this%config%dsbc_type)
+    CALL this%links%flow_sim(this%config%time%delta_t, &
+         &this%config%grav, this%config%res_coeff, &
+         &this%config%dsbc_type)
 
   END SUBROUTINE network_flow
 

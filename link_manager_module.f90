@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2018-01-17 14:51:25 d3g096
+! Last Change: 2018-01-18 11:53:39 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -407,11 +407,11 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_flow_sim
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_flow_sim(this, deltat, res_coeff, dsbc_type)
+  SUBROUTINE link_manager_flow_sim(this, deltat, grav, res_coeff, dsbc_type)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: deltat, res_coeff
+    DOUBLE PRECISION, INTENT(IN) :: deltat, grav, res_coeff
     INTEGER, INTENT(IN) :: dsbc_type
 
     CLASS (link_t), POINTER :: link
@@ -435,7 +435,7 @@ CONTAINS
        DO WHILE (ASSOCIATED(link))
           IF (link%order .EQ. l) THEN
              CALL link%backward_sweep(dsbc_type)
-             CALL link%hydro_update(res_coeff)
+             CALL link%hydro_update(res_coeff, grav, deltat)
           END IF
           CALL this%links%next()
           link => this%links%current()
@@ -447,18 +447,18 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_hyupdate
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_hyupdate(this, res_coeff)
+  SUBROUTINE link_manager_hyupdate(this, res_coeff, grav, dt)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: res_coeff
+    DOUBLE PRECISION, INTENT(IN) :: res_coeff, grav, dt
     CLASS (link_t), POINTER :: link
     
     CALL this%links%begin()
     link => this%links%current()
 
     DO WHILE (ASSOCIATED(link))
-       CALL link%hydro_update(res_coeff)
+       CALL link%hydro_update(res_coeff, grav, dt)
        CALL this%links%next()
        link => this%links%current()
     END DO
