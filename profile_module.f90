@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created January 10, 2018 by William A. Perkins
-  ! Last Change: 2018-01-17 09:29:18 d3g096
+  ! Last Change: 2018-01-18 08:02:35 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE profile_module
@@ -52,6 +52,10 @@ MODULE profile_module
      PROCEDURE :: clear => profile_pt_list_clear
      PROCEDURE :: current => profile_pt_list_current
   END type profile_pt_list
+
+  INTERFACE profile_pt_list
+     PROCEDURE :: new_profile_pt_list
+  END INTERFACE profile_pt_list
   
   ! ----------------------------------------------------------------
   ! TYPE profile
@@ -94,6 +98,10 @@ MODULE profile_module
      PROCEDURE :: current => profile_list_current
   END type profile_list
 
+  INTERFACE profile_list
+     MODULE PROCEDURE new_profile_list
+  END INTERFACE profile_list
+
   ! ----------------------------------------------------------------
   ! TYPE profile_manager
   ! ----------------------------------------------------------------
@@ -119,6 +127,16 @@ CONTAINS
 
   END SUBROUTINE profile_pt_destroy
 
+  ! ----------------------------------------------------------------
+  !  FUNCTION new_profile_pt_list
+  ! ----------------------------------------------------------------
+  FUNCTION new_profile_pt_list()
+
+    IMPLICIT NONE
+    TYPE (profile_pt_list) :: new_profile_pt_list
+    NULLIFY(new_profile_pt_list%head)
+    NULLIFY(new_profile_pt_list%tail)
+  END FUNCTION new_profile_pt_list
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE profile_pt_list_push
@@ -257,16 +275,17 @@ CONTAINS
           CYCLE
        END IF
        n = link%points()
-       DO p = 1, n
+       
+       DO p = n, 1, -1
           ALLOCATE(prfpt)
           prfpt%link_id = link%id
           prfpt%point_idx = p
           prfpt%pt => link%point(p)
-          IF (p .GT. 1) THEN
-             xprf = xprf + (prfpt%pt%x - xold)
+          IF (p .LT. n) THEN
+             xprf = xprf + ABS(prfpt%pt%x - xold)
           END IF
-          xold = prfpt%pt%x
           prfpt%profx = xprf
+          xold = prfpt%pt%x
           CALL this%pts%push(prfpt)
           NULLIFY(prfpt)
        END DO
@@ -298,7 +317,7 @@ CONTAINS
     IF (LEN(TRIM(this%filename)) .EQ. 0) THEN
        WRITE(s, *) this%id
        s = ADJUSTL(s)
-       this%filename = 'profile_' // TRIM(s) // '.out'
+       this%filename = 'profile' // TRIM(s) // '.out'
     END IF
     name = this%filename
   END FUNCTION profile_name
@@ -326,7 +345,7 @@ CONTAINS
 
     ! profile header
     WRITE(punit, 1110)
-    WRITE(punit, 1010) this%id, date_string, time_string
+    WRITE(punit, 1010) this%id, date_string, time_string, this%pts%size()
     WRITE(punit, 1005)
     WRITE(punit, 1110)
 
@@ -376,7 +395,16 @@ CONTAINS
 
   END SUBROUTINE profile_destroy
 
+  ! ----------------------------------------------------------------
+  !  FUNCTION new_profile_list
+  ! ----------------------------------------------------------------
+  FUNCTION new_profile_list() 
 
+    IMPLICIT NONE
+    TYPE (profile_list) :: new_profile_list
+    NULLIFY(new_profile_list%head)
+    NULLIFY(new_profile_list%tail)
+  END FUNCTION new_profile_list
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE profile_list_push
