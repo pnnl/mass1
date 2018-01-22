@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2018-01-18 11:47:01 d3g096
+! Last Change: 2018-01-22 12:13:01 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -135,6 +135,11 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: res_coeff, grav, dt
 
     CALL this%linear_link_t%hydro_update(res_coeff, grav, dt)
+
+    IF (ASSOCIATED(this%latbc%p)) THEN
+       this%latqold = this%latq
+       this%latq = this%latbc%p%current_value
+    END IF
 
   END SUBROUTINE fluvial_link_hupdate
 

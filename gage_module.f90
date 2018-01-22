@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  8, 2018 by William A. Perkins
-! Last Change: 2018-01-10 13:20:08 d3g096
+! Last Change: 2018-01-22 11:21:25 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -86,13 +86,13 @@ CONTAINS
     IF (LEN(TRIM(this%filename)) .LE. 0) THEN
        this%filename = ''
        IF (LEN(TRIM(this%gagename)) .GT. 0) THEN
-          this%filename = 'ts_' // this%gagename // '.out'
+          this%filename = 'ts' // this%gagename // '.out'
        ELSE 
           WRITE(string1, *) this%link_id
           string1 = ADJUSTL(string1)
           WRITE(string2, *) this%point_idx
           string2 = ADJUSTL(string2)
-          this%filename = 'ts_' // TRIM(string1) // TRIM(string2) // '.out'
+          this%filename = 'ts' // TRIM(string1) // TRIM(string2) // '.out'
        END IF
     END IF
     oname = this%filename

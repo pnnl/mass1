@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2018-01-18 11:53:39 d3g096
+! Last Change: 2018-01-22 12:41:36 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -41,6 +41,8 @@ MODULE link_manager_module
      PROCEDURE :: connect => link_manager_connect
      PROCEDURE :: flow_sim => link_manager_flow_sim
      PROCEDURE :: hyupdate => link_manager_hyupdate
+     PROCEDURE :: read_restart => link_manager_read_restart
+     PROCEDURE :: write_restart => link_manager_write_restart
      PROCEDURE :: destroy => link_manager_destroy
   END type link_manager_t
 
@@ -347,6 +349,7 @@ CONTAINS
              NULLIFY(con)
           END IF
           CALL dlink%ucon%p%ulink%push(link)
+          link%dcon%p => dlink%ucon%p
        END IF
        
        CALL this%links%next()
@@ -464,6 +467,55 @@ CONTAINS
     END DO
 
   END SUBROUTINE link_manager_hyupdate
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_read_restart
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_read_restart(this, iounit, res_coeff, grav, dt)
+
+    IMPLICIT NONE
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: iounit
+    DOUBLE PRECISION, INTENT(IN) :: res_coeff, grav, dt
+    CLASS (link_t), POINTER :: link
+
+    CALL this%links%begin()
+    link => this%links%current()
+
+    DO WHILE (ASSOCIATED(link))
+       CALL link%read_restart(iounit)
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+    
+    CALL this%hyupdate(res_coeff, grav, dt)
+    
+
+  END SUBROUTINE link_manager_read_restart
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_write_restart
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_write_restart(this, iounit)
+
+    IMPLICIT NONE
+
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: iounit
+    CLASS (link_t), POINTER :: link
+
+    CALL this%links%begin()
+    link => this%links%current()
+
+    DO WHILE (ASSOCIATED(link))
+       CALL link%write_restart(iounit)
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+
+  END SUBROUTINE link_manager_write_restart
+
+
 
 
   ! ----------------------------------------------------------------

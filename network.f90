@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2018-01-18 11:57:56 d3g096
+! Last Change: 2018-01-22 11:17:21 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -44,6 +44,7 @@ MODULE network_module
      PROCEDURE :: read => network_read
      PROCEDURE :: set_initial => network_set_initial
      PROCEDURE :: read_restart => network_read_restart
+     PROCEDURE :: write_restart => network_write_restart
      PROCEDURE :: initialize => network_initialize
      PROCEDURE :: flow => network_flow
      PROCEDURE :: run => network_run
@@ -253,7 +254,6 @@ CONTAINS
 
     IMPLICIT NONE
     CLASS (network), INTENT(INOUT) :: this
-    CLASS (link_t), POINTER :: link
     INTEGER, PARAMETER :: runit = 31
     CHARACTER (LEN=1024) :: msg
 
@@ -262,22 +262,44 @@ CONTAINS
     WRITE(msg, *) 'reading restart from ', TRIM(this%config%restart_load_file)
     CALL status_message(msg)
 
-    CALL this%links%links%begin()
-    link => this%links%links%current()
-
-    DO WHILE (ASSOCIATED(link)) 
-       WRITE(msg, *) 'reading intial state for link ', link%id
-       CALL status_message(msg)
-       CALL link%read_restart(runit)
-       CALL this%links%links%next()
-       link => this%links%links%current()
-    END DO
+    CALL this%links%read_restart(runit, &
+         &this%config%res_coeff, this%config%grav, &
+         &this%config%time%delta_t)
 
     WRITE (msg, *) 'done reading restart from ', TRIM(this%config%restart_load_file)
     CALL status_message(msg)
     CLOSE(runit)
 
   END SUBROUTINE network_read_restart
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE network_write_restart
+  ! ----------------------------------------------------------------
+  SUBROUTINE network_write_restart(this)
+
+    IMPLICIT NONE
+    CLASS (network), INTENT(INOUT) :: this
+    INTEGER, PARAMETER :: runit = 31
+    INTEGER :: status
+    CHARACTER (LEN=1024) :: msg
+
+    OPEN(runit, file=this%config%restart_save_file, form='UNFORMATTED', iostat=status)
+
+    IF (status .EQ. 0) THEN
+       WRITE(msg, *) 'writing restart te ', TRIM(this%config%restart_save_file)
+       CALL status_message(msg)
+    ELSE 
+       WRITE(msg, *) 'cannot open restart file: ', TRIM(this%config%restart_save_file)
+       CALL error_message(msg, fatal=.TRUE.)
+    END IF
+
+    CALL this%links%write_restart(runit)
+
+    WRITE (msg, *) 'done writing restart to ', TRIM(this%config%restart_save_file)
+    CALL status_message(msg)
+    CLOSE(runit)
+
+  END SUBROUTINE network_write_restart
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE network_initialize
@@ -366,6 +388,10 @@ CONTAINS
     IF (.NOT. dooutput) THEN
        IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
        IF (this%config%do_profileout) CALL this%profiles%output(this%config%time%time)
+    END IF
+
+    IF (this%config%do_restart) THEN
+       CALL this%write_restart()
     END IF
 
 

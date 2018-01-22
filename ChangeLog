@@ -1,3 +1,17 @@
+2018-01-22  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* network.f90 (network_write_restart): added
+	(network_run): write restart at end
+	(network_read_restart): let the link manager do most of the work
+
+	* link_manager_module.f90 (link_manager_read_restart)
+	(link_manager_write_restart): added
+
+	* gage_module.f90 (gage_name): revert to old naming convention
+
+	* fluvial_link_module.f90 (fluvial_link_hupdate): update lateral
+	inflow too
+
 2017-09-11  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* cross_section_table.dat: add a rectangular w/ flood section

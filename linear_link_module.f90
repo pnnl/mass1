@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2018-01-18 11:48:37 d3g096
+! Last Change: 2018-01-22 09:44:17 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -384,7 +384,7 @@ CONTAINS
     ierr = 0
 
     DO i = 1, this%npoints
-       READ(iunit, IOSTAT=iostat) this%id, junk, &
+       READ(iunit, IOSTAT=iostat) junk, junk, &
             &this%pt(i)%hnow%q, &
             &this%pt(i)%hnow%y, &
             &c(1), c(2)
@@ -473,6 +473,7 @@ CONTAINS
        ELSE 
           bcval = 0.0
        END IF
+       this%pt(point)%hnow%q = bcval
        this%pt(point)%sweep%e = 0.0
        this%pt(point)%sweep%f = bcval - this%pt(point)%hnow%q
     END IF
