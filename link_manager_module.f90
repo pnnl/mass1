@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2018-01-22 12:41:36 d3g096
+! Last Change: 2018-01-22 13:37:41 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -228,10 +228,12 @@ CONTAINS
           ALLOCATE(fluvial_link :: link)
        CASE (21)
           ALLOCATE(fluvial_hydro_link :: link)
+          theconfig%do_hydro_bc = .TRUE.
        CASE (2)
           ALLOCATE(discharge_link :: link)
        CASE (6)
           ALLOCATE(hydro_link :: link)
+          theconfig%do_hydro_bc = .TRUE.
        CASE (3)
           ALLOCATE(ustage_link :: link)
        CASE (5)

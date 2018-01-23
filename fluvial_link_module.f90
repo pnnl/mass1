@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2018-01-22 12:13:01 d3g096
+! Last Change: 2018-01-22 13:11:33 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -61,6 +61,7 @@ CONTAINS
 
     ierr = this%linear_link_t%initialize(ldata, bcman)
 
+    this%lpiexp = ldata%lpiexp
     IF (ldata%lbcid .GT. 0) THEN
        this%latbc%p => bcman%find(LATFLOW_BC_TYPE, ldata%lbcid)
        IF (.NOT. ASSOCIATED(this%latbc%p)) THEN

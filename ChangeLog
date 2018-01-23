@@ -1,3 +1,11 @@
+2018-01-23  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* link_manager_module.f90 (link_manager_read): set configuration
+	hydro BC flag when links w/ hydro BC's are encountered
+
+	* fluvial_link_module.f90 (fluvial_link_initialize): set link LPI
+	coefficient here
+
 2018-01-22  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* network.f90 (network_write_restart): added
