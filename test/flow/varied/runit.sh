@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: 2017-03-22 14:21:13 d3g096
+# Last Change: 2018-01-24 13:13:44 d3g096
 # -------------------------------------------------------------
 # $Id$
 
@@ -17,8 +17,6 @@ set -e
 
                                 # to trap floating point errors on SGI
 
-TRAP_FPE='INVALID=ABORT(1);UNDERFL=ZERO;OVERFL=ABORT(1);INT_OVERFL=ABORT(1);DIVZERO=ABORT(1);DEBUG'
-export TRAP_FPE
 
 model=${MODEL-../../../build/mass1}
 
