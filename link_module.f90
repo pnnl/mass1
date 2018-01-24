@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2018-01-18 11:48:33 d3g096
+! Last Change: 2018-01-24 13:53:15 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -53,7 +53,7 @@ MODULE link_module
   TYPE, ABSTRACT, PUBLIC :: link_t
      INTEGER :: id
      INTEGER :: order
-     INTEGER :: dsid
+     INTEGER :: dsid, usbcid, dsbcid
      TYPE (bc_ptr) :: usbc, dsbc
      TYPE (confluence_ptr) :: ucon, dcon
    CONTAINS
@@ -456,8 +456,23 @@ CONTAINS
     IMPLICIT NONE
     DOUBLE PRECISION :: ue
     CLASS (confluence_t), INTENT(INOUT) :: this
+    CLASS (link_t), POINTER :: link
+    CLASS (point_t), POINTER :: pt
+    INTEGER :: pidx
 
     ue = 0.0
+
+    CALL this%ulink%begin()
+    link => this%ulink%current()
+
+    DO WHILE (ASSOCIATED(link))
+       pidx = link%points()
+       pt => link%point(pidx)
+       ue = ue + pt%sweep%e
+
+       CALL this%ulink%next()
+       link => this%ulink%current()
+    END DO
     
   END FUNCTION confluence_coeff_e
 
@@ -469,7 +484,35 @@ CONTAINS
     IMPLICIT NONE
     DOUBLE PRECISION :: uf
     CLASS (confluence_t), INTENT(INOUT) :: this
+    CLASS (link_t), POINTER :: link
+    CLASS (point_t), POINTER :: pt
+    INTEGER :: pidx
+    DOUBLE PRECISION :: q, dq, y, dy, e, f
+    
+    pt => this%dlink%p%point(1)
+    dy = pt%hnow%y
+    dq = pt%hnow%q
+
     uf = 0.0
+
+    CALL this%ulink%begin()
+    link => this%ulink%current()
+
+    DO WHILE (ASSOCIATED(link))
+       pidx = link%points()
+       pt => link%point(pidx)
+       q = pt%hnow%q
+       y = pt%hnow%y
+       e = pt%sweep%e
+       f = pt%sweep%f
+       uf = uf + q + f + e*(dy - y)
+
+       CALL this%ulink%next()
+       link => this%ulink%current()
+    END DO
+
+    uf = uf - dq
+    
 
   END FUNCTION confluence_coeff_f
 

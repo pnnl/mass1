@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2018-01-22 13:37:41 d3g096
+! Last Change: 2018-01-24 12:28:01 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -35,6 +35,7 @@ MODULE link_manager_module
      CLASS (link_t), POINTER :: dslink
      INTEGER :: maxorder
    CONTAINS
+     PROCEDURE, NOPASS :: scan => link_manager_scan
      PROCEDURE :: read => link_manager_read
      PROCEDURE, PRIVATE :: readpts => link_manager_readpts
      PROCEDURE :: find => link_manager_find
@@ -134,6 +135,98 @@ CONTAINS
     RETURN
 
   END SUBROUTINE link_manager_readpts
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_scan
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_scan(theconfig)
+
+    IMPLICIT NONE
+
+    TYPE (configuration_t), INTENT(INOUT) :: theconfig
+    
+    INTEGER, PARAMETER :: lunit = 21
+    INTEGER :: recno, ierr, iostat
+    TYPE (link_input_data) :: ldata
+    CHARACTER (LEN=1024) :: msg
+
+    ierr = 0
+    recno = 0
+
+    CALL open_existing(theconfig%link_file, lunit, fatal=.TRUE.)
+    
+    DO WHILE (.TRUE.) 
+       recno = recno + 1
+       READ(lunit,*, IOSTAT=iostat) &
+            & ldata%linkid, &
+            & ldata%inopt, &
+            & ldata%npt, &
+            & ldata%lorder, &
+            & ldata%ltype, &
+            & ldata%nup, &
+            & ldata%bcid, &
+            & ldata%dsbcid, &
+            & ldata%gbcid, &
+            & ldata%tbcid, &
+            & ldata%mzone, &
+            & ldata%lbcid, &
+            & ldata%lgbcid, &
+            & ldata%ltbcid, &
+            & ldata%lpiexp
+
+       IF (IS_IOSTAT_END(iostat)) THEN
+          EXIT
+       ELSE IF (iostat .NE. 0) THEN
+          WRITE(msg, *) TRIM(theconfig%link_file) // &
+               &': error in or near link record ', recno
+          CALL error_message(msg, fatal=.TRUE.)
+       END IF
+       
+       READ(lunit,*, IOSTAT=iostat) ldata%dsid
+
+       IF (IS_IOSTAT_END(iostat)) THEN
+          WRITE(msg, *) TRIM(theconfig%link_file), ': link record ', recno, &
+               & ', link id = ', ldata%linkid, &
+               &', is incomplete (second line missing)'
+          CALL error_message(msg)
+          ierr = ierr + 1
+          EXIT
+       ELSE IF (iostat .NE. 0) THEN
+          WRITE(msg, *) TRIM(theconfig%link_file) // &
+               &': error in or near link record ', recno
+          CALL error_message(msg, fatal=.TRUE.)
+          EXIT
+       END IF
+
+       SELECT CASE (ldata%ltype)
+       CASE (1)
+       CASE (20) 
+       CASE (21)
+          theconfig%do_hydro_bc = .TRUE.
+       CASE (2)
+       CASE (6)
+          theconfig%do_hydro_bc = .TRUE.
+       CASE (3)
+       CASE (5)
+       CASE DEFAULT
+          WRITE(msg, *) TRIM(theconfig%link_file), ': link record ', recno, &
+               &': link type unknown (', ldata%ltype, ')'
+          CALL error_message(msg)
+          ierr = ierr + 1
+          CYCLE
+       END SELECT
+
+    END DO
+
+    CLOSE (lunit)
+
+    IF (ierr .GT. 0) THEN
+       msg = TRIM(theconfig%link_file) // ': too many errors in link file'
+       CALL error_message(msg, fatal=.TRUE.)
+    END IF
+
+  END SUBROUTINE link_manager_scan
+
 
 
   ! ----------------------------------------------------------------
@@ -324,7 +417,7 @@ CONTAINS
        CALL error_message("No downstream link found, there must be one")
        ierr = ierr + 1
     ELSE IF (nds .GT. 1) THEN
-       CALL error_message("Too many ownstream links found, there can be only one")
+       CALL error_message("Too many downstream links found, there can be only one")
        ierr = ierr + 1
     END IF
 

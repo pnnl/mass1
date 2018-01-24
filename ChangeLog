@@ -1,3 +1,13 @@
+2018-01-24  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* link_module.f90 (confluence_coeff_e, confluence_coeff_f):
+	complete these
+
+	* network.f90 (network_read): call link_manager%scan before
+	reading BCs
+
+	* link_manager_module.f90 (link_manager_scan): add
+
 2018-01-23  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* link_manager_module.f90 (link_manager_read): set configuration

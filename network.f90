@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2018-01-22 11:17:21 d3g096
+! Last Change: 2018-01-24 12:28:48 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -172,6 +172,7 @@ CONTAINS
     END SELECT
 
 
+    CALL this%links%scan(this%config)
     CALL this%readbcs()
     CALL this%sections%read(this%config%section_file)
     CALL this%links%read(this%config, this%bcs, this%sections)
