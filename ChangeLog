@@ -1,5 +1,12 @@
 2018-01-26  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* test/flow/varied-pid/gage_control.dat: add / at line ends
+
+	* point_module.f90 (point_hydro_update): allow deltax = 0
+
+	* gage_module.f90 (gage_manager_read): catch unknown link/point
+	ids correctly
+
 	* profile_module.f90 (profile_fill): fix profile distance
 	calculation 
 

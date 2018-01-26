@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2018-01-18 12:06:57 d3g096
+! Last Change: 2018-01-26 09:57:24 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -134,8 +134,12 @@ CONTAINS
               &SQRT((h%q*h%q*xs%topwidth)/(grav*xs%area**3))
          h%friction_slope = &
               &((h%q*this%manning)/(res_coeff*xs%area*(xs%hydrad**2)**0.3333333))**2.0
-         h%courant_num = &
-              &ABS(h%q)/xs%area*deltat/deltax
+         IF (deltax .GT. 0.0) THEN
+            h%courant_num = &
+                 &ABS(h%q)/xs%area*deltat/deltax
+         ELSE
+            h%courant_num = 0.0
+         END IF
       ELSE 
          h%froude_num = 0.0
          h%friction_slope = 0.0

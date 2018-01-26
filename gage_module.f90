@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  8, 2018 by William A. Perkins
-! Last Change: 2018-01-22 11:21:25 d3g096
+! Last Change: 2018-01-26 09:11:00 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -251,15 +251,17 @@ CONTAINS
        link => linkman%find(linkid)
        IF (.NOT. ASSOCIATED(link)) THEN
           WRITE (msg, *) TRIM(fname), ", line ", line, ": unknown link id: ", linkid
+          CALL error_message(msg)
           ierr = ierr + 1
-          CONTINUE
+          CYCLE
        END IF
 
        point => link%point(pointidx)
        IF (.NOT. ASSOCIATED(point)) THEN
           WRITE (msg, *) TRIM(fname), ", line ", line, ": unknown point index: ", pointidx
+          CALL error_message(msg)
           ierr = ierr + 1
-          CONTINUE
+          CYCLE
        END IF
           
        ALLOCATE(gage)
@@ -276,11 +278,16 @@ CONTAINS
        CALL this%gages%push(gage)
        
     END DO
+
 200 CONTINUE
     WRITE (msg, *) TRIM(fname), ", line ", line, ": I/O error in gage control file"
     CALL error_message(msg, FATAL=.TRUE.)
 100 CONTINUE
     CLOSE(gcunit)
+    IF (ierr .GT. 0) THEN
+       WRITE (msg, *) TRIM(fname), ": error(s) reading"
+       CALL error_message(msg, FATAL=.TRUE.)
+    END IF
     RETURN
   END SUBROUTINE gage_manager_read
 
