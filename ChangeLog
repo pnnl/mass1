@@ -1,5 +1,7 @@
 2018-01-26  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* test/flow/varied-pool/gage_control.dat: add / at line ends
+
 	* test/flow/varied-pid/gage_control.dat: add / at line ends
 
 	* point_module.f90 (point_hydro_update): allow deltax = 0
