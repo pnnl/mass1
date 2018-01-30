@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October 10, 2001 by William A. Perkins
-! Last Change: 2018-01-05 14:27:46 d3g096
+! Last Change: 2018-01-30 10:28:39 d3g096
 ! ----------------------------------------------------------------
 
 
@@ -146,14 +146,19 @@ CONTAINS
        piddata(l)%errsum = 0.0
 
        IF (piddata(l)%followflow) THEN
-          WRITE (99,*) 'PID link #', l, ' is link ', piddata(l)%link, ' and follows dischange'
+          WRITE (msg,*) 'PID link #', l, ' is link ', piddata(l)%link, ' and follows dischange'
        ELSE
-          WRITE (99,*) 'PID link #', l, ' is link ', piddata(l)%link, ' and follows stage'
+          WRITE (msg,*) 'PID link #', l, ' is link ', piddata(l)%link, ' and follows stage'
        END IF
-       WRITE (99, *) 'PID Coefficients are as follows: '
-       WRITE (99, *) '   Kc = ', piddata(l)%kc
-       WRITE (99, *) '   Ti = ', piddata(l)%ti
-       WRITE (99, *) '   Tr = ', piddata(l)%tr
+       CALL status_message(msg)
+       WRITE (msg, *) 'PID Coefficients are as follows: '
+       CALL status_message(msg)
+       WRITE (msg, *) '   Kc = ', piddata(l)%kc
+       CALL status_message(msg)
+       WRITE (msg, *) '   Ti = ', piddata(l)%ti
+       CALL status_message(msg)
+       WRITE (msg, *) '   Tr = ', piddata(l)%tr
+       CALL status_message(msg)
 
                                 ! count the number of flows that are
                                 ! to be lagged
@@ -179,10 +184,11 @@ CONTAINS
        ALLOCATE(piddata(l)%lagged(piddata(l)%numflows))
 
        IF (piddata(l)%followflow) THEN
-          WRITE (99,*) 'PID link #', l, 'uses the following lagged stage data: '
+          WRITE (msg,*) 'PID link #', l, 'uses the following lagged stage data: '
        ELSE
-          WRITE (99,*) 'PID link #', l, 'uses the following lagged flow data: '
+          WRITE (msg,*) 'PID link #', l, 'uses the following lagged flow data: '
        END IF
+       CALL status_message(msg)
 
        DO i = 1, piddata(l)%numflows
 
@@ -216,13 +222,10 @@ CONTAINS
 
           lagtime = lagvalues(i*2)
           IF (lagtime .LT. 0) THEN
-             WRITE (99,*) 'ABORT: error reading pidlink coefficient file ', TRIM(fname)
-             WRITE (99,*) 'link ', link, 'uses lagged flow from link ', laglink, &
+             WRITE (msg,*) 'link ', link, 'uses lagged flow from link ', laglink, &
                   &', but the specified lag (', lagvalues(i*2), ') is invalid '
-             WRITE (*,*) 'ABORT: error reading pidlink coefficient file ', TRIM(fname)
-             WRITE (*,*) 'link ', link, 'uses lagged flow from link ', laglink, &
-                  &', but the specified lag (', lagvalues(i*2), ') is invalid '
-             CALL EXIT(1)
+             CALL error_message(msg)
+             GOTO 100
           END IF
           piddata(l)%lagged(i)%lag = lagtime
 
@@ -233,31 +236,32 @@ CONTAINS
           nullify(piddata(l)%lagged(i)%flow)
 
           IF (ASSOCIATED(piddata(l)%lagged(i)%bc)) THEN
-             WRITE (99,*) '     Link Boundary Condition #', piddata(l)%lagged(i)%link, &
+             WRITE (msg,*) '     Link Boundary Condition #', piddata(l)%lagged(i)%link, &
                   &' lagged ', piddata(l)%lagged(i)%lag, ' days'
           ELSE
-             WRITE (99,*) '     Point 1 on Link #', piddata(l)%lagged(i)%link, &
+             WRITE (msg,*) '     Point 1 on Link #', piddata(l)%lagged(i)%link, &
                   &' lagged ', piddata(l)%lagged(i)%lag, ' days'
           END IF
+          CALL status_message(msg)
        END DO
 
-       WRITE (99,*)
+       CALL status_message("")
 
     END DO
 
-    WRITE (99,*)
-    WRITE (99,*) 'Reading PID Link data complete.' 
-    WRITE (99,*)
+    CALL status_message("")
+    CALL status_message('Reading PID Link data complete.')
+    CALL status_message("")
+
     RETURN
 
                                 ! this should be executed when too few
                                 ! records are in the input file
 100 CONTINUE
-    WRITE (99,*) 'ABORT: error reading pidlink coefficient file ', TRIM(fname)
-    WRITE (99,*) 'error reading record ', l, ' of ', count, ' expected'
-    WRITE (*,*) 'ABORT: error reading pidlink coefficient file ', TRIM(fname)
-    WRITE (*,*) 'error reading record ', l, ' of ', count, ' expected'
-    CALL EXIT(1)
+    WRITE (msg,*) 'reading pidlink coefficient file ', TRIM(fname)
+    CALL error_message(msg)
+    WRITE (msg,*) 'reading record ', l, ' of ', count, ' expected'
+    CALL error_message(msg, fatal=.TRUE.)
   END SUBROUTINE read_pidlink_info
 
   ! ----------------------------------------------------------------
