@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 17, 2017 by William A. Perkins
-! Last Change: 2018-01-08 11:20:36 d3g096
+! Last Change: 2018-02-01 08:02:01 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE nonfluvial_link_module
@@ -81,7 +81,7 @@ CONTAINS
   SUBROUTINE discharge_link_coeff(this, dt, pt1, pt2, cf)
 
     IMPLICIT NONE
-    CLASS (discharge_link), INTENT(IN) :: this
+    CLASS (discharge_link), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: dt
     TYPE (point_t), INTENT(IN) :: pt1, pt2
     TYPE (coeff), INTENT(OUT) :: cf
@@ -141,7 +141,7 @@ CONTAINS
   SUBROUTINE hydro_link_coeff(this, dt, pt1, pt2, cf)
 
     IMPLICIT NONE
-    CLASS (hydro_link), INTENT(IN) :: this
+    CLASS (hydro_link), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: dt
     TYPE (point_t), INTENT(IN) :: pt1, pt2
     TYPE (coeff), INTENT(OUT) :: cf
@@ -156,7 +156,7 @@ CONTAINS
   SUBROUTINE ustage_link_coeff(this, dt, pt1, pt2, cf)
 
     IMPLICIT NONE
-    CLASS (ustage_link), INTENT(IN) :: this
+    CLASS (ustage_link), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: dt
     TYPE (point_t), INTENT(IN) :: pt1, pt2
     TYPE (coeff), INTENT(OUT) :: cf
@@ -184,7 +184,7 @@ CONTAINS
   SUBROUTINE dstage_link_coeff(this, dt, pt1, pt2, cf)
 
     IMPLICIT NONE
-    CLASS (dstage_link), INTENT(IN) :: this
+    CLASS (dstage_link), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: dt
     TYPE (point_t), INTENT(IN) :: pt1, pt2
     TYPE (coeff), INTENT(OUT) :: cf
@@ -214,7 +214,7 @@ CONTAINS
 
     IMPLICIT NONE
 
-    CLASS (trib_inflow_link), INTENT(IN) :: this
+    CLASS (trib_inflow_link), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: dt
     TYPE (point_t), INTENT(IN) :: pt1, pt2
     TYPE (coeff), INTENT(OUT) :: cf

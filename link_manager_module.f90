@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2018-01-24 12:28:01 d3g096
+! Last Change: 2018-02-01 13:56:42 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -22,10 +22,25 @@ MODULE link_manager_module
   USE link_module
   USE fluvial_link_module
   USE nonfluvial_link_module
+  USE pid_link_module
   USE bc_module
   USE section_handler_module
 
   IMPLICIT NONE
+
+  ! ENUM, BIND(C)
+  !    ENUMERATOR :: LINK_ENUM = 0
+  !    ENUMERATOR :: FLUVIAL_TYPE = 1
+  !    ENUMERATOR :: DISCHARGE_TYPE = 2
+  !    ENUMERATOR :: UPSTREAM_STAGE_TYPE = 3
+  !    ENUMERATOR :: DOWNSTREAM_STAGE_TYPE = 4
+  !    ENUMERATOR :: TRIBUTARY_TYPE = 5
+  !    ENUMERATOR :: HYDRO_TYPE = 6
+  !    ENUMERATOR :: DISCHARGE_PID_TYPE = 12
+  !    ENUMERATOR :: STAGE_PID_TYPE = 13
+  !    ENUMERATOR :: FLUVIAL_TDGSAT_TYPE = 20
+  !    ENUMERATOR :: FLUVIAL_HYDRO_TYPE = 21
+  ! END ENUM
 
   ! ----------------------------------------------------------------
   ! link_manager
@@ -38,6 +53,7 @@ MODULE link_manager_module
      PROCEDURE, NOPASS :: scan => link_manager_scan
      PROCEDURE :: read => link_manager_read
      PROCEDURE, PRIVATE :: readpts => link_manager_readpts
+     PROCEDURE, PRIVATE :: readpid => link_manager_readpid
      PROCEDURE :: find => link_manager_find
      PROCEDURE :: connect => link_manager_connect
      PROCEDURE :: flow_sim => link_manager_flow_sim
@@ -137,6 +153,212 @@ CONTAINS
   END SUBROUTINE link_manager_readpts
 
   ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_readpid
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_readpid(this, theconfig, bcman, npid)
+
+    IMPLICIT NONE
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    TYPE (configuration_t), INTENT(INOUT) :: theconfig
+    CLASS (bc_manager_t), INTENT(IN) :: bcman
+    INTEGER, INTENT(IN) :: npid
+
+    INTEGER, PARAMETER :: iounit = 33
+    DOUBLE PRECISION, PARAMETER :: bogus = -999.0
+  
+
+    CLASS (link_t), POINTER :: link
+    CLASS (pid_link), POINTER :: pidlink
+
+    INTEGER :: recno, ierr, iostat
+    INTEGER :: linkid
+    DOUBLE PRECISION :: kc, ti, tr, lagvalues(2*max_pid_lag)
+    DOUBLE PRECISION :: lagtime
+
+    INTEGER :: i, lagid
+    CHARACTER (LEN=1024) :: msg
+
+    ierr = 0
+    iostat = 0
+
+
+    CALL open_existing(theconfig%pid_file, iounit, fatal=.TRUE.)
+
+    msg = 'Reading PID link information from ' // TRIM(theconfig%pid_file)
+    CALL status_message(msg)
+
+    DO recno = 1, npid
+
+       lagvalues = bogus
+
+       READ (iounit, *, IOSTAT=iostat) linkid, kc, ti, tr, lagvalues
+
+       IF (IS_IOSTAT_END(iostat)) THEN
+          WRITE(msg, *) TRIM(theconfig%pid_file) // &
+               &', record ', recno, ': premature end of file, expected ', npid,&
+               &' records'
+          ierr = ierr + 1
+          CALL error_message(msg)
+          EXIT
+       ELSE IF (iostat .NE. 0) THEN
+          WRITE(msg, *) TRIM(theconfig%pid_file) // &
+               &': error in or near record ', recno
+          CALL error_message(msg)
+          ierr = ierr + 1
+          EXIT
+       END IF
+
+       link => this%find(linkid)
+       IF (.NOT. ASSOCIATED(link)) THEN
+          WRITE(msg, *) TRIM(theconfig%pid_file) // &
+               &', record ', recno, ': unknown link ', linkid
+          CALL error_message(msg)
+          ierr = ierr + 1
+          CYCLE
+       END IF
+       
+       SELECT TYPE(link)
+       CLASS IS (pid_link)
+          pidlink => link
+       CLASS DEFAULT
+          WRITE (msg, *) TRIM(theconfig%pid_file) // &
+               &', record ', recno, ': link ', linkid, &
+               &' is not a PID link'
+          CALL error_message(msg)
+          ierr = ierr + 1
+          CYCLE
+       END SELECT
+       
+       pidlink%kc = kc
+       pidlink%ti = ti
+       pidlink%tr = tr
+       pidlink%errsum = 0.0
+
+       IF (pidlink%followflow) THEN
+          WRITE (msg,*) 'PID link #', recno, ' is link ', pidlink%id, ' and follows dischange'
+       ELSE
+          WRITE (msg,*) 'PID link #', recno, ' is link ', pidlink%id, ' and follows stage'
+       END IF
+       CALL status_message(msg)
+       WRITE (msg, *) 'PID Coefficients are as follows: '
+       CALL status_message(msg)
+       WRITE (msg, *) '   Kc = ', pidlink%kc
+       CALL status_message(msg)
+       WRITE (msg, *) '   Ti = ', pidlink%ti
+       CALL status_message(msg)
+       WRITE (msg, *) '   Tr = ', pidlink%tr
+       CALL status_message(msg)
+       
+       ! count the number of flows (signals) that are to be lagged
+       
+       DO i = 1, max_pid_lag
+          IF (lagvalues(i*2 - 1) .LE. -999.0) EXIT
+       END DO
+       pidlink%numflows = i - 1
+
+       IF (pidlink%numflows .LE. 0) THEN
+          WRITE(msg,*) TRIM(theconfig%pid_file),  &
+               &': no lagged signals specified for link ', pidlink%id
+          CALL error_message(msg)
+          ierr = ierr + 1
+       ELSE IF (pidlink%followflow .AND. pidlink%numflows .GT. 1) THEN
+          WRITE(msg,*) TRIM(theconfig%pid_file),&
+               &': too many lagged stages specified for link ', pidlink%id
+          CALL error_message(msg)
+          ierr = ierr + 1
+       END IF
+
+       ALLOCATE(pidlink%lagged(pidlink%numflows))
+       
+       IF (pidlink%followflow) THEN
+          WRITE (msg,*) 'PID link #', pidlink%id, 'uses the following lagged stage data: '
+       ELSE
+          WRITE (msg,*) 'PID link #', pidlink%id, 'uses the following lagged flow data: '
+       END IF
+       CALL status_message(msg)
+
+       DO i = 1, pidlink%numflows
+
+          ASSOCIATE (rec => pidlink%lagged(i))
+            
+            ! identify and check the specified link
+            
+            NULLIFY(rec%bc)
+            NULLIFY(rec%link)
+            lagid = INT(lagvalues(i*2 - 1))
+
+            IF (lagid .LT. 0) THEN
+               lagid = -lagid
+               rec%bc => bcman%find(LINK_BC_TYPE, lagid)
+               IF (.NOT. ASSOCIATED(rec%bc)) THEN
+                  WRITE(msg, *) TRIM(theconfig%pid_file), ': invalid link BC ', lagid, &
+                       &' for link ', pidlink%id
+                  CALL error_message(msg)
+                  ierr = ierr + 1
+               END IF
+            ELSE IF (pidlink%followflow) THEN
+               WRITE(msg, *) TRIM(theconfig%pid_file), ': record ', recno, &
+                    &': link ', pidlink%id, ' must specify a lagged stage link BC'
+               CALL error_message(msg)
+               ierr = ierr + 1
+            ELSE
+               rec%link => this%find(lagid)
+               IF (.NOT. ASSOCIATED(rec%link)) THEN
+                  WRITE(msg, *) TRIM(theconfig%pid_file), ': record ', recno, &
+                       &': link ', pidlink%id, 'uses lagged flow from link ', lagid, &
+                       &', which is not a valid link '
+                  CALL error_message(msg)
+                  ierr = ierr + 1
+               END IF
+            END IF
+
+            ! check the specified lag
+
+            lagtime = lagvalues(i*2)
+            IF (lagtime .LT. 0) THEN
+               WRITE (msg,*) TRIM(theconfig%pid_file), ': record ', recno, &
+                    &': link ', pidlink%id, ': invalid lag time: ', lagtime
+               CALL error_message(msg)
+               ierr = ierr + 1
+            END IF
+            rec%lag = lagtime
+
+            ! initialize the remainder of the
+            ! record
+
+            rec%nlag = MAX(INT(rec%lag/theconfig%time%step + 0.5), 1)
+            ALLOCATE(rec%flow(rec%nlag))
+
+            IF (ASSOCIATED(rec%bc)) THEN
+               WRITE (msg,*) '     Link Boundary Condition #', rec%link%id, &
+                    &' lagged ', rec%lag, ' days'
+            ELSE
+               WRITE (msg,*) '     Point 1 on Link #', rec%link%id, &
+                    &' lagged ', rec%lag, ' days'
+            END IF
+            CALL status_message(msg)
+          END ASSOCIATE
+       END DO
+
+    END DO
+
+    CLOSE(iounit)
+
+    IF (ierr .GT. 0) THEN
+       WRITE(msg, *) TRIM(theconfig%pid_file) // &
+            &': too many errors'
+       CALL error_message(msg, fatal=.TRUE.)
+
+    ELSE 
+       WRITE(msg, *) TRIM(theconfig%pid_file) // &
+            &': read completed'
+       CALL status_message(msg)
+    END IF
+
+  END SUBROUTINE link_manager_readpid
+
+
+  ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_scan
   ! ----------------------------------------------------------------
   SUBROUTINE link_manager_scan(theconfig)
@@ -195,6 +417,7 @@ CONTAINS
           WRITE(msg, *) TRIM(theconfig%link_file) // &
                &': error in or near link record ', recno
           CALL error_message(msg, fatal=.TRUE.)
+          ierr = ierr + 1
           EXIT
        END IF
 
@@ -208,6 +431,8 @@ CONTAINS
           theconfig%do_hydro_bc = .TRUE.
        CASE (3)
        CASE (5)
+       CASE (12)
+       CASE (13)
        CASE DEFAULT
           WRITE(msg, *) TRIM(theconfig%link_file), ': link record ', recno, &
                &': link type unknown (', ldata%ltype, ')'
@@ -241,12 +466,13 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     CLASS (section_handler), INTENT(INOUT) :: sectman
     INTEGER, PARAMETER :: lunit = 21
-    INTEGER :: recno, ierr, iostat
+    INTEGER :: recno, ierr, iostat, npid
     TYPE (link_input_data) :: ldata
     CHARACTER (LEN=1024) :: msg
 
     ierr = 0
     recno = 0
+    npid = 0
 
     CALL open_existing(theconfig%link_file, lunit, fatal=.TRUE.)
     ! FIXME: CALL print_output("LINKS ", 0.0)
@@ -331,6 +557,12 @@ CONTAINS
           ALLOCATE(ustage_link :: link)
        CASE (5)
           ALLOCATE(trib_inflow_link :: link)
+       CASE (12)
+          ALLOCATE(pid_flow_link :: link)
+          npid = npid + 1
+       CASE (13)
+          ALLOCATE(pid_link :: link)
+          npid = npid + 1
        CASE DEFAULT
           WRITE(msg, *) TRIM(theconfig%link_file), ': link record ', recno, &
                &': link type unknown (', ldata%ltype, ')'
@@ -361,6 +593,10 @@ CONTAINS
     CALL status_message(msg)
 
     CALL this%readpts(theconfig, sectman)
+
+    IF (npid .GT. 0) THEN
+       CALL this%readpid(theconfig, bcman, npid)
+    END IF
 
     RETURN
 

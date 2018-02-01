@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2018-01-22 13:11:33 d3g096
+! Last Change: 2018-02-01 08:02:21 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -82,7 +82,7 @@ CONTAINS
     USE fluvial_coeffs
     USE general_vars
     IMPLICIT NONE
-    CLASS (fluvial_link), INTENT(IN) :: this
+    CLASS (fluvial_link), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: dt
     TYPE (point_t), INTENT(IN) :: pt1, pt2
     TYPE (coeff), INTENT(OUT) :: cf

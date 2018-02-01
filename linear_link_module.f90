@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2018-01-22 09:44:17 d3g096
+! Last Change: 2018-02-01 08:02:11 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -440,7 +440,7 @@ CONTAINS
   SUBROUTINE linear_link_coeff(this, dt, pt1, pt2, cf)
 
     IMPLICIT NONE
-    CLASS (linear_link_t), INTENT(IN) :: this
+    CLASS (linear_link_t), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: dt
     TYPE (point_t), INTENT(IN) :: pt1, pt2
     TYPE (coeff), INTENT(OUT) :: cf

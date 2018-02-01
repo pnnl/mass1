@@ -317,7 +317,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
      CASE(1,20,21)
         fluvial = .TRUE.
         nonfluvial = .FALSE.
-     CASE(2,3,4,5,6,7,13)
+     CASE(2,3,4,5,6,7,12,13)
         fluvial = .FALSE.
         nonfluvial = .TRUE.
      END SELECT
