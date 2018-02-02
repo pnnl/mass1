@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October 10, 2001 by William A. Perkins
-! Last Change: 2018-01-30 10:28:39 d3g096
+! Last Change: 2018-02-02 13:46:00 d3g096
 ! ----------------------------------------------------------------
 
 
@@ -390,8 +390,9 @@ CONTAINS
     TYPE(coeff), INTENT(OUT) ::  cf
     TYPE (pidlink_rec), POINTER :: rec
 
-    DOUBLE PRECISION :: lag, eval, lval
-    CHARACTER (LEN=10) :: date_string, time_string
+    DOUBLE PRECISION :: lag, eval, lval, dt
+
+    dt = config%time%step
 
     rec => piddata(linkidmap(link))
 
@@ -403,7 +404,7 @@ CONTAINS
     cf%d = 1.0
     cf%g = q(link, point) - q(link, point + 1)
 
-    rec%errsum = rec%errsum + (y(link, point) -  rec%oldsetpt)*config%time%step
+    rec%errsum = rec%errsum + (y(link, point) -  rec%oldsetpt)*dt
     lag = pidlink_lagged_flow(rec)
 
                                 ! momentum coefficients 
@@ -419,9 +420,9 @@ CONTAINS
        eval = q(link, point)
        lval = y(link, point)
        IF (rec%ti .GT. 0.0) THEN
-          cf%dp = rec%kc*(1.0 + config%time%step/rec%ti + rec%tr/config%time%step)
+          cf%dp = rec%kc*(1.0 + dt/rec%ti + rec%tr/dt)
        ELSE
-          cf%dp = rec%kc*(1.0 + rec%tr/config%time%step)
+          cf%dp = rec%kc*(1.0 + rec%tr/dt)
        END IF
 
     ELSE
@@ -431,30 +432,30 @@ CONTAINS
        eval = y(link, point)
        lval = q(link, point)
        IF (rec%ti .GT. 0.0) THEN
-          cf%cp = rec%kc*(1.0 + config%time%step/rec%ti + rec%tr/config%time%step)
+          cf%cp = rec%kc*(1.0 + dt/rec%ti + rec%tr/dt)
        ELSE
-          cf%cp = rec%kc*(1.0 + rec%tr/config%time%step)
+          cf%cp = rec%kc*(1.0 + rec%tr/dt)
        END IF
 
     END IF
 
     IF (rec%ti .GT. 0.0) THEN
        cf%gp = lag - lval + &
-            & rec%kc*eval*(1.0 + config%time%step/rec%ti) - &
-            & rec%kc*setpt*(1.0 + config%time%step/rec%ti + rec%tr/config%time%step) + &
-            & rec%kc/rec%ti*rec%errsum + rec%kc*rec%tr/config%time%step*rec%oldsetpt
+            & rec%kc*eval*(1.0 + dt/rec%ti) - &
+            & rec%kc*setpt*(1.0 + dt/rec%ti + rec%tr/dt) + &
+            & rec%kc/rec%ti*rec%errsum + rec%kc*rec%tr/dt*rec%oldsetpt
     ELSE
        cf%gp = lag - lval + &
             & rec%kc*eval - &
-            & rec%kc*setpt*(1.0 + rec%tr/config%time%step) + &
-            & rec%kc*rec%tr/config%time%step*rec%oldsetpt
+            & rec%kc*setpt*(1.0 + rec%tr/dt) + &
+            & rec%kc*rec%tr/dt*rec%oldsetpt
     END IF
        
 
     rec%oldsetpt = setpt
 
-    WRITE (1,100) date_string, time_string, link, point, y(link, point), q(link, point), setpt, rec%oldsetpt, lag, rec%errsum
-100 FORMAT(A10, 1X, A8, 2(1X,I5), 6(1X,F10.2))
+    WRITE (1,100) link, point, y(link, point), q(link, point), setpt, rec%oldsetpt, lag, rec%errsum
+100 FORMAT(2(1X,I5), 6(1X,F10.2))
   END SUBROUTINE pidlink_coeff
 
 

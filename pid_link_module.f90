@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January 30, 2018 by William A. Perkins
-! Last Change: 2018-02-02 10:18:36 d3g096
+! Last Change: 2018-02-02 14:06:28 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE pid_link_module
@@ -189,6 +189,9 @@ CONTAINS
     TYPE (coeff), INTENT(OUT) :: cf
 
     DOUBLE PRECISION :: setpt, lag, eval, lval
+    DOUBLE PRECISION :: delta_t
+
+    delta_t = dt/3600.0/24.0
 
                                 ! continuity is the same in all cases
 
@@ -199,8 +202,7 @@ CONTAINS
     cf%g = pt1%hnow%q - pt2%hnow%q
 
     setpt = this%oldsetpt
-    this%errsum = this%errsum + &
-         &(pt1%hnow%y -  setpt)*dt
+    this%errsum = this%errsum + (pt1%hnow%y -  setpt)*delta_t
     lag = this%lag()
 
                                 ! momentum coefficients 
@@ -218,9 +220,9 @@ CONTAINS
        eval = pt1%hnow%q
        lval = pt1%hnow%y
        IF (this%ti .GT. 0.0) THEN
-          cf%dp = this%kc*(1.0 + dt/this%ti + this%tr/dt)
+          cf%dp = this%kc*(1.0 + delta_t/this%ti + this%tr/delta_t)
        ELSE
-          cf%dp = this%kc*(1.0 + this%tr/dt)
+          cf%dp = this%kc*(1.0 + this%tr/delta_t)
        END IF
 
     ELSE
@@ -230,23 +232,23 @@ CONTAINS
        eval = pt1%hnow%y
        lval = pt1%hnow%q
        IF (this%ti .GT. 0.0) THEN
-          cf%cp = this%kc*(1.0 + dt/this%ti + this%tr/dt)
+          cf%cp = this%kc*(1.0 + delta_t/this%ti + this%tr/delta_t)
        ELSE
-          cf%cp = this%kc*(1.0 + this%tr/dt)
+          cf%cp = this%kc*(1.0 + this%tr/delta_t)
        END IF
 
     END IF
 
     IF (this%ti .GT. 0.0) THEN
        cf%gp = lag - lval + &
-            & this%kc*eval*(1.0 + dt/this%ti) - &
-            & this%kc*setpt*(1.0 + dt/this%ti + this%tr/dt) + &
-            & this%kc/this%ti*this%errsum + this%kc*this%tr/dt*this%oldsetpt
+            & this%kc*eval*(1.0 + delta_t/this%ti) - &
+            & this%kc*setpt*(1.0 + delta_t/this%ti + this%tr/delta_t) + &
+            & this%kc/this%ti*this%errsum + this%kc*this%tr/delta_t*this%oldsetpt
     ELSE
        cf%gp = lag - lval + &
             & this%kc*eval - &
-            & this%kc*setpt*(1.0 + this%tr/dt) + &
-            & this%kc*this%tr/dt*this%oldsetpt
+            & this%kc*setpt*(1.0 + this%tr/delta_t) + &
+            & this%kc*this%tr/delta_t*this%oldsetpt
     END IF
        
 

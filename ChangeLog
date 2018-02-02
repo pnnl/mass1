@@ -1,5 +1,11 @@
 2018-02-02  William A. Perkins  <william.perkins@pnnl.gov>
 
+	* pid_link_module.f90 (pid_link_coeff): time step needs to be days
+	here, not seconds
+
+	* pidlink.f90 (pidlink_coeff): make a local time step variable for
+	readability 
+
 	* network.f90 (network_read_bcs): update the BCs after reading, so
 	they have a current value at initialization
 
