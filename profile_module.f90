@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created January 10, 2018 by William A. Perkins
-  ! Last Change: 2018-01-26 08:21:58 d3g096
+  ! Last Change: 2018-02-02 11:03:20 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE profile_module
@@ -68,7 +68,7 @@ MODULE profile_module
      INTEGER :: id
      TYPE (profile_pt_list) :: pts
      CHARACTER (LEN=1024), PRIVATE :: filename = ""
-     LOGICAL :: firstwrite = .TRUE.
+     LOGICAL, PRIVATE :: firstwrite = .TRUE.
    CONTAINS
      PROCEDURE :: fill => profile_fill
      PROCEDURE :: name => profile_name

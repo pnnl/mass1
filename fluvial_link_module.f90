@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2018-02-01 08:02:21 d3g096
+! Last Change: 2018-02-02 10:19:51 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -32,6 +32,7 @@ MODULE fluvial_link_module
      DOUBLE PRECISION :: latq, latqold
      DOUBLE PRECISION :: lpiexp
    CONTAINS
+     PROCEDURE :: construct => fluvial_link_construct
      PROCEDURE :: initialize => fluvial_link_initialize
      PROCEDURE :: coeff => fluvial_link_coeff
      PROCEDURE :: hydro_update => fluvial_link_hupdate
@@ -46,6 +47,23 @@ MODULE fluvial_link_module
   DOUBLE PRECISION, PARAMETER :: theta = 1.0
 
 CONTAINS
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE fluvial_link_construct
+  ! ----------------------------------------------------------------
+  SUBROUTINE fluvial_link_construct(this)
+
+    IMPLICIT NONE
+    CLASS (fluvial_link), INTENT(INOUT) :: this
+
+    CALL this%linear_link_t%construct()
+    NULLIFY(this%latbc%p)
+    this%latq = 0.0
+    this%latqold = 0.0
+    this%lpiexp = 0.0
+
+  END SUBROUTINE fluvial_link_construct
+
 
   ! ----------------------------------------------------------------
   !  FUNCTION fluvial_link_initialize

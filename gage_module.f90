@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  8, 2018 by William A. Perkins
-! Last Change: 2018-01-26 09:11:00 d3g096
+! Last Change: 2018-02-02 11:08:11 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -33,7 +33,7 @@ MODULE gage_module
      CHARACTER (LEN=256) :: gagename
      CLASS (point_t), POINTER :: pt
      CHARACTER (LEN=1024), PRIVATE :: filename
-     LOGICAL, PRIVATE :: header
+     LOGICAL, PRIVATE :: firstwrite = .TRUE.
    CONTAINS
      PROCEDURE, PRIVATE :: name => gage_name
      ! PROCEDURE, PRIVATE :: header 
@@ -109,7 +109,13 @@ CONTAINS
     INTEGER, PARAMETER :: gunit = 51
     DOUBLE PRECISION :: depth
 
-    OPEN(gunit, FILE=this%name(), ACTION="WRITE", POSITION="APPEND")
+    IF (this%firstwrite) THEN
+       CALL open_new(this%name(), gunit)
+    ELSE 
+       OPEN(gunit, FILE=this%name(), ACTION="WRITE", POSITION="APPEND")
+    END IF
+    this%firstwrite = .FALSE.
+    
     ASSOCIATE( pt => this%pt, h => this%pt%hnow, pr => this%pt%xsprop )
       depth = h%y - pt%thalweg
       WRITE(gunit,1010) date_string, time_string, &

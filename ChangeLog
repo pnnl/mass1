@@ -1,3 +1,18 @@
+2018-02-02  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* network.f90 (network_read_bcs): update the BCs after reading, so
+	they have a current value at initialization
+
+	* link_manager_module.f90 (link_manager_read): call
+	link_t%construct() after allocating the link
+
+	* fluvial_link_module.f90 (fluvial_link_construct): added
+
+	* gage_module.f90 (gage_output): add firstwrite attribute and use
+	it when opening the file
+
+	* link_module.f90 (link_construct): add construct method
+
 2018-01-26  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* test/flow/varied-pool/gage_control.dat: add / at line ends

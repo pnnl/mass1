@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2018-02-01 13:56:42 d3g096
+! Last Change: 2018-02-02 10:17:28 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -570,6 +570,10 @@ CONTAINS
           ierr = ierr + 1
           CYCLE
        END SELECT
+
+       ! Wouldn't it be nice to have constructors?
+
+       CALL link%construct()
 
        IF (link%initialize(ldata, bcman) .NE. 0) THEN
           WRITE(msg, *) TRIM(theconfig%link_file), ': link record ', recno, &

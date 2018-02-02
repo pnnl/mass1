@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2018-01-24 13:53:15 d3g096
+! Last Change: 2018-02-02 10:18:13 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -58,6 +58,7 @@ MODULE link_module
      TYPE (confluence_ptr) :: ucon, dcon
    CONTAINS
 
+     PROCEDURE :: construct => link_construct
      PROCEDURE (init_proc), DEFERRED :: initialize
      PROCEDURE (readpts_proc), DEFERRED :: readpts
      PROCEDURE  :: points => link_points
@@ -269,6 +270,22 @@ CONTAINS
   !   NULLIFY(link%dcon%p)
 
   ! END FUNCTION new_link_t
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_construct
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_construct(this)
+
+    IMPLICIT NONE
+    CLASS (link_t), INTENT(INOUT) :: this
+
+    NULLIFY(this%usbc%p)
+    NULLIFY(this%dsbc%p)
+    NULLIFY(this%ucon%p)
+    NULLIFY(this%dcon%p)
+
+  END SUBROUTINE link_construct
+
 
   ! ----------------------------------------------------------------
   !  FUNCTION link_initialize

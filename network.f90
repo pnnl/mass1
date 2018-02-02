@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2018-01-24 12:28:48 d3g096
+! Last Change: 2018-02-02 09:58:00 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -123,6 +123,8 @@ CONTAINS
     END IF
 
 
+    CALL this%bcs%update(this%config%time%begin)
+    CALL this%met%update(this%config%time%begin)
 
 
   END SUBROUTINE network_read_bcs

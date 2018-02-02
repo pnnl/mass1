@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January 30, 2018 by William A. Perkins
-! Last Change: 2018-02-01 14:19:29 d3g096
+! Last Change: 2018-02-02 10:18:36 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE pid_link_module
@@ -124,7 +124,6 @@ CONTAINS
 
     this%followflow = .FALSE.
     this%numflows = 0
-    this%oldsetpt = 0.0
     this%errsum = 0.0
     NULLIFY(this%lagged)
     this%lagready = .FALSE.
@@ -199,8 +198,9 @@ CONTAINS
     cf%d = 1.0
     cf%g = pt1%hnow%q - pt2%hnow%q
 
+    setpt = this%oldsetpt
     this%errsum = this%errsum + &
-         &(pt1%hnow%y -  this%oldsetpt)*dt
+         &(pt1%hnow%y -  setpt)*dt
     lag = this%lag()
 
                                 ! momentum coefficients 
@@ -252,8 +252,8 @@ CONTAINS
 
     this%oldsetpt = setpt
 
-!     WRITE (1,100) this%id, point, y(link, point), q(link, point), setpt, this%oldsetpt, lag, this%errsum
-! 100 FORMAT(A10, 1X, A8, 2(1X,I5), 6(1X,F10.2))
+    WRITE (1,100) this%id, pt1%hnow%y, pt1%hnow%q, setpt, this%oldsetpt, lag, this%errsum
+100 FORMAT(I5, 6(1X,F10.2))
   END SUBROUTINE pid_link_coeff
 
   ! ----------------------------------------------------------------
@@ -270,6 +270,10 @@ CONTAINS
 
     INTEGER :: i
     CLASS (point_t), POINTER :: pt
+    DOUBLE PRECISION :: setpt
+
+    setpt = this%usbc%p%current_value
+    this%oldsetpt = setpt
 
     DO i = 1, this%numflows
        
