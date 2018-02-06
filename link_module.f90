@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2018-02-02 10:18:13 d3g096
+! Last Change: 2018-02-06 09:47:37 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -26,13 +26,6 @@ MODULE link_module
   IMPLICIT NONE
 
   PRIVATE
-
-  ! ----------------------------------------------------------------
-  ! TYPE confluence_ptr (forward)
-  ! ----------------------------------------------------------------
-  TYPE, PUBLIC :: confluence_ptr
-     TYPE (confluence_t), POINTER :: p
-  END type confluence_ptr
 
   ! ----------------------------------------------------------------
   ! TYPE link_input_data
@@ -54,8 +47,8 @@ MODULE link_module
      INTEGER :: id
      INTEGER :: order
      INTEGER :: dsid, usbcid, dsbcid
-     TYPE (bc_ptr) :: usbc, dsbc
-     TYPE (confluence_ptr) :: ucon, dcon
+     CLASS (bc_t), POINTER :: usbc, dsbc
+     CLASS (confluence_t), POINTER :: ucon, dcon
    CONTAINS
 
      PROCEDURE :: construct => link_construct
@@ -221,10 +214,6 @@ MODULE link_module
      MODULE PROCEDURE new_confluence_t
   END INTERFACE
 
-  INTERFACE confluence_ptr
-     MODULE PROCEDURE new_confluence_ptr
-  END INTERFACE confluence_ptr
-
 CONTAINS
 
   ! ----------------------------------------------------------------
@@ -264,10 +253,10 @@ CONTAINS
 
   !   link%id = id
   !   link%dsid = dsid
-  !   NULLIFY(link%usbc%p)
-  !   NULLIFY(link%dsbc%p)
-  !   NULLIFY(link%ucon%p)
-  !   NULLIFY(link%dcon%p)
+  !   NULLIFY(link%usbc)
+  !   NULLIFY(link%dsbc)
+  !   NULLIFY(link%ucon)
+  !   NULLIFY(link%dcon)
 
   ! END FUNCTION new_link_t
 
@@ -279,10 +268,10 @@ CONTAINS
     IMPLICIT NONE
     CLASS (link_t), INTENT(INOUT) :: this
 
-    NULLIFY(this%usbc%p)
-    NULLIFY(this%dsbc%p)
-    NULLIFY(this%ucon%p)
-    NULLIFY(this%dcon%p)
+    NULLIFY(this%usbc)
+    NULLIFY(this%dsbc)
+    NULLIFY(this%ucon)
+    NULLIFY(this%dcon)
 
   END SUBROUTINE link_construct
 
@@ -454,16 +443,6 @@ CONTAINS
   END FUNCTION new_confluence_t
 
   ! ----------------------------------------------------------------
-  !  FUNCTION new_confluence_ptr
-  ! ----------------------------------------------------------------
-  FUNCTION new_confluence_ptr()
-
-    IMPLICIT NONE
-    TYPE (confluence_ptr) :: new_confluence_ptr
-    NULLIFY(new_confluence_ptr%p)
-  END FUNCTION new_confluence_ptr
-
-  ! ----------------------------------------------------------------
   ! FUNCTION confluence_coeff_e
   !
   ! This is called by the downstream link and returns the sum of the
@@ -630,8 +609,8 @@ CONTAINS
     INTEGER :: o
 
     o = order0
-    IF (ASSOCIATED(this%ucon%p)) THEN
-       o = this%ucon%p%set_order(o)
+    IF (ASSOCIATED(this%ucon)) THEN
+       o = this%ucon%set_order(o)
     END IF
     this%order = o
     order = o + 1

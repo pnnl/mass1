@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 17, 2017 by William A. Perkins
-! Last Change: 2018-02-01 08:02:01 d3g096
+! Last Change: 2018-02-06 09:43:10 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE nonfluvial_link_module
@@ -88,7 +88,7 @@ CONTAINS
 
     DOUBLE PRECISION :: bcval
 
-    bcval = this%usbc%p%current_value
+    bcval = this%usbc%current_value
 
     cf%a = 0.0
     cf%b = 1.0
@@ -119,8 +119,8 @@ CONTAINS
     ierr = 0
 
     IF (ldata%bcid .GT. 0) THEN
-       this%usbc%p => bcman%find(HYDRO_BC_TYPE, ldata%bcid)
-       IF (.NOT. ASSOCIATED(this%usbc%p) ) THEN
+       this%usbc => bcman%find(HYDRO_BC_TYPE, ldata%bcid)
+       IF (.NOT. ASSOCIATED(this%usbc) ) THEN
           WRITE (msg, *) 'link ', ldata%linkid, ': unknown hydro BC id: ', ldata%bcid
           CALL error_message(msg)
           ierr = ierr + 1
@@ -162,7 +162,7 @@ CONTAINS
     TYPE (coeff), INTENT(OUT) :: cf
 
     DOUBLE PRECISION :: bcval
-    bcval = this%usbc%p%current_value
+    bcval = this%usbc%current_value
 
     cf%a = 0.0
     cf%b = 1.0
@@ -190,7 +190,7 @@ CONTAINS
     TYPE (coeff), INTENT(OUT) :: cf
 
     DOUBLE PRECISION :: bcval
-    bcval = this%usbc%p%current_value
+    bcval = this%usbc%current_value
 
     cf%a = 1.0
     cf%b = eps
@@ -220,7 +220,7 @@ CONTAINS
     TYPE (coeff), INTENT(OUT) :: cf
 
     DOUBLE PRECISION :: bcval
-    bcval = this%usbc%p%current_value
+    bcval = this%usbc%current_value
 
      cf%a = 0.0
      cf%b = 1.0

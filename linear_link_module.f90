@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2018-02-01 08:02:11 d3g096
+! Last Change: 2018-02-06 09:44:57 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -75,10 +75,10 @@ CONTAINS
 
     ! find the "link" bc, if any; children can set this and it will be preserved
 
-    IF (.NOT. ASSOCIATED(this%usbc%p)) THEN
+    IF (.NOT. ASSOCIATED(this%usbc)) THEN
        IF (ldata%bcid .NE. 0) THEN
-          this%usbc%p => bcman%find(LINK_BC_TYPE, ldata%bcid)
-          IF (.NOT. ASSOCIATED(this%usbc%p) ) THEN
+          this%usbc => bcman%find(LINK_BC_TYPE, ldata%bcid)
+          IF (.NOT. ASSOCIATED(this%usbc) ) THEN
              WRITE (msg, *) 'link ', ldata%linkid, ': unknown link BC id: ', ldata%bcid
              CALL error_message(msg)
              ierr = ierr + 1
@@ -88,10 +88,10 @@ CONTAINS
 
     ! find the downstream bc, if any; children can set this and it will be preserved
 
-    IF (.NOT. ASSOCIATED(this%dsbc%p)) THEN
+    IF (.NOT. ASSOCIATED(this%dsbc)) THEN
        IF (ldata%dsbcid .NE. 0) THEN
-          this%dsbc%p => bcman%find(LINK_BC_TYPE, ldata%dsbcid)
-          IF (.NOT. ASSOCIATED(this%dsbc%p) ) THEN
+          this%dsbc => bcman%find(LINK_BC_TYPE, ldata%dsbcid)
+          IF (.NOT. ASSOCIATED(this%dsbc) ) THEN
              WRITE (msg, *) 'link ', ldata%linkid, &
                   &': unknown downstream BC id: ', ldata%dsbcid
              CALL error_message(msg)
@@ -464,12 +464,12 @@ CONTAINS
     TYPE (coeff) :: cf
 
     point = 1
-    IF (ASSOCIATED(this%ucon%p)) THEN
-       this%pt(point)%sweep%e = this%ucon%p%coeff_e()
-       this%pt(point)%sweep%f = this%ucon%p%coeff_f()
+    IF (ASSOCIATED(this%ucon)) THEN
+       this%pt(point)%sweep%e = this%ucon%coeff_e()
+       this%pt(point)%sweep%f = this%ucon%coeff_f()
     ELSE
-       IF (ASSOCIATED(this%usbc%p)) THEN
-          bcval = this%usbc%p%current_value
+       IF (ASSOCIATED(this%usbc)) THEN
+          bcval = this%usbc%current_value
        ELSE 
           bcval = 0.0
        END IF
@@ -512,14 +512,14 @@ CONTAINS
 
     point = this%npoints
     
-    IF (ASSOCIATED(this%dcon%p)) THEN
+    IF (ASSOCIATED(this%dcon)) THEN
 
-       dy = this%dcon%p%elev() - this%pt(point)%hnow%y
+       dy = this%dcon%elev() - this%pt(point)%hnow%y
        dq = this%pt(point)%sweep%e*dy + this%pt(point)%sweep%f
 
-    ELSE IF (ASSOCIATED(this%dsbc%p)) THEN
+    ELSE IF (ASSOCIATED(this%dsbc)) THEN
 
-       bcval = this%dsbc%p%current_value
+       bcval = this%dsbc%current_value
        SELECT CASE(dsbc_type)
        CASE(1)
           ! given downstream stage

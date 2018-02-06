@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2018-02-02 10:19:51 d3g096
+! Last Change: 2018-02-06 09:42:21 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -23,12 +23,10 @@ MODULE fluvial_link_module
 
   IMPLICIT NONE
 
-  CHARACTER (LEN=80), PRIVATE, SAVE :: rcsid = "$Id$"
-
   PRIVATE
 
   TYPE, PUBLIC, EXTENDS(linear_link_t) :: fluvial_link
-     TYPE (bc_ptr) :: latbc
+     CLASS (bc_t), POINTER :: latbc
      DOUBLE PRECISION :: latq, latqold
      DOUBLE PRECISION :: lpiexp
    CONTAINS
@@ -57,7 +55,7 @@ CONTAINS
     CLASS (fluvial_link), INTENT(INOUT) :: this
 
     CALL this%linear_link_t%construct()
-    NULLIFY(this%latbc%p)
+    NULLIFY(this%latbc)
     this%latq = 0.0
     this%latqold = 0.0
     this%lpiexp = 0.0
@@ -81,8 +79,8 @@ CONTAINS
 
     this%lpiexp = ldata%lpiexp
     IF (ldata%lbcid .GT. 0) THEN
-       this%latbc%p => bcman%find(LATFLOW_BC_TYPE, ldata%lbcid)
-       IF (.NOT. ASSOCIATED(this%latbc%p)) THEN
+       this%latbc => bcman%find(LATFLOW_BC_TYPE, ldata%lbcid)
+       IF (.NOT. ASSOCIATED(this%latbc)) THEN
           WRITE (msg, *) 'link ', ldata%linkid, ': unknown lateral inflow id: ', &
                &ldata%lbcid
           CALL error_message(msg)
@@ -110,7 +108,6 @@ CONTAINS
     DOUBLE PRECISION :: y1, y2, d1, d2, q1, q2, a1, a2, b1, b2, k1, k2, ky1, ky2
     DOUBLE PRECISION :: fr1, fr2
     DOUBLE PRECISION :: dx
-    DOUBLE PRECISION :: beta, fravg, gp1, gp2, gp3, gp4, sigma
 
     ! FIXME: These need to come from the configuration:
     DOUBLE PRECISION :: gr
@@ -147,17 +144,15 @@ CONTAINS
   ! SUBROUTINE fluvial_link_hupdate
   ! ----------------------------------------------------------------
   SUBROUTINE fluvial_link_hupdate(this, res_coeff, grav, dt)
-    USE general_vars, ONLY: depth_minimum
-
     IMPLICIT NONE
     CLASS (fluvial_link), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: res_coeff, grav, dt
 
     CALL this%linear_link_t%hydro_update(res_coeff, grav, dt)
 
-    IF (ASSOCIATED(this%latbc%p)) THEN
+    IF (ASSOCIATED(this%latbc)) THEN
        this%latqold = this%latq
-       this%latq = this%latbc%p%current_value
+       this%latq = this%latbc%current_value
     END IF
 
   END SUBROUTINE fluvial_link_hupdate
@@ -178,8 +173,8 @@ CONTAINS
     ierr = 0
 
     IF (ldata%bcid .GT. 0) THEN
-       this%usbc%p => bcman%find(HYDRO_BC_TYPE, ldata%bcid)
-       IF (.NOT. ASSOCIATED(this%usbc%p) ) THEN
+       this%usbc => bcman%find(HYDRO_BC_TYPE, ldata%bcid)
+       IF (.NOT. ASSOCIATED(this%usbc) ) THEN
           WRITE (msg, *) 'link ', ldata%linkid, ': unknown hydro BC id: ', ldata%bcid
           CALL error_message(msg)
           ierr = ierr + 1

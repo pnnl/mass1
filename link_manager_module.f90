@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2018-02-02 10:17:28 d3g096
+! Last Change: 2018-02-06 09:45:48 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -631,8 +631,8 @@ CONTAINS
     link => this%links%current()
     
     DO WHILE (ASSOCIATED(link))
-       NULLIFY(link%ucon%p)
-       NULLIFY(link%dcon%p)
+       NULLIFY(link%ucon)
+       NULLIFY(link%dcon)
        CALL this%links%next()
        link => this%links%current()
     END DO
@@ -677,14 +677,14 @@ CONTAINS
              CALL error_message(msg)
              ierr = ierr + 1
           END IF
-          IF (.NOT. ASSOCIATED(dlink%ucon%p)) THEN 
+          IF (.NOT. ASSOCIATED(dlink%ucon)) THEN 
              ALLOCATE(con)
              con = confluence_t(dlink)
-             dlink%ucon%p => con
+             dlink%ucon => con
              NULLIFY(con)
           END IF
-          CALL dlink%ucon%p%ulink%push(link)
-          link%dcon%p => dlink%ucon%p
+          CALL dlink%ucon%ulink%push(link)
+          link%dcon => dlink%ucon
        END IF
        
        CALL this%links%next()
@@ -712,14 +712,14 @@ CONTAINS
     DO WHILE (ASSOCIATED(dlink))
        WRITE(msg, '("link ", I4, "(order = ", I4, ") upstream links:")') &
             &dlink%id, dlink%order
-       IF (ASSOCIATED(dlink%ucon%p)) THEN
-          CALL dlink%ucon%p%ulink%begin()
-          link => dlink%ucon%p%ulink%current()
+       IF (ASSOCIATED(dlink%ucon)) THEN
+          CALL dlink%ucon%ulink%begin()
+          link => dlink%ucon%ulink%current()
           DO WHILE (ASSOCIATED(link))
              WRITE(lbl, '(I4)') link%id
              msg = TRIM(msg) // " " // TRIM(lbl)
-             CALL dlink%ucon%p%ulink%next()
-             link => dlink%ucon%p%ulink%current()
+             CALL dlink%ucon%ulink%next()
+             link => dlink%ucon%ulink%current()
           END DO
        ELSE 
           msg = TRIM(msg) // " none"

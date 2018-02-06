@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January 30, 2018 by William A. Perkins
-! Last Change: 2018-02-02 14:06:28 d3g096
+! Last Change: 2018-02-06 09:43:21 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE pid_link_module
@@ -130,7 +130,7 @@ CONTAINS
 
     ierr = this%linear_link_t%initialize(ldata, bcman)
 
-    IF (.NOT. ASSOCIATED(this%usbc%p)) THEN 
+    IF (.NOT. ASSOCIATED(this%usbc)) THEN 
        WRITE(msg, *) 'link ', this%id, &
             &': PID links must have an upstream boundary condition'
        CALL error_message(msg, fatal=.TRUE.)
@@ -210,7 +210,7 @@ CONTAINS
     cf%ap = 0.0
     cf%bp = 0.0
 
-    setpt = this%usbc%p%current_value
+    setpt = this%usbc%current_value
 
 
     IF (this%followflow) THEN
@@ -274,7 +274,7 @@ CONTAINS
     CLASS (point_t), POINTER :: pt
     DOUBLE PRECISION :: setpt
 
-    setpt = this%usbc%p%current_value
+    setpt = this%usbc%current_value
     this%oldsetpt = setpt
 
     DO i = 1, this%numflows
