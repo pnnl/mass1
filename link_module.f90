@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2018-02-06 09:47:37 d3g096
+! Last Change: 2018-02-07 11:37:13 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -83,6 +83,10 @@ MODULE link_module
      ! get a point on a link (if any)
 
      PROCEDURE :: point => link_point
+
+     ! perform sanity checks 
+
+     PROCEDURE :: check => link_check
 
   END type link_t
 
@@ -617,6 +621,18 @@ CONTAINS
 
   END FUNCTION link_set_order
 
+  ! ----------------------------------------------------------------
+  !  FUNCTION link_check
+  ! ----------------------------------------------------------------
+  FUNCTION link_check(this) RESULT(ierr)
+
+    IMPLICIT NONE
+    INTEGER :: ierr
+    CLASS (link_t), INTENT(INOUT) :: this
+
+    ierr = 0
+
+  END FUNCTION link_check
 
 
 END MODULE link_module

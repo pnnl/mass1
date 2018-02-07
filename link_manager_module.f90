@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2018-02-06 09:45:48 d3g096
+! Last Change: 2018-02-07 11:32:14 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -466,7 +466,7 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     CLASS (section_handler), INTENT(INOUT) :: sectman
     INTEGER, PARAMETER :: lunit = 21
-    INTEGER :: recno, ierr, iostat, npid
+    INTEGER :: recno, ierr, iostat, npid, npt
     TYPE (link_input_data) :: ldata
     CHARACTER (LEN=1024) :: msg
 
@@ -602,6 +602,23 @@ CONTAINS
        CALL this%readpid(theconfig, bcman, npid)
     END IF
 
+    ! have all the links do a sanity check
+
+    ierr = 0
+    CALL this%links%begin()
+    link => this%links%current()
+    
+    DO WHILE (ASSOCIATED(link))
+       ierr = ierr + link%check()
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+
+    IF (ierr .GT. 0) THEN
+       msg = TRIM(theconfig%link_file) // ': link errors'
+       CALL error_message(msg, fatal = .TRUE.)
+    END IF
+   
     RETURN
 
   END SUBROUTINE link_manager_read

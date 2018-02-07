@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2018-01-26 09:57:24 d3g096
+! Last Change: 2018-02-07 10:39:12 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -70,18 +70,21 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: res_coeff
     DOUBLE PRECISION :: depth
 
-    depth = this%hnow%y - this%thalweg
-    CALL this%xsection%p%props(depth, this%xsprop)
-    this%xsprop%conveyance = &
-         &res_coeff*this%kstrick*this%xsprop%conveyance
-    this%xsprop%dkdy = &
-         &res_coeff*this%kstrick*this%xsprop%dkdy
-    IF (this%xsprop%area .GT. 0.0D00) THEN
-       this%hnow%v = this%hnow%q/this%xsprop%area
-    ELSE 
-       this%hnow%v = 0.0
-       this%xsprop%area = 0.0
-    END IF
+    ASSOCIATE ( xs => this%xsection%p )
+
+      depth = this%hnow%y - this%thalweg
+      CALL xs%props(depth, this%xsprop)
+      this%xsprop%conveyance = &
+           &res_coeff*this%kstrick*this%xsprop%conveyance
+      this%xsprop%dkdy = &
+           &res_coeff*this%kstrick*this%xsprop%dkdy
+      IF (this%xsprop%area .GT. 0.0D00) THEN
+         this%hnow%v = this%hnow%q/this%xsprop%area
+      ELSE 
+         this%hnow%v = 0.0
+         this%xsprop%area = 0.0
+      END IF
+    END ASSOCIATE
 
   END SUBROUTINE point_section_update
 

@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2018-02-06 09:44:57 d3g096
+! Last Change: 2018-02-07 11:45:09 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -48,6 +48,7 @@ MODULE linear_link_module
      PROCEDURE :: backward_sweep => linear_link_backward
      PROCEDURE :: hydro_update => linear_link_hupdate
      PROCEDURE :: point => linear_link_point
+     PROCEDURE :: check => linear_link_check
      PROCEDURE :: destroy => linear_link_destroy
   END type linear_link_t
 
@@ -563,7 +564,7 @@ CONTAINS
 
     INTEGER :: p
     DOUBLE PRECISION :: dx
-    
+
     DO p = 1, this%npoints
        IF (p .GE. this%npoints) THEN
           dx = ABS(this%pt(p-1)%x - this%pt(p)%x)
@@ -596,7 +597,39 @@ CONTAINS
     END IF
   END FUNCTION linear_link_point
 
-    
+  ! ----------------------------------------------------------------
+  !  FUNCTION linear_link_check
+  ! ----------------------------------------------------------------
+  FUNCTION linear_link_check(this) RESULT(ierr)
+
+    IMPLICIT NONE
+    INTEGER :: ierr
+    CLASS (linear_link_t), INTENT(INOUT) :: this
+    INTEGER :: i
+    CHARACTER (LEN=1024) :: msg
+    CLASS (point_t), POINTER :: pt
+
+    ! why cant I do this
+    ! ierr = this%link_t%check()
+    ierr = 0
+    IF (this%points() .LE. 0) THEN
+       WRITE(msg, *) 'link ', this%id, ': has zero points?'
+       CALL error_message(msg)
+       ierr = ierr + 1
+    ELSE
+       DO i = 1, this%points()
+          pt => this%point(i)
+          IF (.NOT. ASSOCIATED(pt%xsection%p)) THEN
+             WRITE (msg, *) 'link ', this%id, ': point ', i, &
+                  &': no cross section assigned'
+             CALL error_message(msg)
+             ierr = ierr + 1
+          END IF
+       END DO
+            
+    END IF
+  END FUNCTION linear_link_check
+
   ! ----------------------------------------------------------------
   ! SUBROUTINE linear_link_destroy
   ! ----------------------------------------------------------------

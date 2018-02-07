@@ -1,3 +1,12 @@
+2018-02-07  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* link_manager_module.f90 (link_manager_read): have all links do a
+	sanity check
+
+	* linear_link_module.f90 (linear_link_check): added
+
+	* link_module.f90 (link_check): added
+
 2018-02-06  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* fluvial_link_module.f90: use POINTERs for BCs instead of bc_ptr 
