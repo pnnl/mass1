@@ -12,6 +12,9 @@
 	* profile_module.f90 (profile_output): leave the output unit open
 	until the profile is destroyed
 
+	* cross_section.f90 (cross_section): make
+	rectangular_flood_section a compound section
+
 2018-02-07  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* link_manager_module.f90 (link_manager_read): have all links do a

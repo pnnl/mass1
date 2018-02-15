@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2018-02-15 13:29:02 d3g096
+! Last Change: 2018-02-15 13:33:53 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -115,16 +115,6 @@ MODULE cross_section
      PROCEDURE :: read => trapezoidal_read
      PROCEDURE :: props => trapezoidal_props
   END type trapezoidal_section
-  ! ----------------------------------------------------------------
-  ! TYPE rectangular_flood_section
-  ! ----------------------------------------------------------------
-  TYPE, PUBLIC, EXTENDS(rectangular_section) :: rectangular_flood_section
-     DOUBLE PRECISION :: depth_main
-     DOUBLE PRECISION :: bottom_width_flood
-   CONTAINS
-     PROCEDURE :: read => rectangular_flood_read
-     PROCEDURE :: props => rectangular_flood_props
-  END type rectangular_flood_section
 
   ! ----------------------------------------------------------------
   ! TYPE triangular_section
@@ -170,6 +160,14 @@ MODULE cross_section
      PROCEDURE :: props => compound_props
      PROCEDURE :: destroy => compound_destroy
   END type compound_section_t
+
+  ! ----------------------------------------------------------------
+  ! TYPE rectangular_flood_section
+  ! ----------------------------------------------------------------
+  TYPE, PUBLIC, EXTENDS(compound_section_t) :: rectangular_flood_section
+   CONTAINS
+     PROCEDURE :: read => rectangular_flood_read
+  END type rectangular_flood_section
 
   ! ----------------------------------------------------------------
   ! TYPE general_section
@@ -342,35 +340,27 @@ CONTAINS
     CLASS(rectangular_flood_section), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: iounit
     INTEGER, INTENT(OUT) :: ioerr
-
+    DOUBLE PRECISION :: depth_main, bottom_width, bottom_width_flood
+    CLASS (rectangular_section), POINTER :: s1, s2
+    
+    
     READ(iounit,*,IOSTAT=ioerr) &
-         &this%depth_main, this%bottom_width, this%bottom_width_flood
+         &depth_main, bottom_width, bottom_width_flood
 
+    this%nsect = 2
+    ALLOCATE(this%sect(this%nsect), this%selev(this%nsect))
+    this%selev(1) = 0
+    this%selev(2) = depth_main
+
+    ALLOCATE(rectangular_section :: s1)
+    s1%bottom_width = bottom_width
+    this%sect(1)%p => s1
+    ALLOCATE(rectangular_section :: s2)
+    s2%bottom_width = bottom_width_flood
+    this%sect(2)%p => s2
+    
   END SUBROUTINE rectangular_flood_read
 
-  ! ----------------------------------------------------------------
-  ! SUBROUTINE rectangular_flood_props
-  ! ----------------------------------------------------------------
-  SUBROUTINE rectangular_flood_props(this, depth, props)
-
-    IMPLICIT NONE
-    CLASS(rectangular_flood_section), INTENT(IN) :: this
-    DOUBLE PRECISION, INTENT(IN) :: depth
-    TYPE (xsection_prop), INTENT(OUT) :: props
-    
-    IF (depth .LE. this%depth_main) THEN
-       CALL rectangular_props(this, depth, props)
-    ELSE
-       props%depth = depth
-       props%area = this%depth_main*this%bottom_width + &
-            &(depth - this%depth_main)*this%bottom_width_flood
-       props%wetperim = 2*depth + this%bottom_width_flood
-       props%topwidth = this%bottom_width_flood
-       props%hydrad = props%area/props%wetperim
-       props%conveyance = (props%area**(5./3.))/(props%wetperim**(2./3.))
-       props%dkdy = props%conveyance*(5.0*props%topwidth/props%area - 4.0/props%wetperim)/3.0
-    ENDIF
-  END SUBROUTINE rectangular_flood_props
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE triangular_read
@@ -550,8 +540,10 @@ CONTAINS
     DO i = 1, this%nsect
        IF (y .LE. this%selev(i)) EXIT
        d = y - this%selev(i)
-       IF (i .GT. 1) THEN
-          d = MIN(d, y - this%selev(i-1))
+       IF (i .LT. this%nsect) THEN
+          IF (y .GT. this%selev(i+1)) THEN
+             d = this%selev(i+1) - this%selev(i)
+          END IF
        END IF
        CALL this%sect(i)%p%props(d, p0)
        props%wetperim = props%wetperim + p0%wetperim - props%topwidth
