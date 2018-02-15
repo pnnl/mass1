@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  8, 2018 by William A. Perkins
-! Last Change: 2018-02-02 11:08:11 d3g096
+! Last Change: 2018-02-15 10:15:13 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -31,6 +31,7 @@ MODULE gage_module
   TYPE, PRIVATE :: gage_t
      INTEGER :: link_id, point_idx
      CHARACTER (LEN=256) :: gagename
+     INTEGER :: gunit
      CLASS (point_t), POINTER :: pt
      CHARACTER (LEN=1024), PRIVATE :: filename
      LOGICAL, PRIVATE :: firstwrite = .TRUE.
@@ -70,6 +71,10 @@ MODULE gage_module
      PROCEDURE :: output => gage_manager_output
      PROCEDURE :: destroy => gage_manager_destroy
   END type gage_manager
+
+  ! This is base for stupid Fortran I/O unit numbers for gage output. 
+  INTEGER, PARAMETER :: gunit_base = 201
+  INTEGER :: gunit_current
   
 CONTAINS
 
@@ -106,19 +111,19 @@ CONTAINS
     CLASS (gage_t), INTENT(INOUT) :: this
     CHARACTER (LEN=*), INTENT(IN) :: date_string, time_string
 
-    INTEGER, PARAMETER :: gunit = 51
     DOUBLE PRECISION :: depth
 
     IF (this%firstwrite) THEN
-       CALL open_new(this%name(), gunit)
-    ELSE 
-       OPEN(gunit, FILE=this%name(), ACTION="WRITE", POSITION="APPEND")
+       this%gunit = gunit_current
+       gunit_current = gunit_current + 1
+       CALL open_new(this%name(), this%gunit)
+       ! need to write a header
     END IF
     this%firstwrite = .FALSE.
     
     ASSOCIATE( pt => this%pt, h => this%pt%hnow, pr => this%pt%xsprop )
       depth = h%y - pt%thalweg
-      WRITE(gunit,1010) date_string, time_string, &
+      WRITE(this%gunit,1010) date_string, time_string, &
            &h%y, h%q, h%v , depth, &
            & 0.0 , 0.0, 0.0, 0.0, &
            &pt%thalweg, pr%area, pr%topwidth, pr%hydrad,&
@@ -128,7 +133,6 @@ CONTAINS
 1010 FORMAT(a10,2x,a8,2x,f8.2,2x,f12.2,2x,f6.2,2x,f7.2,2x,f10.2,2x,f6.2,2x,f6.2,2x,f6.1,2x, &
           f8.2,2x,es10.2,2x, &
           f8.2,2x,f6.2,f6.2,es10.2,2x,es10.2)
-     CLOSE(gunit)
   END SUBROUTINE gage_output
 
 
@@ -140,6 +144,7 @@ CONTAINS
     IMPLICIT NONE
     CLASS (gage_t), INTENT(INOUT) :: this
 
+    CLOSE(this%gunit)
     NULLIFY(this%pt)
 
   END SUBROUTINE gage_destroy
@@ -245,6 +250,8 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     CLASS (point_t), POINTER :: point
     CHARACTER (LEN=1024) :: msg
+
+    gunit_current = gunit_base
 
     CALL open_existing(fname, gcunit, fatal=.TRUE.)
 

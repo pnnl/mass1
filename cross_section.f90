@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2017-09-11 10:27:26 d3g096
+! Last Change: 2018-02-15 13:29:02 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -810,10 +810,12 @@ CONTAINS
     DOUBLE PRECISION, ALLOCATABLE :: xy(:)
 
     READ(iounit,*,IOSTAT=ioerr) tmp_delta_y, num_pairs
-    ALLOCATE(xy(2*num_pairs))
-    READ(iounit,*,IOSTAT=ioerr) xy(1:2*num_pairs)
+    ALLOCATE(xy(2*(num_pairs+1))) !allocate too many to make sure all are read
+    xy = -9999.0
+    READ(iounit,*,IOSTAT=ioerr) xy(1:2*(num_pairs+1))
     
     CALL this%build(tmp_delta_y, num_pairs, xy)
+    DEALLOCATE(xy)
 
   END SUBROUTINE general_read
 

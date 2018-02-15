@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created January 10, 2018 by William A. Perkins
-  ! Last Change: 2018-02-02 11:03:20 d3g096
+  ! Last Change: 2018-02-15 11:02:19 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE profile_module
@@ -68,6 +68,7 @@ MODULE profile_module
      INTEGER :: id
      TYPE (profile_pt_list) :: pts
      CHARACTER (LEN=1024), PRIVATE :: filename = ""
+     INTEGER :: punit
      LOGICAL, PRIVATE :: firstwrite = .TRUE.
    CONTAINS
      PROCEDURE :: fill => profile_fill
@@ -117,6 +118,9 @@ MODULE profile_module
      PROCEDURE :: destroy => profile_manager_destroy
   END type profile_manager
   
+  ! This is base for stupid Fortran I/O unit numbers for profile output. 
+  INTEGER, PARAMETER :: punit_base = 501
+  INTEGER :: punit_current
 
 CONTAINS
 
@@ -249,6 +253,8 @@ CONTAINS
     new_profile_t%id = id
     new_profile_t%pts = profile_pt_list()
     new_profile_t%filename = ""
+    new_profile_t%punit = punit_current
+    punit_current = punit_current + 1
     new_profile_t%firstwrite = .TRUE.
   END FUNCTION new_profile_t
 
@@ -355,9 +361,7 @@ CONTAINS
     DOUBLE PRECISION :: depth
 
     IF (this%firstwrite) THEN
-       CALL open_new(this%name(), punit)
-    ELSE 
-       OPEN(punit, FILE=this%name(), ACTION="WRITE", POSITION="APPEND")
+       CALL open_new(this%name(), this%punit)
     END IF
     this%firstwrite = .FALSE.
 
@@ -387,8 +391,6 @@ CONTAINS
        pt => this%pts%current()
     END DO
 
-    CLOSE(punit)
-
 1110 FORMAT('#',160('-'))
 1010 FORMAT('#Profile Number - ',i3,'   for Date: ',a10,'  Time: ',a8,'  Max number of points on profile = ',i6/)
 1005 FORMAT('#link',8x,'point',2x,'distance',2x,'water elev',3x,'discharge',5x,'vel',2x,'depth', &
@@ -408,6 +410,8 @@ CONTAINS
 
     IMPLICIT NONE
     CLASS (profile_t), INTENT(INOUT) :: this
+
+    CLOSE(this%punit)
     CALL this%pts%clear()
     
 
@@ -527,6 +531,7 @@ CONTAINS
 
     line = 0
     pid = 0
+    punit_current = punit_base
 
     CALL open_existing(filename, punit, fatal=.TRUE.)
     DO WHILE(.TRUE.)

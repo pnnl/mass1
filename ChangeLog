@@ -1,3 +1,17 @@
+2018-02-15  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* cross_section.f90 (general_read): make sure all the points are
+	read 
+
+	* gage_module.f90 (gage_output): leave the output unit open until
+	destruction 
+
+	* point_module.f90 (point_hydro_update): need to check depth
+	before updating the section
+
+	* profile_module.f90 (profile_output): leave the output unit open
+	until the profile is destroyed
+
 2018-02-07  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* link_manager_module.f90 (link_manager_read): have all links do a

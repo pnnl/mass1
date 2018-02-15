@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2018-02-07 10:39:12 d3g096
+! Last Change: 2018-02-15 10:00:35 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -123,7 +123,6 @@ CONTAINS
     DOUBLE PRECISION :: depth
 
     this%hold = this%hnow
-    CALL this%section_update(res_coeff)
 
     ASSOCIATE (h => this%hnow, xs => this%xsprop)
 
@@ -131,6 +130,8 @@ CONTAINS
       IF (depth .LT. depth_minimum) THEN
          h%y = this%thalweg + depth_minimum
       END IF
+
+      CALL this%section_update(res_coeff)
 
       IF (xs%area .GT. 0.0) THEN
          h%froude_num = &
