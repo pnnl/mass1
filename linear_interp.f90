@@ -60,17 +60,16 @@ DOUBLE PRECISION FUNCTION dlinear_interp(x0,y0,x1,y1,y)
   ! y - y0 = slope*(x - x0)
 
   DOUBLE PRECISION :: x0,y0,x1,y1,slope,y
-  DOUBLE PRECISION :: dx, rdx
+  DOUBLE PRECISION :: dx, rdx, xtest
+  DOUBLE PRECISION, PARAMETER :: eps = 1.0D-100
 
   dx = x1 - x0
 
-  IF (ABS(dx) .LT. 1.0D-250) dx = 0.0
+  IF (ABS(dx) .LT. eps) dx = 0.0
 
-
-  IF (x0 .NE. 0.0) THEN
-     rdx = ABS(dx/x0)
-  ELSE IF (x1 .NE. 0.0) THEN
-     rdx = ABS(dx/x1)
+  xtest = MAX(ABS(x1), ABS(x0))
+  IF (xtest .GT. eps) THEN
+     rdx = ABS(dx/xtest)
   ELSE
      rdx = 0.0
   END IF
