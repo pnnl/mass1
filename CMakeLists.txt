@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2018-02-01 07:05:51 d3g096
+# Last Change: 2018-03-07 14:54:27 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -186,7 +186,6 @@ add_executable(svgrptest svgrp-test.f90 svgrp.f90)
 add_executable(mass1_new
   mass1_new.f90
   "${CMAKE_CURRENT_BINARY_DIR}/banner.f90"
-  bc_module.f90
   bc_module.f90
   coeff.f90
   cross_section.f90
