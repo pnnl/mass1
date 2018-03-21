@@ -40,7 +40,7 @@ USE confluence_module
 
 IMPLICIT NONE
 
-INTEGER :: maxlinks, maxpoint
+INTEGER :: maxlinks, maxpoint, i
 maxlinks = config%maxlinks
 maxpoint = config%maxpoint
 
@@ -57,6 +57,11 @@ ALLOCATE(maxpoints(maxlinks),linkname(maxlinks),linkorder(maxlinks),linktype(max
 ALLOCATE(linkbc_table(maxlinks),ds_conlink(maxlinks))
 ALLOCATE(comporder(maxlinks),dsbc_table(maxlinks),transbc_table(maxlinks),tempbc_table(maxlinks))
 ALLOCATE(usbc(maxlinks), dsbc(maxlinks), latbc(maxlinks))
+DO i = 1, maxlinks
+   NULLIFY(usbc(i)%p)
+   NULLIFY(dsbc(i)%p)
+   NULLIFY(latbc(i)%p)
+END DO
 ALLOCATE(latflowbc_table(maxlinks), metzone(maxlinks))
 latflowbc_table = 0
 ALLOCATE(lattransbc_table(maxlinks), lattempbc_table(maxlinks))
@@ -86,6 +91,11 @@ ALLOCATE(section_number(maxlinks,maxpoint))
 ALLOCATE(ptsection(maxlinks, maxpoint))
 ALLOCATE(y_old(maxlinks,maxpoint))
 ALLOCATE(ucon(maxlinks), dcon(maxlinks))
+
+DO i = 1, maxlinks
+   NULLIFY(ucon(i)%p)
+   NULLIFY(dcon(i)%p)
+END DO
 
 !MODULE transport_vars
 

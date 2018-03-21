@@ -95,7 +95,7 @@ SUBROUTINE allocate_species(error_iounit,status_iounit)
 
   IMPLICIT NONE
   INTEGER :: alloc_stat,error_iounit,status_iounit
-  INTEGER :: maxlinks, maxpoint
+  INTEGER :: maxlinks, maxpoint, i, j
 
   maxlinks = config%maxlinks
   maxpoint = config%maxpoint
@@ -126,6 +126,12 @@ SUBROUTINE allocate_species(error_iounit,status_iounit)
      WRITE(status_iounit,*)'allocation successful for scalar hydrodynamic variables'
   ENDIF
 
+  DO i = 1, maxlinks
+     DO j = 1, max_species
+        NULLIFY(sclrbc(i, j)%p)
+        NULLIFY(latsclrbc(i, j)%p)
+     END DO
+  END DO
 
 END SUBROUTINE allocate_species
 
