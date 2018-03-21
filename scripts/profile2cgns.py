@@ -21,7 +21,7 @@ import fileinput
 from optparse import OptionParser
 import numarray
 import CGNS
-import mx.DateTime
+import datetime
 
 # -------------------------------------------------------------
 # striptitle
@@ -176,7 +176,7 @@ if (options.pstart > options.pend):
 
 if (options.basedate):
     try:
-        basedate = mx.DateTime.strptime(options.basedate, "%m-%d-%Y %H:%M:%S")
+        basedate = datetime.datetime.strptime(options.basedate, "%m-%d-%Y %H:%M:%S")
     except:
         parser.error("specified base date (%s) not understood\n" % options.basedate)
 
@@ -205,7 +205,7 @@ sollist = open(sollistname, "w")
 
 ip = 0
 ipt = 0
-datetime = None
+thedatetime = None
 found1 = None
 first = 1
 zname = 'Undefined'
@@ -237,16 +237,17 @@ for line in fileinput.input(args[0]):
             writefield(cgns, baseidx, zoneidx, solidx, "Depth", D, ni, nj, nk)
             writefield(cgns, baseidx, zoneidx, solidx, "Temperature", T, ni, nj, nk)
             writefield(cgns, baseidx, zoneidx, solidx, "ShearStress", S, ni, nj, nk)
-            datetime = mx.DateTime.strptime(zname, "%m-%d-%Y %H:%M:%S")
+            thedatetime = datetime.datetime.strptime(zname, "%m-%d-%Y %H:%M:%S")
             delta = None
             if (basedate):
-                delta = datetime - basedate
+                delta = thedatetime - basedate
             else:
-                delta = datetime - DateTime(datetime.year, 1, 1)
-            (d, s) = delta.absvalues()
+                delta = thedatetime - datetime(thedatetime.year, 1, 1)
+            # (d, s) = delta.absvalues()
+            s = delta.total_seconds()
             
             sollist.write("%12.0f %s %10d # %s\n" %
-                          ( (d*86400 + s), cgnsname, solidx, zname))
+                          ( (s), cgnsname, solidx, zname))
             if (verbose):
                 sys.stderr.write("%s: %s: wrote solution %d, \"%s\"\n" %
                                  (program, cgnsname, solidx, zname))

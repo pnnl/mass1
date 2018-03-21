@@ -28,6 +28,49 @@ MODULE link_module
   PRIVATE
 
   ! ----------------------------------------------------------------
+  ! TYPE link_ptr
+  ! ----------------------------------------------------------------
+  TYPE, PUBLIC :: link_ptr
+     CLASS (link_t), POINTER :: p
+  END type link_ptr
+
+  ! ----------------------------------------------------------------
+  ! link_list
+  ! ----------------------------------------------------------------
+  TYPE, PUBLIC, EXTENDS(dlist) :: link_list
+   CONTAINS
+     PROCEDURE :: push => link_list_push
+     PROCEDURE :: pop => link_list_pop
+     PROCEDURE :: clear => link_list_clear
+     PROCEDURE :: find => link_list_find
+     PROCEDURE :: current => link_list_current
+  END type link_list
+
+  INTERFACE link_list
+     MODULE PROCEDURE new_link_list
+  END INTERFACE link_list
+
+  PUBLIC new_link_list
+
+  ! ----------------------------------------------------------------
+  ! TYPE confluence_t
+  ! ----------------------------------------------------------------
+  TYPE, PUBLIC :: confluence_t
+     TYPE (link_list) :: ulink
+     TYPE (link_ptr) :: dlink
+   CONTAINS
+     PROCEDURE :: coeff_e => confluence_coeff_e
+     PROCEDURE :: coeff_f => confluence_coeff_f
+     PROCEDURE :: elev => confluence_elev
+     PROCEDURE :: conc => confluence_conc
+     PROCEDURE :: set_order => confluence_set_order
+  END type confluence_t
+
+  INTERFACE confluence_t
+     MODULE PROCEDURE new_confluence_t
+  END INTERFACE
+
+  ! ----------------------------------------------------------------
   ! TYPE link_input_data
   ! Fields expected in link input data
   ! ----------------------------------------------------------------
@@ -173,49 +216,6 @@ MODULE link_module
        CLASS (link_t), INTENT(INOUT) :: this
      END SUBROUTINE destroy_proc
 
-  END INTERFACE
-
-  ! ----------------------------------------------------------------
-  ! TYPE link_ptr
-  ! ----------------------------------------------------------------
-  TYPE, PUBLIC :: link_ptr
-     CLASS (link_t), POINTER :: p
-  END type link_ptr
-
-  ! ----------------------------------------------------------------
-  ! link_list
-  ! ----------------------------------------------------------------
-  TYPE, PUBLIC, EXTENDS(dlist) :: link_list
-   CONTAINS
-     PROCEDURE :: push => link_list_push
-     PROCEDURE :: pop => link_list_pop
-     PROCEDURE :: clear => link_list_clear
-     PROCEDURE :: find => link_list_find
-     PROCEDURE :: current => link_list_current
-  END type link_list
-
-  INTERFACE link_list
-     MODULE PROCEDURE new_link_list
-  END INTERFACE link_list
-
-  PUBLIC new_link_list
-
-  ! ----------------------------------------------------------------
-  ! TYPE confluence_t
-  ! ----------------------------------------------------------------
-  TYPE, PUBLIC :: confluence_t
-     TYPE (link_list) :: ulink
-     TYPE (link_ptr) :: dlink
-   CONTAINS
-     PROCEDURE :: coeff_e => confluence_coeff_e
-     PROCEDURE :: coeff_f => confluence_coeff_f
-     PROCEDURE :: elev => confluence_elev
-     PROCEDURE :: conc => confluence_conc
-     PROCEDURE :: set_order => confluence_set_order
-  END type confluence_t
-
-  INTERFACE confluence_t
-     MODULE PROCEDURE new_confluence_t
   END INTERFACE
 
 CONTAINS

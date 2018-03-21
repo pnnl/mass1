@@ -16,6 +16,10 @@
 ! ----------------------------------------------------------------
 MODULE network_module
 
+#ifdef __INTEL_COMPILER
+  ! for getcwd() and chdir()
+  USE ifport
+#endif
   USE utility
   USE date_time
   USE mass1_config
