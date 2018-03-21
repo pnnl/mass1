@@ -29,11 +29,12 @@ list (APPEND CMAKE_MODULE_PATH "${MASS1_SOURCE_DIR}/cmake")
 # -------------------------------------------------------------
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
-  # trap floating point exceptions
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wall -ffpe-trap=invalid,zero,overflow")
+  # trap floating point exceptions and use preprocessor
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wall -ffpe-trap=invalid,zero,overflow -cpp")
 elseif (CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
   # w/ Intel, build static binaries that trap floating point exceptions
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpe0")
+  # and turn on the preprocessor for all files
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpe0 -fpp")
 endif()
 
 # -------------------------------------------------------------

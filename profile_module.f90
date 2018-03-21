@@ -526,7 +526,7 @@ CONTAINS
     CHARACTER (LEN=8) :: xunits
     DOUBLE PRECISION :: xstart
     INTEGER :: plink(maxlink)
-    TYPE (profile_t), POINTER :: profile
+    CLASS (profile_t), POINTER :: profile
     CHARACTER (LEN=1024) :: msg
 
     line = 0
@@ -541,8 +541,8 @@ CONTAINS
        READ(punit, *, END=100, ERR=200) plink
        pid = pid + 1
 
-       ALLOCATE(profile)
-       profile = profile_t(pid)
+       ALLOCATE(profile, SOURCE=profile_t(pid))
+       !profile = profile_t(pid)
        CALL profile%fill(linkman, numlinks, plink, xstart, xunits)
 
        CALL this%profs%push(profile)
