@@ -7,13 +7,14 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2017-03-10 08:09:50 d3g096
+# Last Change: 2018-03-22 12:29:09 d3g096
 # -------------------------------------------------------------
 
-# add_subdirectory(temperature/pond)
 
 add_subdirectory(flow/dam-break)
 add_subdirectory(flow/drain)
+add_subdirectory(flow/fill)
+add_subdirectory(flow/fill-us)
 add_subdirectory(flow/MacDonald-4)
 add_subdirectory(flow/MacDonald-3)
 add_subdirectory(flow/MacDonald-1)
@@ -24,3 +25,5 @@ add_subdirectory(flow/lateral)
 add_subdirectory(flow/normal-hydro)
 add_subdirectory(flow/normal)
 
+add_subdirectory(transport/advection-1-segment)
+add_subdirectory(temperature/pond)

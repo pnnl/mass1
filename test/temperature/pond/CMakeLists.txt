@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created February 28, 2017 by William A. Perkins
-# Last Change: 2018-03-22 09:21:43 d3g096
+# Last Change: 2018-03-22 12:40:58 d3g096
 # -------------------------------------------------------------
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
 
@@ -98,7 +98,9 @@ endif (GNUPLOT_EXECUTABLE)
 add_custom_target(run_pond_test
   DEPENDS ${rundeps}
 )
-add_dependencies(runtests run_pond_test)
+
+# This test takes too long for this
+# add_dependencies(runtests run_pond_test)
 
 set_property(DIRECTORY 
   APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES

@@ -7,9 +7,11 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 22, 1999 by William A. Perkins
-# Last Change: 2017-06-12 13:17:46 d3g096
+# Last Change: 2018-03-22 12:27:38 d3g096
 # -------------------------------------------------------------
 # $Id$
+
+set terminal postscript eps color solid "Helvetica,18"
 
 set xdata time
 set timefmt '%m-%d-%Y %H:%M:%S'

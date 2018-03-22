@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2018-03-22 10:23:21 d3g096
+# Last Change: 2018-03-22 11:15:09 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -88,7 +88,7 @@ endforeach()
 add_custom_target(run_advection_1_test
   DEPENDS ${rundeps}
 )
-add_dependencies(runtests run_advection_1_tnest)
+add_dependencies(runtests run_advection_1_test)
 
 set_property(DIRECTORY 
   APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
