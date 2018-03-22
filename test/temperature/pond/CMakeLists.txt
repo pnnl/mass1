@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created February 28, 2017 by William A. Perkins
-# Last Change: 2017-03-06 12:47:36 d3g096
+# Last Change: 2018-03-22 09:21:43 d3g096
 # -------------------------------------------------------------
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
 
@@ -65,32 +65,28 @@ set(testfiles
 )
 
 add_custom_command(
-  OUTPUT "ts1500.out"
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ts1500.out"
   COMMAND ${mass1exe} > mass1.log
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Running test temperature/pond"
   DEPENDS mass1 ${testfiles}
 )
-set(rundeps 
-  "ts1500.out"
-)
+set(rundeps "${CMAKE_CURRENT_BINARY_DIR}/ts1500.out")
 
 if (GNUPLOT_EXECUTABLE) 
   add_custom_command(
     OUTPUT 
-    "temp.eps" 
-    "temp.1992.eps"
-    "temp.summer.1992.eps"
-    COMMAND "${GNUPLOT_EXECUTABLE}" "temp.gp" > temp.eps
-    COMMAND "${GNUPLOT_EXECUTABLE}" "temp.1992.gp" > temp.1992.eps
-    COMMAND "${GNUPLOT_EXECUTABLE}" "temp.summer.1992.gp" > temp.summer.1992.eps
+    "temp.eps" "temp.1992.eps" "temp.summer.1992.eps"
+    COMMAND "${GNUPLOT_EXECUTABLE}" "temp.gp" > "temp.eps"
+    COMMAND "${GNUPLOT_EXECUTABLE}" "temp.1992.gp" > "temp.1992.eps"
+    COMMAND "${GNUPLOT_EXECUTABLE}" "temp.summer.1992.gp" > "temp.summer.1992.eps"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     COMMENT "Plotting tests temperature/pond"
     DEPENDS 
-    "ts1500.out"
-    "temp.gp"
-    "temp.1992.gp"
-    "temp.summer.1992.gp"
+    "${CMAKE_CURRENT_BINARY_DIR}/ts1500.out"
+    "${CMAKE_CURRENT_BINARY_DIR}/temp.gp"
+    "${CMAKE_CURRENT_BINARY_DIR}/temp.1992.gp"
+    "${CMAKE_CURRENT_BINARY_DIR}/temp.summer.1992.gp"
   )
   set(rundeps 
     "temp.eps" 
