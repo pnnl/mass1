@@ -58,7 +58,7 @@ known to work:
 * [GNU Fortran](https://gcc.gnu.org/fortran/), Version 4.8 or higher
 
 * [Intel Fortran](https://software.intel.com/en-us/fortran-compilers),
-  Version 14 or higher 
+  Version 18 or higher 
 
 In general, the Intel compiler produces a faster executable, but for
 most applications, this is not noticable. In the past, Fortran
@@ -103,6 +103,14 @@ provided.
 There is an optional [R](https://www.r-project.org/) script for
 reading MASS1 time series output and boundary condition files. 
 
+### Tecplot
+
+[Tecplot](https://www.tecplot.com/) is a commercial visualization
+software package.  There is a script to build
+[Tecplot](https://www.tecplot.com/) input files from MASS1 profile
+output. It is used to make some profile animations in a few
+test cases. It's use is optional.  
+
 ## Configure and Build
 
 MASS1 uses [CMake](https://cmake.org/) cross-platform tools to
@@ -130,8 +138,9 @@ cmake -D CMAKE_BUILD_TYPE:STRING=Release ..
 ## Usage
 
 MASS1 is a *command line* application. There is no graphical user
-interface.  All [input and output](doc/README.md) are plain text files.
-There is very little [documentation](doc/README.md), other than the
+interface.  All [input and output](doc/README.md) are plain text files
+(except hotstart files). There is very little
+[documentation](doc/README.md), other than the
 code itself.  
 
 The first step in a MASS1 application is to define the topology of the
