@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2018-03-07 14:54:27 d3g096
+# Last Change: 2018-03-28 13:21:37 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -41,16 +41,17 @@ endif()
 # Perl - for scripts
 # -------------------------------------------------------------
 find_package(Perl)
-
 find_package(PerlModules COMPONENTS Date::Manip)
 
 # -------------------------------------------------------------
 # Gnuplot - for tests
 # -------------------------------------------------------------
-find_program(GNUPLOT_EXECUTABLE gnuplot)
-# find_package(gnuplot)
+find_package(Gnuplot)
 # should check version
 
+# -------------------------------------------------------------
+# Awk is used for some things
+# -------------------------------------------------------------
 find_program(AWK_EXECUTABLE gawk)
 if (NOT AWK_EXECUTABLE) 
   find_program(AWK_EXECUTABLE awk)
