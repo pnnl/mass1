@@ -11,7 +11,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October 24, 2011 by William A. Perkins
-# Last Change: 2017-06-22 13:19:39 d3g096
+# Last Change: 2018-04-06 12:05:25 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -161,6 +161,10 @@ parser.add_option("-g", "--gage-output",
                   dest="gage", action="store_true", default=False,
                   help="generate a gage control file for all link outlets and turn gage output on")
 
+parser.add_option("-H", "--hot-start",
+                  dest="hotstart", action="store", 
+                  help="use the specified hotstart for the simulation")
+
 
 (options, args) = parser.parse_args()
 
@@ -229,6 +233,11 @@ confout = confout.replace("@SECTF@", sections_file)
 confout = confout.replace("@LINKBCF@", linkbc_file)
 confout = confout.replace("@INITF@", initial_file)
 confout = confout.replace("@LATFLOWF@", lateralq_file)
+if (options.hotstart):
+    confout = confout.replace("@HOTSTART@", options.hotstart)
+    confout = confout.replace("@HSFLG@", "1")
+else:
+    confout = confout.replace("@HSFLG@", "0")
 
 if dogage:
     confout = confout.replace("@GFLG@", "1")
