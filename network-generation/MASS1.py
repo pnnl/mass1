@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October 24, 2011 by William A. Perkins
-# Last Change: 2017-06-22 13:19:28 d3g096
+# Last Change: 2018-04-06 14:57:51 d3g096
 # -------------------------------------------------------------
 
 from inspect import *
@@ -53,32 +53,28 @@ class Section(object):
         q = 1.49*pow(r, 2.0/3.0)*sqrt(slope)/n
         return q
 
-    def write(self, outfd, notchw, notchd):
+    def write_general(self, outfd, notchw, notchd):
         outfd.write("%8d%5d%5d    Section %d\n" %
                     (self.id, 50, 1, self.id))
+        fudge = 0.01
         x = []
         y = []
         x.append(0.0)
         y.append(self.depth)
-        x.append(0.0)
+        x.append(0.0 + fudge)
         y.append(0.0)
 
-        x.append(self.width/2.0 - notchw/2.0 - 0.1)
-        y.append(-0.01)
+        if (notchw > 0.0 and notchd > 0.0):
+            x.append(self.width/2.0 - notchw/2.0)
+            y.append(-fudge)
         
-        x.append(self.width/2.0 - notchw/2.0)
-        y.append(-0.1)
+            x.append(self.width/2.0)
+            y.append(-notchd)
 
-        x.append(self.width/2.0)
-        y.append(-notchd)
+            x.append(self.width/2.0 + notchw/2.0)
+            y.append(-fudge)
 
-        x.append(self.width/2.0 + notchw/2.0)
-        y.append(-0.1)
-
-        x.append(self.width/2.0 + notchw/2.0 + 0.1)
-        y.append(-0.01)
-        
-        x.append(self.width)
+        x.append(self.width - fudge)
         y.append(0.0)
         x.append(self.width)
         y.append(self.depth)
@@ -95,6 +91,25 @@ class Section(object):
                 j = 0
         outfd.write(" / \n");
         return
+
+    def write_rectangular(self, outfd, notchw, notchd):
+
+        if (notchw > 0.0 and notchd > 0.0):
+            outfd.write("%8d%5d    Section %d\n" %
+                        (self.id, 2, self.id))
+            outfd.write("%.1f %.1f %.1f /\n" % 
+                        ( notchd, notchw, self.width ))
+        else:
+            outfd.write("%8d%5d    Section %d\n" %
+                        (self.id, 1, self.id))
+            outfd.write("%.1f /\n" % 
+                        ( self.width ))
+        return
+
+    def write(self, outfd, notchw, notchd):
+        self.write_rectangular(outfd, notchw, notchd)
+        return
+
 
 # -------------------------------------------------------------
 # class Point
@@ -233,7 +248,7 @@ class Link(object):
         self._uplink.append(link)
 
     def get_npoints(self):
-        npt = int(self.point.length/5280.0*8.0) + 1 # put points every 1/8th of a mile
+        npt = int(self.point.length/5280.0*16.0) + 1 # put points every 1/162th of a mile
         if (npt < 2): npt = 2
         return npt
     npoints = property(get_npoints)
@@ -257,7 +272,7 @@ class Link(object):
         lattransbc = 0
         lattempbc = 0
         metzone = 1
-        lpi = 3.5
+        lpi = 2.0
 
         outfd.write("%8d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %5.1f /\n" %
                     (self.id,
@@ -452,7 +467,7 @@ configuration_base = """MASS1 Configuration File
 0       / Do Gas Air/Water Exchange
 0       / Do Temp Dispersion
 0       / Do Temp surface exchange
-0       / Do Hotstart read file
+@HSFLG@       / Do Hotstart read file
 1       / Do Restart write file
 1       / Do Print section geometry
 0       / Do write binary section geom
@@ -480,7 +495,7 @@ no-tempbc-files         / temperature input
 no-weather-files        / weather files
 no-hydropower           / hydropower file name
 no-tdgcoeff             / TDG Coeff file name
-no-restart-file         / Read Hotstart file name
+\"@HOTSTART@\"         / Read Hotstart file name
 \"restart.dat\"           / Write restart file name
 \"@GAGEF@\"    / gage control file name
 \"profile-control.dat\"   / profile file name
