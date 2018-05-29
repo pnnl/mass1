@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2018-02-07 11:32:14 d3g096
+! Last Change: 2018-05-29 12:06:06 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -56,7 +56,8 @@ MODULE link_manager_module
      PROCEDURE, PRIVATE :: readpid => link_manager_readpid
      PROCEDURE :: find => link_manager_find
      PROCEDURE :: connect => link_manager_connect
-     PROCEDURE :: flow_sim => link_manager_flow_sim
+     PROCEDURE :: forward => link_manager_flow_forward
+     PROCEDURE :: backward => link_manager_flow_backward
      PROCEDURE :: hyupdate => link_manager_hyupdate
      PROCEDURE :: read_restart => link_manager_read_restart
      PROCEDURE :: write_restart => link_manager_write_restart
@@ -466,7 +467,7 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     CLASS (section_handler), INTENT(INOUT) :: sectman
     INTEGER, PARAMETER :: lunit = 21
-    INTEGER :: recno, ierr, iostat, npid, npt
+    INTEGER :: recno, ierr, iostat, npid
     TYPE (link_input_data) :: ldata
     CHARACTER (LEN=1024) :: msg
 
@@ -760,14 +761,13 @@ CONTAINS
   END FUNCTION link_manager_find
 
   ! ----------------------------------------------------------------
-  ! SUBROUTINE link_manager_flow_sim
+  ! SUBROUTINE link_manager_flow_forward
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_flow_sim(this, deltat, grav, res_coeff, dsbc_type)
+  SUBROUTINE link_manager_flow_forward(this, deltat)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: deltat, grav, res_coeff
-    INTEGER, INTENT(IN) :: dsbc_type
+    DOUBLE PRECISION, INTENT(IN) :: deltat
 
     CLASS (link_t), POINTER :: link
     INTEGER :: l
@@ -784,6 +784,21 @@ CONTAINS
        END DO
     END DO
 
+  END SUBROUTINE link_manager_flow_forward
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_flow_backward
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_flow_backward(this, deltat, grav, res_coeff, dsbc_type)
+
+    IMPLICIT NONE
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: deltat, grav, res_coeff
+    INTEGER, INTENT(IN) :: dsbc_type
+
+    CLASS (link_t), POINTER :: link
+    INTEGER :: l
+
     DO l = this%maxorder, 1, -1
        CALL this%links%begin()
        link => this%links%current()
@@ -797,7 +812,7 @@ CONTAINS
        END DO
     END DO
 
-  END SUBROUTINE link_manager_flow_sim
+  END SUBROUTINE link_manager_flow_backward
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_hyupdate

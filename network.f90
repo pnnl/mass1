@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2018-02-02 09:58:00 d3g096
+! Last Change: 2018-05-29 13:26:35 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -50,6 +50,8 @@ MODULE network_module
      PROCEDURE :: read_restart => network_read_restart
      PROCEDURE :: write_restart => network_write_restart
      PROCEDURE :: initialize => network_initialize
+     PROCEDURE :: forward => network_forward
+     PROCEDURE :: backward => network_backward
      PROCEDURE :: flow => network_flow
      PROCEDURE :: run => network_run
      PROCEDURE :: destroy => network_destroy
@@ -327,6 +329,31 @@ CONTAINS
 
   END SUBROUTINE network_initialize
 
+  
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE network_forward
+  ! ----------------------------------------------------------------
+  SUBROUTINE network_forward(this)
+    IMPLICIT NONE
+    CLASS (network), INTENT(INOUT) :: this
+
+    CALL this%links%forward(this%config%time%delta_t)
+
+  END SUBROUTINE network_forward
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE network_backward
+  ! ----------------------------------------------------------------
+  SUBROUTINE network_backward(this)
+    IMPLICIT NONE
+    CLASS (network), INTENT(INOUT) :: this
+
+    CALL this%links%backward(this%config%time%delta_t, &
+         &this%config%grav, this%config%res_coeff, &
+         &this%config%dsbc_type)
+
+  END SUBROUTINE network_backward
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE network_flow
@@ -334,10 +361,8 @@ CONTAINS
   SUBROUTINE network_flow(this)
     IMPLICIT NONE
     CLASS (network), INTENT(INOUT) :: this
-
-    CALL this%links%flow_sim(this%config%time%delta_t, &
-         &this%config%grav, this%config%res_coeff, &
-         &this%config%dsbc_type)
+    CALL this%forward()
+    CALL this%backward()
 
   END SUBROUTINE network_flow
 
