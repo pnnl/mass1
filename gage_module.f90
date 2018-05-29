@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  8, 2018 by William A. Perkins
-! Last Change: 2018-02-15 10:15:13 d3g096
+! Last Change: 2018-05-29 13:57:37 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -91,7 +91,7 @@ CONTAINS
     IF (LEN(TRIM(this%filename)) .LE. 0) THEN
        this%filename = ''
        IF (LEN(TRIM(this%gagename)) .GT. 0) THEN
-          this%filename = 'ts' // this%gagename // '.out'
+          this%filename = 'ts' // TRIM(this%gagename) // '.out'
        ELSE 
           WRITE(string1, *) this%link_id
           string1 = ADJUSTL(string1)

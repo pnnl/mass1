@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created January 10, 2018 by William A. Perkins
-  ! Last Change: 2018-02-15 11:02:19 d3g096
+  ! Last Change: 2018-05-29 13:53:12 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE profile_module
@@ -355,7 +355,6 @@ CONTAINS
     CLASS (profile_t), INTENT(INOUT) :: this
     CHARACTER (LEN=*), INTENT(IN) :: date_string, time_string
 
-    INTEGER, PARAMETER :: punit = 41
     CLASS (profile_pt), POINTER :: pt
     INTEGER :: j
     DOUBLE PRECISION :: depth
@@ -366,10 +365,10 @@ CONTAINS
     this%firstwrite = .FALSE.
 
     ! profile header
-    WRITE(punit, 1110)
-    WRITE(punit, 1010) this%id, date_string, time_string, this%pts%size()
-    WRITE(punit, 1005)
-    WRITE(punit, 1110)
+    WRITE(this%punit, 1110)
+    WRITE(this%punit, 1010) this%id, date_string, time_string, this%pts%size()
+    WRITE(this%punit, 1005)
+    WRITE(this%punit, 1110)
 
     CALL this%pts%begin()
     pt => this%pts%current()
@@ -380,7 +379,7 @@ CONTAINS
        j = j + 1
        depth = pt%pt%hnow%y - pt%pt%thalweg
 
-       WRITE(punit,1000) &
+       WRITE(this%punit,1000) &
             &pt%link_id, pt%point_idx, j, pt%profx, &
             &pt%pt%hnow%y, pt%pt%hnow%q, pt%pt%hnow%v, depth, &
             &0.0, 0.0, 0.0, 0.0, &
