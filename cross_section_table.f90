@@ -9,9 +9,9 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  6, 2017 by William A. Perkins
-! Last Change: 2017-06-27 08:46:50 d3g096
+! Last Change: 2018-07-31 14:15:08 d3g096
 ! ----------------------------------------------------------------
-PROGRAM trapezoid_test
+PROGRAM cross_section_table_test
   USE utility
   USE cross_section
   IMPLICIT NONE
@@ -32,6 +32,6 @@ PROGRAM trapezoid_test
      DEALLOCATE(x)
   END DO
 
-END PROGRAM trapezoid_test
+END PROGRAM cross_section_table_test
 
 
