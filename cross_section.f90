@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2018-08-01 13:37:54 d3g096
+! Last Change: 2018-08-02 14:50:21 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -40,6 +40,8 @@ MODULE cross_section
      INTEGER :: ID
    CONTAINS
      PROCEDURE (read_proc), DEFERRED :: read
+     PROCEDURE :: area => xsection_area
+     PROCEDURE :: invarea => xsection_inverse_area
      PROCEDURE (props_proc), DEFERRED :: props
      PROCEDURE (print_proc), DEFERRED :: print
      PROCEDURE (destroy_proc), DEFERRED :: destroy
@@ -55,7 +57,7 @@ MODULE cross_section
        INTEGER, INTENT(IN) :: iounit
        INTEGER, INTENT(OUT) :: ioerr
      END SUBROUTINE read_proc
-     
+
      SUBROUTINE props_proc(this, depth, props)
        IMPORT :: xsection_t, xsection_prop
        IMPLICIT NONE
@@ -203,6 +205,68 @@ MODULE cross_section
 CONTAINS
 
   ! ----------------------------------------------------------------
+  ! DOUBLE PRECISION FUNCTION xsection_area
+  ! ----------------------------------------------------------------
+  DOUBLE PRECISION FUNCTION xsection_area(this, depth)
+    IMPLICIT NONE
+    CLASS(xsection_t), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: depth
+    TYPE (xsection_prop) :: props
+    
+    ! slow, but correct
+    CALL this%props(depth, props);
+    xsection_area = props%area
+  END FUNCTION xsection_area
+
+  ! ----------------------------------------------------------------
+  ! DOUBLE PRECISION FUNCTION xsection_inverse_area
+  ! ----------------------------------------------------------------
+  DOUBLE PRECISION FUNCTION xsection_inverse_area(this, area)
+    IMPLICIT NONE
+    CLASS(xsection_t), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: area
+    DOUBLE PRECISION, PARAMETER :: scale = 2.0, eps = 1.0E-03
+    DOUBLE PRECISION :: a0, y, ymin, ymax
+    LOGICAL :: done
+
+    xsection_inverse_area = 0.0
+    IF (area .LE. 0.0) RETURN
+
+    done = .FALSE.
+
+    y = SQRT(area)
+    ymin = y
+    ymax = y
+    DO WHILE (.NOT. done) 
+       a0 = this%area(y)
+       IF (ABS(a0 - area) .LE. eps) THEN
+          xsection_inverse_area = y
+          done = .TRUE.
+       ELSE IF (a0 .GT. area) THEN
+          ymax = y
+          IF (ymin .LT. y) THEN
+             y = (ymin + y)/2.0
+          ELSE 
+             y = y/2.0
+             ymin = y
+          END IF
+       ELSE
+          ymin = y
+          IF (ymax .GT. y) THEN
+             y = (ymax + y)/2.0
+          ELSE 
+             y = y*2.0
+             ymax = y
+          END IF
+       END IF
+    END DO
+
+    xsection_inverse_area = y
+
+  END FUNCTION xsection_inverse_area
+
+
+  ! ----------------------------------------------------------------
   ! SUBROUTINE prismatic_read
   ! ----------------------------------------------------------------
   SUBROUTINE prismatic_read(this, iounit, ioerr)
@@ -216,6 +280,7 @@ CONTAINS
 
   END SUBROUTINE prismatic_read
 
+
   ! ----------------------------------------------------------------
   ! SUBROUTINE prismatic_props
   ! ----------------------------------------------------------------
@@ -226,6 +291,7 @@ CONTAINS
     TYPE (xsection_prop), INTENT(OUT) :: props
 
     props%depth = depth
+    props%area = this%area(depth)
 
     CALL error_message("prismatic_props: this should not happen", fatal=.TRUE.)
 
@@ -1018,7 +1084,8 @@ CONTAINS
     K = res_coeff*SQRT(slope)*kstrick
     K = (discharge/K)**(1.0/alpha)
     CALL this%props(dguess, props)
-    f = K*(props%wetperim**(beta/alpha))/props%area
+    f = K*(props%wetperim**(beta/alpha))
+    f = this%invarea(f)
 
   END FUNCTION xsection_normal_iterate
 

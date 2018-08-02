@@ -9,11 +9,11 @@ PROGRAM normal_depth_test
   IMPLICIT NONE
 
   CLASS(xsection_t), POINTER :: x
-  DOUBLE PRECISION, PARAMETER :: kstrick = 1.0/0.016, slope = 0.0001, q = 300.0
+  DOUBLE PRECISION, PARAMETER :: kstrick = 1.0/0.016, slope = 0.0001, q = 800.0
   DOUBLE PRECISION, PARAMETER :: dmin = 1.0, dmax = 64.0, dstep = 2.0
   INTEGER, PARAMETER :: iunit = 5, ounit = 6
 
-  DOUBLE PRECISION :: dguess, d
+  DOUBLE PRECISION :: dguess, d, a, dinv
   INTEGER :: ierr
 
   utility_error_iounit = ounit
@@ -26,7 +26,10 @@ PROGRAM normal_depth_test
      dguess = dmin
      DO WHILE (dguess .LE. dmax)
         d = x%normal_depth(q, slope, kstrick, 1.49D00, dguess)
-        WRITE(*, "('dguess = ', F8.2, ' dnormal = ', F8.2)") dguess, d
+        a = x%area(d)
+        dinv = x%invarea(a)
+        WRITE(*, "('dguess = ', F8.2, ' dnormal = ', F8.2, ', a = ', F8.2, ', d = ', F8.2)")&
+             & dguess, d, a, dinv
         dguess = dguess*dstep
      END DO
      CALL x%destroy()
