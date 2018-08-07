@@ -14,8 +14,6 @@ MODULE hydrologic_link_module
 
   IMPLICIT NONE
 
-  CHARACTER (LEN=80), PRIVATE, SAVE :: rcsid = "$Id$"
-
   ! ----------------------------------------------------------------
   ! TYPE hydrologic_link
   ! ----------------------------------------------------------------
@@ -89,7 +87,7 @@ CONTAINS
     DO i = 1, this%npoints
        this%pt(i)%hnow%y = this%pt(i)%xsection%p%normal_depth(&
             &this%pt(i)%hnow%q, this%So, this%pt(i)%kstrick,&
-            &1.49D00, this%pt(i)%hnow%y) + this%pt(i)%thalweg
+            &this%pt(i)%hnow%y) + this%pt(i)%thalweg
        IF (i .EQ. 1) THEN
           dx = ABS(this%pt(i)%x - this%pt(i+1)%x)/2.0
        ELSE IF (i .GE. this%npoints) THEN
@@ -169,7 +167,7 @@ CONTAINS
        this%pt(i)%hnow%q = q
        y = this%pt(i)%hnow%y - this%pt(i)%thalweg
        this%pt(i)%hnow%y = &
-            &this%pt(i)%xsection%p%normal_depth(q, this%So, this%pt(i)%kstrick, 1.49D00, y)
+            &this%pt(i)%xsection%p%normal_depth(q, this%So, this%pt(i)%kstrick, y)
     END DO
 
 
@@ -178,12 +176,12 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE hydrologic_link_hupdate
   ! ----------------------------------------------------------------
-  SUBROUTINE hydrologic_link_hupdate(this, res_coeff, grav, dt)
+  SUBROUTINE hydrologic_link_hupdate(this, grav, dt)
 
     IMPLICIT NONE
     
     CLASS (hydrologic_link), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: res_coeff, grav, dt
+    DOUBLE PRECISION, INTENT(IN) :: grav, dt
 
     
 
@@ -200,6 +198,7 @@ CONTAINS
     INTEGER, INTENT(IN) :: iunit
     CHARACTER (LEN=1024) :: msg
 
+    CALL this%linear_link_t%read_restart(iunit)
     
 
   END SUBROUTINE hydrologic_link_read_restart
@@ -212,6 +211,8 @@ CONTAINS
     IMPLICIT NONE
     CLASS (hydrologic_link), INTENT(IN) :: this
     INTEGER, INTENT(IN) :: iunit
+
+    CALL this%linear_link_t%write_restart(iunit)
 
   END SUBROUTINE hydrologic_link_write_restart
 

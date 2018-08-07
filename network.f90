@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2018-05-29 13:26:35 d3g096
+! Last Change: 2018-08-07 08:57:43 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -272,7 +272,7 @@ CONTAINS
     CALL status_message(msg)
 
     CALL this%links%read_restart(runit, &
-         &this%config%res_coeff, this%config%grav, &
+         &this%config%grav, &
          &this%config%time%delta_t)
 
     WRITE (msg, *) 'done reading restart from ', TRIM(this%config%restart_load_file)
@@ -324,8 +324,7 @@ CONTAINS
        CALL this%set_initial()
     END IF
 
-    CALL this%links%hyupdate(this%config%res_coeff, &
-         &this%config%grav, this%config%time%delta_t)
+    CALL this%links%hyupdate(this%config%grav, this%config%time%delta_t)
 
   END SUBROUTINE network_initialize
 
@@ -349,8 +348,7 @@ CONTAINS
     CLASS (network), INTENT(INOUT) :: this
 
     CALL this%links%backward(this%config%time%delta_t, &
-         &this%config%grav, this%config%res_coeff, &
-         &this%config%dsbc_type)
+         &this%config%grav, this%config%dsbc_type)
 
   END SUBROUTINE network_backward
 

@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2018-02-06 09:42:21 d3g096
+! Last Change: 2018-08-07 08:50:31 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -143,12 +143,12 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE fluvial_link_hupdate
   ! ----------------------------------------------------------------
-  SUBROUTINE fluvial_link_hupdate(this, res_coeff, grav, dt)
+  SUBROUTINE fluvial_link_hupdate(this, grav, dt)
     IMPLICIT NONE
     CLASS (fluvial_link), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: res_coeff, grav, dt
+    DOUBLE PRECISION, INTENT(IN) :: grav, dt
 
-    CALL this%linear_link_t%hydro_update(res_coeff, grav, dt)
+    CALL this%linear_link_t%hydro_update(grav, dt)
 
     IF (ASSOCIATED(this%latbc)) THEN
        this%latqold = this%latq

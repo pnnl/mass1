@@ -10,7 +10,7 @@ PROGRAM normal_depth_test
 
   CLASS(xsection_t), POINTER :: x
   DOUBLE PRECISION, PARAMETER :: res_coeff = 1.49
-  DOUBLE PRECISION, PARAMETER :: kstrick = 1.00/0.016, slope = 0.0001, q = 800.0
+  DOUBLE PRECISION, PARAMETER :: kstrick = res_coeff/0.016, slope = 0.0001, q = 800.0
   DOUBLE PRECISION, PARAMETER :: dmin = 1.0, dmax = 64.0, dstep = 2.0
   INTEGER, PARAMETER :: iunit = 5, ounit = 6
 
@@ -27,11 +27,11 @@ PROGRAM normal_depth_test
      WRITE(ounit, '("########### Section ", I4, " ###########")') x%ID
      dguess = dmin
      DO WHILE (dguess .LE. dmax)
-        d = x%normal_depth(q, slope, kstrick, res_coeff, dguess)
+        d = x%normal_depth(q, slope, kstrick, dguess)
         a = x%area(d)
         dinv = x%invarea(a)
         CALL x%props(dinv, prop)
-        qout = prop%area*res_coeff*kstrick*SQRT(slope)*prop%hydrad**(2.0/3.0)
+        qout = prop%area*kstrick*SQRT(slope)*prop%hydrad**(2.0/3.0)
         WRITE(*, 100) dguess, d, a, dinv, qout
         dguess = dguess*dstep
      END DO

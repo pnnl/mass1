@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2018-02-07 11:45:09 d3g096
+! Last Change: 2018-08-07 08:58:53 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -179,7 +179,7 @@ CONTAINS
              CYCLE
           END IF
           this%pt(i)%manning = manning
-          this%pt(i)%kstrick = 1.0/this%pt(i)%manning
+          this%pt(i)%kstrick = theconfig%res_coeff/this%pt(i)%manning
           this%pt(i)%k_diff = kdiff
 
           ! ksurf is ignored
@@ -251,7 +251,7 @@ CONTAINS
           ENDIF
 
           this%pt(i)%manning = manning
-          this%pt(i)%kstrick = 1.0/this%pt(i)%manning
+          this%pt(i)%kstrick = theconfig%res_coeff/this%pt(i)%manning
           this%pt(i)%k_diff = kdiff
           this%pt(i)%xsection%p => xsect
           ! ksurf is ignored
@@ -556,11 +556,11 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE linear_link_hupdate
   ! ----------------------------------------------------------------
-  SUBROUTINE linear_link_hupdate(this, res_coeff, grav, dt)
+  SUBROUTINE linear_link_hupdate(this, grav, dt)
 
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: res_coeff, grav, dt
+    DOUBLE PRECISION, INTENT(IN) :: grav, dt
 
     INTEGER :: p
     DOUBLE PRECISION :: dx
@@ -571,7 +571,7 @@ CONTAINS
        ELSE 
           dx = ABS(this%pt(p+1)%x - this%pt(p)%x)
        END IF
-       CALL this%pt(p)%hydro_update(res_coeff, grav, dt, dx)
+       CALL this%pt(p)%hydro_update(grav, dt, dx)
     END DO
 
   END SUBROUTINE linear_link_hupdate

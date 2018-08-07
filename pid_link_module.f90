@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January 30, 2018 by William A. Perkins
-! Last Change: 2018-02-06 09:43:21 d3g096
+! Last Change: 2018-08-07 09:02:08 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE pid_link_module
@@ -298,18 +298,18 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE pid_link_hupdate
   ! ----------------------------------------------------------------
-  SUBROUTINE pid_link_hupdate(this, res_coeff, grav, dt)
+  SUBROUTINE pid_link_hupdate(this, grav, dt)
 
     IMPLICIT NONE
     CLASS (pid_link), INTENT(INOUT) ::this
-    DOUBLE PRECISION, INTENT(IN) :: res_coeff, grav, dt
+    DOUBLE PRECISION, INTENT(IN) :: grav, dt
 
     INTEGER :: i, j
     CLASS (point_t), POINTER :: pt
 
     IF (.NOT. this%lagready) CALL this%lag_initialize()
 
-    CALL this%linear_link_t%hydro_update(res_coeff, grav, dt)
+    CALL this%linear_link_t%hydro_update(grav, dt)
 
     DO i = 1, this%numflows
 

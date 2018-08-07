@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2018-05-29 12:06:06 d3g096
+! Last Change: 2018-08-07 08:52:19 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -789,11 +789,11 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_flow_backward
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_flow_backward(this, deltat, grav, res_coeff, dsbc_type)
+  SUBROUTINE link_manager_flow_backward(this, deltat, grav, dsbc_type)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: deltat, grav, res_coeff
+    DOUBLE PRECISION, INTENT(IN) :: deltat, grav
     INTEGER, INTENT(IN) :: dsbc_type
 
     CLASS (link_t), POINTER :: link
@@ -805,7 +805,7 @@ CONTAINS
        DO WHILE (ASSOCIATED(link))
           IF (link%order .EQ. l) THEN
              CALL link%backward_sweep(dsbc_type)
-             CALL link%hydro_update(res_coeff, grav, deltat)
+             CALL link%hydro_update(grav, deltat)
           END IF
           CALL this%links%next()
           link => this%links%current()
@@ -817,18 +817,18 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_hyupdate
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_hyupdate(this, res_coeff, grav, dt)
+  SUBROUTINE link_manager_hyupdate(this, grav, dt)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: res_coeff, grav, dt
+    DOUBLE PRECISION, INTENT(IN) :: grav, dt
     CLASS (link_t), POINTER :: link
     
     CALL this%links%begin()
     link => this%links%current()
 
     DO WHILE (ASSOCIATED(link))
-       CALL link%hydro_update(res_coeff, grav, dt)
+       CALL link%hydro_update(grav, dt)
        CALL this%links%next()
        link => this%links%current()
     END DO
@@ -838,12 +838,12 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_read_restart
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_read_restart(this, iounit, res_coeff, grav, dt)
+  SUBROUTINE link_manager_read_restart(this, iounit, grav, dt)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: iounit
-    DOUBLE PRECISION, INTENT(IN) :: res_coeff, grav, dt
+    DOUBLE PRECISION, INTENT(IN) :: grav, dt
     CLASS (link_t), POINTER :: link
 
     CALL this%links%begin()
@@ -855,7 +855,7 @@ CONTAINS
        link => this%links%current()
     END DO
     
-    CALL this%hyupdate(res_coeff, grav, dt)
+    CALL this%hyupdate(grav, dt)
     
 
   END SUBROUTINE link_manager_read_restart

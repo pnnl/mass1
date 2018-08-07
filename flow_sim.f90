@@ -121,8 +121,8 @@ SUBROUTINE flow_sim
            hydrad = props%hydrad
            width = props%topwidth
            perim = props%wetperim
-           conveyance = config%res_coeff*kstrick(link,point_num)*props%conveyance
-           dkdy = config%res_coeff*kstrick(link,point_num)*props%dkdy
+           conveyance = kstrick(link,point_num)*props%conveyance
+           dkdy = kstrick(link,point_num)*props%dkdy
 
            s1%d = depth
            s1%y = y(link,point)
@@ -152,8 +152,8 @@ SUBROUTINE flow_sim
            hydrad = props%hydrad
            width = props%topwidth
            perim = props%wetperim
-           conveyance = config%res_coeff*kstrick(link,point_num)*props%conveyance
-           dkdy = config%res_coeff*kstrick(link,point_num)*props%dkdy
+           conveyance = kstrick(link,point_num)*props%conveyance
+           dkdy = kstrick(link,point_num)*props%dkdy
 
            s2%d = depth
            s2%y = y(link,point+1)
@@ -323,8 +323,8 @@ SUBROUTINE flow_sim
            hydrad = props%hydrad
            width = props%topwidth
            perim = props%wetperim
-           conveyance = config%res_coeff*kstrick(link,point)*props%conveyance
-           dkdy = config%res_coeff*kstrick(link,point)*props%dkdy
+           conveyance = kstrick(link,point)*props%conveyance
+           dkdy = kstrick(link,point)*props%dkdy
 
 
            IF (point .GE. maxpoints(link)) THEN
@@ -340,8 +340,8 @@ SUBROUTINE flow_sim
               froude_num(link,point) = &
                    &SQRT((q(link,point)**2*width)/(config%grav*area_temp**3))
               friction_slope(link,point) =&
-                   & ((q(link,point)*manning(link,point))/&
-                   & (config%res_coeff*area_temp*(hydrad**2.0)**0.3333333))**2.0
+                   & ((q(link,point))/&
+                   & (kstrick(link,point)*area_temp*(hydrad**2.0)**0.3333333))**2.0
               courant_num(link, point) = &
                    &ABS(q(link,point))/area_temp*config%time%delta_t/delta_x
            ELSE 

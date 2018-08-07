@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2018-02-07 11:37:13 d3g096
+! Last Change: 2018-08-07 09:00:49 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -203,11 +203,11 @@ MODULE link_module
        INTEGER, INTENT(IN) :: dsbc_type
      END SUBROUTINE bsweep_proc
 
-     SUBROUTINE hupdate_proc(this, res_coeff, grav, dt)
+     SUBROUTINE hupdate_proc(this, grav, dt)
        IMPORT :: link_t
        IMPLICIT NONE
        CLASS (link_t), INTENT(INOUT) :: this
-       DOUBLE PRECISION, INTENT(IN) :: res_coeff, grav, dt
+       DOUBLE PRECISION, INTENT(IN) :: grav, dt
      END SUBROUTINE hupdate_proc
 
      SUBROUTINE destroy_proc(this)

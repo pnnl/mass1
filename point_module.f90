@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2018-02-15 10:00:35 d3g096
+! Last Change: 2018-08-07 08:54:45 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -63,11 +63,10 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE point_section_update
   ! ----------------------------------------------------------------
-  SUBROUTINE point_section_update(this, res_coeff)
+  SUBROUTINE point_section_update(this)
 
     IMPLICIT NONE
     CLASS (point_t), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: res_coeff
     DOUBLE PRECISION :: depth
 
     ASSOCIATE ( xs => this%xsection%p )
@@ -75,9 +74,9 @@ CONTAINS
       depth = this%hnow%y - this%thalweg
       CALL xs%props(depth, this%xsprop)
       this%xsprop%conveyance = &
-           &res_coeff*this%kstrick*this%xsprop%conveyance
+           &this%kstrick*this%xsprop%conveyance
       this%xsprop%dkdy = &
-           &res_coeff*this%kstrick*this%xsprop%dkdy
+           &this%kstrick*this%xsprop%dkdy
       IF (this%xsprop%area .GT. 0.0D00) THEN
          this%hnow%v = this%hnow%q/this%xsprop%area
       ELSE 
@@ -113,12 +112,12 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE point_hydro_update
   ! ----------------------------------------------------------------
-  SUBROUTINE point_hydro_update(this, res_coeff, grav, deltat, deltax)
+  SUBROUTINE point_hydro_update(this, grav, deltat, deltax)
     USE general_vars, ONLY: depth_minimum
 
     IMPLICIT NONE
     CLASS (point_t), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: res_coeff, grav, deltat, deltax
+    DOUBLE PRECISION, INTENT(IN) :: grav, deltat, deltax
 
     DOUBLE PRECISION :: depth
 
@@ -131,13 +130,13 @@ CONTAINS
          h%y = this%thalweg + depth_minimum
       END IF
 
-      CALL this%section_update(res_coeff)
+      CALL this%section_update()
 
       IF (xs%area .GT. 0.0) THEN
          h%froude_num = &
               &SQRT((h%q*h%q*xs%topwidth)/(grav*xs%area**3))
          h%friction_slope = &
-              &((h%q*this%manning)/(res_coeff*xs%area*(xs%hydrad**2)**0.3333333))**2.0
+              &((h%q)/(this%kstrick*xs%area*(xs%hydrad**2)**0.3333333))**2.0
          IF (deltax .GT. 0.0) THEN
             h%courant_num = &
                  &ABS(h%q)/xs%area*deltat/deltax

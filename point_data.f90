@@ -148,7 +148,7 @@ SUBROUTINE point_data
            WRITE(io_unit,*)link,point,x(link,i),section_number(link,i),thalweg(link,i), &
                 manning(link,i),k_diff(link,i), surface_mass_trans
            
-           kstrick(link,i) = 1.0/manning(link,i)
+           kstrick(link,i) = config%res_coeff/manning(link,i)
            
            SELECT CASE(config%channel_length_units)
            CASE(CHANNEL_FOOT) ! length is in feet
@@ -213,7 +213,7 @@ SUBROUTINE point_data
            
            section_number(link,i) = sec_num
            manning(link,i) = manning_n
-           kstrick(link,i) = 1.0/manning_n
+           kstrick(link,i) = config%res_coeff/manning_n
            k_diff(link,i) = diffusion
            
            ptsection(link, i)%p => sections%find(section_number(link, i))
