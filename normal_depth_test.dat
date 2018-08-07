@@ -2,5 +2,18 @@
  100.0            /
 100     3         / Trapezoidal Section
  32.8      2.0    /
+200     50      1 / Same trapezoidal section as general section
+    0.025    4
+ 0.0 10.0  20.0 0.0  52.8 0.0 72.8 10.0 /
 110     4         / Triangular Section
   2.0             /
+120     6         / Parabolic Section
+  0.0625          /
+220    14         / Rounded Triangular Section
+  2.0   4.0       / 
+300     2         / Rectangular w/ flood plain
+10.0 300.0 3000.0 /
+320     50      1 / Section 300 as general section
+    0.25    8    /
+   0.0  200.0    0.01  10.0 1200.00 10.0 1200.01   0.0 
+1500.0    0.0 1500.01  10.0 3000.0  10.0 3000.01 200.0 /
