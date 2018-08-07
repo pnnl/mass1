@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2018-08-07 07:32:45 d3g096
+! Last Change: 2018-08-07 08:44:58 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -1179,7 +1179,7 @@ CONTAINS
     b = this%bottom_width
     a1 = b/2.0
     a2 = (discharge/sqrt(slope)/2/(kstrick*res_coeff))**(3.0/5.0) * (2.0/b)
-    dnorm = a2*(a1 + dguess)**(2.0/3.0)
+    dnorm = a2*(a1 + dguess)**(2.0/5.0)
   
   END FUNCTION rectangular_normal_iterate
 
@@ -1208,7 +1208,7 @@ CONTAINS
     a3 = b/c2
     a4 = (discharge/(kstrick*res_coeff)/c1/sqrt(slope))**1.5
     a4 = a4*c2/c1
-    w = ((a3 + dguess)*a4)**(1.0/3.0)
+    w = ((a3 + dguess)*a4)**(0.4)
 
     dnorm = w/(a1 + sqrt(a2 + w))
 
