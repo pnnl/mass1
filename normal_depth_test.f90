@@ -14,7 +14,8 @@ PROGRAM normal_depth_test
   DOUBLE PRECISION, PARAMETER :: dmin = 1.0, dmax = 64.0, dstep = 2.0
   INTEGER, PARAMETER :: iunit = 5, ounit = 6
 
-  DOUBLE PRECISION :: dguess, d, a, dinv
+  DOUBLE PRECISION :: dguess, d, a, dinv, qout
+  TYPE (xsection_prop) :: prop
   INTEGER :: ierr
 
   utility_error_iounit = ounit
@@ -29,12 +30,16 @@ PROGRAM normal_depth_test
         d = x%normal_depth(q, slope, kstrick, res_coeff, dguess)
         a = x%area(d)
         dinv = x%invarea(a)
-        WRITE(*, "('dguess = ', F8.2, ' dnormal = ', F8.2, ', a = ', F8.2, ', d = ', F8.2)")&
-             & dguess, d, a, dinv
+        CALL x%props(dinv, prop)
+        qout = prop%area*res_coeff*kstrick*SQRT(slope)*prop%hydrad**(2.0/3.0)
+        WRITE(*, 100) dguess, d, a, dinv, qout
         dguess = dguess*dstep
      END DO
      CALL x%destroy()
      DEALLOCATE(x)
   END DO
+
+100 FORMAT('dguess = ', F8.2, ' dnormal = ', F8.2, &
+         &', a = ', F8.2, ', d = ', F8.2, ", q = ", F8.2)
 
 END PROGRAM normal_depth_test
