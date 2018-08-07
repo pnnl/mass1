@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2018-03-28 13:21:37 d3g096
+# Last Change: 2018-07-24 09:42:04 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -163,6 +163,20 @@ add_executable(cross_section_test
   svgrp.f90
 )
 target_link_libraries(cross_section_test ts)
+
+# -------------------------------------------------------------
+# normal_depth_test
+# -------------------------------------------------------------
+add_executable(normal_depth_test
+  normal_depth_test.f90
+  section_handler.f90
+  cross_section.f90
+  dlist_module.f90
+  linear_interp.f90
+  svgrp.f90
+)
+target_link_libraries(normal_depth_test ts)
+
 
 # -------------------------------------------------------------
 # trapezoid_test

@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2018-02-15 13:33:53 d3g096
+! Last Change: 2018-08-01 13:37:54 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -43,6 +43,8 @@ MODULE cross_section
      PROCEDURE (props_proc), DEFERRED :: props
      PROCEDURE (print_proc), DEFERRED :: print
      PROCEDURE (destroy_proc), DEFERRED :: destroy
+     PROCEDURE :: normal_depth_iter => xsection_normal_iterate
+     PROCEDURE :: normal_depth => xsection_normal_depth
   END TYPE xsection_t
 
   ABSTRACT INTERFACE
@@ -104,6 +106,7 @@ MODULE cross_section
    CONTAINS
      PROCEDURE :: read => rectangular_read
      PROCEDURE :: props => rectangular_props
+     PROCEDURE :: normal_depth_iter => rectangular_normal_iterate
   END type rectangular_section
 
   ! ----------------------------------------------------------------
@@ -114,6 +117,7 @@ MODULE cross_section
    CONTAINS
      PROCEDURE :: read => trapezoidal_read
      PROCEDURE :: props => trapezoidal_props
+     PROCEDURE :: normal_depth_iter => trapezoidal_normal_iterate
   END type trapezoidal_section
 
   ! ----------------------------------------------------------------
@@ -124,6 +128,7 @@ MODULE cross_section
    CONTAINS
      PROCEDURE :: read => triangular_read
      PROCEDURE :: props => triangular_props
+     PROCEDURE :: normal_depth_iter => triangular_normal_iterate
   END type triangular_section
 
   ! ----------------------------------------------------------------
@@ -994,5 +999,153 @@ CONTAINS
 
   END SUBROUTINE cross_section_table
 
+  ! ----------------------------------------------------------------
+  !  FUNCTION xsection_normal_iterate
+  ! ----------------------------------------------------------------
+  FUNCTION xsection_normal_iterate(this, &
+       &discharge, slope, kstrick, res_coeff, dguess) RESULT (f)
+
+    IMPLICIT NONE
+
+    DOUBLE PRECISION :: f
+    CLASS(xsection_t), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: discharge, slope, kstrick, res_coeff, dguess
+    DOUBLE PRECISION, PARAMETER :: alpha = 5.0/3.0, beta = 2.0/3.0
+
+    TYPE (xsection_prop) :: props
+    DOUBLE PRECISION :: K
+
+    K = res_coeff*SQRT(slope)*kstrick
+    K = (discharge/K)**(1.0/alpha)
+    CALL this%props(dguess, props)
+    f = K*(props%wetperim**(beta/alpha))/props%area
+
+  END FUNCTION xsection_normal_iterate
+
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION xsection_normal_depth
+  !
+  ! This is an implementation of the algorithm to compute normal depth
+  ! from
+  !
+  ! Shirley Edward D., and Lopes Vicente L. 1991. “Normal‐Depth
+  ! Calculations in Complex Channel Sections.” Journal of Irrigation
+  ! and Drainage Engineering 117 (2): 220–32. 
+  ! https://doi.org/10.1061/(ASCE)0733-9437(1991)117:2(220).
+  ! ----------------------------------------------------------------
+  FUNCTION xsection_normal_depth(this, &
+       &discharge, slope, kstrick, res_coeff, dguess) RESULT (dnorm)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION :: dnorm
+    CLASS(xsection_t), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: discharge, slope, kstrick, res_coeff, dguess
+    DOUBLE PRECISION :: K, d, dprev
+    LOGICAL :: done
+    INTEGER :: iter
+
+    DOUBLE PRECISION, PARAMETER :: lim = 1.0E-03
+    INTEGER, PARAMETER :: maxiter = 10
+
+    IF (discharge .LE. 0.0) THEN
+       dnorm = 0.0
+       RETURN
+    END IF
+
+    IF (slope .LE. 0.0) THEN 
+       CALL error_message("xsection_normal_depth: undefined for zero slope")
+       dnorm = dguess
+       RETURN
+    END IF
+    
+    d = dguess
+    done = .FALSE.
+    iter = 0
+    DO WHILE (.NOT. done) 
+       dprev = d
+       d = this%normal_depth_iter(discharge, slope, kstrick, res_coeff, d)
+       done = ABS(d - dprev) .LT. lim
+       iter = iter + 1
+       IF (iter .GT. maxiter) THEN
+          CALL error_message('xsection_normal_depth: maximum iterations exceeded')
+          done = .TRUE.
+       END IF
+    END DO
+    dnorm = d
+    RETURN
+  END FUNCTION xsection_normal_depth
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION triangular_normal_iterate
+  ! ----------------------------------------------------------------
+  FUNCTION triangular_normal_iterate(this, &
+       &discharge, slope, kstrick, res_coeff, dguess) RESULT (dnorm)
+    IMPLICIT NONE
+    DOUBLE PRECISION :: dnorm
+    CLASS(triangular_section), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: discharge, slope, kstrick, res_coeff, dguess
+    
+    DOUBLE PRECISION :: c1, c2
+
+    c1 = this%sidez
+    c2 = 2.0*SQRT(1 + c1*c1)
+
+    dnorm = discharge/kstrick/res_coeff/c2/sqrt(slope)
+    dnorm = dnorm**(3.0/5.0)
+    dnorm = dnorm*c2/c1
+    dnorm = dnorm**(5.0/8.0)
+  END FUNCTION triangular_normal_iterate
+
+
+  ! ----------------------------------------------------------------
+  ! FUNCTION rectangular_normal_iterate
+  ! Using Equation 18a
+  ! ----------------------------------------------------------------
+  FUNCTION rectangular_normal_iterate(this, &
+       &discharge, slope, kstrick, res_coeff, dguess) RESULT (dnorm)
+    IMPLICIT NONE
+    DOUBLE PRECISION :: dnorm
+    CLASS(rectangular_section), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: discharge, slope, kstrick, res_coeff, dguess
+    
+    DOUBLE PRECISION :: b, a1, a2
+
+    b = this%bottom_width
+    a1 = b/2.0
+    a2 = (discharge/sqrt(slope)/2/kstrick/res_coeff)**(3.0/5.0) * (2.0/b)
+    dnorm = a2*(a1 + dguess)**(2.0/3.0)
+  
+  END FUNCTION rectangular_normal_iterate
+
+
+  ! ----------------------------------------------------------------
+  ! FUNCTION trapezoidal_normal_iterate
+  ! Using Equation 20a of Shirley and Lopes.
+  ! ----------------------------------------------------------------
+  FUNCTION trapezoidal_normal_iterate(this, &
+       &discharge, slope, kstrick, res_coeff, dguess) RESULT (dnorm)
+
+    IMPLICIT NONE
+
+    DOUBLE PRECISION :: dnorm
+    CLASS(trapezoidal_section), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: discharge, slope, kstrick, res_coeff, dguess
+    
+    DOUBLE PRECISION :: b, c1, c2, a1, a2, a3, a4, w
+
+    c1 = this%sidez
+    c2 = 2*sqrt(1+this%sidez*this%sidez)
+
+    a1 = b/2.0/c1
+    a2 = a1*a1
+    a3 = b/c2
+    a4 = (discharge/kstrick/res_coeff/c1/sqrt(slope))**1.5
+    a4 = a4*c2/c1
+    w = ((a3 + dguess)*a4)**(1.0/3.0)
+
+    dnorm = w/(a1 + sqrt(a2 + w))
+
+  END FUNCTION trapezoidal_normal_iterate
 
 END MODULE cross_section
