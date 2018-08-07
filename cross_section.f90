@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2018-08-01 13:37:54 d3g096
+! Last Change: 2018-08-07 07:24:43 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -485,7 +485,6 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: depth
     TYPE (xsection_prop), INTENT(OUT) :: props
     DOUBLE PRECISION :: y, z, T, dTdy, dAdy, dPdy
-    CHARACTER (LEN=1024) :: msg
 
     y = depth
 
@@ -529,10 +528,9 @@ CONTAINS
     CLASS(compound_section_t), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(IN) :: depth
     TYPE (xsection_prop), INTENT(OUT) :: props
-    DOUBLE PRECISION :: y, d, z, T, dTdy, dAdy, dPdy
+    DOUBLE PRECISION :: y, d
     INTEGER :: i
     TYPE (xsection_prop) :: p0
-    CHARACTER (LEN=1024) :: msg
 
     props%depth = depth
     props%area = 0.0
@@ -1041,7 +1039,7 @@ CONTAINS
     DOUBLE PRECISION :: dnorm
     CLASS(xsection_t), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(IN) :: discharge, slope, kstrick, res_coeff, dguess
-    DOUBLE PRECISION :: K, d, dprev
+    DOUBLE PRECISION :: d, dprev
     LOGICAL :: done
     INTEGER :: iter
 
@@ -1091,7 +1089,7 @@ CONTAINS
     c1 = this%sidez
     c2 = 2.0*SQRT(1 + c1*c1)
 
-    dnorm = discharge/kstrick/res_coeff/c2/sqrt(slope)
+    dnorm = discharge/(kstrick*res_coeff)/c2/sqrt(slope)
     dnorm = dnorm**(3.0/5.0)
     dnorm = dnorm*c2/c1
     dnorm = dnorm**(5.0/8.0)
@@ -1113,7 +1111,7 @@ CONTAINS
 
     b = this%bottom_width
     a1 = b/2.0
-    a2 = (discharge/sqrt(slope)/2/kstrick/res_coeff)**(3.0/5.0) * (2.0/b)
+    a2 = (discharge/sqrt(slope)/2/(kstrick*res_coeff))**(3.0/5.0) * (2.0/b)
     dnorm = a2*(a1 + dguess)**(2.0/3.0)
   
   END FUNCTION rectangular_normal_iterate
@@ -1136,11 +1134,12 @@ CONTAINS
 
     c1 = this%sidez
     c2 = 2*sqrt(1+this%sidez*this%sidez)
+    b = this%bottom_width
 
     a1 = b/2.0/c1
     a2 = a1*a1
     a3 = b/c2
-    a4 = (discharge/kstrick/res_coeff/c1/sqrt(slope))**1.5
+    a4 = (discharge/(kstrick*res_coeff)/c1/sqrt(slope))**1.5
     a4 = a4*c2/c1
     w = ((a3 + dguess)*a4)**(1.0/3.0)
 

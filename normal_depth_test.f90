@@ -9,7 +9,8 @@ PROGRAM normal_depth_test
   IMPLICIT NONE
 
   CLASS(xsection_t), POINTER :: x
-  DOUBLE PRECISION, PARAMETER :: kstrick = 1.0/0.016, slope = 0.0001, q = 300.0
+  DOUBLE PRECISION, PARAMETER :: res_coeff = 1.49
+  DOUBLE PRECISION, PARAMETER :: kstrick = 1.00/0.016, slope = 0.0001, q = 300.0
   DOUBLE PRECISION, PARAMETER :: dmin = 1.0, dmax = 64.0, dstep = 2.0
   INTEGER, PARAMETER :: iunit = 5, ounit = 6
 
@@ -25,7 +26,7 @@ PROGRAM normal_depth_test
      WRITE(ounit, '("########### Section ", I4, " ###########")') x%ID
      dguess = dmin
      DO WHILE (dguess .LE. dmax)
-        d = x%normal_depth(q, slope, kstrick, 1.49D00, dguess)
+        d = x%normal_depth(q, slope, kstrick, res_coeff, dguess)
         WRITE(*, "('dguess = ', F8.2, ' dnormal = ', F8.2)") dguess, d
         dguess = dguess*dstep
      END DO
