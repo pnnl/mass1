@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2018-08-07 08:52:19 d3g096
+! Last Change: 2018-08-14 07:16:22 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -23,6 +23,7 @@ MODULE link_manager_module
   USE fluvial_link_module
   USE nonfluvial_link_module
   USE pid_link_module
+  USE hydrologic_link_module
   USE bc_module
   USE section_handler_module
 
@@ -434,6 +435,7 @@ CONTAINS
        CASE (5)
        CASE (12)
        CASE (13)
+       CASE (60)
        CASE DEFAULT
           WRITE(msg, *) TRIM(theconfig%link_file), ': link record ', recno, &
                &': link type unknown (', ldata%ltype, ')'
@@ -564,6 +566,8 @@ CONTAINS
        CASE (13)
           ALLOCATE(pid_link :: link)
           npid = npid + 1
+       CASE (60)
+          ALLOCATE(hydrologic_link :: link)
        CASE DEFAULT
           WRITE(msg, *) TRIM(theconfig%link_file), ': link record ', recno, &
                &': link type unknown (', ldata%ltype, ')'

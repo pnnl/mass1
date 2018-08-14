@@ -56,6 +56,7 @@ discharges specified in a [hydro BC](bc.md) file.
 | 4 | Imposed Downstream stage 
 | 5 | Tributary inflow
 | 6 | Imposed hydroelectric dam discharge
+| 60 | Hydrologic routing link 
 
 ## Point Input Option
 

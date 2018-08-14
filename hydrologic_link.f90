@@ -18,13 +18,20 @@ MODULE hydrologic_link_module
   ! TYPE hydrologic_link
   ! ----------------------------------------------------------------
   TYPE, PUBLIC, EXTENDS(linear_link_t) :: hydrologic_link
+     CLASS (bc_t), POINTER :: latbc
      DOUBLE PRECISION :: y
      DOUBLE PRECISION :: L, So
      DOUBLE PRECISION :: K
-     DOUBLE PRECISION :: inflow, outflow, storage
-     DOUBLE PRECISION :: inflow_old, outflow_old, storage_old
-     DOUBLE PRECISION :: qin, qout
+
+     ! inflow and outflow are stored as discharge, ft^3/s
+     DOUBLE PRECISION :: latq, inflow, outflow
+     DOUBLE PRECISION :: latq_old, inflow_old, outflow_old
+
+     ! storage is in volume units, ft^3
+     DOUBLE PRECISION :: storage, storage_old
    CONTAINS
+     PROCEDURE :: construct => hydrologic_link_construct
+     PROCEDURE :: initialize => hydrologic_link_initialize
      PROCEDURE :: readpts => hydrologic_link_readpts
      PROCEDURE :: set_initial => hydrologic_link_set_initial
      PROCEDURE :: forward_sweep => hydrologic_link_forward
@@ -35,6 +42,55 @@ MODULE hydrologic_link_module
   END type hydrologic_link
 
 CONTAINS
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE hydrologic_link_construct
+  ! ----------------------------------------------------------------
+  SUBROUTINE hydrologic_link_construct(this)
+
+    IMPLICIT NONE
+    CLASS (hydrologic_link), INTENT(INOUT) :: this
+    CALL this%linear_link_t%construct()
+    NULLIFY(this%latbc)
+    this%inflow = 0.0
+    this%outflow = 0.0
+    this%inflow_old = 0.0
+    this%outflow_old = 0.0
+    this%storage = 0.0
+    this%storage_old = 0.0
+    this%latq = 0.0
+    this%latq_old = 0.0
+    
+
+  END SUBROUTINE hydrologic_link_construct
+
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION hydrologic_link_initialize
+  ! ----------------------------------------------------------------
+  FUNCTION hydrologic_link_initialize(this, ldata, bcman) RESULT(ierr)
+
+    IMPLICIT NONE
+    INTEGER :: ierr
+    CLASS (hydrologic_link), INTENT(INOUT) :: this
+    CLASS (link_input_data), INTENT(IN) :: ldata
+    CLASS (bc_manager_t), INTENT(IN) :: bcman
+    CHARACTER (LEN=1024) :: msg
+
+    ierr = this%linear_link_t%initialize(ldata, bcman)
+
+    IF (ldata%lbcid .GT. 0) THEN
+       this%latbc => bcman%find(LATFLOW_BC_TYPE, ldata%lbcid)
+       IF (.NOT. ASSOCIATED(this%latbc)) THEN
+          WRITE (msg, *) 'link ', ldata%linkid, ': unknown lateral inflow id: ', &
+               &ldata%lbcid
+          CALL error_message(msg)
+          ierr = ierr + 1
+       END IF
+    END IF
+
+  END FUNCTION hydrologic_link_initialize
+
 
   ! ----------------------------------------------------------------
   !  FUNCTION hydrologic_link_readpts
@@ -49,6 +105,8 @@ CONTAINS
     INTEGER, INTENT(INOUT) :: lineno
     CHARACTER (LEN=1024) :: msg
 
+    ierr = 0
+
     SELECT CASE (this%input_option)
     CASE (1)
        WRITE(msg, *) "Link ", this%id, &
@@ -58,6 +116,13 @@ CONTAINS
     CASE (2)
        ierr = this%linear_link_t%readpts(theconfig, sectman, punit, lineno)
     END SELECT
+
+    this%L = ABS(this%pt(1)%x - this%pt(this%npoints)%x)
+    this%So = ABS(this%pt(1)%thalweg - this%pt(this%npoints)%thalweg)
+    this%So = this%So/this%L
+
+    WRITE(*,*) "Hydrologic link ", this%id, ": L = ", this%L, ", So = ", this%So
+
     RETURN
   END FUNCTION hydrologic_link_readpts
 
@@ -71,23 +136,27 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: stage, discharge, c(:)
     INTEGER :: i
     DOUBLE PRECISION :: dx, a, depth
-    TYPE (xsection_prop) :: props
 
     CALL this%linear_link_t%set_initial(stage, discharge, c)
 
+    ! initialize the discharges
+    
     this%inflow = discharge
     this%outflow = discharge
     this%inflow_old = this%inflow
     this%outflow_old = this%outflow
 
-    ! assume normal stage throughout the link; compute storage based
-    ! on that
+    ! assume normal stage throughout the link initial compute storage
+    ! based on that
+
     this%storage = 0.0
 
     DO i = 1, this%npoints
-       this%pt(i)%hnow%y = this%pt(i)%xsection%p%normal_depth(&
+       depth = this%pt(i)%hnow%y - this%pt(i)%thalweg
+       depth = this%pt(i)%xsection%p%normal_depth(&
             &this%pt(i)%hnow%q, this%So, this%pt(i)%kstrick,&
-            &this%pt(i)%hnow%y) + this%pt(i)%thalweg
+            &depth)
+       this%pt(i)%hnow%y = depth + this%pt(i)%thalweg
        IF (i .EQ. 1) THEN
           dx = ABS(this%pt(i)%x - this%pt(i+1)%x)/2.0
        ELSE IF (i .GE. this%npoints) THEN
@@ -95,13 +164,14 @@ CONTAINS
        ELSE 
           dx = ABS(this%pt(i-1)%x - this%pt(i+1)%x)/2.0
        END IF
-       depth = this%pt(i)%hnow%y - this%pt(i)%thalweg
        a = this%pt(i)%xsection%p%area(depth)
        this%storage = this%storage + dx*a
     END DO
 
     this%storage_old = this%storage
     this%y = this%pt(this%npoints)%hnow%y - this%pt(this%npoints)%thalweg
+
+    WRITE(*,*) "Hydrologic link ", this%id, ": Q = ", discharge, ", S = ", this%storage
 
   END SUBROUTINE hydrologic_link_set_initial
 
@@ -116,34 +186,61 @@ CONTAINS
     CLASS (hydrologic_link), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: deltat
 
-    DOUBLE PRECISION :: X, kstrick, latflow
-
-    this%y = this%pt(this%npoints)%hnow%y - this%pt(this%npoints)%thalweg
-    kstrick = this%pt(this%npoints)%kstrick
-    this%K = SQRT(this%So)*kstrick*this%y**(2.0/3.0)/this%L
-
-    X = EXP(-this%K*deltat)
+    DOUBLE PRECISION :: X, kstrick
+    DOUBLE PRECISION :: invol, outvol, latvol, q, x0
+    INTEGER :: i
 
     ! get upstream inflow (volume)
 
-    this%inflow = this%inflow*deltat
+    IF (ASSOCIATED(this%ucon)) THEN
+       ! do something to get a discharge (there should only be
+       ! hydrologic links upstream)
+       ! invol = this%ucon%p%discharge()
+    ELSE
+       IF (ASSOCIATED(this%usbc)) THEN
+          invol = this%usbc%current_value
+       ELSE 
+          invol = 0.0
+       END IF
+    END IF
 
-    ! get lateral inflow (volume)
+    this%inflow = invol
+    latvol = this%latq
 
-    latflow = latflow*this%L*deltat
+    ! use the downstream section to compute conveyance
+    
+    this%y = this%pt(this%npoints)%xsprop%depth
+    this%y = this%pt(this%npoints)%xsprop%hydrad
+    ! this%y = 0.75*this%y
+    kstrick = this%pt(this%npoints)%kstrick
+    this%K = SQRT(this%So)*kstrick*this%y**(2.0/3.0)/this%L
+    X = EXP(-this%K*deltat)
 
-    this%storage = (1/this%K)*(this%inflow + latflow) + &
-         &X*(this%storage_old - (1/this%K)*(this%inflow + latflow))
+    WRITE (*,*) "Hydrologic link ", this%id, ": ", &
+         &"y = ", this%y, ", "&
+         &"K = ", this%K, ", "&
+         &"X = ", X 
 
-    this%outflow = this%inflow + latflow + (this%storage - this%storage_old)
+    this%storage = (invol + latvol)/this%K + &
+         &X*(this%storage_old - (invol + latvol)/this%K)
+
+    outvol = invol + latvol + (this%storage - this%storage_old)/deltat
+    this%outflow = outvol
 
     ! compute discharge rates and sweep coefficients for confluences
 
-    this%qout = this%outflow / deltat;
-    this%pt(this%npoints)%hnow%q = this%qout
-    this%qin = this%inflow / deltat;
-    this%pt(1)%hnow%q = this%qin
+    x0 = this%pt(this%npoints)%x
 
+    DO i = 1, this%npoints
+       x = this%pt(this%npoints)%x
+       q = (x - x0)/this%L*(this%inflow - this%outflow) + this%outflow
+       this%pt(i)%hnow%q = q
+    END DO
+
+    WRITE(*,*) 'Hydrologic link ', this%id, &
+         &": I = ", this%inflow, &
+         &", S = ", this%storage, &
+         &", O = ", this%outflow
 
   END SUBROUTINE hydrologic_link_forward
 
@@ -155,21 +252,16 @@ CONTAINS
     IMPLICIT NONE
     CLASS (hydrologic_link), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: dsbc_type
-
-    DOUBLE PRECISION :: x0, x, q, y
     INTEGER :: i
-
-    x0 = this%pt(this%npoints)%x
+    DOUBLE PRECISION :: q, depth
 
     DO i = 1, this%npoints
-       x = this%pt(this%npoints)%x
-       q = (x - x0)/this%L*(this%qin - this%qout) + this%qout
-       this%pt(i)%hnow%q = q
-       y = this%pt(i)%hnow%y - this%pt(i)%thalweg
-       this%pt(i)%hnow%y = &
-            &this%pt(i)%xsection%p%normal_depth(q, this%So, this%pt(i)%kstrick, y)
+       q = this%pt(i)%hnow%q
+       depth = this%pt(i)%hnow%y - this%pt(i)%thalweg
+       depth = &
+            &this%pt(i)%xsection%p%normal_depth(q, this%So, this%pt(i)%kstrick, depth)
+       this%pt(i)%hnow%y = depth + this%pt(i)%thalweg
     END DO
-
 
   END SUBROUTINE hydrologic_link_backward
 
@@ -183,7 +275,17 @@ CONTAINS
     CLASS (hydrologic_link), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: grav, dt
 
-    
+    CALL this%linear_link_t%hydro_update(grav, dt)
+
+    this%storage_old = this%storage
+    this%inflow_old = this%inflow
+    this%outflow_old = this%outflow
+
+    IF (ASSOCIATED(this%latbc)) THEN
+       this%latq_old = this%latq
+       this%latq = this%latbc%current_value
+    END IF
+
 
 
   END SUBROUTINE hydrologic_link_hupdate
@@ -196,7 +298,6 @@ CONTAINS
     IMPLICIT NONE
     CLASS (hydrologic_link), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: iunit
-    CHARACTER (LEN=1024) :: msg
 
     CALL this%linear_link_t%read_restart(iunit)
     
