@@ -195,7 +195,7 @@ CONTAINS
     IF (ASSOCIATED(this%ucon)) THEN
        ! do something to get a discharge (there should only be
        ! hydrologic links upstream)
-       ! invol = this%ucon%p%discharge()
+       invol = this%ucon%discharge()
     ELSE
        IF (ASSOCIATED(this%usbc)) THEN
           invol = this%usbc%current_value
@@ -224,16 +224,21 @@ CONTAINS
     this%storage = (invol + latvol)/this%K + &
          &X*(this%storage_old - (invol + latvol)/this%K)
 
-    outvol = invol + latvol + (this%storage - this%storage_old)/deltat
+    outvol = invol + latvol - (this%storage - this%storage_old)/deltat
     this%outflow = outvol
+
+    ! compute some coefficients that can be used by confluences
+
+    this%pt(:)%sweep%e = 0.0
+    this%pt(:)%sweep%f = this%outflow - this%outflow_old
 
     ! compute discharge rates and sweep coefficients for confluences
 
     x0 = this%pt(this%npoints)%x
 
     DO i = 1, this%npoints
-       x = this%pt(this%npoints)%x
-       q = (x - x0)/this%L*(this%inflow - this%outflow) + this%outflow
+       x = this%pt(i)%x
+       q = ABS(x - x0)/this%L*(this%inflow - this%outflow) + this%outflow
        this%pt(i)%hnow%q = q
     END DO
 
@@ -254,6 +259,9 @@ CONTAINS
     INTEGER, INTENT(IN) :: dsbc_type
     INTEGER :: i
     DOUBLE PRECISION :: q, depth
+
+    ! assume normal depth at all cross sections, given the
+    ! interpolated discharge
 
     DO i = 1, this%npoints
        q = this%pt(i)%hnow%q
