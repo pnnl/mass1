@@ -121,7 +121,7 @@ CONTAINS
     this%So = ABS(this%pt(1)%thalweg - this%pt(this%npoints)%thalweg)
     this%So = this%So/this%L
 
-    WRITE(*,*) "Hydrologic link ", this%id, ": L = ", this%L, ", So = ", this%So
+    ! WRITE(*,*) "Hydrologic link ", this%id, ": L = ", this%L, ", So = ", this%So
 
     RETURN
   END FUNCTION hydrologic_link_readpts
@@ -171,7 +171,7 @@ CONTAINS
     this%storage_old = this%storage
     this%y = this%pt(this%npoints)%hnow%y - this%pt(this%npoints)%thalweg
 
-    WRITE(*,*) "Hydrologic link ", this%id, ": Q = ", discharge, ", S = ", this%storage
+    ! WRITE(*,*) "Hydrologic link ", this%id, ": Q = ", discharge, ", S = ", this%storage
 
   END SUBROUTINE hydrologic_link_set_initial
 
@@ -216,10 +216,10 @@ CONTAINS
     this%K = SQRT(this%So)*kstrick*this%y**(2.0/3.0)/this%L
     X = EXP(-this%K*deltat)
 
-    WRITE (*,*) "Hydrologic link ", this%id, ": ", &
-         &"y = ", this%y, ", "&
-         &"K = ", this%K, ", "&
-         &"X = ", X 
+    ! WRITE (*,*) "Hydrologic link ", this%id, ": ", &
+    !      &"y = ", this%y, ", "&
+    !      &"K = ", this%K, ", "&
+    !      &"X = ", X 
 
     this%storage = (invol + latvol)/this%K + &
          &X*(this%storage_old - (invol + latvol)/this%K)
@@ -242,10 +242,10 @@ CONTAINS
        this%pt(i)%hnow%q = q
     END DO
 
-    WRITE(*,*) 'Hydrologic link ', this%id, &
-         &": I = ", this%inflow, &
-         &", S = ", this%storage, &
-         &", O = ", this%outflow
+    ! WRITE(*,*) 'Hydrologic link ', this%id, &
+    !      &": I = ", this%inflow, &
+    !      &", S = ", this%storage, &
+    !      &", O = ", this%outflow
 
   END SUBROUTINE hydrologic_link_forward
 
