@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2018-08-08 12:00:57 d3g096
+! Last Change: 2018-08-15 13:25:46 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -64,6 +64,7 @@ MODULE link_module
      PROCEDURE :: elev => confluence_elev
      PROCEDURE :: conc => confluence_conc
      PROCEDURE :: set_order => confluence_set_order
+     PROCEDURE :: discharge => confluence_discharge
   END type confluence_t
 
   INTERFACE confluence_t
@@ -570,6 +571,10 @@ CONTAINS
        ELSE 
           qout = qout + link%q_down()
        END IF
+
+       CALL this%ulink%next()
+       link => this%ulink%current()
+
        n = n + 1
     END DO
     
@@ -614,6 +619,30 @@ CONTAINS
 
   END FUNCTION confluence_set_order
 
+  ! ----------------------------------------------------------------
+  !  FUNCTION confluence_discharge
+  !
+  ! Computes the discharge to the *downstream* link, i.e. the sum of
+  ! the upstream link discharge(s).  This should probably only be used
+  ! by hydrologic links.
+  ! ----------------------------------------------------------------
+  FUNCTION confluence_discharge(this) RESULT(q)
+    IMPLICIT NONE
+    DOUBLE PRECISION :: q
+    CLASS (confluence_t), INTENT(INOUT) :: this
+    CLASS (link_t), POINTER :: link
+
+    q = 0.0
+
+    CALL this%ulink%begin()
+    link => this%ulink%current()
+    DO WHILE (ASSOCIATED(link))
+       q = q + link%q_down()
+       CALL this%ulink%next()
+       link => this%ulink%current()
+    END DO
+
+  END FUNCTION confluence_discharge
 
   ! ----------------------------------------------------------------
   !  FUNCTION link_set_order

@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2018-08-07 08:49:31 d3g096
+! Last Change: 2018-08-13 14:48:00 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -141,6 +141,7 @@ MODULE cross_section
    CONTAINS
      PROCEDURE :: read => triangular_rounded_read
      PROCEDURE :: props => triangular_rounded_props
+     PROCEDURE :: normal_depth_iter => triangular_rounded_normal_iterate
   END type triangular_rounded_section
 
   ! ----------------------------------------------------------------
@@ -1161,6 +1162,32 @@ CONTAINS
     dnorm = dnorm*c2/c1
     dnorm = dnorm**(5.0/8.0)
   END FUNCTION triangular_normal_iterate
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION triangular_rounded_normal_iterate
+  ! ----------------------------------------------------------------
+  FUNCTION triangular_rounded_normal_iterate(this, &
+       &discharge, slope, kstrick, dguess) RESULT (f)
+    IMPLICIT NONE
+    DOUBLE PRECISION :: f
+    CLASS(triangular_rounded_section), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: discharge, slope, kstrick, dguess
+    DOUBLE PRECISION, PARAMETER :: alpha = 5.0/3.0, beta = 2.0/3.0
+
+    TYPE (xsection_prop) :: props
+    DOUBLE PRECISION :: K
+
+    ! copied from xsection_normal_iterate() because we can't do this:
+    ! f = this%xsection_t%normal_depth_iter(discharge, slope, kstrick, dguess)
+    
+    K = SQRT(slope)*kstrick
+    K = (discharge/K)**(1.0/alpha)
+    CALL this%props(dguess, props)
+    f = K*(props%wetperim**(beta/alpha))
+    f = this%invarea(f)
+
+  END FUNCTION triangular_rounded_normal_iterate
+
 
 
   ! ----------------------------------------------------------------

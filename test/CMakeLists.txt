@@ -7,10 +7,12 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2018-03-22 12:29:09 d3g096
+# Last Change: 2018-08-15 08:31:19 d3g096
 # -------------------------------------------------------------
 
 
+add_subdirectory(flow/hlink-slopebreak1)
+add_subdirectory(flow/hlink-normal)
 add_subdirectory(flow/dam-break)
 add_subdirectory(flow/drain)
 add_subdirectory(flow/fill)
