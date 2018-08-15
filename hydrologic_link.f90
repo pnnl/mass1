@@ -230,7 +230,7 @@ CONTAINS
     ! compute some coefficients that can be used by confluences
 
     this%pt(:)%sweep%e = 0.0
-    this%pt(:)%sweep%f = this%outflow - this%outflow_old
+    this%pt(:)%sweep%f = 0.0
 
     ! compute discharge rates and sweep coefficients for confluences
 
@@ -291,7 +291,7 @@ CONTAINS
 
     IF (ASSOCIATED(this%latbc)) THEN
        this%latq_old = this%latq
-       this%latq = this%latbc%current_value
+       this%latq = this%latbc%current_value*this%L
     END IF
 
 
