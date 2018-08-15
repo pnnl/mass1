@@ -276,7 +276,11 @@ SUBROUTINE flow_sim
         IF(linktype(link) == 2)THEN
            bcval = usbc(link)%p%current_value
            dq = bcval - q(link,point)
-           dy = (dq - f(link,point))/e(link,point)
+           IF (e(link,point) .GT. 0.0) THEN
+              dy = (dq - f(link,point))/e(link,point)
+           ELSE 
+              dy = 0.0          ! not sure if this ever happens
+           END IF
 
         ELSEIF(linktype(link) == 6)THEN
 
