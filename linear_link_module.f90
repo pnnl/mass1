@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2018-08-07 08:58:53 d3g096
+! Last Change: 2018-08-13 14:57:53 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -47,6 +47,8 @@ MODULE linear_link_module
      PROCEDURE :: forward_sweep => linear_link_forward
      PROCEDURE :: backward_sweep => linear_link_backward
      PROCEDURE :: hydro_update => linear_link_hupdate
+     PROCEDURE :: max_courant => linear_link_max_courant
+     PROCEDURE :: max_diffuse => linear_link_max_diffuse
      PROCEDURE :: point => linear_link_point
      PROCEDURE :: check => linear_link_check
      PROCEDURE :: destroy => linear_link_destroy
@@ -576,6 +578,44 @@ CONTAINS
 
   END SUBROUTINE linear_link_hupdate
 
+  ! ----------------------------------------------------------------
+  ! DOUBLE PRECISION FUNCTION linear_link_max_courant
+  ! ----------------------------------------------------------------
+  FUNCTION linear_link_max_courant(this, dt) RESULT(cnmax)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION :: cnmax
+    CLASS (linear_link_t), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: dt
+
+    INTEGER :: i
+
+    cnmax = 0.0
+    DO i = 1, this%npoints
+       cnmax = MAX(cnmax, this%pt(i)%hnow%courant_num)
+    END DO
+
+  END FUNCTION linear_link_max_courant
+
+  ! ----------------------------------------------------------------
+  ! DOUBLE PRECISION FUNCTION linear_link_max_diffuse
+  ! ----------------------------------------------------------------
+  FUNCTION linear_link_max_diffuse(this, dt) RESULT(dmax)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION :: dmax
+    CLASS (linear_link_t), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: dt
+
+    INTEGER :: i
+
+    dmax = 0.0
+    DO i = 1, this%npoints
+       dmax = MAX(dmax, this%pt(i)%hnow%diffuse_num)
+    END DO
+
+  END FUNCTION linear_link_max_diffuse
+
 
   ! ----------------------------------------------------------------
   !  FUNCTION linear_link_point
@@ -640,6 +680,8 @@ CONTAINS
     DEALLOCATE(this%pt)
 
   END SUBROUTINE linear_link_destroy
+
+  
 
 
 END MODULE linear_link_module

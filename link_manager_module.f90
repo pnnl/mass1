@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2018-08-07 08:52:19 d3g096
+! Last Change: 2018-08-09 07:45:24 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -61,6 +61,8 @@ MODULE link_manager_module
      PROCEDURE :: hyupdate => link_manager_hyupdate
      PROCEDURE :: read_restart => link_manager_read_restart
      PROCEDURE :: write_restart => link_manager_write_restart
+     PROCEDURE :: transport_steps => link_manager_transport_steps
+     ! PROCEDURE :: transport => link_manager_transport
      PROCEDURE :: destroy => link_manager_destroy
   END type link_manager_t
 
@@ -882,6 +884,54 @@ CONTAINS
 
   END SUBROUTINE link_manager_write_restart
 
+  ! ----------------------------------------------------------------
+  ! INTEGER FUNCTION link_manager_transport_steps
+  ! ----------------------------------------------------------------
+  FUNCTION link_manager_transport_steps(this, dt) RESULT(nstep)
+
+    IMPLICIT NONE
+    INTEGER :: nstep
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: dt
+
+    DOUBLE PRECISION :: cmax, dmax, a_transdt, d_transdt
+    CLASS (link_t), POINTER :: link
+
+    DOUBLE PRECISION, PARAMETER :: max_courant = 0.99, max_diffuse = 0.99
+
+    CALL this%links%begin()
+    link => this%links%current()
+
+    DO WHILE (ASSOCIATED(link))
+       cmax = MAX(cmax, link%max_courant(dt))
+       dmax = MAX(dmax, link%max_diffuse(dt))
+
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+
+    IF (cmax .GT. max_courant) THEN 
+       a_transdt = max_courant/cmax*dt
+    ELSE 
+       a_transdt = dt
+    END IF
+
+    IF (dmax .GT. max_diffuse) THEN 
+       d_transdt = max_diffuse/dmax*dt
+    ELSE 
+       d_transdt = dt
+    END IF
+
+    a_transdt = MIN(a_transdt, d_transdt)
+
+    nstep = FLOOR(dt/a_transdt)
+
+    IF (FRACTION(dt/a_transdt) .GT. EPSILON(a_transdt)) &
+         &nstep = nstep + 1
+
+    nstep = MAX(nstep, 1)
+
+  END FUNCTION link_manager_transport_steps
 
 
 

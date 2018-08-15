@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2018-08-07 09:00:49 d3g096
+! Last Change: 2018-08-08 12:00:57 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -123,6 +123,12 @@ MODULE link_module
      PROCEDURE (bsweep_proc), DEFERRED :: backward_sweep
      PROCEDURE (hupdate_proc), DEFERRED :: hydro_update
 
+     ! transport related routines
+
+     PROCEDURE (max_tnumber_proc), DEFERRED :: max_courant
+     PROCEDURE (max_tnumber_proc), DEFERRED :: max_diffuse
+     ! PROCEDURE (trans_interp_proc, DEFERRED :: trans_interp
+
      ! get a point on a link (if any)
 
      PROCEDURE :: point => link_point
@@ -209,6 +215,13 @@ MODULE link_module
        CLASS (link_t), INTENT(INOUT) :: this
        DOUBLE PRECISION, INTENT(IN) :: grav, dt
      END SUBROUTINE hupdate_proc
+
+     DOUBLE PRECISION FUNCTION max_tnumber_proc(this, dt)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(IN) :: this
+       DOUBLE PRECISION, INTENT(IN) :: dt
+     END FUNCTION max_tnumber_proc
 
      SUBROUTINE destroy_proc(this)
        IMPORT :: link_t
