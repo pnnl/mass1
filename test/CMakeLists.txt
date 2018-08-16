@@ -7,11 +7,12 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2018-08-16 08:05:49 d3g096
+# Last Change: 2018-08-16 08:10:32 d3g096
 # -------------------------------------------------------------
 
 
 add_subdirectory(flow/hlink-trib)
+add_subdirectory(flow/hlink-upstream)
 add_subdirectory(flow/hlink-lateral)
 add_subdirectory(flow/hlink-slopebreak1)
 add_subdirectory(flow/hlink-normal)

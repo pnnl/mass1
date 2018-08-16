@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2017-01-20 07:45:47 d3g096
+# Last Change: 2018-08-16 07:02:49 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -54,7 +54,7 @@ add_custom_command(
   COMMAND ${mass1exe} > mass1.inflow.log
   COMMAND ${CMAKE_COMMAND} -E rename profile1.out profile1.inflow.out
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-  COMMENT "Running test flow/MacDonald-1 (inflow)"
+  COMMENT "Running test flow/lateral (inflow)"
   DEPENDS 
   mass1 ${testfiles}
   "${CMAKE_CURRENT_BINARY_DIR}/mass1-inflow.cfg"
@@ -68,7 +68,7 @@ add_custom_command(
   COMMAND ${mass1exe} > mass1.outflow.log
   COMMAND ${CMAKE_COMMAND} -E rename profile1.out profile1.outflow.out
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-  COMMENT "Running test flow/MacDonald-1 (outflow)"
+  COMMENT "Running test flow/lateral (outflow)"
   DEPENDS 
   mass1 ${testfiles}
   "${CMAKE_CURRENT_BINARY_DIR}/mass1-outflow.cfg"

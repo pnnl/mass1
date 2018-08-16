@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2018-08-15 14:32:33 d3g096
+# Last Change: 2018-08-16 06:56:04 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -51,12 +51,12 @@ set(testfiles
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/profile1.inflow.out"
   COMMAND ${CMAKE_COMMAND} -E copy mass1-inflow.cfg mass1.cfg
-  COMMAND ${mass1exe} > mass1.inflow.log
+  COMMAND ${mass1newexe} > mass1.inflow.log
   COMMAND ${CMAKE_COMMAND} -E rename profile1.out profile1.inflow.out
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-  COMMENT "Running test flow/MacDonald-1 (inflow)"
+  COMMENT "Running test flow/hlink-lateral (inflow)"
   DEPENDS 
-  mass1 ${testfiles}
+  mass1_new ${testfiles}
   "${CMAKE_CURRENT_BINARY_DIR}/mass1-inflow.cfg"
   "${CMAKE_CURRENT_BINARY_DIR}/lat-inflow-files.dat"
   "${CMAKE_CURRENT_SOURCE_DIR}/lateral-inflow.dat"
@@ -65,12 +65,12 @@ add_custom_command(
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/profile1.outflow.out"
   COMMAND ${CMAKE_COMMAND} -E copy mass1-outflow.cfg mass1.cfg
-  COMMAND ${mass1exe} > mass1.outflow.log
+  COMMAND ${mass1newexe} > mass1.outflow.log
   COMMAND ${CMAKE_COMMAND} -E rename profile1.out profile1.outflow.out
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-  COMMENT "Running test flow/MacDonald-1 (outflow)"
+  COMMENT "Running test flow/hlink-lateral (outflow)"
   DEPENDS 
-  mass1 ${testfiles}
+  mass1_new ${testfiles}
   "${CMAKE_CURRENT_BINARY_DIR}/mass1-outflow.cfg"
   "${CMAKE_CURRENT_BINARY_DIR}/lat-outflow-files.dat"
   "${CMAKE_CURRENT_SOURCE_DIR}/lateral-outflow.dat"
@@ -85,7 +85,7 @@ if (GNUPLOT_EXECUTABLE)
     OUTPUT "plot.eps"
     COMMAND "${GNUPLOT_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp" > plot.eps
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    COMMENT "Plotting test flow/lateral"
+    COMMENT "Plotting test flow/hlink-lateral"
     DEPENDS 
     ${rundeps}
     "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp"
@@ -96,8 +96,8 @@ endif (GNUPLOT_EXECUTABLE)
 add_custom_target(run_hlink_lateral_test
   DEPENDS ${rundeps}
 )
-# FIXME: net yet
-# add_dependencies(runtests run_lateral_test)
+
+add_dependencies(runtests run_hlink_lateral_test)
 
 set_property(DIRECTORY 
   APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES

@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2018-08-15 08:30:48 d3g096
+# Last Change: 2018-08-16 06:25:00 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -36,10 +36,10 @@ set(testfiles
 
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/profile1.out"
-  COMMAND ${mass1exe} > mass1.log
+  COMMAND ${mass1newexe} > mass1.log
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-  COMMENT "Running test flow/slopebreak1"
-  DEPENDS mass1 ${testfiles}
+  COMMENT "Running test flow/hlink-slopebreak1"
+  DEPENDS mass1_new ${testfiles}
 )
 set(rundeps "${CMAKE_CURRENT_BINARY_DIR}/profile1.out")
 
@@ -49,7 +49,7 @@ if (GNUPLOT_EXECUTABLE)
     COMMAND "${GNUPLOT_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp" > plot.eps
     COMMAND "${GNUPLOT_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/plot-elev.gp" > plot-elev.eps
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    COMMENT "Plotting test flow/slopebreak1"
+    COMMENT "Plotting test flow/hlink-slopebreak1"
     DEPENDS 
     "${CMAKE_CURRENT_BINARY_DIR}/profile1.out"
     "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp"
@@ -61,8 +61,7 @@ endif (GNUPLOT_EXECUTABLE)
 add_custom_target(run_hlink_slopebreak_1_test
   DEPENDS ${rundeps}
 )
-# FIXME: not yet
-# add_dependencies(runtests run_slopebreak_1_test)
+add_dependencies(runtests run_hlink_slopebreak_1_test)
 
 set_property(DIRECTORY 
   APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
