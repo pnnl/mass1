@@ -229,9 +229,6 @@ CONTAINS
 
     ! compute some coefficients that can be used by confluences
 
-    this%pt(:)%sweep%e = 0.0
-    this%pt(:)%sweep%f = 0.0
-
     ! compute discharge rates and sweep coefficients for confluences
 
     x0 = this%pt(this%npoints)%x
@@ -241,6 +238,9 @@ CONTAINS
        q = ABS(x - x0)/this%L*(this%inflow - this%outflow) + this%outflow
        this%pt(i)%hnow%q = q
     END DO
+
+    this%pt(:)%sweep%e = 0.0
+    this%pt(:)%sweep%f = 0.0
 
     ! WRITE(*,*) 'Hydrologic link ', this%id, &
     !      &": I = ", this%inflow, &
