@@ -306,9 +306,33 @@ CONTAINS
     IMPLICIT NONE
     CLASS (hydrologic_link), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: iunit
+    INTEGER :: ierr, iostat
+    CHARACTER (LEN=1024) :: msg
+
+    ierr = 0
 
     CALL this%linear_link_t%read_restart(iunit)
     
+    READ(iunit, IOSTAT=iostat) this%y, this%K, &
+         &this%inflow, this%outflow, this%latq, &
+         &this%inflow_old, this%outflow_old, this%latq_old, &
+         &this%storage, this%storage_old
+    IF (IS_IOSTAT_END(iostat)) THEN
+       WRITE(msg, *) 'link ', this%id, &
+            &': premature end of file for hydrologic link'
+       CALL error_message(msg)
+       ierr = ierr + 1
+    ELSE IF (iostat .NE. 0) THEN
+       WRITE(msg, *) 'link ', this%id, &
+            &': error reading restart for hydrologic link '
+       CALL error_message(msg)
+       ierr = ierr + 1
+    END IF
+
+    IF (ierr .GT. 0) THEN
+       WRITE(msg, *) 'problem reading restart for link', this%id
+       CALL error_message(msg, fatal=.TRUE.)
+    END IF
 
   END SUBROUTINE hydrologic_link_read_restart
 
@@ -322,6 +346,11 @@ CONTAINS
     INTEGER, INTENT(IN) :: iunit
 
     CALL this%linear_link_t%write_restart(iunit)
+
+    WRITE(iunit) this%y, this%K, &
+         &this%inflow, this%outflow, this%latq, &
+         &this%inflow_old, this%outflow_old, this%latq_old, &
+         &this%storage, this%storage_old
 
   END SUBROUTINE hydrologic_link_write_restart
 

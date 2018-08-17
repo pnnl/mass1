@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October 24, 2011 by William A. Perkins
-# Last Change: 2018-04-06 14:57:51 d3g096
+# Last Change: 2018-08-16 08:55:07 d3g096
 # -------------------------------------------------------------
 
 from inspect import *
@@ -255,7 +255,7 @@ class Link(object):
 
     def write(self, outfd):
         ptopt = 2                       # format of point input
-        lntype = 1                      # link type
+        lntype = 60                      # link type
 
         usbc = 0                        # there is only one upstream bc file
         if (len(self._uplink) == 0):
