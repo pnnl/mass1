@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2018-08-16 06:20:42 d3g096
+# Last Change: 2018-08-21 08:08:49 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -199,8 +199,7 @@ add_executable(svgrptest svgrp-test.f90 svgrp.f90)
 # -------------------------------------------------------------
 # the new mass1
 # -------------------------------------------------------------
-add_executable(mass1_new
-  mass1_new.f90
+add_library(mass1lib
   "${CMAKE_CURRENT_BINARY_DIR}/banner.f90"
   bc_module.f90
   coeff.f90
@@ -224,7 +223,10 @@ add_executable(mass1_new
   linear_interp.f90
   svgrp.f90
 )
-target_link_libraries(mass1_new gastemp ts)
+add_executable(mass1_new
+  mass1_new.f90
+)
+target_link_libraries(mass1_new mass1lib gastemp ts)
 # save for running tests
 set(mass1newexe $<TARGET_FILE:mass1_new>)
 
