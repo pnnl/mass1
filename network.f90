@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2018-08-07 08:57:43 d3g096
+! Last Change: 2018-08-20 14:44:36 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -54,6 +54,7 @@ MODULE network_module
      PROCEDURE :: backward => network_backward
      PROCEDURE :: flow => network_flow
      PROCEDURE :: run => network_run
+     PROCEDURE :: run_to => network_run_to_time
      PROCEDURE :: destroy => network_destroy
   END type network
 
@@ -365,26 +366,20 @@ CONTAINS
   END SUBROUTINE network_flow
 
   ! ----------------------------------------------------------------
-  ! SUBROUTINE network_run
+  ! SUBROUTINE network_run_to_time
   ! ----------------------------------------------------------------
-  SUBROUTINE network_run(this)
+  SUBROUTINE network_run_to_time(this, tend)
 
     IMPLICIT NONE
     CLASS (network), INTENT(INOUT) :: this
-    INTEGER :: nstep
+    DOUBLE PRECISION, INTENT(IN) :: tend
+
     CHARACTER (LEN=20) :: date_string, time_string
     LOGICAL :: dooutput
 
-    nstep = 0
     dooutput = .FALSE.
 
-    this%config%time%time = this%config%time%begin
-
-    ! make sure initial conditions are in the output
-    IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
-    IF (this%config%do_profileout) CALL this%profiles%output(this%config%time%time)
-
-    DO WHILE(this%config%time%time .LT. this%config%time%end)
+    DO WHILE(this%config%time%time .LT. tend)
 
        ! print out initial conditions
 
@@ -399,10 +394,11 @@ CONTAINS
        ! time is placed in output
 
        ! model_time = model_time + time_step
-       nstep = nstep + 1
-       this%config%time%time = this%config%time%begin + nstep*this%config%time%step
+       this%config%time%current_step = this%config%time%current_step + 1
+       this%config%time%time = this%config%time%begin + &
+            &this%config%time%current_step*this%config%time%step
 
-       dooutput = (MOD(nstep, this%config%print_freq) == 0)
+       dooutput = (MOD(this%config%time%current_step, this%config%print_freq) == 0)
        
        IF (dooutput) THEN
           IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
@@ -413,8 +409,30 @@ CONTAINS
        WRITE(*,*) 'Done Crunching through ** Date: ', &
             &TRIM(date_string),'  Time: ', TRIM(time_string)
     END DO
+    
+
+  END SUBROUTINE network_run_to_time
+
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE network_run
+  ! ----------------------------------------------------------------
+  SUBROUTINE network_run(this)
+
+    IMPLICIT NONE
+    CLASS (network), INTENT(INOUT) :: this
+    LOGICAL :: dooutput
+
+    this%config%time%time = this%config%time%begin
+
+    ! make sure initial conditions are in the output
+    IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
+    IF (this%config%do_profileout) CALL this%profiles%output(this%config%time%time)
+
+    CALL this%run_to(this%config%time%end)
 
     ! always write the last state, if not done already
+    dooutput = (MOD(this%config%time%current_step, this%config%print_freq) == 0)
     IF (.NOT. dooutput) THEN
        IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
        IF (this%config%do_profileout) CALL this%profiles%output(this%config%time%time)

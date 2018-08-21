@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2017-06-23 13:52:22 d3g096
+! Last Change: 2018-08-20 14:39:29 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE mass1_config
@@ -63,6 +63,7 @@ MODULE mass1_config
      DOUBLE PRECISION :: delta_t
      DOUBLE PRECISION :: step
      DOUBLE PRECISION :: mult
+     INTEGER :: current_step
      CHARACTER (LEN=10) :: date_run_begins, date_run_ends
      CHARACTER (LEN=10) :: time_run_begins, time_run_ends
      CONTAINS 
@@ -525,6 +526,7 @@ CONTAINS
 
     this%time%step = this%time%delta_t/24.0
     this%time%delta_t = this%time%delta_t*3600.0
+    this%time%current_step = 0
 
     this%met_required = &
          &(this%do_temp .AND. this%temp_exchange) .OR. &
