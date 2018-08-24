@@ -18,7 +18,6 @@ MODULE hydrologic_link_module
   ! TYPE hydrologic_link
   ! ----------------------------------------------------------------
   TYPE, PUBLIC, EXTENDS(linear_link_t) :: hydrologic_link
-     CLASS (bc_t), POINTER :: latbc
      DOUBLE PRECISION :: y
      DOUBLE PRECISION :: L, So
      DOUBLE PRECISION :: K

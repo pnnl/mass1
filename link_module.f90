@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2018-08-15 13:25:46 d3g096
+! Last Change: 2018-08-21 15:02:06 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -91,14 +91,15 @@ MODULE link_module
      INTEGER :: id
      INTEGER :: order
      INTEGER :: dsid, usbcid, dsbcid
-     CLASS (bc_t), POINTER :: usbc, dsbc
+     CLASS (bc_t), POINTER :: usbc, dsbc, latbc
      CLASS (confluence_t), POINTER :: ucon, dcon
    CONTAINS
 
      PROCEDURE :: construct => link_construct
      PROCEDURE (init_proc), DEFERRED :: initialize
      PROCEDURE (readpts_proc), DEFERRED :: readpts
-     PROCEDURE  :: points => link_points
+     PROCEDURE :: points => link_points
+     PROCEDURE :: length => link_length
      PROCEDURE (destroy_proc), DEFERRED :: destroy
 
      PROCEDURE, NON_OVERRIDABLE :: set_order => link_set_order
@@ -288,6 +289,7 @@ CONTAINS
 
     NULLIFY(this%usbc)
     NULLIFY(this%dsbc)
+    NULLIFY(this%latbc)
     NULLIFY(this%ucon)
     NULLIFY(this%dcon)
 
@@ -320,6 +322,20 @@ CONTAINS
     n = 0
 
   END FUNCTION link_points
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION link_length
+  ! ----------------------------------------------------------------
+  FUNCTION link_length(this) RESULT (len)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION :: len
+    CLASS (link_t), INTENT(IN) :: this
+
+    len = 0
+
+  END FUNCTION link_length
+
 
   ! ----------------------------------------------------------------
   !  FUNCTION link_point

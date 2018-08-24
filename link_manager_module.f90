@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2018-08-15 13:25:35 d3g096
+! Last Change: 2018-08-21 14:00:08 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -55,6 +55,7 @@ MODULE link_manager_module
      PROCEDURE :: read => link_manager_read
      PROCEDURE, PRIVATE :: readpts => link_manager_readpts
      PROCEDURE, PRIVATE :: readpid => link_manager_readpid
+     PROCEDURE :: maxid => link_manager_maxid
      PROCEDURE :: find => link_manager_find
      PROCEDURE :: connect => link_manager_connect
      PROCEDURE :: forward => link_manager_flow_forward
@@ -765,6 +766,30 @@ CONTAINS
     INTEGER, INTENT(IN) :: linkid
     link => this%links%find(linkid)
   END FUNCTION link_manager_find
+
+  ! ----------------------------------------------------------------
+  ! INTEGER FUNCTION link_manager_maxid
+  ! ----------------------------------------------------------------
+  INTEGER FUNCTION link_manager_maxid(this)
+
+    IMPLICIT NONE
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+
+    CLASS (link_t), POINTER :: link
+
+    link_manager_maxid = 0
+
+    CALL this%links%begin()
+    link => this%links%current()
+    DO WHILE (ASSOCIATED(link))
+       link_manager_maxid = MAX(link_manager_maxid, link%id)
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+    
+    
+  END FUNCTION link_manager_maxid
+  
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_flow_forward

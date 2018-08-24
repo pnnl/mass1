@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2018-08-13 14:57:53 d3g096
+! Last Change: 2018-08-21 15:04:48 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -34,6 +34,7 @@ MODULE linear_link_module
      PROCEDURE :: initialize => linear_link_initialize
      PROCEDURE :: readpts => linear_link_readpts
      PROCEDURE :: points => linear_link_points
+     PROCEDURE :: length => linear_link_length
      PROCEDURE :: q_up => linear_link_q_up
      PROCEDURE :: q_down => linear_link_q_down
      PROCEDURE :: y_up => linear_link_y_up
@@ -280,6 +281,19 @@ CONTAINS
     INTEGER :: n
     n = this%npoints
   END FUNCTION linear_link_points
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION linear_link_length
+  ! ----------------------------------------------------------------
+  FUNCTION linear_link_length(this) RESULT(len)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION :: len
+    CLASS (linear_link_t), INTENT(IN) :: this
+    
+    len = ABS(this%pt(1)%x - this%pt(this%npoints)%x)
+
+  END FUNCTION linear_link_length
 
 
   ! ----------------------------------------------------------------

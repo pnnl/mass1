@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2018-08-07 08:50:31 d3g096
+! Last Change: 2018-08-21 12:29:08 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -26,7 +26,6 @@ MODULE fluvial_link_module
   PRIVATE
 
   TYPE, PUBLIC, EXTENDS(linear_link_t) :: fluvial_link
-     CLASS (bc_t), POINTER :: latbc
      DOUBLE PRECISION :: latq, latqold
      DOUBLE PRECISION :: lpiexp
    CONTAINS
