@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December  1, 2010 by William A. Perkins
-# Last Change: 2017-07-14 12:57:05 d3g096
+# Last Change: 2018-08-21 12:42:23 d3g096
 # -------------------------------------------------------------
 
 set -u
@@ -28,6 +28,11 @@ dirs=" \
     fill \
     fill-us \
     lateral-fill \
+    hlink-normal \
+    hlink-lateral \
+    hlink-slopebreak1 \
+    hlink-trib \
+    hlink-upstream \
     varied \
     varied-pid \
     varied-pool \
