@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2018-08-16 08:10:32 d3g096
+# Last Change: 2019-01-18 10:47:21 d3g096
 # -------------------------------------------------------------
 
 
@@ -24,6 +24,7 @@ add_subdirectory(flow/MacDonald-4)
 add_subdirectory(flow/MacDonald-3)
 add_subdirectory(flow/MacDonald-1)
 add_subdirectory(flow/storage)
+add_subdirectory(flow/slopebreak3)
 add_subdirectory(flow/slopebreak2)
 add_subdirectory(flow/slopebreak1)
 add_subdirectory(flow/lateral)
