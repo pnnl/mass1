@@ -1,7 +1,7 @@
 ! ----------------------------------------------------------------
-! MODULE mass1_api
+! MODULE mass1_dhsvm
 ! ----------------------------------------------------------------
-MODULE mass1_api
+MODULE mass1_dhsvm
 
   USE iso_c_binding
   USE utility
@@ -19,24 +19,20 @@ MODULE mass1_api
   !
   ! Corresponds to the DATE struct in DHSVM
   ! ----------------------------------------------------------------
-  TYPE, PUBLIC :: DHSVM_date
-     INTEGER(C_INT) :: year
-     INTEGER(C_INT) :: month
-     INTEGER(C_INT) :: day
-     INTEGER(C_INT) :: hour
-     INTEGER(C_INT) :: min
-     INTEGER(C_INT) :: sec
-     INTEGER(C_INT) :: jday     ! day of year
-     REAL(C_DOUBLE) :: julian   ! julian day?
+  TYPE, PUBLIC, BIND(c) :: DHSVM_date
+     INTEGER(KIND=C_INT) :: year
+     INTEGER(KIND=C_INT) :: month
+     INTEGER(KIND=C_INT) :: day
+     INTEGER(KIND=C_INT) :: hour
+     INTEGER(KIND=C_INT) :: min
+     INTEGER(KIND=C_INT) :: sec
+     INTEGER(KIND=C_INT) :: jday     ! day of year
+     REAL(KIND=C_DOUBLE) :: julian   ! julian day?
   END type DHSVM_date
 
-  TYPE (link_ptr), ALLOCATABLE, PRIVATE :: link_lookup(:)
-
-  TYPE (network) :: thenet
-
   TYPE, PUBLIC :: DHSVM_network
-     TYPE (link_ptr), ALLOCATABLE, PRIVATE :: link(:)
-     TYPE (network) :: net
+     TYPE (link_ptr), ALLOCATABLE :: link_lookup(:)
+     TYPE (network), POINTER :: net
   END type DHSVM_network
 
 CONTAINS
@@ -78,7 +74,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   SUBROUTINE c2fstring(cstr, fstr)
     IMPLICIT NONE
-    TYPE (c_ptr), INTENT(IN) :: cstr
+    TYPE (c_ptr), VALUE :: cstr
     CHARACTER(LEN=1, KIND=c_char), DIMENSION(:), POINTER :: p_chars
     CHARACTER (LEN=*), INTENT(OUT) :: fstr
     INTEGER :: i
@@ -100,9 +96,10 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE mass1_initialize
   ! ----------------------------------------------------------------
-  SUBROUTINE mass1_initialize(cfgdir, outdir, start, end, dotemp)
+  SUBROUTINE mass1_initialize(dnet, cfgdir, outdir, start, end, dotemp)
 
     IMPLICIT NONE
+    TYPE (DHSVM_network), INTENT(INOUT) :: dnet
     CHARACTER (LEN=*), INTENT(IN) :: cfgdir, outdir
     TYPE (DHSVM_date), INTENT(INOUT) :: start, end
     LOGICAL, INTENT(IN) :: dotemp
@@ -135,10 +132,10 @@ CONTAINS
 
     CALL banner()
 
-    thenet = network()
-    CALL thenet%read(cfgdir)
+    dnet%net = network()
+    CALL dnet%net%read(cfgdir)
 
-    ASSOCIATE (cfg => thenet%config)
+    ASSOCIATE (cfg => dnet%net%config)
       cfg%time%begin = dhsvm_to_decimal(start)
       cfg%time%end = dhsvm_to_decimal(end)
       cfg%do_temp = dotemp
@@ -152,18 +149,18 @@ CONTAINS
     ! also, initialize a lateral inflow table for each link, if
     ! necessary
 
-    ALLOCATE(link_lookup(thenet%links%maxid()))
-    ASSOCIATE (links => thenet%links%links, bcs => thenet%bcs%bcs)
+    ALLOCATE(dnet%link_lookup(dnet%net%links%maxid()))
+    ASSOCIATE (links => dnet%net%links%links, bcs => dnet%net%bcs%bcs)
       link =>links%current();
 
       DO WHILE (ASSOCIATED(link))
          id = link%id
-         link_lookup(id)%p => link
+         dnet%link_lookup(id)%p => link
          IF (.NOT. ASSOCIATED(link%latbc)) THEN
             ALLOCATE(latbc)
             latbc%tbl => time_series_alloc(id, 1, 1)
             latbc%tbl%limit_mode = TS_LIMIT_FLAT
-            CALL time_series_push(latbc%tbl, thenet%config%time%begin, zero)
+            CALL time_series_push(latbc%tbl, dnet%net%config%time%begin, zero)
             CALL bcs%push(LATFLOW_BC_TYPE, latbc)
          ELSE
             WRITE (msg, *) 'link ', id, ': existing lateral inflow table ',&
@@ -176,95 +173,4 @@ CONTAINS
   END SUBROUTINE mass1_initialize
 
   
-  ! ----------------------------------------------------------------
-  ! SUBROUTINE mass1_update_latq
-  ! ----------------------------------------------------------------
-  SUBROUTINE mass1_update_latq(linkid, latq, ddate)
-
-    IMPLICIT NONE
-    INTEGER, INTENT(IN) :: linkid
-    DOUBLE PRECISION, INTENT(IN) :: latq ! volume rate
-    TYPE (DHSVM_date), INTENT(IN) :: ddate
-
-    DOUBLE PRECISION :: lq(1), llen, time
-    CLASS (link_t), POINTER :: link
-    TYPE (time_series_rec), POINTER :: ts
-    
-    link => link_lookup(linkid)%p
-    llen = link%length()
-
-    ! assume everything is in English units
-    lq = latq/llen
-    
-    time = dhsvm_to_decimal(ddate)
-    ts => link%latbc%table()
-    CALL time_series_push(ts, time, lq)
-
-  END SUBROUTINE mass1_update_latq
-
-  ! ----------------------------------------------------------------
-  !  FUNCTION mass1_link_outflow
-  ! ----------------------------------------------------------------
-  FUNCTION mass1_link_outflow(linkid) RESULT (q)
-
-    IMPLICIT NONE
-    DOUBLE PRECISION :: q
-    INTEGER, INTENT(IN) :: linkid
-        
-    CLASS (link_t), POINTER :: link
-    link => link_lookup(linkid)%p
-
-    q = link%q_down()
-    
-  END FUNCTION mass1_link_outflow
-
-  ! ----------------------------------------------------------------
-  !  FUNCTION mass1_link_inflow
-  ! ----------------------------------------------------------------
-  FUNCTION mass1_link_inflow(linkid) RESULT (q)
-    
-    IMPLICIT NONE
-    DOUBLE PRECISION :: q
-    INTEGER, INTENT(IN) :: linkid
-    
-    CLASS (link_t), POINTER :: link
-    link => link_lookup(linkid)%p
-
-    q = link%q_up()
-    
-  END FUNCTION mass1_link_inflow
-
-  ! ----------------------------------------------------------------
-  ! SUBROUTINE mass1_write_hotstart
-  ! ----------------------------------------------------------------
-  SUBROUTINE mass1_write_hotstart(fname)
-
-    IMPLICIT NONE
-    CHARACTER (LEN=*), INTENT(IN) :: fname
-
-    thenet%config%restart_save_file = fname
-    CALL thenet%write_restart()
-
-  END SUBROUTINE mass1_write_hotstart
-
-
-  ! ----------------------------------------------------------------
-  ! SUBROUTINE mass1_read_hotstart
-  ! ----------------------------------------------------------------
-  SUBROUTINE mass1_read_hotstart(fname)
-
-    IMPLICIT NONE
-    CHARACTER (LEN=*), INTENT(IN) :: fname
-
-    thenet%config%restart_load_file = fname
-    CALL thenet%read_restart()
-
-  END SUBROUTINE mass1_read_hotstart
-
-
-
-
-END MODULE mass1_api
-
-
-
+END MODULE mass1_dhsvm
