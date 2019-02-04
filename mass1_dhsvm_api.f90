@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  4, 2019 by William A. Perkins
-! Last Change: 2019-02-04 11:22:45 d3g096
+! Last Change: 2019-02-04 11:48:14 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -15,7 +15,7 @@
 ! ----------------------------------------------------------------
 FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, dotemp) RESULT(net) BIND(c)
   USE, INTRINSIC :: iso_c_binding
-  USE mass1_dhsvm
+  USE mass1_dhsvm_module
   IMPLICIT NONE
   TYPE (c_ptr) :: net
   TYPE (c_ptr), VALUE :: c_cfgdir, c_outdir
@@ -46,7 +46,7 @@ END FUNCTION mass1_create
 ! ----------------------------------------------------------------
 SUBROUTINE mass1_update_latq(cnet, linkid, latq, ddate)
   USE, INTRINSIC :: iso_c_binding
-  USE mass1_dhsvm
+  USE mass1_dhsvm_module
 
   IMPLICIT NONE
   TYPE (C_PTR), VALUE :: cnet
@@ -78,7 +78,7 @@ END SUBROUTINE mass1_update_latq
 ! ----------------------------------------------------------------
 FUNCTION mass1_link_outflow(cnet, linkid) RESULT (q) BIND(c)
   USE, INTRINSIC :: iso_c_binding
-  USE mass1_dhsvm
+  USE mass1_dhsvm_module
 
   IMPLICIT NONE
   REAL(KIND=C_DOUBLE) :: q
@@ -101,7 +101,7 @@ END FUNCTION mass1_link_outflow
 FUNCTION mass1_link_inflow(cnet, linkid) RESULT (q) BIND(c)
 
   USE, INTRINSIC :: iso_c_binding
-  USE mass1_dhsvm
+  USE mass1_dhsvm_module
 
   IMPLICIT NONE
   REAL(KIND=C_DOUBLE) :: q
@@ -125,7 +125,7 @@ END FUNCTION mass1_link_inflow
 SUBROUTINE mass1_write_hotstart(cnet, cname)
 
   USE, INTRINSIC :: iso_c_binding
-  USE mass1_dhsvm
+  USE mass1_dhsvm_module
   IMPLICIT NONE
   TYPE (C_PTR), VALUE :: cnet
   TYPE (C_PTR), VALUE :: cname
@@ -145,7 +145,7 @@ END SUBROUTINE mass1_write_hotstart
 ! ----------------------------------------------------------------
 SUBROUTINE mass1_read_hotstart(cnet, cname) BIND(c)
   USE, INTRINSIC :: iso_c_binding
-  USE mass1_dhsvm
+  USE mass1_dhsvm_module
   IMPLICIT NONE
   TYPE (C_PTR), VALUE :: cnet
   TYPE (C_PTR), VALUE :: cname
@@ -166,7 +166,7 @@ END SUBROUTINE mass1_read_hotstart
 ! ----------------------------------------------------------------
 SUBROUTINE mass1_destroy(cnet) BIND(c)
   USE, INTRINSIC :: iso_c_binding
-  USE mass1_dhsvm
+  USE mass1_dhsvm_module
   IMPLICIT NONE
   TYPE (C_PTR), VALUE :: cnet
   TYPE (DHSVM_network), POINTER :: dnet

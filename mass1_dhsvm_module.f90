@@ -1,7 +1,7 @@
 ! ----------------------------------------------------------------
-! MODULE mass1_dhsvm
+! MODULE mass1_dhsvm_module
 ! ----------------------------------------------------------------
-MODULE mass1_dhsvm
+MODULE mass1_dhsvm_module
 
   USE iso_c_binding
   USE utility
@@ -173,4 +173,4 @@ CONTAINS
   END SUBROUTINE mass1_initialize
 
   
-END MODULE mass1_dhsvm
+END MODULE mass1_dhsvm_module

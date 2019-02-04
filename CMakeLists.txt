@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2019-02-04 11:11:50 d3g096
+# Last Change: 2019-02-04 11:46:56 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -222,7 +222,7 @@ add_library(mass1lib
   section_handler.f90
   linear_interp.f90
   svgrp.f90
-  mass1_api_module.f90
+  mass1_dhsvm_module.f90
   mass1_dhsvm_api.f90
 )
 add_executable(mass1_new
