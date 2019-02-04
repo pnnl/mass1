@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January 17, 2017 by William A. Perkins
-! Last Change: 2017-08-21 13:03:13 d3g096
+! Last Change: 2018-08-24 11:17:11 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE bc_module
@@ -44,6 +44,7 @@ MODULE bc_module
      DOUBLE PRECISION :: current_value
    CONTAINS
      PROCEDURE (read_proc), DEFERRED :: read 
+     PROCEDURE (table_proc), DEFERRED :: table
      PROCEDURE (update_proc), DEFERRED :: update
      PROCEDURE (destroy_proc), DEFERRED :: destroy
   END type bc_t
@@ -64,6 +65,14 @@ MODULE bc_module
        DOUBLE PRECISION, INTENT(IN) :: time
      END SUBROUTINE update_proc
 
+     FUNCTION table_proc(this) RESULT (tbl)
+       USE time_series
+       IMPORT :: bc_t
+       IMPLICIT NONE
+       TYPE (time_series_rec), POINTER :: tbl
+       CLASS(bc_t), INTENT(IN) :: this
+     END FUNCTION table_proc
+
      SUBROUTINE destroy_proc(this)
        IMPORT :: bc_t
        IMPLICIT NONE
@@ -74,18 +83,6 @@ MODULE bc_module
   END INTERFACE
 
   ! ----------------------------------------------------------------
-  ! TYPE simple_bc
-  ! ----------------------------------------------------------------
-  TYPE, PUBLIC, EXTENDS(bc_t) :: simple_bc_t
-     TYPE (time_series_rec), POINTER :: tbl
-   CONTAINS
-     PROCEDURE :: read => simple_bc_read
-     PROCEDURE :: update => simple_bc_update
-     PROCEDURE :: destroy => simple_bc_destroy
-  END type simple_bc_t
-
-  
-  ! ----------------------------------------------------------------
   ! TYPE bc_ptr
   ! ----------------------------------------------------------------
   TYPE, PUBLIC :: bc_ptr
@@ -93,6 +90,19 @@ MODULE bc_module
      CLASS (bc_t), POINTER :: p
   END type bc_ptr
 
+  ! ----------------------------------------------------------------
+  ! TYPE simple_bc
+  ! ----------------------------------------------------------------
+  TYPE, PUBLIC, EXTENDS(bc_t) :: simple_bc_t
+     TYPE (time_series_rec), POINTER :: tbl
+   CONTAINS
+     PROCEDURE :: read => simple_bc_read
+     PROCEDURE :: table => simple_bc_table
+     PROCEDURE :: update => simple_bc_update
+     PROCEDURE :: destroy => simple_bc_destroy
+  END type simple_bc_t
+
+  
   ! ----------------------------------------------------------------
   ! TYPE hydro_bc
   ! ----------------------------------------------------------------
@@ -177,6 +187,18 @@ CONTAINS
     INTEGER, PARAMETER :: iunit = 55
     this%tbl => time_series_read(fname, fields=1, unit=iunit)
   END SUBROUTINE simple_bc_read
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION simple_bc_table
+  ! ----------------------------------------------------------------
+  FUNCTION simple_bc_table(this) RESULT(tbl)
+
+    IMPLICIT NONE
+    TYPE (time_series_rec), POINTER :: tbl
+    CLASS(simple_bc_t), INTENT(IN) :: this
+
+    tbl => this%tbl
+  END FUNCTION simple_bc_table
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE simple_bc_update
