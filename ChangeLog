@@ -1,0 +1,192 @@
+2018-05-02  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* time_series.f90 (time_series_push): add routine to put point on
+	end of series
+
+2017-08-24  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* Makefile.am (noinst_LIBRARIES): do not install the ts library 
+
+2017-08-21  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* utility.f90 (utility): add optional FORM option (passed to OPEN)
+
+2017-06-22  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* README.md: add
+
+	* add copyright notice to code files
+
+2013-03-05  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* const_series.f90 (const_series_destroy): apparently
+	declaring the pointer INOUT causes problems here
+
+	* met_time_series.f90 (met_time_series_destroy): apparently
+	declaring the pointer INOUT causes problems here
+
+2013-03-04  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* Makefile.am (libts_a_SOURCES): add const_series.f90
+
+	* const_series.f90 (const_series): added
+
+2013-03-01  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* Makefile.am (libts_a_SOURCES): add met_time_series.f90
+
+	* mettest1.f90 (mettest1): add met time series test 
+
+	* met_time_series.f90 (met_time_series): add met-specific time
+	series 
+
+2013-02-28  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* cumtstest1.f90 (cumtstest): add cumulative time series test
+
+	* cumulative_time_series.f90 (cumulative_time_series): add
+	cumulative time series
+
+2011-05-15  Perkins  <D3G096@ironhorse.pnl.gov>
+
+	* Makefile.am: use $(OBJEXT) instead of .o so things work on
+	Windoze
+
+2010-12-17  William A. Perkins  <william.perkins@pnl.gov>
+
+	* configure.in: need to do AC_PROG_FC() before AC_PROG_F90()
+
+2009-01-21  William Perkins  <d3g096@turbulent.pnl.gov>
+
+	* acinclude.m4: recognize ia64 linux machines
+
+2008-10-17  William A. Perkins  <william.perkins@pnl.gov>
+
+	* acinclude.m4: include "ifort" as name for Intel compiler
+
+2007-02-06  William A. Perkins  <william.perkins@pnl.gov>
+
+	* utility.f90 (utility): error and status unit number need to be
+	changeable 
+
+2007-02-02  William A. Perkins  <william.perkins@pnl.gov>
+
+	* acinclude.m4: adjust Fortran compilers and flags for x86_64
+	hosts 
+
+2005-06-10  William A. Perkins  <william.perkins@pnl.gov>
+
+	* utility.f90 (utility): make error and status unit numbers public
+
+2004-04-14  William A. Perkins  <william.perkins@pnl.gov>
+
+	* acinclude.m4 (AC_PROG_F90_FLAGS): select an fptrap module based
+	on the compiler
+
+	* Makefile.am (libts_a_LIBADD): include the fptrap module in
+	library 
+
+	* fptraptest.f90: floating point exception trap test
+
+	* fptrap-intel.f90: fptrap_common specific to the Intel compiler
+
+	* fptrap-null.f90: An empty module with the fptrap_common
+	subroutine. 
+
+2004-04-02  William A. Perkins  <william.perkins@pnl.gov>
+
+	* configure.in: compiler command line options are now in
+	acinclude.m4; they don't need to be here
+
+	* acinclude.m4 (AC_PROG_F90): put the --with-f90 option in this
+	macro 
+	(AAC_PROG_F90_FLAGS): put the f90 options in this macro
+
+2003-07-21  William A. Perkins  <william.perkins@pnl.gov>
+
+	* utility.f90 (open_existing): provide an optional fatal (default
+	is .TRUE.) argument
+
+2003-07-17  William A. Perkins  <william.perkins@pnl.gov>
+
+	* utility.f90: be more descriptive about the error in
+	open_existing. 
+
+2003-06-10  William A. Perkins  <william.perkins@pnl.gov>
+
+	* configure.in: moved all options for the F90 compiler to the
+	AC_PROG_F90 macro in acinclude.m4
+
+	* acinclude.m4: AC_PROG_F90 now contains the options
+
+2003-05-14  William A. Perkins  <william.perkins@pnl.gov>
+
+	* tstest3.f90: test of increasing and one point time series
+
+	* tstest3b.dat, tstest3a.dat: added data files for tstest3.f90
+
+	* time_series.f90: added function time_series_increases to check
+	for monotonically increasing series; made sure one point time
+	series work, but only with TS_LIMIT_FLAT; also added
+	time_series_destroy to deallocate time series.
+
+2003-04-28  William A. Perkins  <william.perkins@pnl.gov>
+
+	* acinclude.m4: use F90FLAGS set in the environment; remove CPU
+	specific options from Intel compiler switches 
+
+2003-04-15  William A. Perkins  <william.perkins@pnl.gov>
+
+	* utility.f90: error_message's should include the word ERROR and
+	FATAL if fatal.
+
+2003-04-08  William A. Perkins  <william.perkins@pnl.gov>
+
+	* time_series.f90: when the number of fields is specified, that is
+	a maximum, NOT a minimum
+
+2003-04-04  William A. Perkins  <william.perkins@pnl.gov>
+
+	* bootstrap.sh: bootstrap time_series too
+
+	* acinclude.m4: Intel profiling flags incorrect
+
+	* date_time_module.f90: fixed a FORMAT problem the Intel compiler
+	did not like
+
+2003-04-02  William A. Perkins  <william.perkins@pnl.gov>
+
+	* Makefile.am (check_PROGRAMS): test programs are check_PROGRAMS
+	instead of bin_PROGRAMS 
+
+2003-03-31  William A. Perkins  <william.perkins@pnl.gov>
+
+	* utility.f90: added open_new routine
+
+	* Makefile.am: added datetest2 program
+
+	* utility.f90: needed to rename the error and status I/O units. 
+
+	* acinclude.m4: some macros to find a Fortran 90 compiler
+
+2003-03-26  William A. Perkins  <william.perkins@pnl.gov>
+
+
+	* configure.in: created for autotools
+
+	* bootstrap.sh: created for autotools
+
+	* Makefile.am: created for autotools
+
+	* Makefile: moved to Makefile.noauto
+
+	* utility.f90: The Intel compiler does not like CHARACTER*(*)
+	declarations -- changed them to CHARACTER (LEN=*)
+
+2003-01-23  William A. Perkins  <william.perkins@pnl.gov>
+
+	* date_time_module.f90 (date_time_init): ignore the sdigits option
+	until I figure out how to do it consistently
+
+	* datetest1.f90: format error A field not long enough
+
