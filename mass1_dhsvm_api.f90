@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  4, 2019 by William A. Perkins
-! Last Change: 2019-02-04 11:48:14 d3g096
+! Last Change: 2019-02-08 15:16:47 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -39,6 +39,30 @@ FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, dotemp) RESULT(net) BIND(c
   net = C_LOC(f_net)
 
 END FUNCTION mass1_create
+
+! ----------------------------------------------------------------
+! SUBROUTINE mass1_route
+! ----------------------------------------------------------------
+SUBROUTINE mass1_route(cnet, ddate)
+  USE, INTRINSIC :: iso_c_binding
+  USE mass1_dhsvm_module
+
+
+  IMPLICIT NONE
+
+  TYPE (C_PTR), VALUE :: cnet
+  TYPE (DHSVM_date) :: ddate
+  TYPE (DHSVM_network), POINTER :: dnet
+  DOUBLE PRECISION :: time
+
+  CALL C_F_POINTER(cnet, dnet)
+
+  time = dhsvm_to_decimal(ddate)
+
+  CALL dnet%net%run_to(time)
+
+END SUBROUTINE mass1_route
+
 
 
 ! ----------------------------------------------------------------
