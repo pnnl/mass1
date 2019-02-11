@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  4, 2019 by William A. Perkins
-! Last Change: 2019-02-08 15:16:47 d3g096
+! Last Change: 2019-02-11 09:44:09 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -43,7 +43,7 @@ END FUNCTION mass1_create
 ! ----------------------------------------------------------------
 ! SUBROUTINE mass1_route
 ! ----------------------------------------------------------------
-SUBROUTINE mass1_route(cnet, ddate)
+SUBROUTINE mass1_route(cnet, ddate) BIND(c)
   USE, INTRINSIC :: iso_c_binding
   USE mass1_dhsvm_module
 
@@ -68,7 +68,7 @@ END SUBROUTINE mass1_route
 ! ----------------------------------------------------------------
 ! SUBROUTINE mass1_update_latq
 ! ----------------------------------------------------------------
-SUBROUTINE mass1_update_latq(cnet, linkid, latq, ddate)
+SUBROUTINE mass1_update_latq(cnet, linkid, latq, ddate) BIND(c)
   USE, INTRINSIC :: iso_c_binding
   USE mass1_dhsvm_module
 
