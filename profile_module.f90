@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created January 10, 2018 by William A. Perkins
-  ! Last Change: 2018-05-29 13:53:12 d3g096
+  ! Last Change: 2019-02-13 10:16:44 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE profile_module
@@ -19,6 +19,7 @@ MODULE profile_module
   USE dlist_module
   USE point_module
   USE link_manager_module
+  USE mass1_config
 
   IMPLICIT NONE
 
@@ -271,25 +272,25 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE profile_fill
   ! ----------------------------------------------------------------
-  SUBROUTINE profile_fill(this, linkman, num_links, plink, xstart, xunits)
+  SUBROUTINE profile_fill(this, linkman, num_links, plink, xstart, xfactor)
 
     IMPLICIT NONE
     CLASS (profile_t), INTENT(INOUT) :: this
     CLASS (link_manager_t), INTENT(IN) :: linkman
     INTEGER, INTENT(IN) :: num_links
     INTEGER, INTENT(IN) :: plink(:)
-    DOUBLE PRECISION, INTENT(IN) :: xstart
-    CHARACTER (LEN=*), INTENT(IN) :: xunits
+    DOUBLE PRECISION, INTENT(IN) :: xstart, xfactor
 
     INTEGER :: l, p, n, ierr
     CLASS (link_t), POINTER :: link
     CLASS (profile_pt), POINTER :: prfpt
-    DOUBLE PRECISION :: xprf, xold
+    DOUBLE PRECISION :: xprf, x, xold
     CHARACTER (LEN=1024) :: msg
 
     ierr = 0
     xprf = xstart
-    IF (xunits .EQ. 'RM') xprf = xprf*5280.0
+
+    xprf = xprf*xfactor
 
     DO l = 1, num_links
        link => linkman%find(plink(l))
@@ -306,8 +307,9 @@ CONTAINS
           prfpt%link_id = link%id
           prfpt%point_idx = p
           prfpt%pt => link%point(p)
+          x = prfpt%pt%x
           IF (p .LT. n) THEN
-             xprf = xprf + ABS(prfpt%pt%x - xold)
+             xprf = xprf + ABS(x - xold)
           END IF
           prfpt%profx = xprf
           xold = prfpt%pt%x
@@ -316,15 +318,13 @@ CONTAINS
        END DO
     END DO
 
-    IF (xunits .EQ. 'RM') THEN
-       CALL this%pts%begin()
+    CALL this%pts%begin()
+    prfpt => this%pts%current()
+    DO WHILE (ASSOCIATED(prfpt)) 
+       prfpt%profx = prfpt%profx/xfactor
+       CALL this%pts%next()
        prfpt => this%pts%current()
-       DO WHILE (ASSOCIATED(prfpt)) 
-          prfpt%profx = prfpt%profx/5280.0
-          CALL this%pts%next()
-          prfpt => this%pts%current()
-       END DO
-    END IF
+    END DO
 
   END SUBROUTINE profile_fill
 
@@ -512,18 +512,18 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE profile_manager_read
   ! ----------------------------------------------------------------
-  SUBROUTINE profile_manager_read(this, filename, linkman)
+  SUBROUTINE profile_manager_read(this, theconfig, linkman)
 
     IMPLICIT NONE
     CLASS (profile_manager), INTENT(INOUT) :: this
-    CHARACTER (LEN=*), INTENT(IN) :: filename
+    TYPE (configuration_t), INTENT(INOUT) :: theconfig
     CLASS (link_manager_t), INTENT(IN) :: linkman
 
     INTEGER, PARAMETER :: punit = 34, maxlink = 100
     INTEGER :: line
     INTEGER :: pid, numlinks
     CHARACTER (LEN=8) :: xunits
-    DOUBLE PRECISION :: xstart
+    DOUBLE PRECISION :: xstart, xfactor
     INTEGER :: plink(maxlink)
     CLASS (profile_t), POINTER :: profile
     CHARACTER (LEN=1024) :: msg
@@ -532,7 +532,7 @@ CONTAINS
     pid = 0
     punit_current = punit_base
 
-    CALL open_existing(filename, punit, fatal=.TRUE.)
+    CALL open_existing(theconfig%profile_file, punit, fatal=.TRUE.)
     DO WHILE(.TRUE.)
        line = line + 1
        READ(punit, *, END=100, ERR=200) numlinks, xunits, xstart
@@ -542,7 +542,25 @@ CONTAINS
 
        ALLOCATE(profile, SOURCE=profile_t(pid))
        !profile = profile_t(pid)
-       CALL profile%fill(linkman, numlinks, plink, xstart, xunits)
+
+       ! get a factor to convert internal length units to the desired
+       ! profile output units
+    
+       IF (xunits .EQ. 'FT') THEN
+          xfactor = theconfig%channel_len_factor(CHANNEL_FOOT)
+       ELSE IF (xunits .EQ. 'M') THEN
+          xfactor = theconfig%channel_len_factor(CHANNEL_METER)
+       ELSE IF (xunits .EQ. 'RM') THEN
+          xfactor = theconfig%channel_len_factor(CHANNEL_MILE)
+       ELSE IF (xunits .EQ. 'RKM') THEN
+          xfactor = theconfig%channel_len_factor(CHANNEL_KM)
+       ELSE
+          WRITE (msg, *) theconfig%profile_file, ": line ", line, &
+               &": error: unknown length units: ", TRIM(xunits)
+          CALL error_message(msg, FATAL=.TRUE.)
+       END IF
+       
+       CALL profile%fill(linkman, numlinks, plink, xstart, xfactor)
 
        CALL this%profs%push(profile)
        NULLIFY(profile)
@@ -551,13 +569,14 @@ CONTAINS
 
 200 CONTINUE
     CLOSE(punit)
-    WRITE (msg, *) TRIM(filename), ", line ", line, ": I/O error in profile control file"
+    WRITE (msg, *) TRIM(theconfig%profile_file), ", line ", &
+         &line, ": I/O error in profile control file"
     CALL error_message(msg, FATAL=.TRUE.)
     RETURN
 
 100 CONTINUE 
     CLOSE(punit)
-    WRITE (msg, *) TRIM(filename), ": ", pid, " profiles read"
+    WRITE (msg, *) TRIM(theconfig%profile_file), ": ", pid, " profiles read"
     CALL status_message(msg)
     RETURN
 

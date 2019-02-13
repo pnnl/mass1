@@ -49,10 +49,8 @@ definitions can be in any order, but
 | 3 | Imposed  upstream stage
 | 12 | Discharge following PID 
 | 13 | Stage following PID 
-| 20 | Normal fluvial link with upstream TDG specified as saturation
-rather than concentration
-| 21 | Hydroelectric inflow link: like 1 but with generation and spill
-discharges specified in a [hydro BC](bc.md) file.  
+| 20 | Normal fluvial link with upstream TDG specified as saturation rather than concentration
+| 21 | Hydroelectric inflow link: like 1 but with generation and spill discharges specified in a [hydro BC](bc.md) file.  
 | 4 | Imposed Downstream stage 
 | 5 | Tributary inflow
 | 6 | Imposed hydroelectric dam discharge

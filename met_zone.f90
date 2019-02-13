@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 21, 2017 by William A. Perkins
-! Last Change: 2017-07-12 14:25:22 d3g096
+! Last Change: 2019-02-13 08:15:54 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE met_zone
@@ -148,6 +148,7 @@ CONTAINS
     flux = net_heat_flux(this%coeff, this%current%rad, &
          &twater, this%current%temp, this%current%dew, &
          &this%current%wind)
+    ! FIXME: Metric units
     flux = flux/(1000.0*4186.0/3.2808) ! rho*specifc heat*depth in feet
   END FUNCTION met_zone_energy_flux
 

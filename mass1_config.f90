@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2018-08-20 14:39:29 d3g096
+! Last Change: 2019-02-13 09:04:50 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE mass1_config
@@ -127,6 +127,7 @@ MODULE mass1_config
 
    CONTAINS
      PROCEDURE :: read => configuration_read
+     PROCEDURE :: channel_len_factor => config_channel_len_factor
   END type configuration_t
 
   CHARACTER(LEN=path_length), PARAMETER, PRIVATE :: config_name = 'mass1.cfg'
@@ -542,5 +543,53 @@ CONTAINS
 
   END SUBROUTINE configuration_read
 
+  ! ----------------------------------------------------------------
+  ! FUNCTION config_channel_len_factor
+  !
+  ! Multiply by the returned factor to get internal channel length units
+  ! ----------------------------------------------------------------
+  FUNCTION config_channel_len_factor(this, cunits) RESULT (f)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION :: f
+    CLASS (configuration_t), INTENT(IN) :: this
+    INTEGER (KIND=KIND(CHANNEL_UNITS)), INTENT(IN), OPTIONAL :: cunits
+    INTEGER (KIND=KIND(CHANNEL_UNITS)) :: the_cunits
+
+    IF (PRESENT(cunits)) THEN
+       the_cunits = cunits
+    ELSE
+       the_cunits = this%channel_length_units
+    END IF
+
+    SELECT CASE(this%units)
+    CASE (ENGLISH_UNITS)
+       ! the internal length unit is feet
+       SELECT CASE(the_cunits)
+       CASE(CHANNEL_FOOT) ! length is in feet
+          f = 1.0
+       CASE(CHANNEL_METER) ! length is in meters
+          f = 3.2808
+       CASE(CHANNEL_MILE) ! length is in miles
+          f = 5280.0
+       CASE(CHANNEL_KM) ! length in kilometers
+          f = 0.6211*5280.0
+       END SELECT
+    CASE (METRIC_UNITS)
+       ! the internal length unit is meters
+       SELECT CASE(the_cunits)
+       CASE(CHANNEL_FOOT) ! length is in feet
+          f = 0.3048
+       CASE(CHANNEL_METER) ! length is in meters
+          f = 1.0
+       CASE(CHANNEL_MILE) ! length is in miles
+          f = 1609.344
+       CASE(CHANNEL_KM) ! length in kilometers
+          f = 1000.0
+       END SELECT
+    END SELECT
+  END FUNCTION config_channel_len_factor
+
+  
 END MODULE mass1_config
   

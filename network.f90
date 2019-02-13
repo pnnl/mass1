@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2018-08-20 14:44:36 d3g096
+! Last Change: 2019-02-13 10:06:53 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -189,7 +189,7 @@ CONTAINS
     IF (this%config%do_gageout) &
          &CALL this%gages%read(this%config%gage_file, this%links)
     IF (this%config%do_profileout) &
-         &CALL this%profiles%read(this%config%profile_file, this%links)
+         &CALL this%profiles%read(this%config, this%links)
 
   END SUBROUTINE network_read
 
