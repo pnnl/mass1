@@ -14,7 +14,7 @@ conditions are assigned to each point along the entire length of the
 link. 
 
 | Field | Type | Description 
-|:----: | :----: | :----:
+|:----: | :----: | :----
 | 1 | int  | Link identifier 
 | 2 | real | Discharge, cfs
 | 3 | real | Water surface elevation, ft
