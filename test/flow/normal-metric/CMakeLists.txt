@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2017-01-19 14:11:31 d3g096
+# Last Change: 2019-02-13 10:44:08 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -37,10 +37,10 @@ set(testfiles
 
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/profile1.out"
-  COMMAND ${mass1exe} > mass1.log
+  COMMAND ${mass1newexe} > mass1.log
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-  COMMENT "Running test flow/normal"
-  DEPENDS mass1 ${testfiles}
+  COMMENT "Running test flow/normal-metric"
+  DEPENDS mass1_new ${testfiles}
 )
 set(rundeps "${CMAKE_CURRENT_BINARY_DIR}/profile1.out")
 
@@ -50,7 +50,7 @@ if (GNUPLOT_EXECUTABLE)
     COMMAND "${GNUPLOT_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp" > plot.eps
     COMMAND "${GNUPLOT_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/plot-elev.gp" > plot-elev.eps
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    COMMENT "Plotting tests flow/normal"
+    COMMENT "Plotting tests flow/normal-metric"
     DEPENDS 
     "${CMAKE_CURRENT_BINARY_DIR}/profile1.out"
     "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp"
@@ -59,10 +59,10 @@ if (GNUPLOT_EXECUTABLE)
   set(rundeps plot.eps plot-elev.eps)
 endif (GNUPLOT_EXECUTABLE)
 
-add_custom_target(run_normal_test
+add_custom_target(run_normal_metric_test
   DEPENDS ${rundeps}
 )
-add_dependencies(runtests run_normal_test)
+add_dependencies(runtests run_normal_metric_test)
 
 set_property(DIRECTORY 
   APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES

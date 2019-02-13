@@ -1,4 +1,4 @@
-MASS1 Configuration File - Normal Flow Test - $Id$
+MASS1 Configuration File - Metric Normal Flow Test
 1 	/ Do Flow
 0	/ Do Lateral Inflow
 0 	/ Do Gas
@@ -15,10 +15,10 @@ MASS1 Configuration File - Normal Flow Test - $Id$
 0 	/ Do Print section geometry
 0 	/ Do write binary section geom
 0 	/ Do read binary section geom
-0 	/ units option
+1 	/ units option
 1 	/ time option
 2 	/ time units
-0 	/ channel length units
+1 	/ channel length units
 0 	/ downstream bc type
 1 	/ max links
 200 	/ max points on a link

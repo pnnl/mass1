@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2019-01-18 10:47:21 d3g096
+# Last Change: 2019-02-13 10:42:28 d3g096
 # -------------------------------------------------------------
 
 
@@ -29,6 +29,7 @@ add_subdirectory(flow/slopebreak2)
 add_subdirectory(flow/slopebreak1)
 add_subdirectory(flow/lateral)
 add_subdirectory(flow/normal-hydro)
+add_subdirectory(flow/normal-metric)
 add_subdirectory(flow/normal)
 
 add_subdirectory(transport/advection-1-segment)
