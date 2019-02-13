@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-02-13 09:44:18 d3g096
+! Last Change: 2019-02-13 12:05:30 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -354,12 +354,12 @@ CONTAINS
     CLASS (linear_link_t), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: stage, discharge, c(:)
     INTEGER :: i
-    
+
     DO i = 1, this%npoints
-       this%pt(i)%hnow%y = stage
-       this%pt(i)%hold%y = stage
+       this%pt(i)%hnow%y = MAX(stage, this%pt(i)%thalweg + depth_minimum)
+       this%pt(i)%hold%y = this%pt(i)%hnow%y
        this%pt(i)%hnow%q = discharge
-       this%pt(i)%hold%q = discharge
+       this%pt(i)%hold%q = this%pt(i)%hnow%q
     END DO
 
   END SUBROUTINE linear_link_set_initial

@@ -265,6 +265,7 @@ CONTAINS
     DO i = 1, this%npoints
        q = this%pt(i)%hnow%q
        depth = this%pt(i)%hnow%y - this%pt(i)%thalweg
+       depth = MAX(depth, 0.0)
        depth = &
             &this%pt(i)%xsection%p%normal_depth(q, this%So, this%pt(i)%kstrick, depth)
        this%pt(i)%hnow%y = depth + this%pt(i)%thalweg
