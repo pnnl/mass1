@@ -8,7 +8,7 @@
 * [Cross section data file](section.md)
 * [Boundary conditions](bc.md)
 * [Meteorology zone list](met.md)
-* [Initial conditions files](initial.md)
+* [Initial conditions file](initial.md)
 
 ## Notes
 
