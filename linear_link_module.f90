@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2018-08-21 15:04:48 d3g096
+! Last Change: 2019-02-13 09:11:38 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -123,11 +123,15 @@ CONTAINS
     DOUBLE PRECISION :: x, thalweg, manning, kdiff, ksurf
     DOUBLE PRECISION :: length, delta_x, slope, start_el, end_el
     CLASS (xsection_t), POINTER :: xsect
+    DOUBLE PRECISION :: cl_factor
+
     ierr = 0
+    cl_factor = theconfig%channel_len_factor()
 
     WRITE(msg, *) "Reading/building points for link = ", this%id, &
          &", input option = ", this%input_option, &
-         &", points = ", this%npoints
+         &", points = ", this%npoints, &
+         &", length factor = ", cl_factor
     CALL status_message(msg)
 
     SELECT CASE(this%input_option)
@@ -159,17 +163,8 @@ CONTAINS
 
           lineno = lineno + 1
 
-          SELECT CASE(theconfig%channel_length_units)
-          CASE(CHANNEL_FOOT) ! length is in feet
-             x = x
-          CASE(CHANNEL_METER) ! length is in meters
-             x = x*3.2808
-          CASE(CHANNEL_MILE) ! length is in miles
-             x = x*5280.0
-          CASE(CHANNEL_KM) ! length in kilometers
-             x = x*0.6211*5280.0
-          END SELECT
-
+          ! Convert lengths to internal length units
+          x = x*cl_factor
 
           this%pt(i)%x = x
           this%pt(i)%thalweg = thalweg
