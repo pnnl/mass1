@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-02-13 09:11:38 d3g096
+! Last Change: 2019-02-13 09:44:18 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -204,22 +204,8 @@ CONTAINS
             &kdiff, &
             &ksurf
 
-       SELECT CASE(theconfig%channel_length_units)
-       CASE(CHANNEL_FOOT) ! length is in feet
-          length = length
-       CASE(CHANNEL_METER) ! length is in meters
-          length = length*3.2808
-       CASE(CHANNEL_MILE) ! length is in miles
-          length = length*5280.0
-       CASE(CHANNEL_KM) ! length in kilometers
-          length = length*0.6211*5280.0
-       END SELECT
-
-       SELECT CASE(theconfig%units)
-       CASE(METRIC_UNITS)
-          start_el = start_el*3.2808
-          end_el = end_el*3.2808
-       END SELECT
+       ! Convert lengths to internal length units
+       length = length*cl_factor
 
        IF (manning .LE. 0.0) THEN
           WRITE(msg, *) 'link ', this%id,  &
