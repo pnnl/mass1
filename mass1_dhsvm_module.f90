@@ -105,7 +105,7 @@ CONTAINS
     LOGICAL, INTENT(IN) :: dotemp
 
     CHARACTER (LEN=1024) :: path, msg
-    INTEGER :: id
+    INTEGER :: id, n
 
     CLASS (link_t), POINTER :: link
     CLASS (simple_bc_t), POINTER :: latbc
@@ -138,6 +138,7 @@ CONTAINS
     ASSOCIATE (cfg => dnet%net%config)
       cfg%time%begin = dhsvm_to_decimal(start)
       cfg%time%end = dhsvm_to_decimal(end)
+      cfg%time%time = cfg%time%begin
       cfg%do_temp = dotemp
       cfg%temp_diffusion = .TRUE.
       cfg%temp_exchange = .TRUE.
@@ -148,9 +149,10 @@ CONTAINS
     ! big, make a lookup table so we can easily find links later;
     ! also, initialize a lateral inflow table for each link, if
     ! necessary
-
-    ALLOCATE(dnet%link_lookup(dnet%net%links%maxid()))
+    n = dnet%net%links%maxid()
+    ALLOCATE(dnet%link_lookup(n))
     ASSOCIATE (links => dnet%net%links%links, bcs => dnet%net%bcs%bcs)
+      CALL links%begin();
       link =>links%current();
 
       DO WHILE (ASSOCIATED(link))
@@ -162,13 +164,19 @@ CONTAINS
             latbc%tbl%limit_mode = TS_LIMIT_FLAT
             CALL time_series_push(latbc%tbl, dnet%net%config%time%begin, zero)
             CALL bcs%push(LATFLOW_BC_TYPE, latbc)
+            link%latbc => latbc
+            NULLIFY(latbc)
          ELSE
             WRITE (msg, *) 'link ', id, ': existing lateral inflow table ',&
                  &'may cause problems'
             CALL error_message(msg)
          END IF
+         CALL links%next();
+         link =>links%current();
       END DO
     END ASSOCIATE
+
+    CALL dnet%net%initialize()
 
   END SUBROUTINE mass1_initialize
 

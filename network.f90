@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-02-13 10:06:53 d3g096
+! Last Change: 2019-02-14 12:53:10 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -272,9 +272,7 @@ CONTAINS
     WRITE(msg, *) 'reading restart from ', TRIM(this%config%restart_load_file)
     CALL status_message(msg)
 
-    CALL this%links%read_restart(runit, &
-         &this%config%grav, &
-         &this%config%time%delta_t)
+    CALL this%links%read_restart(runit)
 
     WRITE (msg, *) 'done reading restart from ', TRIM(this%config%restart_load_file)
     CALL status_message(msg)
@@ -324,7 +322,6 @@ CONTAINS
     ELSE
        CALL this%set_initial()
     END IF
-
     CALL this%links%hyupdate(this%config%grav, this%config%time%delta_t)
 
   END SUBROUTINE network_initialize

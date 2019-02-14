@@ -281,6 +281,7 @@ CONTAINS
     
     CLASS (hydrologic_link), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: grav, dt
+    DOUBLE PRECISION :: q
 
     CALL this%linear_link_t%hydro_update(grav, dt)
 
@@ -289,8 +290,10 @@ CONTAINS
     this%outflow_old = this%outflow
 
     IF (ASSOCIATED(this%latbc)) THEN
-       this%latq_old = this%latq
-       this%latq = this%latbc%current_value*this%L
+       q = this%latq
+       this%latq_old = q
+       q = this%latbc%current_value*this%L
+       this%latq = q
     END IF
 
 
