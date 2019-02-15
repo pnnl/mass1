@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  4, 2019 by William A. Perkins
-! Last Change: 2019-02-11 09:44:09 d3g096
+! Last Change: 2019-02-15 10:28:36 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -146,7 +146,7 @@ END FUNCTION mass1_link_inflow
 ! ----------------------------------------------------------------
 ! SUBROUTINE mass1_write_hotstart
 ! ----------------------------------------------------------------
-SUBROUTINE mass1_write_hotstart(cnet, cname)
+SUBROUTINE mass1_write_hotstart(cnet, cname) BIND(C)
 
   USE, INTRINSIC :: iso_c_binding
   USE mass1_dhsvm_module
