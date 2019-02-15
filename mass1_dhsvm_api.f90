@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  4, 2019 by William A. Perkins
-! Last Change: 2019-02-15 13:41:24 d3g096
+! Last Change: 2019-02-15 14:29:30 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -32,7 +32,6 @@ FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, pid, dotemp) RESULT(net) B
   ALLOCATE(f_net)
   ALLOCATE(f_net%net)
   f_net%net = network()
-  f_net%net%config%quiet = (pid .GT. 0)
   f_dotemp = (dotemp .NE. 0)
 
   utility_error_iounit = 11
@@ -59,7 +58,7 @@ FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, pid, dotemp) RESULT(net) B
      CALL banner()
   END IF
 
-  CALL mass1_initialize(f_net, cfgdir, outdir, start, end, f_dotemp)
+  CALL mass1_initialize(f_net, cfgdir, outdir, start, end, .TRUE., f_dotemp)
 
   net = C_LOC(f_net)
 
@@ -113,7 +112,7 @@ SUBROUTINE mass1_update_latq(cnet, linkid, latq, ddate) BIND(c)
   link => dnet%link_lookup(linkid)%p
   llen = link%length()
 
-  ! assume everything is in English units
+  ! assume everything is in correct units
   lq = latq/llen
 
   time = dhsvm_to_decimal(ddate)
