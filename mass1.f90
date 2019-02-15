@@ -71,6 +71,7 @@ PROGRAM mass1
   CALL banner()
 
   ! read in configuration file
+  config%quiet = .FALSE.
   CALL config%read()
 
   CALL print_output("HEADER", time)

@@ -111,27 +111,6 @@ CONTAINS
     CLASS (simple_bc_t), POINTER :: latbc
     DOUBLE PRECISION, PARAMETER :: zero(5) = 0.0
 
-    utility_error_iounit = 11
-    utility_status_iounit = 99
-
-    CALL date_time_flags()
-    CALL time_series_module_init()
-
-    ! open the status file - this file records progress through the
-    ! input stream and errors
-    !
-    IF (LEN_TRIM(outdir) .GT. 0) THEN
-       path = TRIM(outdir) // "/mass1-status.out"
-       CALL open_new(path, utility_status_iounit)
-       path = TRIM(outdir) // "/mass1-error.out"
-       CALL open_new(path, utility_error_iounit)
-    ELSE 
-       CALL open_new('mass1-status.out', utility_status_iounit)
-       CALL open_new('mass1-warning.out', utility_error_iounit)
-    END IF
-
-    CALL banner()
-
     dnet%net = network()
     CALL dnet%net%read(cfgdir)
 
