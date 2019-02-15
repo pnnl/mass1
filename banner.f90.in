@@ -9,17 +9,21 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2017-06-30 09:03:20 d3g096
+! Last Change: 2019-02-15 11:08:35 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! SUBROUTINE banner
 ! ----------------------------------------------------------------
 SUBROUTINE banner()
 
+  USE iso_fortran_env
+  
   IMPLICIT NONE
-  WRITE (*, 10)
-  WRITE(*, 11)
-  WRITE (*, 15) '@MASS1_BRANCH@: @MASS1_REVISION@ (@MASS1_REVISION_DATE@)'
+  WRITE (output_unit, 10)
+  WRITE(output_unit, 11)
+  WRITE (output_unit, 15) '@MASS1_BRANCH@: @MASS1_REVISION@ (@MASS1_REVISION_DATE@)'
+
+  CALL FLUSH(output_unit)
 10 FORMAT(&
      &T4, " ____    ____       _       ______    ______    __     ", /,&
      &T4, "|_   \  /   _|     / \    .' ____ \ .' ____ \  /  |    ", /,&

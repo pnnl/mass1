@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2019-02-13 09:04:50 d3g096
+! Last Change: 2019-02-15 13:37:21 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE mass1_config
@@ -124,6 +124,8 @@ MODULE mass1_config
      CHARACTER(LEN=path_length) :: profile_file
      CHARACTER(LEN=path_length) :: lateral_file
      CHARACTER(LEN=path_length) :: pid_file
+
+     LOGICAL :: quiet
 
    CONTAINS
      PROCEDURE :: read => configuration_read

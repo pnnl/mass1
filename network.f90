@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-02-15 07:46:51 d3g096
+! Last Change: 2019-02-15 13:37:52 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -77,7 +77,6 @@ CONTAINS
     net%links = new_link_manager()
 
   END FUNCTION new_network
-
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE network_read_bcs
@@ -403,8 +402,10 @@ CONTAINS
        END IF
           
        CALL decimal_to_date(this%config%time%time, date_string, time_string)
-       WRITE(*,*) 'Done Crunching through ** Date: ', &
-            &TRIM(date_string),'  Time: ', TRIM(time_string)
+       IF (.NOT. this%config%quiet) THEN
+          WRITE(*,*) 'Done Crunching through ** Date: ', &
+               &TRIM(date_string),'  Time: ', TRIM(time_string)
+       END IF
     END DO
     
 
