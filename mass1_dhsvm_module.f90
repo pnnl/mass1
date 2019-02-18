@@ -96,13 +96,13 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE mass1_initialize
   ! ----------------------------------------------------------------
-  SUBROUTINE mass1_initialize(dnet, cfgdir, outdir, start, end, dotemp)
+  SUBROUTINE mass1_initialize(dnet, cfgdir, outdir, start, end, quiet, dotemp)
 
     IMPLICIT NONE
     TYPE (DHSVM_network), INTENT(INOUT) :: dnet
     CHARACTER (LEN=*), INTENT(IN) :: cfgdir, outdir
     TYPE (DHSVM_date), INTENT(INOUT) :: start, end
-    LOGICAL, INTENT(IN) :: dotemp
+    LOGICAL, INTENT(IN) :: quiet, dotemp
 
     CHARACTER (LEN=1024) :: path, msg
     INTEGER :: id, n
@@ -111,7 +111,6 @@ CONTAINS
     CLASS (simple_bc_t), POINTER :: latbc
     DOUBLE PRECISION, PARAMETER :: zero(5) = 0.0
 
-    dnet%net = network()
     CALL dnet%net%read(cfgdir)
 
     ASSOCIATE (cfg => dnet%net%config)
@@ -122,6 +121,7 @@ CONTAINS
       cfg%temp_diffusion = .TRUE.
       cfg%temp_exchange = .TRUE.
       cfg%met_required = cfg%do_temp
+      cfg%quiet = quiet
     END ASSOCIATE
 
     ! assume link id's are generally contiguous, or at least not too
