@@ -17,6 +17,10 @@
 
 	* add copyright notice to code files
 
+2014-04-29  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* configure.in: add maintainer mode
+
 2013-03-05  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* const_series.f90 (const_series_destroy): apparently
@@ -46,6 +50,22 @@
 
 	* cumulative_time_series.f90 (cumulative_time_series): add
 	cumulative time series
+
+2011-10-04  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* configure.in: modernize initialization; use new AC_F90 macros
+
+	* configure, aclocal.m4, Makefile.in: added: keep autotools in
+	version control
+
+	* Makefile.am: don't use the fptrap stuff; use $(OBJEXT) and $(EXEEXT)
+
+	* bootstrap.sh: use the stuff in m4/
+
+	* acinclude.m4: no longer used -- use the stuff in m4/
+
+	* m4 (ax_f90*.m4): get these macros from the autoconf macro
+	library 
 
 2011-05-15  Perkins  <D3G096@ironhorse.pnl.gov>
 
