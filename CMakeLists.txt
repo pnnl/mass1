@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2019-02-04 11:46:56 d3g096
+# Last Change: 2019-02-22 10:05:48 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -205,6 +205,7 @@ add_library(mass1lib
   coeff.f90
   cross_section.f90
   dlist_module.f90
+  flow_coeff.f90
   fluvial_link_module.f90
   gage_module.f90
   linear_link_module.f90
@@ -222,9 +223,11 @@ add_library(mass1lib
   section_handler.f90
   linear_interp.f90
   svgrp.f90
+  tdg_equation_coeff.f90
   mass1_dhsvm_module.f90
   mass1_dhsvm_api.f90
-)
+  )
+add_dependencies(mass1lib gastemp ts)
 add_executable(mass1_new
   mass1_new.f90
 )
