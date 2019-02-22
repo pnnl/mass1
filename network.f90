@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-02-13 10:06:53 d3g096
+! Last Change: 2019-02-22 09:43:17 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -77,7 +77,6 @@ CONTAINS
     net%links = new_link_manager()
 
   END FUNCTION new_network
-
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE network_read_bcs
@@ -272,9 +271,7 @@ CONTAINS
     WRITE(msg, *) 'reading restart from ', TRIM(this%config%restart_load_file)
     CALL status_message(msg)
 
-    CALL this%links%read_restart(runit, &
-         &this%config%grav, &
-         &this%config%time%delta_t)
+    CALL this%links%read_restart(runit)
 
     WRITE (msg, *) 'done reading restart from ', TRIM(this%config%restart_load_file)
     CALL status_message(msg)
@@ -324,7 +321,6 @@ CONTAINS
     ELSE
        CALL this%set_initial()
     END IF
-
     CALL this%links%hyupdate(this%config%grav, this%config%time%delta_t)
 
   END SUBROUTINE network_initialize
@@ -406,8 +402,10 @@ CONTAINS
        END IF
           
        CALL decimal_to_date(this%config%time%time, date_string, time_string)
-       WRITE(*,*) 'Done Crunching through ** Date: ', &
-            &TRIM(date_string),'  Time: ', TRIM(time_string)
+       IF (.NOT. this%config%quiet) THEN
+          WRITE(*,*) 'Done Crunching through ** Date: ', &
+               &TRIM(date_string),'  Time: ', TRIM(time_string)
+       END IF
     END DO
     
 

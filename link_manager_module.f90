@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2018-08-21 14:00:08 d3g096
+! Last Change: 2019-02-14 12:52:49 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -869,12 +869,11 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_read_restart
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_read_restart(this, iounit, grav, dt)
+  SUBROUTINE link_manager_read_restart(this, iounit)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: iounit
-    DOUBLE PRECISION, INTENT(IN) :: grav, dt
     CLASS (link_t), POINTER :: link
 
     CALL this%links%begin()
@@ -886,9 +885,6 @@ CONTAINS
        link => this%links%current()
     END DO
     
-    CALL this%hyupdate(grav, dt)
-    
-
   END SUBROUTINE link_manager_read_restart
 
   ! ----------------------------------------------------------------

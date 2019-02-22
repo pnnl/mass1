@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2018-08-13 14:48:00 d3g096
+! Last Change: 2019-02-14 13:21:31 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -1114,6 +1114,8 @@ CONTAINS
     DOUBLE PRECISION, PARAMETER :: lim = 1.0E-03
     INTEGER, PARAMETER :: maxiter = 10
 
+    CHARACTER (LEN=256) :: msg
+
     IF (discharge .LE. 0.0) THEN
        dnorm = 0.0
        RETURN
@@ -1134,7 +1136,9 @@ CONTAINS
        done = ABS(d - dprev) .LT. lim
        iter = iter + 1
        IF (iter .GT. maxiter) THEN
-          CALL error_message('xsection_normal_depth: maximum iterations exceeded')
+          WRITE(msg, *) 'xsection_normal_depth: maximum iterations (', maxiter, &
+               &') , exceeded at q = ', discharge, ", d = ", d
+          CALL error_message(msg)
           done = .TRUE.
        END IF
     END DO

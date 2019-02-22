@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  8, 2018 by William A. Perkins
-! Last Change: 2018-05-29 13:57:37 d3g096
+! Last Change: 2019-02-14 07:26:42 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -251,6 +251,11 @@ CONTAINS
     CLASS (point_t), POINTER :: point
     CHARACTER (LEN=1024) :: msg
 
+    ! assume the list is empty but pointers need nullification
+
+    NULLIFY(this%gages%head)
+    NULLIFY(this%gages%tail)
+    
     gunit_current = gunit_base
 
     CALL open_existing(fname, gcunit, fatal=.TRUE.)

@@ -7,23 +7,23 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  4, 2019 by William A. Perkins
-! Last Change: 2019-02-11 09:44:09 d3g096
+! Last Change: 2019-02-15 14:29:30 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
 !  FUNCTION mass1_create
 ! ----------------------------------------------------------------
-FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, dotemp) RESULT(net) BIND(c)
+FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, pid, dotemp) RESULT(net) BIND(c)
   USE, INTRINSIC :: iso_c_binding
   USE mass1_dhsvm_module
   IMPLICIT NONE
   TYPE (c_ptr) :: net
   TYPE (c_ptr), VALUE :: c_cfgdir, c_outdir
   TYPE (DHSVM_date), INTENT(INOUT) :: start, end
-  INTEGER(KIND=C_INT), VALUE :: dotemp
+  INTEGER(KIND=C_INT), VALUE :: pid, dotemp
 
   TYPE (DHSVM_network), POINTER :: f_net
-  CHARACTER (LEN=1024) :: cfgdir, outdir
+  CHARACTER (LEN=1024) :: cfgdir, outdir, spath, epath, buf
   LOGICAL :: f_dotemp
 
   CALL c2fstring(c_cfgdir, cfgdir)
@@ -34,7 +34,31 @@ FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, dotemp) RESULT(net) BIND(c
   f_net%net = network()
   f_dotemp = (dotemp .NE. 0)
 
-  CALL mass1_initialize(f_net, cfgdir, outdir, start, end, f_dotemp)
+  utility_error_iounit = 11
+  utility_status_iounit = 99
+
+  CALL date_time_flags()
+  CALL time_series_module_init()
+
+  ! open the status file - this file records progress through the
+  ! input stream and errors
+  !
+  WRITE(buf, '(I0.4)') pid
+
+  spath = "mass1-status.out" // "." // TRIM(buf)
+  epath = "mass1-error.out" // "." // TRIM(buf)
+  IF (LEN_TRIM(outdir) .GT. 0) THEN
+     spath = TRIM(outdir) // "/" // spath
+     epath = TRIM(outdir) // "/" // epath
+  END IF
+  CALL open_new(spath, utility_status_iounit)
+  CALL open_new(epath, utility_error_iounit)
+
+  IF (pid .EQ. 0) THEN
+     CALL banner()
+  END IF
+
+  CALL mass1_initialize(f_net, cfgdir, outdir, start, end, .TRUE., f_dotemp)
 
   net = C_LOC(f_net)
 
@@ -88,7 +112,7 @@ SUBROUTINE mass1_update_latq(cnet, linkid, latq, ddate) BIND(c)
   link => dnet%link_lookup(linkid)%p
   llen = link%length()
 
-  ! assume everything is in English units
+  ! assume everything is in correct units
   lq = latq/llen
 
   time = dhsvm_to_decimal(ddate)
@@ -146,7 +170,7 @@ END FUNCTION mass1_link_inflow
 ! ----------------------------------------------------------------
 ! SUBROUTINE mass1_write_hotstart
 ! ----------------------------------------------------------------
-SUBROUTINE mass1_write_hotstart(cnet, cname)
+SUBROUTINE mass1_write_hotstart(cnet, cname) BIND(C)
 
   USE, INTRINSIC :: iso_c_binding
   USE mass1_dhsvm_module

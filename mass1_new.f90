@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2018-08-17 11:53:18 d3g096
+! Last Change: 2019-02-15 13:45:03 d3g096
 ! ----------------------------------------------------------------
 PROGRAM mass1
   USE utility
@@ -20,6 +20,7 @@ PROGRAM mass1
 
   TYPE (network) :: thenet
   thenet = network()
+  thenet%config%quiet = .FALSE.
 
   utility_error_iounit = 11
   utility_status_iounit = 99
