@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-02-15 13:37:52 d3g096
+! Last Change: 2019-02-18 09:38:45 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -53,6 +53,7 @@ MODULE network_module
      PROCEDURE :: forward => network_forward
      PROCEDURE :: backward => network_backward
      PROCEDURE :: flow => network_flow
+     PROCEDURE :: transport => network_transport
      PROCEDURE :: run => network_run
      PROCEDURE :: run_to => network_run_to_time
      PROCEDURE :: destroy => network_destroy
@@ -362,6 +363,46 @@ CONTAINS
   END SUBROUTINE network_flow
 
   ! ----------------------------------------------------------------
+  ! SUBROUTINE network_transport
+  ! ----------------------------------------------------------------
+  SUBROUTINE network_transport(this)
+
+    IMPLICIT NONE
+    CLASS (network), INTENT(INOUT) :: this
+    INTEGER :: nsteps
+    DOUBLE PRECISION :: htime0, htime1
+    DOUBLE PRECISION :: tnow, tdeltat
+    INTEGER :: tsteps, i, ispec
+
+    htime0 = this%config%time%time
+    htime1 = htime0 + this%config%time%delta_t
+
+    tnow = htime0
+    
+    IF (this%config%scalar_steps .GT. 0) THEN
+       tsteps = this%config%scalar_steps
+    ELSE
+       tsteps = this%links%transport_steps(this%config%time%delta_t)
+       WRITE(*, '(" Using ", I5, " transport steps")') tsteps
+    END IF
+    tdeltat = config%time%delta_t/DBLE(tsteps)
+
+    DO i = 1, tsteps
+       CALL this%bcs%update(tnow)
+       CALL this%met%update(tnow)
+       CALL this%links%transport_interp(tnow, htime0, htime1)
+       DO ispec = 1, this%config%nspecies
+          ! CALL this%links%transport(ispec)
+       END DO
+       tnow = htime0 + i*tdeltat
+    END DO
+    
+    
+
+  END SUBROUTINE network_transport
+
+
+  ! ----------------------------------------------------------------
   ! SUBROUTINE network_run_to_time
   ! ----------------------------------------------------------------
   SUBROUTINE network_run_to_time(this, tend)
@@ -385,6 +426,10 @@ CONTAINS
        IF (this%config%do_flow) THEN
           CALL this%flow()
        ENDIF
+
+       IF (this%config%do_transport) THEN
+          CALL this%transport()
+       END IF
 
        ! update time step here so correct
        ! time is placed in output

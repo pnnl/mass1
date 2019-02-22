@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2019-02-14 12:52:49 d3g096
+! Last Change: 2019-02-18 07:51:32 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -64,6 +64,7 @@ MODULE link_manager_module
      PROCEDURE :: read_restart => link_manager_read_restart
      PROCEDURE :: write_restart => link_manager_write_restart
      PROCEDURE :: transport_steps => link_manager_transport_steps
+     PROCEDURE :: transport_interp => link_manager_transport_interp
      ! PROCEDURE :: transport => link_manager_transport
      PROCEDURE :: destroy => link_manager_destroy
   END type link_manager_t
@@ -958,6 +959,27 @@ CONTAINS
 
   END FUNCTION link_manager_transport_steps
 
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_transport_interp
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_transport_interp(this, tnow, htime0, htime1)
+
+    IMPLICIT NONE
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: tnow, htime0, htime1
+    CLASS (link_t), POINTER :: link
+
+    CALL this%links%begin()
+    link => this%links%current()
+
+    DO WHILE (ASSOCIATED(link))
+       CALL link%trans_interp(tnow, htime0, htime1)
+
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+  END SUBROUTINE link_manager_transport_interp
 
 
   ! ----------------------------------------------------------------

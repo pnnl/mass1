@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2018-08-21 15:02:06 d3g096
+! Last Change: 2019-02-18 07:36:41 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -129,7 +129,7 @@ MODULE link_module
 
      PROCEDURE (max_tnumber_proc), DEFERRED :: max_courant
      PROCEDURE (max_tnumber_proc), DEFERRED :: max_diffuse
-     ! PROCEDURE (trans_interp_proc, DEFERRED :: trans_interp
+     PROCEDURE (trans_interp_proc), DEFERRED :: trans_interp
 
      ! get a point on a link (if any)
 
@@ -224,6 +224,13 @@ MODULE link_module
        CLASS (link_t), INTENT(IN) :: this
        DOUBLE PRECISION, INTENT(IN) :: dt
      END FUNCTION max_tnumber_proc
+
+     SUBROUTINE trans_interp_proc(this, tnow, htime0, htime1)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(INOUT) :: this
+       DOUBLE PRECISION, INTENT(IN) :: tnow, htime0, htime1
+     END SUBROUTINE trans_interp_proc
 
      SUBROUTINE destroy_proc(this)
        IMPORT :: link_t

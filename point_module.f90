@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2018-08-07 08:54:45 d3g096
+! Last Change: 2019-02-22 07:55:42 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -25,6 +25,9 @@ MODULE point_module
 
   PRIVATE
 
+  ! ----------------------------------------------------------------
+  ! TYPE point_hydro_state
+  ! ----------------------------------------------------------------
   TYPE, PUBLIC :: point_hydro_state
      DOUBLE PRECISION :: y, q, v
      DOUBLE PRECISION :: lateral_inflow
@@ -33,10 +36,24 @@ MODULE point_module
      DOUBLE PRECISION :: courant_num, diffuse_num
   END type point_hydro_state
 
+  ! ----------------------------------------------------------------
+  ! TYPE point_transport_state
+  ! ----------------------------------------------------------------
+  TYPE, PUBLIC :: point_transport_state
+     TYPE (point_hydro_state) :: hnow, hold
+     TYPE (xsection_prop) :: xsprop
+  END type point_transport_state
+
+  ! ----------------------------------------------------------------
+  ! TYPE point_sweep_coeff
+  ! ----------------------------------------------------------------
   TYPE, PUBLIC :: point_sweep_coeff
      DOUBLE PRECISION :: e,f,l,m,n
   END type point_sweep_coeff
 
+  ! ----------------------------------------------------------------
+  ! TYPE point_t
+  ! ----------------------------------------------------------------
   TYPE, PUBLIC :: point_t
      DOUBLE PRECISION :: x, thalweg
      DOUBLE PRECISION :: manning, k_diff, kstrick
@@ -44,11 +61,13 @@ MODULE point_module
      TYPE (xsection_prop) :: xsprop
      TYPE (point_hydro_state) :: hnow, hold
      TYPE (point_sweep_coeff) :: sweep
+     TYPE (point_transport_state) :: trans
    CONTAINS
      PROCEDURE :: section_update => point_section_update
      PROCEDURE :: depth_check => point_depth_check
      PROCEDURE :: hydro_update => point_hydro_update
      PROCEDURE :: assign => point_assign
+     PROCEDURE :: transport_interp => point_transport_interp
   END type point_t
 
   ! ----------------------------------------------------------------
@@ -59,6 +78,31 @@ MODULE point_module
   END type point_ptr
 
 CONTAINS
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE hydro_interp
+  ! ----------------------------------------------------------------
+  SUBROUTINE hydro_interp(t, told, tnew, h, hold, hnew)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION, INTENT(IN) :: t, told, tnew
+    TYPE (point_hydro_state), INTENT(IN) :: hold, hnew
+    TYPE (point_hydro_state), INTENT(INOUT) :: h
+    DOUBLE PRECISION :: dlinear_interp
+
+    h%y = dlinear_interp(hold%y, hnew%y, told, tnew, t)
+    h%q = dlinear_interp(hold%q, hnew%q, told, tnew, t)
+    h%v = dlinear_interp(hold%v, hnew%v, told, tnew, t)
+    h%lateral_inflow = &
+         &dlinear_interp(hold%lateral_inflow, hnew%lateral_inflow, told, tnew, t)
+    h%friction_slope = &
+         &dlinear_interp(hold%friction_slope, hnew%friction_slope, told, tnew, t)
+    h%bed_shear = dlinear_interp(hold%bed_shear, hnew%bed_shear, told, tnew, t)
+    h%courant_num = dlinear_interp(hold%courant_num, hnew%courant_num, told, tnew, t)
+    h%diffuse_num = dlinear_interp(hold%diffuse_num, hnew%diffuse_num, told, tnew, t)
+
+    
+  END SUBROUTINE hydro_interp
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE point_section_update
@@ -152,6 +196,30 @@ CONTAINS
 
   END SUBROUTINE point_hydro_update
 
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE point_transport_interp
+  ! ----------------------------------------------------------------
+  SUBROUTINE point_transport_interp(this, tnow, htime0, htime1)
+
+    IMPLICIT NONE
+    CLASS (point_t), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: tnow, htime0, htime1
+    DOUBLE PRECISION :: depth
+
+    this%trans%hold = this%trans%hnow
+    CALL hydro_interp(tnow, htime0, htime1, &
+         &this%hold, this%hnow, this%trans%hnow)
+
+    depth = this%trans%hnow%y - this%thalweg
+    CALL this%xsection%p%props(depth, this%trans%xsprop)
+    IF (this%trans%xsprop%area .GT. 0.0D00) THEN
+       this%trans%hnow%v = this%trans%hnow%q/this%trans%xsprop%area
+    ELSE 
+       this%trans%hnow%v = 0.0
+       this%trans%xsprop%area = 0.0
+    END IF
+
+  END SUBROUTINE point_transport_interp
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE point_depth_check

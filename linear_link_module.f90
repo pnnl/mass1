@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-02-13 12:05:30 d3g096
+! Last Change: 2019-02-18 07:38:52 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -52,6 +52,7 @@ MODULE linear_link_module
      PROCEDURE :: max_diffuse => linear_link_max_diffuse
      PROCEDURE :: point => linear_link_point
      PROCEDURE :: check => linear_link_check
+     PROCEDURE :: trans_interp => linear_link_trans_interp
      PROCEDURE :: destroy => linear_link_destroy
   END type linear_link_t
 
@@ -664,6 +665,25 @@ CONTAINS
             
     END IF
   END FUNCTION linear_link_check
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE linear_link_trans_interp
+  ! ----------------------------------------------------------------
+  SUBROUTINE linear_link_trans_interp(this, tnow, htime0, htime1)
+
+    IMPLICIT NONE
+    CLASS (linear_link_t), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: tnow, htime0, htime1
+    INTEGER :: i
+    CLASS (point_t), POINTER :: pt
+    
+    DO i = 1, this%points()
+       pt => this%point(i)
+       CALL pt%transport_interp(tnow, htime0, htime1)
+    END DO
+
+  END SUBROUTINE linear_link_trans_interp
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE linear_link_destroy

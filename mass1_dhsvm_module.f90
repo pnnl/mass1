@@ -104,7 +104,7 @@ CONTAINS
     TYPE (DHSVM_date), INTENT(INOUT) :: start, end
     LOGICAL, INTENT(IN) :: quiet, dotemp
 
-    CHARACTER (LEN=1024) :: path, msg
+    CHARACTER (LEN=1024) :: msg
     INTEGER :: id, n
 
     CLASS (link_t), POINTER :: link
