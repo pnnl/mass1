@@ -1,6 +1,9 @@
 
 !***************************************************************
-!            Pacific Northwest National Laboratory
+! Copyright (c) 2017 Battelle Memorial Institute
+! Licensed under modified BSD License. A copy of this license can be
+! found in the LICENSE file in the top level directory of this
+! distribution.
 !***************************************************************
 !
 ! NAME: fluvial_coeff
@@ -71,7 +74,9 @@ SUBROUTINE fluvial_coeff(a,b,c,d,g,ap,bp,cp,dp,gp,dx,dt,gr,latq_old,latq_new,lpi
   ! change the friction weighting
   IF ( (d1 .LT. depth_threshold) .OR. (d2 .LT. depth_threshold)) THEN
      sigma = 0.0
-     beta = 0.95
+     beta = 1.0
+  ELSE 
+     beta = 0.5
   END IF
 
 

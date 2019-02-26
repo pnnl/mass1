@@ -4,12 +4,14 @@
 # A module of routines for handling cross-sections.
 # -------------------------------------------------------------
 # -------------------------------------------------------------
-# Battelle Memorial Institute
-# Pacific Northwest Laboratory
+# Copyright (c) 2017 Battelle Memorial Institute
+# Licensed under modified BSD License. A copy of this license can be
+# found in the LICENSE file in the top level directory of this
+# distribution.
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created November 19, 1996 by William A. Perkins
-# Last Change: Wed Mar 23 12:57:04 2005 by William A. Perkins <perk@leechong.pnl.gov>
+# Last Change: 2017-07-14 12:55:26 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -379,6 +381,7 @@ sub read_section {
   while ($npts > 0) {
     return 0 unless defined($rec = <$fd>);
     chop $rec;
+    $rec =~ s/\s+$//;
     while (length($rec) > 0 && $npts > 0) {
       $x = substr($rec,0,10); $rec = substr($rec,10);
       $z = substr($rec,0,10); $rec = substr($rec,10);

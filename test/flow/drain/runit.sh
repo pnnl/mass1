@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: 2017-01-13 11:19:51 d3g096
+# Last Change: 2017-06-16 12:25:05 d3g096
 # -------------------------------------------------------------
 # $Id$
 
@@ -21,6 +21,9 @@ TRAP_FPE='INVALID=ABORT(1);UNDERFL=ZERO;OVERFL=ABORT(1);INT_OVERFL=ABORT(1);DIVZ
 export TRAP_FPE
 
 model=${MODEL-../../../mass1}
+python=${PYTHON-python}
+tecplot=${TECPLOT-tecplot}
+convert=${CONVERT-convert}
 
 $model
 
@@ -46,4 +49,8 @@ $model
     set terminal postscript eps color solid \"Helvetica\" 22 \; \
     load \"plot-disch.gp\"\; ) | \
         gnuplot > plot-disch.eps
+
+"$python" ../../../scripts/profile_tecplot.py profile1.out > profile1.dat
+"$tecplot" -b -p ../../../scripts/xy-looper-png.mcr stage1.lay
+"$convert" -delay 20 -loop 1 looper-0*.png drain.gif
 

@@ -5,9 +5,10 @@
 * [Configuration file](configuration.md)
 * [Link data file](link.md)
 * [Point data file](point.md)
-* [Cross Section file](section.md)
+* [Cross section data file](section.md)
 * [Boundary conditions](bc.md)
-* [Meterological Data](met.md)
+* [Meteorology zone list](met.md)
+* [Initial conditions file](initial.md)
 
 ## Output
 

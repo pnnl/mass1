@@ -8,12 +8,14 @@
 
 # -------------------------------------------------------------
 # -------------------------------------------------------------
-# Battelle Memorial Institute
-# Pacific Northwest Laboratory
+# Copyright (c) 2017 Battelle Memorial Institute
+# Licensed under modified BSD License. A copy of this license can be
+# found in the LICENSE file in the top level directory of this
+# distribution.
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October  4, 1999 by William A. Perkins
-# Last Change: Wed Mar  3 13:44:45 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+# Last Change: 2017-08-28 08:32:42 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -131,7 +133,8 @@ my %fieldnames =
  tdgpress => "TDG Pressure"
 );
 
-Date::Manip::Date_Init("TZ=PST");
+Date::Manip::Date_Init('SetDate=now,UTC');
+#Date::Manip::Date_Init("TZ=-08:00");
 
 my $field = undef;
 my $offset = undef;

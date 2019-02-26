@@ -1,6 +1,9 @@
 
 !***************************************************************
-!            Pacific Northwest National Laboratory
+! Copyright (c) 2017 Battelle Memorial Institute
+! Licensed under modified BSD License. A copy of this license can be
+! found in the LICENSE file in the top level directory of this
+! distribution.
 !***************************************************************
 !
 ! NAME:	section
@@ -116,11 +119,24 @@ SUBROUTINE section(link,point,depth,area_temp,width,conveyance,dkdy,hydrad)
 		area_temp = factor*(sect_area(i,j+1)-sect_area(i,j))+sect_area(i,j) 
                 perm = 	factor*(sect_perm(i,j+1)-sect_perm(i,j))+sect_perm(i,j)
                 width = factor*(sect_width(i,j+1)-sect_width(i,j))+sect_width(i,j)
-                hydrad = factor*(sect_hydradius(i,j+1)-sect_hydradius(i,j))+sect_hydradius(i,j) 
-        !dpdy = 2.0
+                ! hydrad = factor*(sect_hydradius(i,j+1)-sect_hydradius(i,j))+sect_hydradius(i,j) 
+
+                ! it seems like hydraulic radius does not extrapolate
+                ! (negative values past the top of the section) very
+                ! well, so make sure the interpolated value is at
+                ! least as large as area/wetted perimiter
+                IF (perm .GT. 0.0) THEN
+                   hydrad = MAX(hydrad, area_temp/perm)
+                END IF
 		conveyance = res_coeff*kstrick(link,point)*(factor*(sect_convey(i,j+1)-sect_convey(i,j))+sect_convey(i,j))
 		dkdy = res_coeff*kstrick(link,point)*(sect_convey(i,j+1) - sect_convey(i,j))/delta_y(i)
 
         END SELECT
 
+        area_temp = MAX(area_temp, 0.0D00)
+        width = MAX(width, 0.0D00)
+        conveyance = MAX(conveyance, 0.0D00)
+        IF (hydrad .LE. 0.0) THEN 
+           hydrad = 0.0
+        END IF
 END SUBROUTINE section

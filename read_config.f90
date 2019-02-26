@@ -1,5 +1,8 @@
 !***************************************************************
-!            Pacific Northwest National Laboratory
+! Copyright (c) 2017 Battelle Memorial Institute
+! Licensed under modified BSD License. A copy of this license can be
+! found in the LICENSE file in the top level directory of this
+! distribution.
 !***************************************************************
 !
 ! NAME: mass1
@@ -310,8 +313,10 @@ SUBROUTINE read_config
 
   ! Some things that need to be set, but are not read (yet)
 
-  depth_minimum = 0.001           ! m
-  depth_threshold = 0.01          ! m
+  depth_minimum = 0.005           ! m
+  depth_threshold = 0.0500          ! m
+  depth_minimum = 0.003           ! m
+  depth_threshold = 0.100          ! m
 
   IF(debug_print == 1)THEN 
 

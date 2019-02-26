@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 22, 1999 by William A. Perkins
-# Last Change: 2017-01-17 12:03:42 d3g096
+# Last Change: 2017-05-23 12:41:00 d3g096
 # -------------------------------------------------------------
 # $Id$
 
@@ -18,14 +18,15 @@ set xrange [0:12000]
 set xlabel 'Longitudinal Distance, ft'
 set format y "%.1f"
 set ylabel 'Elevation, ft'
-# set yrange [4:6]
+set yrange [0:6.5]
 set pointsize 0.5
 # set timestamp
 set key below
 
-plot "<head -n 105 profile1.out" using (10656 - $4):13 title "Thalweg" with linespoint lt 3, \
-     "<head -n 105 profile1.out" using (10656 - $4):5 title 'Initial Conditions' with linespoint lt 1, \
-     "<tail -n 105 profile1.out" using (10656 - $4):5 title 'Final Conditions' with linespoints lt 7
+plot "profile1.out" using (10656 - $4):5 notitle with lines lt 9, \
+     "<head -n 105 profile1.out" using (10656 - $4):13 title "Thalweg" with lines lt 1 lc 7, \
+     "<head -n 105 profile1.out" using (10656 - $4):5 title 'Initial Conditions' with points lt 1 lc 1, \
+     "<tail -n 105 profile1.out" using (10656 - $4):5 title 'Final Conditions' with points lt 7 lc 3
      
 
 

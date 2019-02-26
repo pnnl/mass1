@@ -4,12 +4,14 @@
 # file: HEC2CHARIMA.pl
 # -------------------------------------------------------------
 # -------------------------------------------------------------
-# Battelle Memorial Institute
-# Pacific Northwest Laboratory
+# Copyright (c) 2017 Battelle Memorial Institute
+# Licensed under modified BSD License. A copy of this license can be
+# found in the LICENSE file in the top level directory of this
+# distribution.
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December  2, 1996 by William A. Perkins
-# Last Change: Wed Nov 11 10:16:59 1998 by William A. Perkins <perk@erebus.pnl.gov>
+# Last Change: 2017-06-22 11:41:07 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$

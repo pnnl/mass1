@@ -2,12 +2,14 @@
 # file: readbc.R
 # -------------------------------------------------------------
 # -------------------------------------------------------------
-# Battelle Memorial Institute
-# Pacific Northwest Laboratory
+# Copyright (c) 2017 Battelle Memorial Institute
+# Licensed under modified BSD License. A copy of this license can be
+# found in the LICENSE file in the top level directory of this
+# distribution.
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October 25, 2001 by William A. Perkins
-# Last Change: Tue Feb 13 13:57:24 2007 by William A. Perkins <perk@mcbill.pnl.gov>
+# Last Change: 2017-06-22 11:46:05 d3g096
 # -------------------------------------------------------------
 
 # library(chron)

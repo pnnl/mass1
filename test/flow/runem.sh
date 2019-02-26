@@ -8,13 +8,14 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December  1, 2010 by William A. Perkins
-# Last Change: 2017-03-06 09:53:45 d3g096
+# Last Change: 2017-07-14 12:57:05 d3g096
 # -------------------------------------------------------------
 
 set -u
 
 dirs=" \
     normal \
+    normal-hydro \
     slopebreak1 \
     slopebreak2 \
     lateral \
@@ -24,6 +25,9 @@ dirs=" \
     MacDonald-4 \
     dam-break \
     drain \
+    fill \
+    fill-us \
+    lateral-fill \
     varied \
     varied-pid \
     varied-pool \

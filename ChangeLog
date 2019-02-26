@@ -1,3 +1,101 @@
+2017-08-29  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* scripts/mass1profile.in: fix problem with deprecated array
+	references 
+
+2017-08-28  Perkins  <d3g096@WE32673>
+
+	* scripts/mass1bc.in: update to newer Date::Manip initialization
+
+	* scripts/mass1profile.in: update to newer Date::Manip initialization
+
+2017-08-28  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* scripts/Makefile.am (xsscript_DATA): install cross section
+	scripts in .../share/mass1
+
+	* gastemp/Makefile.am: do not install the TDG/temperature library 
+
+2017-07-26  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* doc/bibliography.md: added
+
+	* README.md: add citation
+
+	* coeff.f90 (fluvial_coeff): oops: value of beta not returned to
+	default -- fixed
+
+2017-07-14  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* test/flow/normal-hydro: add a case for link type 6
+
+	* scripts/cross-section/XSection.pm (read_section): trim of trailing
+	white space necessary, maybe
+
+	* scripts/cross-section/CHARIMAnotch.pl: add verbose option
+
+	* doc/point.md: clarification of point numbering
+
+	* test/flow/fill-us/section.dat: add an alternative section with a 
+	notch
+
+	* test/flow/fill/section.dat: add an alternative section with a
+	notch 
+
+2017-06-27  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* section.f90 (section): take some steps to catch bad
+	extrapolation of hydraulic radius
+
+2017-06-23  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* flow_sim.f90 (flow_sim): check to make sure area is greater than
+	zero before using it in the denominator
+
+2017-06-22  William A. Perkins  <william.perkins@pnnl.gov>
+
+	*  time_series: point at the PNNL Github repository
+
+2017-06-06  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* read_config.f90 (read_config): set dry depth values more
+	appropriate to real channels
+
+	* section.f90 (section): make sure section properties are
+	nonnegative when appropriate
+
+	* scripts/profile_extract.py (read_next_profile): fix column numbers
+
+2017-05-24  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* test/flow/lateral-fill: use tecplot to animate profile output
+
+	* test/flow/fill: use tecplot to animate profile output
+
+	* test/flow/drain: use tecplot to animate profile output
+
+	* scripts/xy-looper.mcr: add
+
+	* scripts/xy-looper-png.mcr: add
+
+	* scripts/profile_tecplot.py: add 
+
+2017-05-23  William A. Perkins  <william.perkins@pnnl.gov>
+
+	* test/flow/lateral-fill: test filling a dry channel with lateral
+	inflow 
+
+	* test/flow/fill: test for filling a channel from downstream; 
+	doesn't work real well
+
+	* coeff.f90 (fluvial_coeff): when dry set beta to 1.0 (go all the
+	way) 
+
+	* test/flow/drain: several modifications to make test work
+
+	* flow_sim.f90 (flow_sim): do not get section properties for
+	depths less than depth_minimum
+
 2017-03-27  William A. Perkins  <william.perkins@pnnl.gov>
 
 	* read_config.f90 (read_config): better output format
