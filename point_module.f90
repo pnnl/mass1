@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2019-02-22 07:55:42 d3g096
+! Last Change: 2019-02-28 07:38:26 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -41,7 +41,8 @@ MODULE point_module
   ! ----------------------------------------------------------------
   TYPE, PUBLIC :: point_transport_state
      TYPE (point_hydro_state) :: hnow, hold
-     TYPE (xsection_prop) :: xsprop
+     TYPE (xsection_prop) :: xsprop, xspropold
+     DOUBLE PRECISION :: twater
   END type point_transport_state
 
   ! ----------------------------------------------------------------

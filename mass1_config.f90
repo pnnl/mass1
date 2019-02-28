@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2019-02-18 09:42:30 d3g096
+! Last Change: 2019-02-28 10:28:52 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE mass1_config
@@ -128,7 +128,6 @@ MODULE mass1_config
      LOGICAL :: quiet
 
      LOGICAL :: do_transport
-     INTEGER :: nspecies
 
    CONTAINS
      PROCEDURE :: read => configuration_read
@@ -536,26 +535,20 @@ CONTAINS
 
     this%do_transport = (this%do_temp .OR. this%do_gas)
     IF (this%do_transport) THEN
-       IF (this%do_temp .AND. this%do_gas) THEN
-          this%nspecies = 2
-       ELSE
-          this%nspecies = 1
-       END IF
-    ELSE
-       this%nspecies = 0
-    END IF
 
-    IF (this%do_gas .AND. this%gas_exchange) THEN
-       IF (.NOT. this%do_temp) THEN
-          CALL error_message(&
-               &"Simulating TDG with atmospheric exchange requries temperature", &
-               &FATAL=.TRUE.)
+       IF (this%do_gas .AND. this%gas_exchange) THEN
+          IF (.NOT. this%do_temp) THEN
+             CALL error_message(&
+                  &"Simulating TDG with atmospheric exchange requries temperature", &
+                  &FATAL=.TRUE.)
+          END IF
        END IF
-    END IF
 
-    this%met_required = &
-         &(this%do_temp .AND. this%temp_exchange) .OR. &
-         &(this%do_gas .AND. this%gas_exchange)
+       this%met_required = &
+            &(this%do_temp .AND. this%temp_exchange) .OR. &
+            &(this%do_gas .AND. this%gas_exchange)
+
+    END IF
 
     RETURN 
 

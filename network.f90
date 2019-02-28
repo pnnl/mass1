@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-02-18 09:38:45 d3g096
+! Last Change: 2019-02-28 10:35:35 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -29,6 +29,7 @@ MODULE network_module
   USE met_zone
   USE gage_module
   USE profile_module
+  USE scalar_module
 
   IMPLICIT NONE
 
@@ -43,6 +44,7 @@ MODULE network_module
      TYPE (link_manager_t) :: links
      TYPE (gage_manager) :: gages
      TYPE (profile_manager) :: profiles
+     TYPE (scalar_manager) :: scalars
    CONTAINS
      PROCEDURE :: readbcs => network_read_bcs
      PROCEDURE :: read => network_read
@@ -180,7 +182,7 @@ CONTAINS
        
     END SELECT
 
-
+    CALL this%scalars%initialize(this%config)
     CALL this%links%scan(this%config)
     CALL this%readbcs()
     CALL this%sections%read(this%config%section_file)
@@ -391,7 +393,7 @@ CONTAINS
        CALL this%bcs%update(tnow)
        CALL this%met%update(tnow)
        CALL this%links%transport_interp(tnow, htime0, htime1)
-       DO ispec = 1, this%config%nspecies
+       DO ispec = 1, this%scalars%nspecies
           ! CALL this%links%transport(ispec)
        END DO
        tnow = htime0 + i*tdeltat

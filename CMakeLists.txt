@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2019-02-22 10:05:48 d3g096
+# Last Change: 2019-02-28 10:47:14 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -220,7 +220,9 @@ add_library(mass1lib
   hydrologic_link.f90
   point_module.f90
   profile_module.f90
+  scalar_module.f90
   section_handler.f90
+  transport_module.f90
   linear_interp.f90
   svgrp.f90
   tdg_equation_coeff.f90
@@ -230,7 +232,8 @@ add_library(mass1lib
 add_dependencies(mass1lib gastemp ts)
 add_executable(mass1_new
   mass1_new.f90
-)
+  )
+add_dependencies(mass1_new mass1lib)
 target_link_libraries(mass1_new mass1lib gastemp ts)
 # save for running tests
 set(mass1newexe $<TARGET_FILE:mass1_new>)
