@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2018-08-21 12:29:08 d3g096
+! Last Change: 2019-03-06 09:37:08 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -18,6 +18,7 @@ MODULE fluvial_link_module
   USE point_module
   USE link_module
   USE linear_link_module
+  USE scalar_module
   USE utility
   USE flow_coeff
 
@@ -65,16 +66,17 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION fluvial_link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION fluvial_link_initialize(this, ldata, bcman) RESULT(ierr)
+  FUNCTION fluvial_link_initialize(this, ldata, bcman, sclrman) RESULT(ierr)
 
     IMPLICIT NONE
     INTEGER :: ierr
     CLASS (fluvial_link), INTENT(INOUT) :: this
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
     CHARACTER (LEN=1024) :: msg
 
-    ierr = this%linear_link_t%initialize(ldata, bcman)
+    ierr = this%linear_link_t%initialize(ldata, bcman, sclrman)
 
     this%lpiexp = ldata%lpiexp
     IF (ldata%lbcid .GT. 0) THEN
@@ -160,13 +162,15 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION fluvial_hydro_link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION fluvial_hydro_link_initialize(this, ldata, bcman) RESULT(ierr)
+  FUNCTION fluvial_hydro_link_initialize(this, ldata, bcman, sclrman) RESULT(ierr)
 
     IMPLICIT NONE
     INTEGER :: ierr
     CLASS (fluvial_hydro_link), INTENT(INOUT) :: this
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
+
     CHARACTER (LEN=1024) :: msg
 
     ierr = 0
@@ -184,7 +188,7 @@ CONTAINS
        ierr = ierr + 1
     END IF
 
-    ierr = ierr + this%fluvial_link%initialize(ldata, bcman)
+    ierr = ierr + this%fluvial_link%initialize(ldata, bcman, sclrman)
   END FUNCTION fluvial_hydro_link_initialize
 
   

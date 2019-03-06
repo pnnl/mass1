@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-02-18 07:38:52 d3g096
+! Last Change: 2019-03-06 08:45:31 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -16,6 +16,7 @@ MODULE linear_link_module
   USE link_module
   USE point_module
   USE bc_module
+  USE scalar_module
   USE cross_section
   USE section_handler_module
   USE mass1_config
@@ -61,13 +62,14 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION linear_link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION linear_link_initialize(this, ldata, bcman) RESULT(ierr)
+  FUNCTION linear_link_initialize(this, ldata, bcman, sclrman) RESULT(ierr)
 
     IMPLICIT NONE
     INTEGER :: ierr
     CLASS (linear_link_t), INTENT(INOUT) :: this
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
     CHARACTER (LEN=1024) :: msg
 
     ierr = 0

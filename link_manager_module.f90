@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2019-02-18 07:51:32 d3g096
+! Last Change: 2019-03-06 09:41:04 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -26,6 +26,7 @@ MODULE link_manager_module
   USE hydrologic_link_module
   USE bc_module
   USE section_handler_module
+  USE scalar_module
 
   IMPLICIT NONE
 
@@ -464,7 +465,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_read
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_read(this, theconfig, bcman, sectman)
+  SUBROUTINE link_manager_read(this, theconfig, bcman, sectman, sclrman)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
@@ -472,6 +473,7 @@ CONTAINS
     CLASS (bc_manager_t), INTENT(IN) :: bcman
     CLASS (link_t), POINTER :: link
     CLASS (section_handler), INTENT(INOUT) :: sectman
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
     INTEGER, PARAMETER :: lunit = 21
     INTEGER :: recno, ierr, iostat, npid
     TYPE (link_input_data) :: ldata
@@ -584,7 +586,7 @@ CONTAINS
 
        CALL link%construct()
 
-       IF (link%initialize(ldata, bcman) .NE. 0) THEN
+       IF (link%initialize(ldata, bcman, sclrman) .NE. 0) THEN
           WRITE(msg, *) TRIM(theconfig%link_file), ': link record ', recno, &
                & ', link id = ', ldata%linkid, ': error'
           CALL error_message(msg)

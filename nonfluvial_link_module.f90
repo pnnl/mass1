@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 17, 2017 by William A. Perkins
-! Last Change: 2018-02-06 09:43:10 d3g096
+! Last Change: 2019-03-06 09:38:25 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE nonfluvial_link_module
@@ -16,6 +16,7 @@ MODULE nonfluvial_link_module
   USE utility
   USE point_module
   USE link_module
+  USE scalar_module
   USE linear_link_module
   USE flow_coeff
   USE bc_module
@@ -107,13 +108,15 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION hydro_link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION hydro_link_initialize(this, ldata, bcman) RESULT(ierr)
+  FUNCTION hydro_link_initialize(this, ldata, bcman, sclrman) RESULT(ierr)
 
     IMPLICIT NONE
     INTEGER :: ierr
     CLASS (hydro_link), INTENT(INOUT) :: this
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
+    
     CHARACTER (LEN=1024) :: msg
 
     ierr = 0
@@ -131,7 +134,7 @@ CONTAINS
        ierr = ierr + 1
     END IF
     
-    ierr = ierr + this%linear_link_t%initialize(ldata, bcman)
+    ierr = ierr + this%linear_link_t%initialize(ldata, bcman, sclrman)
   END FUNCTION hydro_link_initialize
 
 

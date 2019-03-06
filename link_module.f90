@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2019-02-18 07:36:41 d3g096
+! Last Change: 2019-03-06 08:44:25 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -22,6 +22,7 @@ MODULE link_module
   USE mass1_config
   USE section_handler_module
   USE point_module
+  USE scalar_module
 
   IMPLICIT NONE
 
@@ -142,13 +143,14 @@ MODULE link_module
   END type link_t
 
   ABSTRACT INTERFACE
-     FUNCTION init_proc(this, ldata, bcman) RESULT(ierr)
-       IMPORT :: link_t, link_input_data, bc_manager_t
+     FUNCTION init_proc(this, ldata, bcman, sclrman) RESULT(ierr)
+       IMPORT :: link_t, link_input_data, bc_manager_t, scalar_manager
        IMPLICIT NONE
        INTEGER :: ierr
        CLASS (link_t), INTENT(INOUT) :: this
        CLASS (link_input_data), INTENT(IN) :: ldata
        CLASS (bc_manager_t), INTENT(IN) :: bcman
+       CLASS (scalar_manager), INTENT(IN) :: sclrman
      END FUNCTION init_proc
 
      FUNCTION readpts_proc(this, theconfig, sectman, punit, lineno) RESULT (ierr)
@@ -306,13 +308,14 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION link_initialize(this, ldata, bcman) RESULT(ierr)
+  FUNCTION link_initialize(this, ldata, bcman, sclrman) RESULT(ierr)
 
     IMPLICIT NONE
     INTEGER :: ierr
     CLASS (link_t), INTENT(INOUT) :: this
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
     CHARACTER (LEN=1024) :: msg
 
 

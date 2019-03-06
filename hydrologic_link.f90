@@ -7,6 +7,7 @@ MODULE hydrologic_link_module
   USE point_module
   USE bc_module
   USE link_module
+  USE scalar_module
   USE cross_section
   USE section_handler_module
   USE mass1_config
@@ -67,16 +68,17 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION hydrologic_link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION hydrologic_link_initialize(this, ldata, bcman) RESULT(ierr)
+  FUNCTION hydrologic_link_initialize(this, ldata, bcman, sclrman) RESULT(ierr)
 
     IMPLICIT NONE
     INTEGER :: ierr
     CLASS (hydrologic_link), INTENT(INOUT) :: this
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
     CHARACTER (LEN=1024) :: msg
 
-    ierr = this%linear_link_t%initialize(ldata, bcman)
+    ierr = this%linear_link_t%initialize(ldata, bcman, sclrman)
 
     IF (ldata%lbcid .GT. 0) THEN
        this%latbc => bcman%find(LATFLOW_BC_TYPE, ldata%lbcid)
