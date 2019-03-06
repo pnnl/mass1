@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2017-01-19 12:49:15 d3g096
+# Last Change: 2019-03-06 12:20:58 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -36,10 +36,10 @@ set(testfiles
 
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/profile1.out"
-  COMMAND ${mass1exe} > mass1.log
+  COMMAND ${mass1newexe} > mass1.log
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Running test flow/slopebreak1"
-  DEPENDS mass1 ${testfiles}
+  DEPENDS mass1_new ${testfiles}
 )
 set(rundeps "${CMAKE_CURRENT_BINARY_DIR}/profile1.out")
 
