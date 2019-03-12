@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-03-12 07:12:23 d3g096
+! Last Change: 2019-03-12 14:18:47 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -114,11 +114,16 @@ CONTAINS
     END IF
 
     IF (sclrman%nspecies .GT. 0) THEN
+       DO i = 1, this%npoints
+          ALLOCATE(this%pt(i)%trans%cnow(sclrman%nspecies))
+          ALLOCATE(this%pt(i)%trans%cold(sclrman%nspecies))
+       END DO
+
+       
        ALLOCATE(this%species(sclrman%nspecies))
+
        DO i = 1, sclrman%nspecies
           this%species(i)%scalar => sclrman%species(i)%p
-          ALLOCATE(this%species(i)%cnow(this%npoints))
-          ALLOCATE(this%species(i)%cold(this%npoints))
 
           SELECT CASE (this%species(i)%scalar%bctype)
           CASE (TEMP_BC_TYPE)
@@ -137,12 +142,12 @@ CONTAINS
              END IF
           CASE DEFAULT
           END SELECT
+
+          IF (this%species(i)%scalar%needmet .AND. ldata%mzone .NE. 0) THEN
+             this%species(i)%met => metman%find(ldata%mzone)
+          END IF
+
        END DO
-
-       IF (this%species(i)%scalar%needmet .AND. ldata%mzone .NE. 0) THEN
-          this%species(i)%met => metman%find(ldata%mzone)
-       END IF
-
     END IF
 
   END FUNCTION linear_link_initialize
@@ -374,7 +379,7 @@ CONTAINS
     CLASS (linear_link_t), INTENT(IN) :: this
     INTEGER, INTENT(IN) :: ispecies
 
-    linear_link_c_up = this%species(ispecies)%cnow(1)
+    linear_link_c_up = this%pt(1)%trans%cnow(ispecies)
   END FUNCTION linear_link_c_up
 
 
@@ -387,7 +392,7 @@ CONTAINS
     INTEGER, INTENT(IN) :: ispecies
     INTEGER :: npts
     npts = this%points()
-    linear_link_c_down = this%species(ispecies)%cnow(npts)
+    linear_link_c_down = this%pt(npts)%trans%cnow(ispecies)
   END FUNCTION linear_link_c_down
 
   ! ----------------------------------------------------------------
@@ -737,30 +742,37 @@ CONTAINS
     INTEGER, INTENT(IN) :: ispec
     DOUBLE PRECISION, INTENT(IN) :: tdeltat
 
+    INTEGER :: i
+    DOUBLE PRECISION :: c
+
+    DO i = 1, this%npoints
+       this%pt(i)%trans%cold(ispec) = this%pt(i)%trans%cnow(ispec)
+    END DO
+    
     ! the default is to just pass the boundary concentration through
     ! to all points. There needs to be a general way of dealing
     ! reverse flow, but get it working first
 
-    ASSOCIATE(sp => this%species(ispec))
-      sp%cold = sp%cnow
-      IF (this%q_up() .GT. 0.0) THEN
-         IF (ASSOCIATED(sp%usbc)) THEN
-            sp%cnow = sp%usbc%current_value
-         ELSEIF (ASSOCIATED(this%ucon)) THEN
-            sp%cnow = this%ucon%conc(ispec)
-         ELSE
-            ! this is bad, but shouldn't happen often
-            CALL error_message("Upstream link w/o transport BC")
-         END IF
-      ELSEIF (this%q_down() .LT. 0.0) THEN
-         IF (ASSOCIATED(this%dcon)) THEN
-            sp%cnow = this%dcon%conc(ispec)
-         ELSE
-            ! also bad, but shouldn't happen often
-            CALL error_message("Reverse flow w/o transport BC")
-         END IF
-      END IF
-    END ASSOCIATE
+    IF (this%q_up() .GT. 0.0) THEN
+       IF (ASSOCIATED(this%species(ispec)%usbc)) THEN
+          c = this%species(ispec)%usbc%current_value
+       ELSEIF (ASSOCIATED(this%ucon)) THEN
+          c = this%ucon%conc(ispec)
+       ELSE
+          ! this is bad, but shouldn't happen often
+          CALL error_message("Upstream link w/o transport BC")
+       END IF
+    ELSEIF (this%q_down() .LT. 0.0) THEN
+       IF (ASSOCIATED(this%dcon)) THEN
+          c = this%dcon%conc(ispec)
+       ELSE
+          ! also bad, but shouldn't happen often
+          CALL error_message("Reverse flow w/o transport BC")
+       END IF
+    END IF
+    DO i = i, this%npoints
+       this%pt(i)%trans%cnow(ispec) = c
+    END DO
 
   END SUBROUTINE linear_link_transport
 
@@ -771,7 +783,15 @@ CONTAINS
   SUBROUTINE linear_link_destroy(this)
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(INOUT) :: this
+    INTEGER :: i
 
+    IF (ASSOCIATED(this%species)) THEN
+       DO i = 1, this%npoints
+          DEALLOCATE(this%pt(i)%trans%cnow)
+          DEALLOCATE(this%pt(i)%trans%cold)
+       END DO
+       DEALLOCATE(this%species)
+    END IF
     DEALLOCATE(this%pt)
 
   END SUBROUTINE linear_link_destroy

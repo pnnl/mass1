@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February 18, 2019 by William A. Perkins
-  ! Last Change: 2019-03-12 07:13:48 d3g096
+  ! Last Change: 2019-03-12 14:24:43 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE transport_link_module
@@ -33,12 +33,19 @@ MODULE transport_link_module
   ! TYPE transport_link_t
   ! ----------------------------------------------------------------
   TYPE, PUBLIC, EXTENDS(linear_link_t) :: transport_link_t
+     ! transport cell lengths
+     DOUBLE PRECISION, DIMENSION(:), POINTER :: dxx
+     ! an array to hold concentration during transport calculations
+     DOUBLE PRECISION, DIMENSION(:), POINTER :: c
+     ! an array to hold part of the advection calculation
+     DOUBLE PRECISION, DIMENSION(:), POINTER :: f
    CONTAINS
      PROCEDURE :: initialize => transport_link_initialize
      PROCEDURE :: advection => transport_link_advection
      PROCEDURE :: diffusion => transport_link_diffusion
      PROCEDURE :: source => transport_link_source
      PROCEDURE :: transport => transport_link_transport
+     PROCEDURE :: destroy => transport_link_destroy
   END type transport_link_t
 
 
@@ -59,7 +66,8 @@ CONTAINS
     CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
 
     ierr = this%linear_link_t%initialize(ldata, bcman, sclrman, metman)
-
+    NULLIFY(this%c)
+    NULLIFY(this%dxx)
   END FUNCTION transport_link_initialize
 
   ! ----------------------------------------------------------------
@@ -72,7 +80,62 @@ CONTAINS
     INTEGER, INTENT(IN) :: ispec
     DOUBLE PRECISION, INTENT(IN) :: deltat
 
-    
+    DOUBLE PRECISION :: velave, ave_vel, cflx, s, corr, tmp, phi, dtdx
+    DOUBLE PRECISION :: a, aold
+    INTEGER :: i
+
+    DO i = 1, this%npoints - 1
+
+       IF (i .EQ. this%npoints) THEN
+          velave = this%pt(i)%trans%hold%q
+          ave_vel = this%pt(i)%trans%hnow%v
+       ELSE
+          velave = 0.5*(this%pt(i)%trans%hold%q + this%pt(i+1)%trans%hold%q)
+          ave_vel = 0.5*(this%pt(i)%trans%hnow%v + this%pt(i+1)%trans%hnow%v)
+       END IF
+
+       cflx = ave_vel*deltat/this%dxx(i)
+
+       IF (velave .GE. 0.0) THEN
+          this%f(i) = this%c(i+1) - this%c(i)
+          IF (ABS(this%f(i)) .GT. 1.0D-40) THEN
+             corr = 0.5*(this%dxx(i+1) + this%dxx(i))/ &
+                  &(0.5*(this%dxx(i) + this%dxx(i-1)))
+             s = corr*(this%c(i) - this%c(i-1))/this%f(i)
+             tmp = MIN(&
+                  &2.0D+00, &
+                  &2.0D+00*s, &
+                  &0.33333333333333333d0*(2.0D+00 - cflx+(1.0D+00 + cflx)*s)&
+                  &)
+             phi = MAX(0.0D+00, tmp)
+          ELSE
+             phi = 0.0
+          END IF
+          this%f(i) = velave*(this%pt(i)%trans%cnow(ispec) + 0.5*(1.0 - cflx)*phi*this%f(i))
+       ELSE
+          this%f(i) = velave*(this%c(i) - this%c(i+1))
+          IF (ABS(this%f(i)) .GT. 1.0D-40) THEN
+             corr = 0.5*(this%dxx(i+1)+this%dxx(i))/&
+                  &(0.5*(this%dxx(i+1)+this%dxx(i+2))) 
+             s = corr*(this%c(i+1) - this%c(i+2))/this%f(i)
+             tmp = MIN(&
+                  &2.0D+00, &
+                  &2.0D+00*s, &
+                  &0.33333333333333333d0*(2.0D+00 - cflx+(1.0D+00 + cflx)*s)&
+                  &)
+             phi = MAX(0.0D+00, tmp)
+          ELSE
+             phi = 0.0
+          END IF
+       END IF
+    END DO
+
+    DO i = 2, this%npoints - 1
+       dtdx = deltat/this%dxx(i)
+       a = this%pt(i)%trans%xsprop%area
+       aold = this%pt(i)%trans%xspropold%area
+       this%c(i) = this%c(i)*aold/a - dtdx*(this%f(i) - this%f(i-1))/a
+    END DO
 
   END SUBROUTINE transport_link_advection
 
@@ -93,23 +156,28 @@ CONTAINS
     DOUBLE PRECISION :: dtdx
 
     INTEGER :: i
+    DOUBLE PRECISION :: c
 
     DO i = 2, this%npoints - 1
-       ASSOCIATE (pt0 => this%pt(i), ptp1 => this%pt(i+1), ptm1 => this%pt(i-1), &
-            &c_old => this%species(ispec)%cold)
-         k_e = 0.5*(ptp1%k_diff + pt0%k_diff)
-         k_w = 0.5*(pt0%k_diff + ptm1%k_diff)
-         area_e = 0.5*(ptp1%trans%xspropold%area + pt0%trans%xspropold%area)
-         area_w = 0.5*(pt0%trans%xspropold%area + ptm1%trans%xspropold%area)
-         flux_e = k_e*area_e*(c_old(i+1) - c_old(i))/&
-              &(ABS(ptp1%x - pt0%x))
-         flux_w = k_w*area_w*(c_old(i) - c_old(i-1))/&
-              &(ABS(pt0%x - ptm1%x))
-         ! dtdx = 
+       ASSOCIATE (&
+            &pt0 => this%pt(i), &
+            &ptp1 => this%pt(i+1), &
+            &ptm1 => this%pt(i-1))
+         IF (pt0%trans%xspropold%area .GT. 0.0) THEN
+            k_e = 0.5*(ptp1%k_diff + pt0%k_diff)
+            k_w = 0.5*(pt0%k_diff + ptm1%k_diff)
+            area_e = 0.5*(ptp1%trans%xspropold%area + pt0%trans%xspropold%area)
+            area_w = 0.5*(pt0%trans%xspropold%area + ptm1%trans%xspropold%area)
+            flux_e = k_e*area_e*(ptp1%trans%cnow(ispec) - pt0%trans%cnow(ispec))/&
+                 &(ABS(ptp1%x - pt0%x))
+            flux_w = k_w*area_w*(pt0%trans%cnow(ispec) - ptm1%trans%cnow(ispec))/&
+                 &(ABS(pt0%x - ptm1%x))
+            dtdx = deltat/this%dxx(i)
+            c = pt0%trans%cnow(ispec)
+            c = c + dtdx*(flux_e - flux_w)/pt0%trans%xspropold%area
+         END IF
        END ASSOCIATE
     END DO
-
-    
 
   END SUBROUTINE transport_link_diffusion
 
@@ -127,15 +195,15 @@ CONTAINS
 
     INTEGER :: i
 
-    DOUBLE PRECISION :: latc
+    DOUBLE PRECISION :: c, latc
 
     latc = this%species(ispec)%latbc%current_value
 
     DO i = 2, this%npoints
-       ASSOCIATE (sp => this%species(ispec))
-         sp%cnow(i) = this%species(ispec)%scalar%source(&
-              &sp%cnow(i), this%pt(i)%trans, latc, tdeltat, met)
-       END ASSOCIATE
+       c = this%c(i) 
+       c = this%species(ispec)%scalar%source(&
+            &c, this%pt(i)%trans, latc, tdeltat, met)
+       this%c(i) = c
     END DO
 
   END SUBROUTINE transport_link_source
@@ -151,19 +219,97 @@ CONTAINS
     INTEGER, INTENT(IN) :: ispec
     DOUBLE PRECISION, INTENT(IN) :: tdeltat
 
+    INTEGER :: n, i
+
+    IF (.NOT. ASSOCIATED(this%c)) THEN
+       ALLOCATE(this%c(0:this%npoints + 2))
+    END IF
+    IF (.NOT. ASSOCIATED(this%f)) THEN
+       ALLOCATE(this%f(this%npoints))
+    END IF
+    IF (.NOT. ASSOCIATED(this%dxx)) THEN
+       ALLOCATE(this%dxx(0:this%npoints+2))
+
+       ! Cell lengths used for transport
     
+       this%dxx(1) = ABS(this%pt(2)%x - this%pt(1)%x)
+       this%dxx(0) = this%dxx(1)
+       DO i = 2, this%npoints - 1
+          this%dxx(i) = ABS(0.5*(this%pt(i)%x - this%pt(i-1)%x)) + &
+               &ABS(0.5*(this%pt(i+1)%x - this%pt(i)%x))
+       END DO
+       i = this%npoints
+       this%dxx(i) = ABS(this%pt(i)%x - this%pt(i-1)%x)
+       this%dxx(i+1) = this%dxx(i)
+       this%dxx(i+2) = this%dxx(i)
+    END IF
+    
+    ! FIXME: boundary conditions
+    
+    DO i = 1, this%npoints
+       this%pt(i)%trans%cold(ispec) = this%pt(i)%trans%cnow(ispec)
+    END DO
+
+    DO i = 1, this%npoints
+       this%c(i) = this%pt(i)%trans%cnow(ispec)
+    END DO
+    this%c(0) = this%c(1)
+    this%c(this%npoints+1) = this%c(this%npoints)
+    this%c(this%npoints+2) = this%c(this%npoints)
 
     CALL this%advection(ispec, tdeltat)
+
     IF (this%species(ispec)%scalar%dodiffusion) THEN
+       ! store advection results for diffusion calculations
+       DO i = 1, this%npoints
+          this%pt(i)%trans%cnow(ispec) = this%c(i)
+       END DO
        CALL this%diffusion(ispec, tdeltat)
     END IF
     IF (this%species(ispec)%scalar%dosource) THEN
        CALL this%source(ispec, tdeltat, this%species(ispec)%met)
     END IF
-    ! adjust boundary concentrations
+    DO i = 1, this%npoints
+       this%pt(i)%trans%cnow(ispec) = this%c(i)
+    END DO
+    
+    ! adjust boundary concentrations to have zero concentration
+    ! gradient w/ outflow
 
+    n = this%npoints
+    IF (this%q_up() .LT. 0.0) THEN
+       this%pt(1)%trans%cnow(ispec) = this%pt(2)%trans%cnow(ispec)
+    END IF
+    IF (this%q_down() .GT. 0.0) THEN
+       this%pt(n)%trans%cnow(ispec) = this%pt(n-1)%trans%cnow(ispec)
+    END IF
+    
   END SUBROUTINE transport_link_transport
 
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE transport_link_destroy
+  ! ----------------------------------------------------------------
+  SUBROUTINE transport_link_destroy(this)
+
+    IMPLICIT NONE
+    CLASS (transport_link_t), INTENT(INOUT) :: this
+
+    IF (ASSOCIATED(this%dxx)) THEN
+       DEALLOCATE(this%dxx)
+    END IF
+
+    IF (ASSOCIATED(this%c)) THEN
+       DEALLOCATE(this%c)
+    END IF
+
+    IF (ASSOCIATED(this%f)) THEN
+       DEALLOCATE(this%f)
+    END IF
+
+    CALL this%linear_link_t%destroy()
+
+  END SUBROUTINE transport_link_destroy
 
 END MODULE transport_link_module
   
