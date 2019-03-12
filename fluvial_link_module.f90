@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2019-03-06 09:37:08 d3g096
+! Last Change: 2019-03-12 07:15:45 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -66,7 +66,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION fluvial_link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION fluvial_link_initialize(this, ldata, bcman, sclrman) RESULT(ierr)
+  FUNCTION fluvial_link_initialize(this, ldata, bcman, sclrman, metman) RESULT(ierr)
 
     IMPLICIT NONE
     INTEGER :: ierr
@@ -74,9 +74,10 @@ CONTAINS
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
     CLASS (scalar_manager), INTENT(IN) :: sclrman
+    CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
     CHARACTER (LEN=1024) :: msg
 
-    ierr = this%linear_link_t%initialize(ldata, bcman, sclrman)
+    ierr = this%linear_link_t%initialize(ldata, bcman, sclrman, metman)
 
     this%lpiexp = ldata%lpiexp
     IF (ldata%lbcid .GT. 0) THEN
@@ -162,7 +163,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION fluvial_hydro_link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION fluvial_hydro_link_initialize(this, ldata, bcman, sclrman) RESULT(ierr)
+  FUNCTION fluvial_hydro_link_initialize(this, ldata, bcman, sclrman, metman) RESULT(ierr)
 
     IMPLICIT NONE
     INTEGER :: ierr
@@ -170,6 +171,7 @@ CONTAINS
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
     CLASS (scalar_manager), INTENT(IN) :: sclrman
+    CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
 
     CHARACTER (LEN=1024) :: msg
 
@@ -188,7 +190,7 @@ CONTAINS
        ierr = ierr + 1
     END IF
 
-    ierr = ierr + this%fluvial_link%initialize(ldata, bcman, sclrman)
+    ierr = ierr + this%fluvial_link%initialize(ldata, bcman, sclrman, metman)
   END FUNCTION fluvial_hydro_link_initialize
 
   

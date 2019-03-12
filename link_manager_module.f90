@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2019-03-06 11:47:52 d3g096
+! Last Change: 2019-03-12 07:14:28 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -465,7 +465,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_read
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_read(this, theconfig, bcman, sectman, sclrman)
+  SUBROUTINE link_manager_read(this, theconfig, bcman, sectman, sclrman, metman)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
@@ -474,6 +474,7 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     CLASS (section_handler), INTENT(INOUT) :: sectman
     CLASS (scalar_manager), INTENT(IN) :: sclrman
+    CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
     INTEGER, PARAMETER :: lunit = 21
     INTEGER :: recno, ierr, iostat, npid
     TYPE (link_input_data) :: ldata
@@ -586,7 +587,7 @@ CONTAINS
 
        CALL link%construct()
 
-       IF (link%initialize(ldata, bcman, sclrman) .NE. 0) THEN
+       IF (link%initialize(ldata, bcman, sclrman, metman) .NE. 0) THEN
           WRITE(msg, *) TRIM(theconfig%link_file), ': link record ', recno, &
                & ', link id = ', ldata%linkid, ': error'
           CALL error_message(msg)

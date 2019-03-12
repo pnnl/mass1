@@ -68,7 +68,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION hydrologic_link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION hydrologic_link_initialize(this, ldata, bcman, sclrman) RESULT(ierr)
+  FUNCTION hydrologic_link_initialize(this, ldata, bcman, sclrman, metman) RESULT(ierr)
 
     IMPLICIT NONE
     INTEGER :: ierr
@@ -76,9 +76,10 @@ CONTAINS
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
     CLASS (scalar_manager), INTENT(IN) :: sclrman
+    CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
     CHARACTER (LEN=1024) :: msg
 
-    ierr = this%linear_link_t%initialize(ldata, bcman, sclrman)
+    ierr = this%linear_link_t%initialize(ldata, bcman, sclrman, metman)
 
     IF (ldata%lbcid .GT. 0) THEN
        this%latbc => bcman%find(LATFLOW_BC_TYPE, ldata%lbcid)

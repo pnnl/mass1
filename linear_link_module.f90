@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-03-06 12:59:43 d3g096
+! Last Change: 2019-03-12 07:12:23 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -65,7 +65,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION linear_link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION linear_link_initialize(this, ldata, bcman, sclrman) RESULT(ierr)
+  FUNCTION linear_link_initialize(this, ldata, bcman, sclrman, metman) RESULT(ierr)
 
     IMPLICIT NONE
     INTEGER :: ierr
@@ -73,6 +73,7 @@ CONTAINS
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
     CLASS (scalar_manager), INTENT(IN) :: sclrman
+    CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
 
     INTEGER :: i
     CHARACTER (LEN=1024) :: msg
@@ -137,6 +138,11 @@ CONTAINS
           CASE DEFAULT
           END SELECT
        END DO
+
+       IF (this%species(i)%scalar%needmet .AND. ldata%mzone .NE. 0) THEN
+          this%species(i)%met => metman%find(ldata%mzone)
+       END IF
+
     END IF
 
   END FUNCTION linear_link_initialize

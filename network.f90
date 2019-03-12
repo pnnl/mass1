@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-03-06 11:40:16 d3g096
+! Last Change: 2019-03-12 07:15:09 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -186,7 +186,7 @@ CONTAINS
     CALL this%links%scan(this%config)
     CALL this%readbcs()
     CALL this%sections%read(this%config%section_file)
-    CALL this%links%read(this%config, this%bcs, this%sections, this%scalars)
+    CALL this%links%read(this%config, this%bcs, this%sections, this%scalars, this%met)
     CALL this%links%connect()
     IF (this%config%do_gageout) &
          &CALL this%gages%read(this%config%gage_file, this%links)

@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January 30, 2018 by William A. Perkins
-! Last Change: 2019-03-06 09:39:55 d3g096
+! Last Change: 2019-03-12 07:19:01 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE pid_link_module
@@ -112,7 +112,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION pid_link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION pid_link_initialize(this, ldata, bcman, sclrman) RESULT(ierr)
+  FUNCTION pid_link_initialize(this, ldata, bcman, sclrman, metman) RESULT(ierr)
 
     IMPLICIT NONE
 
@@ -121,6 +121,7 @@ CONTAINS
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
     CLASS (scalar_manager), INTENT(IN) :: sclrman
+    CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
 
     CHARACTER (LEN=1024) :: msg
 
@@ -130,7 +131,7 @@ CONTAINS
     NULLIFY(this%lagged)
     this%lagready = .FALSE.
 
-    ierr = this%linear_link_t%initialize(ldata, bcman, sclrman)
+    ierr = this%linear_link_t%initialize(ldata, bcman, sclrman, metman)
 
     IF (.NOT. ASSOCIATED(this%usbc)) THEN 
        WRITE(msg, *) 'link ', this%id, &
@@ -143,7 +144,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION pid_flow_link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION pid_flow_link_initialize(this, ldata, bcman, sclrman) RESULT(ierr)
+  FUNCTION pid_flow_link_initialize(this, ldata, bcman, sclrman, metman) RESULT(ierr)
 
     IMPLICIT NONE
 
@@ -152,8 +153,9 @@ CONTAINS
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
     CLASS (scalar_manager), INTENT(IN) :: sclrman
+    CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
 
-    ierr = this%pid_link%initialize(ldata, bcman, sclrman)
+    ierr = this%pid_link%initialize(ldata, bcman, sclrman, metman)
     this%followflow = .TRUE.
 
   END FUNCTION pid_flow_link_initialize

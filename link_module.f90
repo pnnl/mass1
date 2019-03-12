@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2019-03-06 11:43:05 d3g096
+! Last Change: 2019-03-12 07:06:47 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -144,14 +144,15 @@ MODULE link_module
   END type link_t
 
   ABSTRACT INTERFACE
-     FUNCTION init_proc(this, ldata, bcman, sclrman) RESULT(ierr)
-       IMPORT :: link_t, link_input_data, bc_manager_t, scalar_manager
+     FUNCTION init_proc(this, ldata, bcman, sclrman, metman) RESULT(ierr)
+       IMPORT :: link_t, link_input_data, bc_manager_t, scalar_manager, met_zone_manager_t
        IMPLICIT NONE
        INTEGER :: ierr
        CLASS (link_t), INTENT(INOUT) :: this
        CLASS (link_input_data), INTENT(IN) :: ldata
        CLASS (bc_manager_t), INTENT(IN) :: bcman
        CLASS (scalar_manager), INTENT(IN) :: sclrman
+       CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
      END FUNCTION init_proc
 
      FUNCTION readpts_proc(this, theconfig, sectman, punit, lineno) RESULT (ierr)

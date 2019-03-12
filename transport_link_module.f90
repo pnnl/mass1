@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February 18, 2019 by William A. Perkins
-  ! Last Change: 2019-03-12 06:40:22 d3g096
+  ! Last Change: 2019-03-12 07:13:48 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE transport_link_module
@@ -48,7 +48,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION transport_link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION transport_link_initialize(this, ldata, bcman, sclrman) RESULT(ierr)
+  FUNCTION transport_link_initialize(this, ldata, bcman, sclrman, metman) RESULT(ierr)
 
     IMPLICIT NONE
     INTEGER :: ierr
@@ -56,8 +56,9 @@ CONTAINS
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
     CLASS (scalar_manager), INTENT(IN) :: sclrman
+    CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
 
-    ierr = this%linear_link_t%initialize(ldata, bcman, sclrman)
+    ierr = this%linear_link_t%initialize(ldata, bcman, sclrman, metman)
 
   END FUNCTION transport_link_initialize
 
