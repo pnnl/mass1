@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2019-03-06 09:41:04 d3g096
+! Last Change: 2019-03-06 11:47:52 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -66,7 +66,7 @@ MODULE link_manager_module
      PROCEDURE :: write_restart => link_manager_write_restart
      PROCEDURE :: transport_steps => link_manager_transport_steps
      PROCEDURE :: transport_interp => link_manager_transport_interp
-     ! PROCEDURE :: transport => link_manager_transport
+     PROCEDURE :: transport => link_manager_transport
      PROCEDURE :: destroy => link_manager_destroy
   END type link_manager_t
 
@@ -982,6 +982,31 @@ CONTAINS
        link => this%links%current()
     END DO
   END SUBROUTINE link_manager_transport_interp
+
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_transport
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_transport(this, ispec, tdeltat)
+
+    IMPLICIT NONE
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: ispec
+    DOUBLE PRECISION, INTENT(IN) :: tdeltat
+    
+    CLASS (link_t), POINTER :: link
+
+    CALL this%links%begin()
+    link => this%links%current()
+
+    DO WHILE (ASSOCIATED(link))
+       CALL link%transport(ispec, tdeltat)
+
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+
+  END SUBROUTINE link_manager_transport
 
 
   ! ----------------------------------------------------------------

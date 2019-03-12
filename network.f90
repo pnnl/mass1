@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-03-06 09:41:52 d3g096
+! Last Change: 2019-03-06 11:40:16 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -394,7 +394,7 @@ CONTAINS
        CALL this%met%update(tnow)
        CALL this%links%transport_interp(tnow, htime0, htime1)
        DO ispec = 1, this%scalars%nspecies
-          ! CALL this%links%transport(ispec)
+          CALL this%links%transport(ispec, tdeltat)
        END DO
        tnow = htime0 + i*tdeltat
     END DO

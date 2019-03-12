@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-03-06 08:45:31 d3g096
+! Last Change: 2019-03-06 12:59:43 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -17,6 +17,7 @@ MODULE linear_link_module
   USE point_module
   USE bc_module
   USE scalar_module
+  USE transport_module
   USE cross_section
   USE section_handler_module
   USE mass1_config
@@ -31,6 +32,7 @@ MODULE linear_link_module
      INTEGER :: npoints
      INTEGER :: input_option
      TYPE (point_t), DIMENSION(:),POINTER :: pt
+     TYPE (link_scalar), DIMENSION(:), POINTER :: species
    CONTAINS
      PROCEDURE :: initialize => linear_link_initialize
      PROCEDURE :: readpts => linear_link_readpts
@@ -54,6 +56,7 @@ MODULE linear_link_module
      PROCEDURE :: point => linear_link_point
      PROCEDURE :: check => linear_link_check
      PROCEDURE :: trans_interp => linear_link_trans_interp
+     PROCEDURE :: transport => linear_link_transport
      PROCEDURE :: destroy => linear_link_destroy
   END type linear_link_t
 
@@ -70,6 +73,8 @@ CONTAINS
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
     CLASS (scalar_manager), INTENT(IN) :: sclrman
+
+    INTEGER :: i
     CHARACTER (LEN=1024) :: msg
 
     ierr = 0
@@ -105,6 +110,33 @@ CONTAINS
              ierr = ierr + 1
           END IF
        END IF
+    END IF
+
+    IF (sclrman%nspecies .GT. 0) THEN
+       ALLOCATE(this%species(sclrman%nspecies))
+       DO i = 1, sclrman%nspecies
+          this%species(i)%scalar => sclrman%species(i)%p
+          ALLOCATE(this%species(i)%cnow(this%npoints))
+          ALLOCATE(this%species(i)%cold(this%npoints))
+
+          SELECT CASE (this%species(i)%scalar%bctype)
+          CASE (TEMP_BC_TYPE)
+             IF (ldata%tbcid .GT. 0) THEN
+                this%species(i)%usbc => bcman%find(TEMP_BC_TYPE, ldata%tbcid)
+             END IF
+             IF (ldata%ltbcid .GT. 0) THEN
+                this%species(i)%latbc => bcman%find(TEMP_BC_TYPE, ldata%ltbcid)
+             END IF
+          CASE (TRANS_BC_TYPE)
+             IF (ldata%gbcid .GT. 0) THEN
+                this%species(i)%usbc => bcman%find(TRANS_BC_TYPE, ldata%gbcid)
+             END IF
+             IF (ldata%lgbcid .GT. 0) THEN
+                this%species(i)%latbc => bcman%find(TRANS_BC_TYPE, ldata%lgbcid)
+             END IF
+          CASE DEFAULT
+          END SELECT
+       END DO
     END IF
 
   END FUNCTION linear_link_initialize
@@ -335,7 +367,8 @@ CONTAINS
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(IN) :: this
     INTEGER, INTENT(IN) :: ispecies
-    linear_link_c_up = 0.0
+
+    linear_link_c_up = this%species(ispecies)%cnow(1)
   END FUNCTION linear_link_c_up
 
 
@@ -346,7 +379,9 @@ CONTAINS
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(IN) :: this
     INTEGER, INTENT(IN) :: ispecies
-    linear_link_c_down = 0.0
+    INTEGER :: npts
+    npts = this%points()
+    linear_link_c_down = this%species(ispecies)%cnow(npts)
   END FUNCTION linear_link_c_down
 
   ! ----------------------------------------------------------------
@@ -685,6 +720,43 @@ CONTAINS
     END DO
 
   END SUBROUTINE linear_link_trans_interp
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE linear_link_transport
+  ! ----------------------------------------------------------------
+  SUBROUTINE linear_link_transport(this, ispec, tdeltat)
+
+    IMPLICIT NONE
+    CLASS (linear_link_t), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: ispec
+    DOUBLE PRECISION, INTENT(IN) :: tdeltat
+
+    ! the default is to just pass the boundary concentration through
+    ! to all points. There needs to be a general way of dealing
+    ! reverse flow, but get it working first
+
+    ASSOCIATE(sp => this%species(ispec))
+      sp%cold = sp%cnow
+      IF (this%q_up() .GT. 0.0) THEN
+         IF (ASSOCIATED(sp%usbc)) THEN
+            sp%cnow = sp%usbc%current_value
+         ELSEIF (ASSOCIATED(this%ucon)) THEN
+            sp%cnow = this%ucon%conc(ispec)
+         ELSE
+            ! this is bad, but shouldn't happen often
+            CALL error_message("Upstream link w/o transport BC")
+         END IF
+      ELSEIF (this%q_down() .LT. 0.0) THEN
+         IF (ASSOCIATED(this%dcon)) THEN
+            sp%cnow = this%dcon%conc(ispec)
+         ELSE
+            ! also bad, but shouldn't happen often
+            CALL error_message("Reverse flow w/o transport BC")
+         END IF
+      END IF
+    END ASSOCIATE
+
+  END SUBROUTINE linear_link_transport
 
 
   ! ----------------------------------------------------------------

@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  7, 2019 by William A. Perkins
-! Last Change: 2019-02-28 10:36:29 d3g096
+! Last Change: 2019-03-06 11:52:04 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -23,6 +23,7 @@ MODULE scalar_module
 
   USE mass1_config
   USE point_module
+  USE bc_module
   USE met_zone
 
   IMPLICIT NONE
@@ -37,6 +38,7 @@ MODULE scalar_module
      LOGICAL :: dosource
      LOGICAL :: needmet
      LOGICAL :: istemp
+     INTEGER (KIND=KIND(BC_ENUM)) :: bctype
    CONTAINS
      PROCEDURE :: source => scalar_source
   END type scalar_t
@@ -103,6 +105,7 @@ CONTAINS
     s%dodiffusion = dodiff
     s%dolatinflow = dolatq
     s%dosource = dosrc
+    s%bctype = BC_ENUM
 
   END FUNCTION new_scalar_t
 
@@ -152,7 +155,7 @@ CONTAINS
     t%dodiffusion = dodiff
     t%dolatinflow = dolatq
     t%dosource = dosrc
-
+    t%bctype = TEMP_BC_TYPE
     t%needmet = t%dosource
 
   END FUNCTION new_temperature
@@ -199,6 +202,7 @@ CONTAINS
     t%dodiffusion = dodiff
     t%dolatinflow = dolatq
     t%dosource = dosrc
+    t%bctype = TRANS_BC_TYPE
 
     t%needmet = t%dosource
 

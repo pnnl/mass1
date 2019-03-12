@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created August  8, 2018 by William A. Perkins
-! Last Change: 2019-03-06 08:27:06 d3g096
+! Last Change: 2019-03-06 11:02:28 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -45,8 +45,32 @@ MODULE transport_module
      PROCEDURE :: source => link_scalar_source
   END type link_scalar
 
+  INTERFACE link_scalar
+     MODULE PROCEDURE new_link_scalar
+  END INTERFACE link_scalar
   
 CONTAINS
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION new_link_scalar
+  ! ----------------------------------------------------------------
+  FUNCTION new_link_scalar(npts, scalar) RESULT(l)
+
+    IMPLICIT NONE
+    TYPE (link_scalar) :: l
+    INTEGER, INTENT(IN) :: npts
+    CLASS (scalar_t), POINTER, INTENT(IN) :: scalar
+
+    l%npts = npts
+    l%scalar => scalar
+    NULLIFY(l%usbc)
+    NULLIFY(l%latbc)
+    NULLIFY(l%met)
+
+    ALLOCATE(l%cnow(l%npts), l%cold(l%npts))
+    
+  END FUNCTION new_link_scalar
+
 
   ! ----------------------------------------------------------------
   !  FUNCTION link_scalar_getusbc
