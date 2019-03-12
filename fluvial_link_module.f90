@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2019-03-12 07:15:45 d3g096
+! Last Change: 2019-03-12 07:25:25 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -17,7 +17,7 @@ MODULE fluvial_link_module
   USE bc_module
   USE point_module
   USE link_module
-  USE linear_link_module
+  USE transport_link_module
   USE scalar_module
   USE utility
   USE flow_coeff
@@ -26,7 +26,7 @@ MODULE fluvial_link_module
 
   PRIVATE
 
-  TYPE, PUBLIC, EXTENDS(linear_link_t) :: fluvial_link
+  TYPE, PUBLIC, EXTENDS(transport_link_t) :: fluvial_link
      DOUBLE PRECISION :: latq, latqold
      DOUBLE PRECISION :: lpiexp
    CONTAINS
@@ -54,7 +54,7 @@ CONTAINS
     IMPLICIT NONE
     CLASS (fluvial_link), INTENT(INOUT) :: this
 
-    CALL this%linear_link_t%construct()
+    CALL this%transport_link_t%construct()
     NULLIFY(this%latbc)
     this%latq = 0.0
     this%latqold = 0.0
@@ -77,7 +77,7 @@ CONTAINS
     CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
     CHARACTER (LEN=1024) :: msg
 
-    ierr = this%linear_link_t%initialize(ldata, bcman, sclrman, metman)
+    ierr = this%transport_link_t%initialize(ldata, bcman, sclrman, metman)
 
     this%lpiexp = ldata%lpiexp
     IF (ldata%lbcid .GT. 0) THEN
@@ -150,7 +150,7 @@ CONTAINS
     CLASS (fluvial_link), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: grav, dt
 
-    CALL this%linear_link_t%hydro_update(grav, dt)
+    CALL this%transport_link_t%hydro_update(grav, dt)
 
     IF (ASSOCIATED(this%latbc)) THEN
        this%latqold = this%latq
