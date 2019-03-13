@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February 18, 2019 by William A. Perkins
-  ! Last Change: 2019-03-12 14:24:43 d3g096
+  ! Last Change: 2019-03-13 08:08:46 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE transport_link_module
@@ -68,6 +68,7 @@ CONTAINS
     ierr = this%linear_link_t%initialize(ldata, bcman, sclrman, metman)
     NULLIFY(this%c)
     NULLIFY(this%dxx)
+    NULLIFY(this%f)
   END FUNCTION transport_link_initialize
 
   ! ----------------------------------------------------------------
@@ -294,6 +295,7 @@ CONTAINS
 
     IMPLICIT NONE
     CLASS (transport_link_t), INTENT(INOUT) :: this
+    INTEGER :: istat
 
     IF (ASSOCIATED(this%dxx)) THEN
        DEALLOCATE(this%dxx)

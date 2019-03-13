@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-03-12 14:18:47 d3g096
+! Last Change: 2019-03-13 08:09:16 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -148,6 +148,8 @@ CONTAINS
           END IF
 
        END DO
+    ELSE
+       NULLIFY(this%species)
     END IF
 
   END FUNCTION linear_link_initialize
@@ -787,8 +789,8 @@ CONTAINS
 
     IF (ASSOCIATED(this%species)) THEN
        DO i = 1, this%npoints
-          DEALLOCATE(this%pt(i)%trans%cnow)
-          DEALLOCATE(this%pt(i)%trans%cold)
+          DEALLOCATE(this%pt(i)%trans%cnow, &
+               &this%pt(i)%trans%cold)
        END DO
        DEALLOCATE(this%species)
     END IF

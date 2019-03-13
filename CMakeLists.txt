@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2019-03-12 06:05:55 d3g096
+# Last Change: 2019-03-13 07:53:05 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -30,7 +30,7 @@ list (APPEND CMAKE_MODULE_PATH "${MASS1_SOURCE_DIR}/cmake")
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
   # trap floating point exceptions and use preprocessor
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wall -ffpe-trap=invalid,zero,overflow -cpp")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wall -ffpe-trap=invalid,zero,overflow -cpp -fbacktrace")
 elseif (CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
   # w/ Intel, build static binaries that trap floating point exceptions
   # and turn on the preprocessor for all files
