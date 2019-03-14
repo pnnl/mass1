@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2019-03-12 07:25:25 d3g096
+! Last Change: 2019-03-14 11:49:25 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -29,6 +29,7 @@ MODULE fluvial_link_module
   TYPE, PUBLIC, EXTENDS(transport_link_t) :: fluvial_link
      DOUBLE PRECISION :: latq, latqold
      DOUBLE PRECISION :: lpiexp
+     DOUBLE PRECISION :: gravity
    CONTAINS
      PROCEDURE :: construct => fluvial_link_construct
      PROCEDURE :: initialize => fluvial_link_initialize
@@ -80,6 +81,7 @@ CONTAINS
     ierr = this%transport_link_t%initialize(ldata, bcman, sclrman, metman)
 
     this%lpiexp = ldata%lpiexp
+    this%gravity = ldata%gravity
     IF (ldata%lbcid .GT. 0) THEN
        this%latbc => bcman%find(LATFLOW_BC_TYPE, ldata%lbcid)
        IF (.NOT. ASSOCIATED(this%latbc)) THEN
@@ -114,7 +116,7 @@ CONTAINS
     ! FIXME: These need to come from the configuration:
     DOUBLE PRECISION :: gr
 
-    gr = 32.2
+    gr = this%gravity
 
     CALL pt1%assign(y1, d1, q1, a1, b1, k1, ky1, fr1)
     CALL pt2%assign(y2, d2, q2, a2, b2, k2, ky2, fr2)
@@ -145,12 +147,12 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE fluvial_link_hupdate
   ! ----------------------------------------------------------------
-  SUBROUTINE fluvial_link_hupdate(this, grav, dt)
+  SUBROUTINE fluvial_link_hupdate(this, grav, unitwt, dt)
     IMPLICIT NONE
     CLASS (fluvial_link), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: grav, dt
+    DOUBLE PRECISION, INTENT(IN) :: grav, unitwt, dt
 
-    CALL this%transport_link_t%hydro_update(grav, dt)
+    CALL this%transport_link_t%hydro_update(grav, unitwt, dt)
 
     IF (ASSOCIATED(this%latbc)) THEN
        this%latqold = this%latq

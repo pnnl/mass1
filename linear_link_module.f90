@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-03-13 13:21:51 d3g096
+! Last Change: 2019-03-14 11:47:53 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -707,11 +707,11 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE linear_link_hupdate
   ! ----------------------------------------------------------------
-  SUBROUTINE linear_link_hupdate(this, grav, dt)
+  SUBROUTINE linear_link_hupdate(this, grav, unitwt, dt)
 
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: grav, dt
+    DOUBLE PRECISION, INTENT(IN) :: grav, unitwt, dt
 
     INTEGER :: p
     DOUBLE PRECISION :: dx
@@ -722,7 +722,7 @@ CONTAINS
        ELSE 
           dx = ABS(this%pt(p+1)%x - this%pt(p)%x)
        END IF
-       CALL this%pt(p)%hydro_update(grav, dt, dx)
+       CALL this%pt(p)%hydro_update(grav, unitwt, dt, dx)
     END DO
 
   END SUBROUTINE linear_link_hupdate

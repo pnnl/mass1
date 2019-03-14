@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-03-13 14:02:56 d3g096
+! Last Change: 2019-03-14 11:53:34 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -351,7 +351,9 @@ CONTAINS
     ELSE
        CALL this%set_initial()
     END IF
-    CALL this%links%hyupdate(this%config%grav, this%config%time%delta_t)
+    CALL this%links%hyupdate(this%config%grav, &
+         &this%config%unit_weight_h2o, &
+         &this%config%time%delta_t)
 
   END SUBROUTINE network_initialize
 
@@ -375,7 +377,8 @@ CONTAINS
     CLASS (network), INTENT(INOUT) :: this
 
     CALL this%links%backward(this%config%time%delta_t, &
-         &this%config%grav, this%config%dsbc_type)
+         &this%config%grav, this%config%unit_weight_h2o, &
+         &this%config%dsbc_type)
 
   END SUBROUTINE network_backward
 

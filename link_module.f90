@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2019-03-13 13:20:14 d3g096
+! Last Change: 2019-03-14 11:48:44 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -81,6 +81,7 @@ MODULE link_module
     INTEGER :: nup, dsid
     INTEGER :: bcid, dsbcid, gbcid, tbcid, mzone, lbcid, lgbcid, ltbcid
     DOUBLE PRECISION :: lpiexp
+    DOUBLE PRECISION :: gravity
   CONTAINS 
     PROCEDURE :: defaults => link_input_defaults
   END type link_input_data
@@ -231,11 +232,11 @@ MODULE link_module
        INTEGER, INTENT(IN) :: dsbc_type
      END SUBROUTINE bsweep_proc
 
-     SUBROUTINE hupdate_proc(this, grav, dt)
+     SUBROUTINE hupdate_proc(this, grav, unitwt, dt)
        IMPORT :: link_t
        IMPLICIT NONE
        CLASS (link_t), INTENT(INOUT) :: this
-       DOUBLE PRECISION, INTENT(IN) :: grav, dt
+       DOUBLE PRECISION, INTENT(IN) :: grav, unitwt, dt
      END SUBROUTINE hupdate_proc
 
      DOUBLE PRECISION FUNCTION max_tnumber_proc(this, dt)

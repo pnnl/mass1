@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2019-03-14 09:11:42 d3g096
+! Last Change: 2019-03-14 11:46:27 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -158,12 +158,12 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE point_hydro_update
   ! ----------------------------------------------------------------
-  SUBROUTINE point_hydro_update(this, grav, deltat, deltax)
+  SUBROUTINE point_hydro_update(this, grav, unitwt, deltat, deltax)
     USE general_vars, ONLY: depth_minimum
 
     IMPLICIT NONE
     CLASS (point_t), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: grav, deltat, deltax
+    DOUBLE PRECISION, INTENT(IN) :: grav, unitwt, deltat, deltax
 
     DOUBLE PRECISION :: depth
 
@@ -194,6 +194,10 @@ CONTAINS
          h%friction_slope = 0.0
          h%courant_num = 0.0
       END IF
+
+      h%bed_shear = unitwt*xs%hydrad*h%friction_slope
+      h%diffuse_num = 2.0*this%k_diff*deltat/deltax/deltax
+
     END ASSOCIATE
 
   END SUBROUTINE point_hydro_update

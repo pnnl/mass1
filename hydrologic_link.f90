@@ -279,15 +279,15 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE hydrologic_link_hupdate
   ! ----------------------------------------------------------------
-  SUBROUTINE hydrologic_link_hupdate(this, grav, dt)
+  SUBROUTINE hydrologic_link_hupdate(this, grav, unitwt, dt)
 
     IMPLICIT NONE
     
     CLASS (hydrologic_link), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: grav, dt
+    DOUBLE PRECISION, INTENT(IN) :: grav, unitwt, dt
     DOUBLE PRECISION :: q
 
-    CALL this%transport_link_t%hydro_update(grav, dt)
+    CALL this%transport_link_t%hydro_update(grav, unitwt, dt)
 
     this%storage_old = this%storage
     this%inflow_old = this%inflow

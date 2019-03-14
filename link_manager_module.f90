@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2019-03-13 13:42:37 d3g096
+! Last Change: 2019-03-14 11:52:53 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -509,6 +509,8 @@ CONTAINS
             & ldata%ltbcid, &
             & ldata%lpiexp
 
+       ldata%gravity = theconfig%grav
+
        IF (IS_IOSTAT_END(iostat)) THEN
           EXIT
        ELSE IF (iostat .NE. 0) THEN
@@ -826,11 +828,11 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_flow_backward
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_flow_backward(this, deltat, grav, dsbc_type)
+  SUBROUTINE link_manager_flow_backward(this, deltat, grav, unitwt, dsbc_type)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: deltat, grav
+    DOUBLE PRECISION, INTENT(IN) :: deltat, grav, unitwt
     INTEGER, INTENT(IN) :: dsbc_type
 
     CLASS (link_t), POINTER :: link
@@ -842,7 +844,7 @@ CONTAINS
        DO WHILE (ASSOCIATED(link))
           IF (link%order .EQ. l) THEN
              CALL link%backward_sweep(dsbc_type)
-             CALL link%hydro_update(grav, deltat)
+             CALL link%hydro_update(grav, unitwt, deltat)
           END IF
           CALL this%links%next()
           link => this%links%current()
@@ -854,18 +856,18 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_hyupdate
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_hyupdate(this, grav, dt)
+  SUBROUTINE link_manager_hyupdate(this, grav, unitwt, dt)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: grav, dt
+    DOUBLE PRECISION, INTENT(IN) :: grav, unitwt, dt
     CLASS (link_t), POINTER :: link
     
     CALL this%links%begin()
     link => this%links%current()
 
     DO WHILE (ASSOCIATED(link))
-       CALL link%hydro_update(grav, dt)
+       CALL link%hydro_update(grav, unitwt, dt)
        CALL this%links%next()
        link => this%links%current()
     END DO
