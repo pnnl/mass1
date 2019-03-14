@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2019-03-12 07:06:47 d3g096
+! Last Change: 2019-03-13 13:20:14 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -119,6 +119,8 @@ MODULE link_module
      PROCEDURE (set_initial_proc), DEFERRED :: set_initial
      PROCEDURE (read_restart_proc), DEFERRED :: read_restart
      PROCEDURE (write_restart_proc), DEFERRED :: write_restart
+     PROCEDURE (read_trans_restart_proc), DEFERRED :: read_trans_restart
+     PROCEDURE (write_trans_restart_proc), DEFERRED :: write_trans_restart
 
      ! hydrodynamics are computed with two sweeps
 
@@ -200,6 +202,20 @@ MODULE link_module
        CLASS (link_t), INTENT(IN) :: this
        INTEGER, INTENT(IN) :: iunit
      END SUBROUTINE write_restart_proc
+
+     SUBROUTINE read_trans_restart_proc(this, iunit, nspecies)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(INOUT) :: this
+       INTEGER, INTENT(IN) :: iunit, nspecies
+     END SUBROUTINE read_trans_restart_proc
+
+     SUBROUTINE write_trans_restart_proc(this, iunit, nspecies)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(IN) :: this
+       INTEGER, INTENT(IN) :: iunit, nspecies
+     END SUBROUTINE write_trans_restart_proc
 
      SUBROUTINE fsweep_proc(this, deltat)
        IMPORT :: link_t

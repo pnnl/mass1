@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2019-03-12 07:35:46 d3g096
+! Last Change: 2019-03-14 09:11:42 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -84,7 +84,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE hydro_interp
   ! ----------------------------------------------------------------
-  SUBROUTINE hydro_interp(t, told, tnew, h, hold, hnew)
+  SUBROUTINE hydro_interp(t, told, tnew, hold, hnew, h)
 
     IMPLICIT NONE
     DOUBLE PRECISION, INTENT(IN) :: t, told, tnew
@@ -92,16 +92,16 @@ CONTAINS
     TYPE (point_hydro_state), INTENT(INOUT) :: h
     DOUBLE PRECISION :: dlinear_interp
 
-    h%y = dlinear_interp(hold%y, hnew%y, told, tnew, t)
-    h%q = dlinear_interp(hold%q, hnew%q, told, tnew, t)
-    h%v = dlinear_interp(hold%v, hnew%v, told, tnew, t)
+    h%y = dlinear_interp(hold%y, told, hnew%y, tnew, t)
+    h%q = dlinear_interp(hold%q, told, hnew%q, tnew, t)
+    h%v = dlinear_interp(hold%v, told, hnew%v, tnew, t)
     h%lateral_inflow = &
-         &dlinear_interp(hold%lateral_inflow, hnew%lateral_inflow, told, tnew, t)
+         &dlinear_interp(hold%lateral_inflow, told, hnew%lateral_inflow, tnew, t)
     h%friction_slope = &
-         &dlinear_interp(hold%friction_slope, hnew%friction_slope, told, tnew, t)
-    h%bed_shear = dlinear_interp(hold%bed_shear, hnew%bed_shear, told, tnew, t)
-    h%courant_num = dlinear_interp(hold%courant_num, hnew%courant_num, told, tnew, t)
-    h%diffuse_num = dlinear_interp(hold%diffuse_num, hnew%diffuse_num, told, tnew, t)
+         &dlinear_interp(hold%friction_slope, told, hnew%friction_slope, tnew, t)
+    h%bed_shear = dlinear_interp(hold%bed_shear, told, hnew%bed_shear, tnew, t)
+    h%courant_num = dlinear_interp(hold%courant_num, told, hnew%courant_num, tnew, t)
+    h%diffuse_num = dlinear_interp(hold%diffuse_num, told, hnew%diffuse_num, tnew, t)
 
     
   END SUBROUTINE hydro_interp
@@ -214,6 +214,7 @@ CONTAINS
 
     depth = this%trans%hnow%y - this%thalweg
     CALL this%xsection%p%props(depth, this%trans%xsprop)
+    ! conveyance not needed
     IF (this%trans%xsprop%area .GT. 0.0D00) THEN
        this%trans%hnow%v = this%trans%hnow%q/this%trans%xsprop%area
     ELSE 

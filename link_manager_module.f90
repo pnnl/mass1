@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2019-03-12 07:14:28 d3g096
+! Last Change: 2019-03-13 13:42:37 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -64,6 +64,8 @@ MODULE link_manager_module
      PROCEDURE :: hyupdate => link_manager_hyupdate
      PROCEDURE :: read_restart => link_manager_read_restart
      PROCEDURE :: write_restart => link_manager_write_restart
+     PROCEDURE :: read_trans_restart => link_manager_read_trans_restart
+     PROCEDURE :: write_trans_restart => link_manager_write_trans_restart
      PROCEDURE :: transport_steps => link_manager_transport_steps
      PROCEDURE :: transport_interp => link_manager_transport_interp
      PROCEDURE :: transport => link_manager_transport
@@ -892,6 +894,27 @@ CONTAINS
   END SUBROUTINE link_manager_read_restart
 
   ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_read_trans_restart
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_read_trans_restart(this, iounit, nspecies)
+
+    IMPLICIT NONE
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: iounit, nspecies
+    CLASS (link_t), POINTER :: link
+
+    CALL this%links%begin()
+    link => this%links%current()
+
+    DO WHILE (ASSOCIATED(link))
+       CALL link%read_trans_restart(iounit, nspecies)
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+    
+  END SUBROUTINE link_manager_read_trans_restart
+
+  ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_write_restart
   ! ----------------------------------------------------------------
   SUBROUTINE link_manager_write_restart(this, iounit)
@@ -912,6 +935,28 @@ CONTAINS
     END DO
 
   END SUBROUTINE link_manager_write_restart
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_write_trans_restart
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_write_trans_restart(this, iounit, nspecies)
+
+    IMPLICIT NONE
+
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: iounit, nspecies
+    CLASS (link_t), POINTER :: link
+
+    CALL this%links%begin()
+    link => this%links%current()
+
+    DO WHILE (ASSOCIATED(link))
+       CALL link%write_trans_restart(iounit, nspecies)
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+
+  END SUBROUTINE link_manager_write_trans_restart
 
   ! ----------------------------------------------------------------
   ! INTEGER FUNCTION link_manager_transport_steps

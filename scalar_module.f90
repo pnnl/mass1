@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  7, 2019 by William A. Perkins
-! Last Change: 2019-03-12 07:02:49 d3g096
+! Last Change: 2019-03-14 08:03:36 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -250,23 +250,30 @@ CONTAINS
     INTEGER :: i
 
     IF (cfg%do_transport) THEN
-       this%nspecies = 2
+       IF (cfg%do_gas .AND. cfg%do_temp) THEN
+          this%nspecies = 2
+       ELSE
+          this%nspecies = 1
+       END IF
 
        ALLOCATE(this%species(this%nspecies))
        DO i = 1, this%nspecies
           NULLIFY(this%species(i)%p)
        END DO
+       i = 1
        IF (cfg%do_gas) THEN
-          ALLOCATE(this%species(1)%p, &
+          ALLOCATE(this%species(i)%p, &
                &SOURCE=tdg((cfg%units .EQ. METRIC_UNITS), &
                &           cfg%gas_diffusion, &
                &           cfg%do_latflow, cfg%gas_exchange))
+          i = i + 1
        END IF
        IF (cfg%do_temp) THEN
-          ALLOCATE(this%species(1)%p, &
+          ALLOCATE(this%species(i)%p, &
                &SOURCE=temperature((cfg%units .EQ. METRIC_UNITS), &
                &                    cfg%gas_diffusion, &
                &                    cfg%do_latflow, cfg%gas_exchange))
+          i = i + 1
        END IF
     ELSE
        this%nspecies = 0
