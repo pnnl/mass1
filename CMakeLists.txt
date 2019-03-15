@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2019-03-13 07:53:05 d3g096
+# Last Change: 2019-03-15 08:30:53 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -236,6 +236,8 @@ add_executable(mass1_new
   )
 add_dependencies(mass1_new mass1lib)
 target_link_libraries(mass1_new mass1lib gastemp ts)
+install(TARGETS mass1_new DESTINATION bin)
+
 # save for running tests
 set(mass1newexe $<TARGET_FILE:mass1_new>)
 
