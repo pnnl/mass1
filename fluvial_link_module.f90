@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2019-03-14 11:49:25 d3g096
+! Last Change: 2019-03-29 13:02:42 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -152,11 +152,16 @@ CONTAINS
     CLASS (fluvial_link), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: grav, unitwt, dt
 
+    INTEGER :: i
+
     CALL this%transport_link_t%hydro_update(grav, unitwt, dt)
 
     IF (ASSOCIATED(this%latbc)) THEN
        this%latqold = this%latq
        this%latq = this%latbc%current_value
+       DO i = 1, this%npoints
+          this%pt(i)%hnow%lateral_inflow = this%latq
+       END DO
     END IF
 
   END SUBROUTINE fluvial_link_hupdate

@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  7, 2019 by William A. Perkins
-! Last Change: 2019-03-29 10:54:35 d3g096
+! Last Change: 2019-03-29 13:05:59 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -160,7 +160,7 @@ CONTAINS
           ELSE
              c = latc
           END IF
-          cout = (cin*avg_area + latc*avg_latq*deltat)/avg_area
+          cout = (cin*avg_area + c*avg_latq*deltat)/avg_area
        END IF
     END IF
 
@@ -202,10 +202,10 @@ CONTAINS
 
     tout = this%scalar_t%source(cin, pt, latc, deltat, met)
 
-    area = pt%xsprop%area
-    width = pt%xsprop%topwidth
-
     IF (this%dosource) THEN
+       area = pt%xsprop%area
+       width = pt%xsprop%topwidth
+
        IF (area .GT. 0.0) THEN
           ! FIXME: metric units
           tout = tout + met%energy_flux(tout)*deltat*width/area

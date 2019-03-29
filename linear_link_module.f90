@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-03-29 08:24:38 d3g096
+! Last Change: 2019-03-29 13:49:46 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -424,9 +424,21 @@ CONTAINS
        this%pt(i)%trans%hnow = this%pt(i)%hnow
        this%pt(i)%trans%hold = this%pt(i)%hnow
 
+       ! FIXME: just do this eventually
+       ! DO s = 1, nspecies
+       !    this%pt(i)%trans%cnow(s) = c(s)
+       !    this%pt(i)%trans%cold(s) = c(s)
+       ! END DO
+
        DO s = 1, nspecies
-          this%pt(i)%trans%cnow(s) = c(s)
-          this%pt(i)%trans%cold(s) = c(s)
+          SELECT CASE (this%species(s)%scalar%bctype)
+          CASE (TRANS_BC_TYPE)
+             this%pt(i)%trans%cnow(s) = c(1)
+          CASE (TEMP_BC_TYPE)
+             this%pt(i)%trans%cnow(s) = c(2)
+          CASE DEFAULT
+             this%pt(i)%trans%cnow(s) = c(1)
+          END SELECT
        END DO
     END DO
 

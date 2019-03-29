@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February 18, 2019 by William A. Perkins
-  ! Last Change: 2019-03-29 11:54:51 d3g096
+  ! Last Change: 2019-03-29 14:37:55 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE transport_link_module
@@ -204,13 +204,18 @@ CONTAINS
 
     DOUBLE PRECISION :: c, latc
 
-    latc = this%species(ispec)%latbc%current_value
-
     DO i = 2, this%npoints
        c = this%c(i) 
+
+       IF (ASSOCIATED(this%species(ispec)%latbc)) THEN
+          latc = this%species(ispec)%latbc%current_value
+       ELSE
+          latc = c
+       END IF
+
        c = this%species(ispec)%scalar%source(&
             &c, this%pt(i)%trans, latc, tdeltat, met)
-       this%c(i) = c
+       this%pt(i)%trans%cnow(ispec) = c
     END DO
 
   END SUBROUTINE transport_link_source
@@ -307,9 +312,7 @@ CONTAINS
        this%pt(i)%trans%cnow(ispec) = this%c(i)
     END DO
     
-    IF (this%species(ispec)%scalar%dosource) THEN
-       CALL this%source(ispec, tdeltat, this%species(ispec)%met)
-    END IF
+    CALL this%source(ispec, tdeltat, this%species(ispec)%met)
     
     ! adjust boundary concentrations to have zero concentration
     ! gradient w/ outflow
