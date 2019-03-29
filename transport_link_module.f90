@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February 18, 2019 by William A. Perkins
-  ! Last Change: 2019-03-29 07:04:32 d3g096
+  ! Last Change: 2019-03-29 11:54:51 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE transport_link_module
@@ -181,6 +181,7 @@ CONTAINS
             dtdx = deltat/this%dxx(i)
             c = pt0%trans%cnow(ispec)
             c = c + dtdx*(flux_e - flux_w)/pt0%trans%xspropold%area
+            this%c(i) = c
          END IF
        END ASSOCIATE
     END DO
@@ -302,12 +303,13 @@ CONTAINS
        CALL this%diffusion(ispec, tdeltat)
     END IF
 
-    IF (this%species(ispec)%scalar%dosource) THEN
-       CALL this%source(ispec, tdeltat, this%species(ispec)%met)
-    END IF
     DO i = 1, this%npoints
        this%pt(i)%trans%cnow(ispec) = this%c(i)
     END DO
+    
+    IF (this%species(ispec)%scalar%dosource) THEN
+       CALL this%source(ispec, tdeltat, this%species(ispec)%met)
+    END IF
     
     ! adjust boundary concentrations to have zero concentration
     ! gradient w/ outflow

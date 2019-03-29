@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  7, 2019 by William A. Perkins
-! Last Change: 2019-03-18 06:53:59 d3g096
+! Last Change: 2019-03-29 10:54:35 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -323,8 +323,8 @@ CONTAINS
        IF (cfg%do_temp) THEN
           ALLOCATE(this%species(i)%p, &
                &SOURCE=temperature((cfg%units .EQ. METRIC_UNITS), &
-               &                    cfg%gas_diffusion, &
-               &                    cfg%do_latflow, cfg%gas_exchange))
+               &                    cfg%temp_diffusion, &
+               &                    cfg%do_latflow, cfg%temp_exchange))
           i = i + 1
        END IF
     ELSE
