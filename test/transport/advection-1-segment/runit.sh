@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: 2019-03-14 07:52:19 d3g096
+# Last Change: 2019-03-29 10:00:48 d3g096
 # -------------------------------------------------------------
 # $Id$
 
@@ -17,7 +17,7 @@ set -e
 
                                 # to trap floating point errors on SGI
 
-model=${MODEL-../../../build/mass1}
+model=${MODEL-../../../build/mass1_new}
 
 touch nolatinflow
 

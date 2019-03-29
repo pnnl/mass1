@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-03-14 11:47:53 d3g096
+! Last Change: 2019-03-29 08:24:38 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -421,6 +421,9 @@ CONTAINS
        this%pt(i)%hnow%q = discharge
        this%pt(i)%hold%q = this%pt(i)%hnow%q
 
+       this%pt(i)%trans%hnow = this%pt(i)%hnow
+       this%pt(i)%trans%hold = this%pt(i)%hnow
+
        DO s = 1, nspecies
           this%pt(i)%trans%cnow(s) = c(s)
           this%pt(i)%trans%cold(s) = c(s)
@@ -447,6 +450,13 @@ CONTAINS
        READ(iunit, IOSTAT=iostat) junk, junk, &
             &this%pt(i)%hnow%q, &
             &this%pt(i)%hnow%y
+
+       ! FIXME: should the transport states be saved too?
+       this%pt(i)%trans%hnow%q = this%pt(i)%hnow%q
+       this%pt(i)%trans%hold%q = this%pt(i)%hnow%q
+       this%pt(i)%trans%hnow%y = this%pt(i)%hnow%y
+       this%pt(i)%trans%hold%y = this%pt(i)%hnow%y
+       
        IF (IS_IOSTAT_END(iostat)) THEN
           WRITE(msg, *) 'link ', this%id, &
                &': premature end of file reading (hydrodynamics) restart for point ', i
@@ -725,6 +735,14 @@ CONTAINS
        CALL this%pt(p)%hydro_update(grav, unitwt, dt, dx)
     END DO
 
+    ! Update the transport hydro state and section properties
+    IF (ASSOCIATED(this%species)) THEN
+       DO p = 1, this%npoints
+          this%pt(p)%trans%hnow = this%pt(p)%hnow
+          this%pt(p)%trans%xsprop = this%pt(p)%xsprop
+       END DO
+    END IF
+
   END SUBROUTINE linear_link_hupdate
 
   ! ----------------------------------------------------------------
@@ -832,6 +850,8 @@ CONTAINS
     
     DO i = 1, this%points()
        pt => this%point(i)
+       pt%trans%hold = pt%trans%hnow
+       pt%trans%xspropold = pt%trans%xsprop
        CALL pt%transport_interp(tnow, htime0, htime1)
     END DO
 
@@ -867,7 +887,8 @@ CONTAINS
           ! this is bad, but shouldn't happen often
           CALL error_message("Upstream link w/o transport BC")
        END IF
-    ELSEIF (this%q_down() .LT. 0.0) THEN
+    END IF
+    IF (this%q_down() .LT. 0.0) THEN
        IF (ASSOCIATED(this%dcon)) THEN
           c = this%dcon%conc(ispec)
        ELSE

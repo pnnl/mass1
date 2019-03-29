@@ -7,17 +7,18 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February 18, 2019 by William A. Perkins
-  ! Last Change: 2019-03-13 08:08:46 d3g096
+  ! Last Change: 2019-03-29 07:04:32 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE transport_link_module
 !
 ! This module contains a (logically abstract) link class implements a
 ! TVD transport scheme.  Links types that actually do transport
-! (fluvial) should inherit from htis.
+! (fluvial) should inherit from this.
 ! ----------------------------------------------------------------
 MODULE transport_link_module
 
+  USE utility
   USE link_module
   USE bc_module
   USE linear_link_module
@@ -31,6 +32,10 @@ MODULE transport_link_module
 
   ! ----------------------------------------------------------------
   ! TYPE transport_link_t
+  !
+  ! This is a (logically abstract) link class implements a TVD
+  ! transport scheme.  Links types that actually do transport
+  ! (fluvial) should inherit from this.
   ! ----------------------------------------------------------------
   TYPE, PUBLIC, EXTENDS(linear_link_t) :: transport_link_t
      ! transport cell lengths
@@ -112,7 +117,7 @@ CONTAINS
           ELSE
              phi = 0.0
           END IF
-          this%f(i) = velave*(this%pt(i)%trans%cnow(ispec) + 0.5*(1.0 - cflx)*phi*this%f(i))
+          this%f(i) = velave*(this%c(i) + 0.5*(1.0 - cflx)*phi*this%f(i))
        ELSE
           this%f(i) = velave*(this%c(i) - this%c(i+1))
           IF (ABS(this%f(i)) .GT. 1.0D-40) THEN
@@ -221,6 +226,8 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: tdeltat
 
     INTEGER :: n, i
+    CHARACTER (LEN=1024) :: msg
+    DOUBLE PRECISION :: c
 
     IF (.NOT. ASSOCIATED(this%c)) THEN
        ALLOCATE(this%c(0:this%npoints + 2))
@@ -245,12 +252,39 @@ CONTAINS
        this%dxx(i+2) = this%dxx(i)
     END IF
     
-    ! FIXME: boundary conditions
-    
     DO i = 1, this%npoints
        this%pt(i)%trans%cold(ispec) = this%pt(i)%trans%cnow(ispec)
     END DO
 
+    ! FIXME: boundary conditions
+    IF (this%q_up() .GT. 0.0) THEN
+       c = 0.0
+       IF (ASSOCIATED(this%ucon)) THEN
+          c = this%ucon%conc(ispec)
+       ELSE IF (ASSOCIATED(this%species(ispec)%usbc)) THEN
+          c = this%species(ispec)%getusbc()
+       ELSE 
+          WRITE(msg, *) 'link ', this%id, &
+               &': error: upstream inflow w/o conc BC for species ', &
+               &ispec
+          CALL error_message(msg)
+       END IF
+       this%pt(1)%trans%cnow = c
+    END IF
+    IF (this%q_down() .LT. 0.0) THEN
+       c = 0.0
+       IF (ASSOCIATED(this%ucon)) THEN
+          c = this%dcon%conc(ispec)
+       ELSE
+          WRITE(msg, *) 'link ', this%id, &
+               &': error: reverse flow at downstream boundary w/o conc BC for species ', &
+               &ispec
+          CALL error_message(msg)
+       END IF
+       this%pt(1)%trans%cnow(ispec) = c
+    END IF
+      
+    
     DO i = 1, this%npoints
        this%c(i) = this%pt(i)%trans%cnow(ispec)
     END DO
@@ -267,6 +301,7 @@ CONTAINS
        END DO
        CALL this%diffusion(ispec, tdeltat)
     END IF
+
     IF (this%species(ispec)%scalar%dosource) THEN
        CALL this%source(ispec, tdeltat, this%species(ispec)%met)
     END IF
@@ -295,7 +330,6 @@ CONTAINS
 
     IMPLICIT NONE
     CLASS (transport_link_t), INTENT(INOUT) :: this
-    INTEGER :: istat
 
     IF (ASSOCIATED(this%dxx)) THEN
        DEALLOCATE(this%dxx)

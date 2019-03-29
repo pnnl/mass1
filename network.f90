@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-03-14 11:53:34 d3g096
+! Last Change: 2019-03-29 09:55:37 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -190,8 +190,10 @@ CONTAINS
     CALL this%links%connect()
     IF (this%config%do_gageout) &
          &CALL this%gages%read(this%config%gage_file, this%links)
-    IF (this%config%do_profileout) &
-         &CALL this%profiles%read(this%config, this%links)
+    IF (this%config%do_profileout) THEN
+       this%profiles = profile_manager()
+       CALL this%profiles%read(this%config, this%links)
+    END IF
 
   END SUBROUTINE network_read
 
@@ -407,17 +409,18 @@ CONTAINS
     INTEGER :: tsteps, i, ispec
 
     htime0 = this%config%time%time
-    htime1 = htime0 + this%config%time%delta_t
+    htime1 = htime0 + this%config%time%step
 
     tnow = htime0
     
     IF (this%config%scalar_steps .GT. 0) THEN
        tsteps = this%config%scalar_steps
     ELSE
-       tsteps = this%links%transport_steps(this%config%time%delta_t)
+       tsteps = this%links%transport_steps(this%config%time%step)
        WRITE(*, '(" Using ", I5, " transport steps")') tsteps
     END IF
-    tdeltat = config%time%delta_t/DBLE(tsteps)
+    tdeltat = this%config%time%delta_t
+    tdeltat = tdeltat/DBLE(tsteps)
 
     DO i = 1, tsteps
        CALL this%bcs%update(tnow)
@@ -426,7 +429,7 @@ CONTAINS
        DO ispec = 1, this%scalars%nspecies
           CALL this%links%transport(ispec, tdeltat)
        END DO
-       tnow = htime0 + i*tdeltat
+       tnow = htime0 + i*this%config%time%step/DBLE(tsteps)
     END DO
     
     
@@ -474,8 +477,10 @@ CONTAINS
        dooutput = (MOD(this%config%time%current_step, this%config%print_freq) == 0)
        
        IF (dooutput) THEN
-          IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
-          IF (this%config%do_profileout) CALL this%profiles%output(this%config%time%time)
+          IF (this%config%do_gageout) &
+               &CALL this%gages%output(this%config%time%time, this%scalars)
+          IF (this%config%do_profileout) &
+               &CALL this%profiles%output(this%config%time%time, this%scalars)
        END IF
           
        CALL decimal_to_date(this%config%time%time, date_string, time_string)
@@ -501,16 +506,20 @@ CONTAINS
     this%config%time%time = this%config%time%begin
 
     ! make sure initial conditions are in the output
-    IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
-    IF (this%config%do_profileout) CALL this%profiles%output(this%config%time%time)
+    IF (this%config%do_gageout) &
+         &CALL this%gages%output(this%config%time%time, this%scalars)
+    IF (this%config%do_profileout) &
+         &CALL this%profiles%output(this%config%time%time, this%scalars)
 
     CALL this%run_to(this%config%time%end)
 
     ! always write the last state, if not done already
     dooutput = (MOD(this%config%time%current_step, this%config%print_freq) == 0)
     IF (.NOT. dooutput) THEN
-       IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
-       IF (this%config%do_profileout) CALL this%profiles%output(this%config%time%time)
+       IF (this%config%do_gageout) &
+            &CALL this%gages%output(this%config%time%time, this%scalars)
+       IF (this%config%do_profileout) &
+            &CALL this%profiles%output(this%config%time%time, this%scalars)
     END IF
 
     IF (this%config%do_restart) THEN

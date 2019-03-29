@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  8, 2018 by William A. Perkins
-! Last Change: 2019-02-14 07:26:42 d3g096
+! Last Change: 2019-03-21 07:28:11 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -20,6 +20,7 @@ MODULE gage_module
   USE dlist_module
   USE point_module
   USE link_manager_module
+  USE scalar_module
   
   IMPLICIT NONE
 
@@ -106,11 +107,14 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE gage_output
   ! ----------------------------------------------------------------
-  SUBROUTINE gage_output(this, date_string, time_string)
+  SUBROUTINE gage_output(this, date_string, time_string, sclrman)
     IMPLICIT NONE
     CLASS (gage_t), INTENT(INOUT) :: this
     CHARACTER (LEN=*), INTENT(IN) :: date_string, time_string
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
 
+    DOUBLE PRECISION :: tout, tdgout, tdgsat, tdgpress, cout(10)
+    INTEGER :: ncout, s
     DOUBLE PRECISION :: depth
 
     IF (this%firstwrite) THEN
@@ -122,10 +126,32 @@ CONTAINS
     this%firstwrite = .FALSE.
     
     ASSOCIATE( pt => this%pt, h => this%pt%hnow, pr => this%pt%xsprop )
+
+      ! FIXME: this copies original MASS1 output. it needs to be made
+      ! more general
+      cout = 0.0
+      tout = 0.0
+      tdgout = 0.0
+      tdgsat = 0.0
+      tdgpress = 0.0
+      DO s = 1, sclrman%nspecies
+         CALL sclrman%species(s)%p%output(s, pt, cout, ncout)
+         SELECT CASE (sclrman%species(s)%p%bctype)
+         CASE (TRANS_BC_TYPE)
+            tdgout = cout(1)
+            IF (ncout .GT. 1) THEN
+               tdgsat = cout(2)
+               tdgpress = cout(3)
+            END IF
+         CASE DEFAULT
+            tout = cout(1)
+         END SELECT
+      END DO
+
       depth = h%y - pt%thalweg
       WRITE(this%gunit,1010) date_string, time_string, &
            &h%y, h%q, h%v , depth, &
-           & 0.0 , 0.0, 0.0, 0.0, &
+           &tdgout , tout, tdgsat, tdgpress, &
            &pt%thalweg, pr%area, pr%topwidth, pr%hydrad,&
            &h%froude_num, h%friction_slope, h%bed_shear
     END ASSOCIATE
@@ -312,11 +338,12 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE gage_manager_output
   ! ----------------------------------------------------------------
-  SUBROUTINE gage_manager_output(this, time)
+  SUBROUTINE gage_manager_output(this, time, sclrman)
 
     IMPLICIT NONE
     CLASS (gage_manager), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: time
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
 
     CHARACTER (LEN=20) :: date_string, time_string
     CLASS (gage_t), POINTER :: gage
@@ -327,7 +354,7 @@ CONTAINS
     gage => this%gages%current()
 
     DO WHILE (ASSOCIATED(gage))
-       CALL gage%output(date_string, time_string)
+       CALL gage%output(date_string, time_string, sclrman)
        CALL this%gages%next()
        gage => this%gages%current()
     END DO

@@ -10,16 +10,15 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2019-03-14 11:46:27 d3g096
+! Last Change: 2019-03-15 10:15:29 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
 ! ----------------------------------------------------------------
 MODULE point_module
 
-  USE mass1_config
   USE cross_section
-  USE general_vars
+  USE general_vars, ONLY: depth_minimum
 
   IMPLICIT NONE
 
@@ -159,7 +158,6 @@ CONTAINS
   ! SUBROUTINE point_hydro_update
   ! ----------------------------------------------------------------
   SUBROUTINE point_hydro_update(this, grav, unitwt, deltat, deltax)
-    USE general_vars, ONLY: depth_minimum
 
     IMPLICIT NONE
     CLASS (point_t), INTENT(INOUT) :: this

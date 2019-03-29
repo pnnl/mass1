@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  7, 2019 by William A. Perkins
-! Last Change: 2019-03-14 08:03:36 d3g096
+! Last Change: 2019-03-18 06:53:59 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -25,6 +25,7 @@ MODULE scalar_module
   USE point_module
   USE bc_module
   USE met_zone
+  USE gas_functions
 
   IMPLICIT NONE
 
@@ -43,6 +44,7 @@ MODULE scalar_module
      LOGICAL :: istemp
      INTEGER (KIND=KIND(BC_ENUM)) :: bctype
    CONTAINS
+     PROCEDURE :: output => scalar_output
      PROCEDURE :: source => scalar_source
   END type scalar_t
 
@@ -85,6 +87,7 @@ MODULE scalar_module
   TYPE, PUBLIC, EXTENDS(scalar_t) :: tdg
    CONTAINS
      PROCEDURE :: source => tdg_source
+     PROCEDURE :: output => tdg_output
   END type tdg
 
   INTERFACE tdg
@@ -111,6 +114,24 @@ CONTAINS
     s%bctype = BC_ENUM
 
   END FUNCTION new_scalar_t
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE scalar_output
+  ! ----------------------------------------------------------------
+  SUBROUTINE scalar_output(this, ispec, pt, cout, nout)
+
+    IMPLICIT NONE
+    CLASS(scalar_t), INTENT(IN) :: this
+    INTEGER, INTENT(IN) :: ispec
+    CLASS(point_t), INTENT(IN) :: pt
+    DOUBLE PRECISION, INTENT(OUT) :: cout(*)
+    INTEGER, INTENT(OUT) :: nout
+
+    nout = 1
+    cout(1) = pt%trans%cnow(ispec)
+
+  END SUBROUTINE scalar_output
+
 
   ! ----------------------------------------------------------------
   !  FUNCTION scalar_source
@@ -210,6 +231,37 @@ CONTAINS
     t%needmet = t%dosource
 
   END FUNCTION new_tdg
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE tdg_output
+  ! ----------------------------------------------------------------
+  SUBROUTINE tdg_output(this, ispec, pt, cout, nout)
+
+    IMPLICIT NONE
+    CLASS(tdg), INTENT(IN) :: this
+    INTEGER, INTENT(IN) :: ispec
+    CLASS(point_t), INTENT(IN) :: pt
+    DOUBLE PRECISION, INTENT(OUT) :: cout(*)
+    INTEGER, INTENT(OUT) :: nout
+
+    DOUBLE PRECISION :: cin, twater, salinity, bp
+
+    salinity = 0.0
+    
+    ! FIXME: Bogus barometric pressure
+    bp = 760.0
+
+    nout = 3
+    cout(1:nout) = 0.0
+    cin = pt%trans%cnow(ispec)
+    twater = pt%trans%twater
+    IF (cin > 0.0) THEN
+       cout(1) = cin
+       cout(2) = TDGasSaturation(cin, twater, salinity, bp)
+       cout(3) = TDGasPress(cin, twater, salinity)
+    END IF
+  END SUBROUTINE tdg_output
+
 
   ! ----------------------------------------------------------------
   !  FUNCTION tdg_source

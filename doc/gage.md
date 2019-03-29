@@ -13,6 +13,7 @@ shown in the table below.
 |Field |Type | Description |
 |1     |int  | Link identifier |
 |2     |int  | Point number    |
+|3     |string | Optional name to use instead of link/point (new only) |
 
 ## Example
 
