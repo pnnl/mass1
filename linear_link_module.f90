@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-03-29 13:49:46 d3g096
+! Last Change: 2019-04-01 11:14:30 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -132,22 +132,32 @@ CONTAINS
           CASE (TEMP_BC_TYPE)
              IF (ldata%tbcid .GT. 0) THEN
                 this%species(i)%usbc => bcman%find(TEMP_BC_TYPE, ldata%tbcid)
+             ELSE
+                NULLIFY(this%species(i)%usbc)
              END IF
              IF (ldata%ltbcid .GT. 0) THEN
                 this%species(i)%latbc => bcman%find(TEMP_BC_TYPE, ldata%ltbcid)
+             ELSE
+                NULLIFY(this%species(i)%latbc)
              END IF
           CASE (TRANS_BC_TYPE)
              IF (ldata%gbcid .GT. 0) THEN
                 this%species(i)%usbc => bcman%find(TRANS_BC_TYPE, ldata%gbcid)
+             ELSE
+                NULLIFY(this%species(i)%usbc)
              END IF
              IF (ldata%lgbcid .GT. 0) THEN
                 this%species(i)%latbc => bcman%find(TRANS_BC_TYPE, ldata%lgbcid)
+             ELSE
+                NULLIFY(this%species(i)%latbc)
              END IF
           CASE DEFAULT
           END SELECT
 
           IF (this%species(i)%scalar%needmet .AND. ldata%mzone .NE. 0) THEN
              this%species(i)%met => metman%find(ldata%mzone)
+          ELSE
+             NULLIFY(this%species(i)%met)
           END IF
 
        END DO

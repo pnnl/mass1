@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February 18, 2019 by William A. Perkins
-  ! Last Change: 2019-04-01 09:39:07 d3g096
+  ! Last Change: 2019-04-01 12:29:02 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE transport_link_module
@@ -265,10 +265,10 @@ CONTAINS
     ! FIXME: boundary conditions
     IF (this%q_up() .GT. 0.0) THEN
        c = 0.0
-       IF (ASSOCIATED(this%ucon)) THEN
-          c = this%ucon%conc(ispec)
-       ELSE IF (ASSOCIATED(this%species(ispec)%usbc)) THEN
+       IF (ASSOCIATED(this%species(ispec)%usbc)) THEN
           c = this%species(ispec)%getusbc()
+       ELSE IF (ASSOCIATED(this%ucon)) THEN
+          c = this%ucon%conc(ispec)
        ELSE 
           WRITE(msg, *) 'link ', this%id, &
                &': error: upstream inflow w/o conc BC for species ', &

@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2019-03-29 13:02:42 d3g096
+! Last Change: 2019-04-01 11:18:49 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -56,7 +56,6 @@ CONTAINS
     CLASS (fluvial_link), INTENT(INOUT) :: this
 
     CALL this%transport_link_t%construct()
-    NULLIFY(this%latbc)
     this%latq = 0.0
     this%latqold = 0.0
     this%lpiexp = 0.0
