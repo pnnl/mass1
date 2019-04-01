@@ -109,6 +109,7 @@ CONTAINS
 
     CLASS (link_t), POINTER :: link
     CLASS (simple_bc_t), POINTER :: latbc
+    CLASS (bc_t), POINTER :: stupid
     DOUBLE PRECISION, PARAMETER :: zero(5) = 0.0
 
     CALL dnet%net%read(cfgdir)
@@ -142,7 +143,8 @@ CONTAINS
             latbc%tbl => time_series_alloc(id, 1, 1)
             latbc%tbl%limit_mode = TS_LIMIT_FLAT
             CALL time_series_push(latbc%tbl, dnet%net%config%time%begin, zero)
-            CALL bcs%push(LATFLOW_BC_TYPE, latbc)
+            stupid => latbc
+            CALL bcs%push(LATFLOW_BC_TYPE, stupid)
             link%latbc => latbc
             NULLIFY(latbc)
          ELSE
