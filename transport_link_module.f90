@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February 18, 2019 by William A. Perkins
-  ! Last Change: 2019-03-29 14:37:55 d3g096
+  ! Last Change: 2019-04-01 09:39:07 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE transport_link_module
@@ -279,7 +279,7 @@ CONTAINS
     END IF
     IF (this%q_down() .LT. 0.0) THEN
        c = 0.0
-       IF (ASSOCIATED(this%ucon)) THEN
+       IF (ASSOCIATED(this%dcon)) THEN
           c = this%dcon%conc(ispec)
        ELSE
           WRITE(msg, *) 'link ', this%id, &

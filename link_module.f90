@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2019-03-14 11:48:44 d3g096
+! Last Change: 2019-04-01 10:33:59 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -622,7 +622,7 @@ CONTAINS
           qin = qin + link%q_down()
           uconc = link%q_down()*link%c_down(ispecies)
        ELSE 
-          qout = qout + link%q_down()
+          qout = qout - link%q_down()
        END IF
 
        CALL this%ulink%next()
@@ -634,7 +634,7 @@ CONTAINS
     link => this%dlink%p
     cavg = cavg +  link%c_up(ispecies)
     IF (link%q_up() .LT. 0.0) THEN
-       qin = qin + link%q_up()
+       qin = qin - link%q_up()
        uconc = link%q_up()*link%c_up(ispecies)
     ELSE 
        qout = qout + link%q_up()
