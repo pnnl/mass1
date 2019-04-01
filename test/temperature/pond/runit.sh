@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Thu Sep 30 13:46:06 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+# Last Change: 2019-04-01 12:10:22 d3g096
 # -------------------------------------------------------------
 # $Id$
 
@@ -26,5 +26,6 @@ $model
 
 gnuplot temp.gp > temp.eps
 gnuplot temp.1992.gp > temp.1992.eps
+gnuplot compare.1992.gp > compare.1992.eps
 gnuplot temp.summer.1992.gp > temp.summer.1992.eps
 
