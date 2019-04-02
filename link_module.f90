@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2019-04-01 12:36:17 d3g096
+! Last Change: 2019-04-02 10:27:42 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -23,6 +23,7 @@ MODULE link_module
   USE section_handler_module
   USE point_module
   USE scalar_module
+  USE transport_module
 
   IMPLICIT NONE
 
@@ -95,6 +96,7 @@ MODULE link_module
      INTEGER :: dsid, usbcid, dsbcid
      CLASS (bc_t), POINTER :: usbc, dsbc, latbc
      CLASS (confluence_t), POINTER :: ucon, dcon
+     TYPE (link_scalar), DIMENSION(:), POINTER :: species
    CONTAINS
 
      PROCEDURE :: construct => link_construct

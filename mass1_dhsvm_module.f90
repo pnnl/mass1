@@ -110,7 +110,8 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     CLASS (simple_bc_t), POINTER :: latbc
     CLASS (bc_t), POINTER :: stupid
-    DOUBLE PRECISION, PARAMETER :: zero(5) = 0.0
+    DOUBLE PRECISION, PARAMETER :: zero(5) = 0.0, tempin(5) = 12.0
+    INTEGER :: tidx
 
     CALL dnet%net%read(cfgdir)
 
@@ -118,10 +119,13 @@ CONTAINS
       cfg%time%begin = dhsvm_to_decimal(start)
       cfg%time%end = dhsvm_to_decimal(end)
       cfg%time%time = cfg%time%begin
+
+      ! Temperature should be turned ON in the read
+      ! configuration. This is here to turn it off.
       cfg%do_temp = dotemp
       cfg%temp_diffusion = .TRUE.
-      cfg%temp_exchange = .TRUE.
-      cfg%met_required = cfg%do_temp
+      cfg%temp_exchange = .FALSE.
+      cfg%met_required = cfg%temp_exchange
       cfg%quiet = quiet
     END ASSOCIATE
 
@@ -151,6 +155,22 @@ CONTAINS
             WRITE (msg, *) 'link ', id, ': existing lateral inflow table ',&
                  &'may cause problems'
             CALL error_message(msg)
+         END IF
+         IF (dotemp) THEN
+            tidx = dnet%net%scalars%temp_index
+            IF (tidx .LE. 0) THEN
+               CALL error_message("Temperature requested by DHSVM, but not enabled in MASS1",&
+                    &fatal=.TRUE.)
+            END IF
+            ! create a temperature BC for lateral inflow
+            NULLIFY(latbc)
+            ALLOCATE(latbc)
+            latbc%tbl => time_series_alloc(id, 1, 1)
+            latbc%tbl%limit_mode = TS_LIMIT_FLAT
+            CALL time_series_push(latbc%tbl, dnet%net%config%time%begin, tempin)
+            stupid => latbc
+            CALL bcs%push(TEMP_BC_TYPE, stupid)
+            link%species(tidx)%latbc => latbc
          END IF
          CALL links%next();
          link =>links%current();

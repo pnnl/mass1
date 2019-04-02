@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  7, 2019 by William A. Perkins
-! Last Change: 2019-03-29 13:05:59 d3g096
+! Last Change: 2019-04-02 10:24:23 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -65,6 +65,7 @@ MODULE scalar_module
   TYPE, PUBLIC :: scalar_manager
      INTEGER :: nspecies
      TYPE (scalar_ptr), POINTER :: species(:)
+     INTEGER :: temp_index
    CONTAINS
      PROCEDURE :: initialize => scalar_manager_init
   END type scalar_manager
@@ -301,6 +302,9 @@ CONTAINS
 
     INTEGER :: i
 
+    this%temp_index = 0
+    this%nspecies = 0
+
     IF (cfg%do_transport) THEN
        IF (cfg%do_gas .AND. cfg%do_temp) THEN
           this%nspecies = 2
@@ -325,10 +329,9 @@ CONTAINS
                &SOURCE=temperature((cfg%units .EQ. METRIC_UNITS), &
                &                    cfg%temp_diffusion, &
                &                    cfg%do_latflow, cfg%temp_exchange))
+          this%temp_index = i
           i = i + 1
        END IF
-    ELSE
-       this%nspecies = 0
     END IF
        
   END SUBROUTINE scalar_manager_init

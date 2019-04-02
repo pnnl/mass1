@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-04-01 11:14:30 d3g096
+! Last Change: 2019-04-02 10:24:55 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -32,7 +32,6 @@ MODULE linear_link_module
      INTEGER :: npoints
      INTEGER :: input_option
      TYPE (point_t), DIMENSION(:),POINTER :: pt
-     TYPE (link_scalar), DIMENSION(:), POINTER :: species
    CONTAINS
      PROCEDURE :: initialize => linear_link_initialize
      PROCEDURE :: readpts => linear_link_readpts
