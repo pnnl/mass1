@@ -7,17 +7,18 @@ MODULE hydrologic_link_module
   USE point_module
   USE bc_module
   USE link_module
+  USE scalar_module
   USE cross_section
   USE section_handler_module
   USE mass1_config
-  USE linear_link_module
+  USE transport_link_module
 
   IMPLICIT NONE
 
   ! ----------------------------------------------------------------
   ! TYPE hydrologic_link
   ! ----------------------------------------------------------------
-  TYPE, PUBLIC, EXTENDS(linear_link_t) :: hydrologic_link
+  TYPE, PUBLIC, EXTENDS(transport_link_t) :: hydrologic_link
      DOUBLE PRECISION :: y
      DOUBLE PRECISION :: L, So
      DOUBLE PRECISION :: K
@@ -49,7 +50,7 @@ CONTAINS
 
     IMPLICIT NONE
     CLASS (hydrologic_link), INTENT(INOUT) :: this
-    CALL this%linear_link_t%construct()
+    CALL this%transport_link_t%construct()
     NULLIFY(this%latbc)
     this%inflow = 0.0
     this%outflow = 0.0
@@ -67,16 +68,18 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION hydrologic_link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION hydrologic_link_initialize(this, ldata, bcman) RESULT(ierr)
+  FUNCTION hydrologic_link_initialize(this, ldata, bcman, sclrman, metman) RESULT(ierr)
 
     IMPLICIT NONE
     INTEGER :: ierr
     CLASS (hydrologic_link), INTENT(INOUT) :: this
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
+    CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
     CHARACTER (LEN=1024) :: msg
 
-    ierr = this%linear_link_t%initialize(ldata, bcman)
+    ierr = this%transport_link_t%initialize(ldata, bcman, sclrman, metman)
 
     IF (ldata%lbcid .GT. 0) THEN
        this%latbc => bcman%find(LATFLOW_BC_TYPE, ldata%lbcid)
@@ -113,7 +116,7 @@ CONTAINS
        CALL error_message(msg)
        ierr = ierr + 1
     CASE (2)
-       ierr = this%linear_link_t%readpts(theconfig, sectman, punit, lineno)
+       ierr = this%transport_link_t%readpts(theconfig, sectman, punit, lineno)
     END SELECT
 
     this%L = ABS(this%pt(1)%x - this%pt(this%npoints)%x)
@@ -136,7 +139,7 @@ CONTAINS
     INTEGER :: i
     DOUBLE PRECISION :: dx, a, depth
 
-    CALL this%linear_link_t%set_initial(stage, discharge, c)
+    CALL this%transport_link_t%set_initial(stage, discharge, c)
 
     ! initialize the discharges
     
@@ -276,15 +279,15 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE hydrologic_link_hupdate
   ! ----------------------------------------------------------------
-  SUBROUTINE hydrologic_link_hupdate(this, grav, dt)
+  SUBROUTINE hydrologic_link_hupdate(this, grav, unitwt, dt)
 
     IMPLICIT NONE
     
     CLASS (hydrologic_link), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: grav, dt
+    DOUBLE PRECISION, INTENT(IN) :: grav, unitwt, dt
     DOUBLE PRECISION :: q
 
-    CALL this%linear_link_t%hydro_update(grav, dt)
+    CALL this%transport_link_t%hydro_update(grav, unitwt, dt)
 
     this%storage_old = this%storage
     this%inflow_old = this%inflow
@@ -314,7 +317,7 @@ CONTAINS
 
     ierr = 0
 
-    CALL this%linear_link_t%read_restart(iunit)
+    CALL this%transport_link_t%read_restart(iunit)
     
     READ(iunit, IOSTAT=iostat) this%y, this%K, &
          &this%inflow, this%outflow, this%latq, &
@@ -348,7 +351,7 @@ CONTAINS
     CLASS (hydrologic_link), INTENT(IN) :: this
     INTEGER, INTENT(IN) :: iunit
 
-    CALL this%linear_link_t%write_restart(iunit)
+    CALL this%transport_link_t%write_restart(iunit)
 
     WRITE(iunit) this%y, this%K, &
          &this%inflow, this%outflow, this%latq, &

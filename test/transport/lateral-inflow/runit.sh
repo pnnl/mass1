@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created July  2, 1999 by William A. Perkins
-# Last Change: Wed Sep 29 14:16:10 2010 by William A. Perkins <d3g096@bearflag.pnl.gov>
+# Last Change: 2019-03-29 12:32:33 d3g096
 # -------------------------------------------------------------
 # $Id$
 
@@ -20,7 +20,7 @@ set -e
 TRAP_FPE='INVALID=ABORT(1);UNDERFL=ZERO;OVERFL=ABORT(1);INT_OVERFL=ABORT(1);DIVZERO=ABORT(1);DEBUG'
 export TRAP_FPE
 
-model=${MODEL-../../../build/mass1}
+model=${MODEL-../../../build/mass1_new}
 
 rm -f mass1.cfg
 ln -f -s mass1-inflow.cfg mass1.cfg

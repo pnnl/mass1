@@ -8,7 +8,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Mon Jan  9 07:07:06 2006 by William A. Perkins <perk@McPerk.pnl.gov>
+# Last Change: 2019-03-29 10:00:48 d3g096
 # -------------------------------------------------------------
 # $Id$
 
@@ -17,10 +17,7 @@ set -e
 
                                 # to trap floating point errors on SGI
 
-TRAP_FPE='INVALID=ABORT(1);UNDERFL=ZERO;OVERFL=ABORT(1);INT_OVERFL=ABORT(1);DIVZERO=ABORT(1);DEBUG'
-export TRAP_FPE
-
-model=${MODEL-../../../build/mass1}
+model=${MODEL-../../../build/mass1_new}
 
 touch nolatinflow
 

@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-02-13 12:05:30 d3g096
+! Last Change: 2019-04-02 10:24:55 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -16,6 +16,8 @@ MODULE linear_link_module
   USE link_module
   USE point_module
   USE bc_module
+  USE scalar_module
+  USE transport_module
   USE cross_section
   USE section_handler_module
   USE mass1_config
@@ -44,6 +46,8 @@ MODULE linear_link_module
      PROCEDURE :: set_initial => linear_link_set_initial
      PROCEDURE :: read_restart => linear_link_read_restart
      PROCEDURE :: write_restart => linear_link_write_restart
+     PROCEDURE :: read_trans_restart => linear_link_read_trans_restart
+     PROCEDURE :: write_trans_restart => linear_link_write_trans_restart
      PROCEDURE :: coeff => linear_link_coeff
      PROCEDURE :: forward_sweep => linear_link_forward
      PROCEDURE :: backward_sweep => linear_link_backward
@@ -52,6 +56,8 @@ MODULE linear_link_module
      PROCEDURE :: max_diffuse => linear_link_max_diffuse
      PROCEDURE :: point => linear_link_point
      PROCEDURE :: check => linear_link_check
+     PROCEDURE :: trans_interp => linear_link_trans_interp
+     PROCEDURE :: transport => linear_link_transport
      PROCEDURE :: destroy => linear_link_destroy
   END type linear_link_t
 
@@ -60,15 +66,18 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION linear_link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION linear_link_initialize(this, ldata, bcman) RESULT(ierr)
+  FUNCTION linear_link_initialize(this, ldata, bcman, sclrman, metman) RESULT(ierr)
 
     IMPLICIT NONE
     INTEGER :: ierr
     CLASS (linear_link_t), INTENT(INOUT) :: this
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
-    CHARACTER (LEN=1024) :: msg
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
+    CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
 
+    INTEGER :: i
+    CHARACTER (LEN=1024) :: msg
     ierr = 0
     this%id = ldata%linkid
     this%npoints = ldata%npt
@@ -102,6 +111,57 @@ CONTAINS
              ierr = ierr + 1
           END IF
        END IF
+    END IF
+
+    IF (sclrman%nspecies .GT. 0) THEN
+       DO i = 1, this%npoints
+          ALLOCATE(this%pt(i)%trans%cnow(sclrman%nspecies))
+          ALLOCATE(this%pt(i)%trans%cold(sclrman%nspecies))
+          this%pt(i)%trans%cnow = 0.0
+          this%pt(i)%trans%cold = 0.0
+       END DO
+
+       
+       ALLOCATE(this%species(sclrman%nspecies))
+
+       DO i = 1, sclrman%nspecies
+          this%species(i)%scalar => sclrman%species(i)%p
+
+          SELECT CASE (this%species(i)%scalar%bctype)
+          CASE (TEMP_BC_TYPE)
+             IF (ldata%tbcid .GT. 0) THEN
+                this%species(i)%usbc => bcman%find(TEMP_BC_TYPE, ldata%tbcid)
+             ELSE
+                NULLIFY(this%species(i)%usbc)
+             END IF
+             IF (ldata%ltbcid .GT. 0) THEN
+                this%species(i)%latbc => bcman%find(TEMP_BC_TYPE, ldata%ltbcid)
+             ELSE
+                NULLIFY(this%species(i)%latbc)
+             END IF
+          CASE (TRANS_BC_TYPE)
+             IF (ldata%gbcid .GT. 0) THEN
+                this%species(i)%usbc => bcman%find(TRANS_BC_TYPE, ldata%gbcid)
+             ELSE
+                NULLIFY(this%species(i)%usbc)
+             END IF
+             IF (ldata%lgbcid .GT. 0) THEN
+                this%species(i)%latbc => bcman%find(TRANS_BC_TYPE, ldata%lgbcid)
+             ELSE
+                NULLIFY(this%species(i)%latbc)
+             END IF
+          CASE DEFAULT
+          END SELECT
+
+          IF (this%species(i)%scalar%needmet .AND. ldata%mzone .NE. 0) THEN
+             this%species(i)%met => metman%find(ldata%mzone)
+          ELSE
+             NULLIFY(this%species(i)%met)
+          END IF
+
+       END DO
+    ELSE
+       NULLIFY(this%species)
     END IF
 
   END FUNCTION linear_link_initialize
@@ -332,7 +392,8 @@ CONTAINS
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(IN) :: this
     INTEGER, INTENT(IN) :: ispecies
-    linear_link_c_up = 0.0
+
+    linear_link_c_up = this%pt(1)%trans%cnow(ispecies)
   END FUNCTION linear_link_c_up
 
 
@@ -343,7 +404,9 @@ CONTAINS
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(IN) :: this
     INTEGER, INTENT(IN) :: ispecies
-    linear_link_c_down = 0.0
+    INTEGER :: npts
+    npts = this%points()
+    linear_link_c_down = this%pt(npts)%trans%cnow(ispecies)
   END FUNCTION linear_link_c_down
 
   ! ----------------------------------------------------------------
@@ -353,13 +416,39 @@ CONTAINS
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: stage, discharge, c(:)
-    INTEGER :: i
+    INTEGER :: i, nspecies, s
+
+    IF (ASSOCIATED(this%species)) THEN
+       nspecies = SIZE(this%species)
+    ELSE
+       nspecies = 0
+    END IF
 
     DO i = 1, this%npoints
        this%pt(i)%hnow%y = MAX(stage, this%pt(i)%thalweg + depth_minimum)
        this%pt(i)%hold%y = this%pt(i)%hnow%y
        this%pt(i)%hnow%q = discharge
        this%pt(i)%hold%q = this%pt(i)%hnow%q
+
+       this%pt(i)%trans%hnow = this%pt(i)%hnow
+       this%pt(i)%trans%hold = this%pt(i)%hnow
+
+       ! FIXME: just do this eventually
+       ! DO s = 1, nspecies
+       !    this%pt(i)%trans%cnow(s) = c(s)
+       !    this%pt(i)%trans%cold(s) = c(s)
+       ! END DO
+
+       DO s = 1, nspecies
+          SELECT CASE (this%species(s)%scalar%bctype)
+          CASE (TRANS_BC_TYPE)
+             this%pt(i)%trans%cnow(s) = c(1)
+          CASE (TEMP_BC_TYPE)
+             this%pt(i)%trans%cnow(s) = c(2)
+          CASE DEFAULT
+             this%pt(i)%trans%cnow(s) = c(1)
+          END SELECT
+       END DO
     END DO
 
   END SUBROUTINE linear_link_set_initial
@@ -374,27 +463,30 @@ CONTAINS
     CLASS (linear_link_t), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: iunit
     INTEGER :: i, junk, iostat, ierr
-    DOUBLE PRECISION :: c(2)
     CHARACTER (LEN=1024) :: msg
 
-    ! FIXME: transport
-    c = 0.0
     ierr = 0
 
     DO i = 1, this%npoints
        READ(iunit, IOSTAT=iostat) junk, junk, &
             &this%pt(i)%hnow%q, &
-            &this%pt(i)%hnow%y, &
-            &c(1), c(2)
+            &this%pt(i)%hnow%y
+
+       ! FIXME: should the transport states be saved too?
+       this%pt(i)%trans%hnow%q = this%pt(i)%hnow%q
+       this%pt(i)%trans%hold%q = this%pt(i)%hnow%q
+       this%pt(i)%trans%hnow%y = this%pt(i)%hnow%y
+       this%pt(i)%trans%hold%y = this%pt(i)%hnow%y
+       
        IF (IS_IOSTAT_END(iostat)) THEN
           WRITE(msg, *) 'link ', this%id, &
-               &': premature end of file reading restart for point ', i
+               &': premature end of file reading (hydrodynamics) restart for point ', i
           CALL error_message(msg)
           ierr = ierr + 1
           EXIT
        ELSE IF (iostat .NE. 0) THEN
           WRITE(msg, *) 'link ', this%id, &
-               &': error reading restart for point ', i
+               &': error reading (hydrodynamics) restart for point ', i
           CALL error_message(msg)
           ierr = ierr + 1
           EXIT
@@ -409,6 +501,55 @@ CONTAINS
   END SUBROUTINE linear_link_read_restart
 
   ! ----------------------------------------------------------------
+  ! SUBROUTINE linear_link_read_trans_restart
+  ! ----------------------------------------------------------------
+  SUBROUTINE linear_link_read_trans_restart(this, iunit, nspecies)
+
+    IMPLICIT NONE
+
+    CLASS (linear_link_t), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: iunit
+    INTEGER, INTENT(IN) :: nspecies
+
+    INTEGER :: i, s, iostat, ierr = 0
+    CHARACTER (LEN=1024) :: msg
+    
+    DOUBLE PRECISION :: c(nspecies), cold(nspecies)
+
+    ierr = 0
+
+    DO i = 1, this%npoints
+       READ(iunit, IOSTAT=iostat) &
+            &(c(s), s = 1, nspecies), &
+            &(cold(s), s = 1, nspecies)
+       
+       IF (IS_IOSTAT_END(iostat)) THEN
+          WRITE(msg, *) 'link ', this%id, &
+               &': error reading (transport) restart for point ', i
+          CALL error_message(msg)
+          ierr = ierr + 1
+          EXIT
+       ELSE IF (iostat .NE. 0) THEN
+          WRITE(msg, *) 'link ', this%id, &
+               &': error reading (transport) restart for point ', i
+          CALL error_message(msg)
+          ierr = ierr + 1
+          EXIT
+       END IF
+       DO s = 1, nspecies
+          this%pt(i)%trans%cnow(s) = c(s)
+          this%pt(i)%trans%cold(s) = cold(s)
+       END DO
+    END DO
+    
+    IF (ierr .GT. 0) THEN
+       WRITE(msg, *) 'problem reading restart (transport) for link', this%id
+       CALL error_message(msg, fatal=.TRUE.)
+    END IF
+
+  END SUBROUTINE linear_link_read_trans_restart
+
+  ! ----------------------------------------------------------------
   ! SUBROUTINE linear_link_write_restart
   ! ----------------------------------------------------------------
   SUBROUTINE linear_link_write_restart(this, iunit)
@@ -416,20 +557,64 @@ CONTAINS
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(IN) :: this
     INTEGER, INTENT(IN) :: iunit
-    INTEGER :: i
-    DOUBLE PRECISION :: c
+    INTEGER :: i, iostat, ierr
+    CHARACTER (LEN=1024) :: msg
 
-    ! FIXME: transport
-    c = 0.0
-
+    ierr = 0
+    
     DO i = 1, this%npoints
-       WRITE(iunit) this%id, i, &
+       WRITE(iunit, IOSTAT=iostat) this%id, i, &
             &this%pt(i)%hnow%q, &
-            &this%pt(i)%hnow%y, &
-            &c, c
+            &this%pt(i)%hnow%y
+       IF (iostat .NE. 0) THEN
+          WRITE(msg, *) 'link ', this%id, &
+               &': error writing (hydrodynamis) restart for point ', i
+          CALL error_message(msg)
+          ierr = ierr + 1
+          EXIT
+       END IF
     END DO
+
+    IF (ierr .GT. 0) THEN
+       WRITE(msg, *) 'problem writing restart (hydrodynamics) for link', this%id
+       CALL error_message(msg, fatal=.TRUE.)
+    END IF
   END SUBROUTINE linear_link_write_restart
 
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE linear_link_write_trans_restart
+  ! ----------------------------------------------------------------
+  SUBROUTINE linear_link_write_trans_restart(this, iunit, nspecies)
+
+    IMPLICIT NONE
+    CLASS (linear_link_t), INTENT(IN) :: this
+    INTEGER, INTENT(IN) :: iunit
+    INTEGER, INTENT(IN) :: nspecies
+
+    INTEGER :: i, s, iostat, ierr = 0
+    DOUBLE PRECISION :: c(nspecies), cold(nspecies)
+    CHARACTER (LEN=1024) :: msg
+
+    ierr = 0
+    DO i = 1, this%npoints
+       WRITE(iunit, IOSTAT=iostat) &
+            &(this%pt(i)%trans%cnow(s), s = 1, nspecies), &
+            &(this%pt(i)%trans%cold(s), s = 1, nspecies)
+       IF (iostat .NE. 0) THEN
+          WRITE(msg, *) 'link ', this%id, &
+               &': error writing (hydrodynamis) restart for point ', i
+          CALL error_message(msg)
+          ierr = ierr + 1
+          EXIT
+       END IF
+    END DO
+
+    IF (ierr .GT. 0) THEN
+       WRITE(msg, *) 'problem reading restart (transport) for link', this%id
+       CALL error_message(msg, fatal=.TRUE.)
+    END IF
+
+  END SUBROUTINE linear_link_write_trans_restart
 
 
   ! ----------------------------------------------------------------
@@ -553,11 +738,11 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE linear_link_hupdate
   ! ----------------------------------------------------------------
-  SUBROUTINE linear_link_hupdate(this, grav, dt)
+  SUBROUTINE linear_link_hupdate(this, grav, unitwt, dt)
 
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: grav, dt
+    DOUBLE PRECISION, INTENT(IN) :: grav, unitwt, dt
 
     INTEGER :: p
     DOUBLE PRECISION :: dx
@@ -568,8 +753,16 @@ CONTAINS
        ELSE 
           dx = ABS(this%pt(p+1)%x - this%pt(p)%x)
        END IF
-       CALL this%pt(p)%hydro_update(grav, dt, dx)
+       CALL this%pt(p)%hydro_update(grav, unitwt, dt, dx)
     END DO
+
+    ! Update the transport hydro state and section properties
+    IF (ASSOCIATED(this%species)) THEN
+       DO p = 1, this%npoints
+          this%pt(p)%trans%hnow = this%pt(p)%hnow
+          this%pt(p)%trans%xsprop = this%pt(p)%xsprop
+       END DO
+    END IF
 
   END SUBROUTINE linear_link_hupdate
 
@@ -666,12 +859,86 @@ CONTAINS
   END FUNCTION linear_link_check
 
   ! ----------------------------------------------------------------
+  ! SUBROUTINE linear_link_trans_interp
+  ! ----------------------------------------------------------------
+  SUBROUTINE linear_link_trans_interp(this, tnow, htime0, htime1)
+
+    IMPLICIT NONE
+    CLASS (linear_link_t), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: tnow, htime0, htime1
+    INTEGER :: i
+    CLASS (point_t), POINTER :: pt
+    
+    DO i = 1, this%points()
+       pt => this%point(i)
+       pt%trans%hold = pt%trans%hnow
+       pt%trans%xspropold = pt%trans%xsprop
+       CALL pt%transport_interp(tnow, htime0, htime1)
+    END DO
+
+  END SUBROUTINE linear_link_trans_interp
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE linear_link_transport
+  ! ----------------------------------------------------------------
+  SUBROUTINE linear_link_transport(this, ispec, tdeltat)
+
+    IMPLICIT NONE
+    CLASS (linear_link_t), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: ispec
+    DOUBLE PRECISION, INTENT(IN) :: tdeltat
+
+    INTEGER :: i
+    DOUBLE PRECISION :: c
+
+    DO i = 1, this%npoints
+       this%pt(i)%trans%cold(ispec) = this%pt(i)%trans%cnow(ispec)
+    END DO
+    
+    ! the default is to just pass the boundary concentration through
+    ! to all points. There needs to be a general way of dealing
+    ! reverse flow, but get it working first
+
+    IF (this%q_up() .GT. 0.0) THEN
+       IF (ASSOCIATED(this%species(ispec)%usbc)) THEN
+          c = this%species(ispec)%usbc%current_value
+       ELSEIF (ASSOCIATED(this%ucon)) THEN
+          c = this%ucon%conc(ispec)
+       ELSE
+          ! this is bad, but shouldn't happen often
+          CALL error_message("Upstream link w/o transport BC")
+       END IF
+    END IF
+    IF (this%q_down() .LT. 0.0) THEN
+       IF (ASSOCIATED(this%dcon)) THEN
+          c = this%dcon%conc(ispec)
+       ELSE
+          ! also bad, but shouldn't happen often
+          CALL error_message("Reverse flow w/o transport BC")
+       END IF
+    END IF
+    DO i = i, this%npoints
+       this%pt(i)%trans%cnow(ispec) = c
+    END DO
+
+  END SUBROUTINE linear_link_transport
+
+
+  ! ----------------------------------------------------------------
   ! SUBROUTINE linear_link_destroy
   ! ----------------------------------------------------------------
   SUBROUTINE linear_link_destroy(this)
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(INOUT) :: this
+    INTEGER :: i
 
+    IF (ASSOCIATED(this%species)) THEN
+       DO i = 1, this%npoints
+          DEALLOCATE(this%pt(i)%trans%cnow, &
+               &this%pt(i)%trans%cold)
+       END DO
+       DEALLOCATE(this%species)
+    END IF
     DEALLOCATE(this%pt)
 
   END SUBROUTINE linear_link_destroy

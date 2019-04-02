@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2017-01-20 10:57:56 d3g096
+# Last Change: 2019-04-02 10:35:22 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -55,12 +55,12 @@ add_custom_command(
   OUTPUT 
   "${CMAKE_CURRENT_BINARY_DIR}/hotstart-warmup.dat"
   COMMAND ${CMAKE_COMMAND} -E copy mass1-warmup.cfg mass1.cfg
-  COMMAND ${mass1exe} > mass1.warmup.log
+  COMMAND ${mass1newexe} > mass1.warmup.log
   COMMAND ${CMAKE_COMMAND} -E rename profile1.out profile1.warmup.out
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Running test flow/storage (warmup)"
   DEPENDS 
-  mass1 ${testfiles}
+  mass1_new ${testfiles}
   "${CMAKE_CURRENT_BINARY_DIR}/mass1-warmup.cfg"
   "${CMAKE_CURRENT_SOURCE_DIR}/inflow-bc.dat"
   "${CMAKE_CURRENT_BINARY_DIR}/link-flowbc-files.dat"
@@ -74,14 +74,14 @@ add_custom_command(
   "${CMAKE_CURRENT_BINARY_DIR}/ts11.flowbc.out"
   "${CMAKE_CURRENT_BINARY_DIR}/ts1149.flowbc.out"
   COMMAND ${CMAKE_COMMAND} -E copy mass1-flowbc.cfg mass1.cfg
-  COMMAND ${mass1exe} > mass1.flowbc.log
+  COMMAND ${mass1newexe} > mass1.flowbc.log
   COMMAND ${CMAKE_COMMAND} -E rename profile1.out profile1.flowbc.out
   COMMAND ${CMAKE_COMMAND} -E rename ts11.out ts11.flowbc.out
   COMMAND ${CMAKE_COMMAND} -E rename ts1149.out ts1149.flowbc.out
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Running test flow/storage (flowbc)"
   DEPENDS 
-  mass1 ${testfiles}
+  mass1_new ${testfiles}
   "${CMAKE_CURRENT_BINARY_DIR}/hotstart-warmup.dat"
   "${CMAKE_CURRENT_BINARY_DIR}/mass1-flowbc.cfg"
   "${CMAKE_CURRENT_SOURCE_DIR}/inflow-bc.dat"
@@ -94,7 +94,7 @@ add_custom_command(
   "${CMAKE_CURRENT_BINARY_DIR}/ts11.lateral.out"
   "${CMAKE_CURRENT_BINARY_DIR}/ts1149.lateral.out"
   COMMAND ${CMAKE_COMMAND} -E copy mass1-lateral.cfg mass1.cfg
-  COMMAND ${mass1exe} > mass1.lateral.log
+  COMMAND ${mass1newexe} > mass1.lateral.log
   COMMAND ${CMAKE_COMMAND} -E rename profile1.out profile1.lateral.out
   COMMAND ${CMAKE_COMMAND} -E rename ts11.out ts11.lateral.out
   COMMAND ${CMAKE_COMMAND} -E rename ts1149.out ts1149.lateral.out
@@ -102,7 +102,7 @@ add_custom_command(
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Running test flow/storage (lateral)"
   DEPENDS 
-  mass1 ${testfiles}
+  mass1_new ${testfiles}
   "${CMAKE_CURRENT_BINARY_DIR}/hotstart-warmup.dat"
   "${CMAKE_CURRENT_BINARY_DIR}/mass1-lateral.cfg"
   "${CMAKE_CURRENT_SOURCE_DIR}/inflow-bc.dat"
@@ -165,6 +165,7 @@ set_property(DIRECTORY
   output.out
   profile1.out
   status.out
+  error-warning.out
   hotstart-warmup.dat
   profile1.flowbc.out
   profile1.lateral.out

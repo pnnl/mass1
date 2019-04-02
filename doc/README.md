@@ -10,5 +10,10 @@
 * [Meteorology zone list](met.md)
 * [Initial conditions file](initial.md)
 
+## Output
+
+* [Gage (single location) Output](gage.md)
+* [Profile Output] (profile.md)
+
 ## Notes
 

@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-02-15 13:37:52 d3g096
+! Last Change: 2019-03-29 09:55:37 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -29,6 +29,7 @@ MODULE network_module
   USE met_zone
   USE gage_module
   USE profile_module
+  USE scalar_module
 
   IMPLICIT NONE
 
@@ -43,6 +44,7 @@ MODULE network_module
      TYPE (link_manager_t) :: links
      TYPE (gage_manager) :: gages
      TYPE (profile_manager) :: profiles
+     TYPE (scalar_manager) :: scalars
    CONTAINS
      PROCEDURE :: readbcs => network_read_bcs
      PROCEDURE :: read => network_read
@@ -53,6 +55,7 @@ MODULE network_module
      PROCEDURE :: forward => network_forward
      PROCEDURE :: backward => network_backward
      PROCEDURE :: flow => network_flow
+     PROCEDURE :: transport => network_transport
      PROCEDURE :: run => network_run
      PROCEDURE :: run_to => network_run_to_time
      PROCEDURE :: destroy => network_destroy
@@ -179,16 +182,18 @@ CONTAINS
        
     END SELECT
 
-
+    CALL this%scalars%initialize(this%config)
     CALL this%links%scan(this%config)
     CALL this%readbcs()
     CALL this%sections%read(this%config%section_file)
-    CALL this%links%read(this%config, this%bcs, this%sections)
+    CALL this%links%read(this%config, this%bcs, this%sections, this%scalars, this%met)
     CALL this%links%connect()
     IF (this%config%do_gageout) &
          &CALL this%gages%read(this%config%gage_file, this%links)
-    IF (this%config%do_profileout) &
-         &CALL this%profiles%read(this%config, this%links)
+    IF (this%config%do_profileout) THEN
+       this%profiles = profile_manager()
+       CALL this%profiles%read(this%config, this%links)
+    END IF
 
   END SUBROUTINE network_read
 
@@ -206,7 +211,7 @@ CONTAINS
     INTEGER, PARAMETER :: iunit = 25
     CHARACTER (LEN=1024) :: msg
 
-    ! FIXME: transport
+    ! FIXME: transport: arbitrary scalars
     ALLOCATE(c(2))
 
     ierr = 0
@@ -253,6 +258,8 @@ CONTAINS
        CALL error_message(msg, fatal=.TRUE.)
     END IF
 
+    DEALLOCATE(c)
+
   END SUBROUTINE network_set_initial
 
 
@@ -264,6 +271,8 @@ CONTAINS
     IMPLICIT NONE
     CLASS (network), INTENT(INOUT) :: this
     INTEGER, PARAMETER :: runit = 31
+    INTEGER :: iostat, nspecies, s
+    INTEGER (KIND=KIND(BC_ENUM)) :: stype(10) ! FIXME: fixed array length
     CHARACTER (LEN=1024) :: msg
 
     CALL open_existing(this%config%restart_load_file, runit, form='UNFORMATTED')
@@ -272,6 +281,29 @@ CONTAINS
     CALL status_message(msg)
 
     CALL this%links%read_restart(runit)
+
+    IF (this%config%do_transport) THEN
+       READ (runit, IOSTAT=iostat) nspecies
+       IF (IS_IOSTAT_END(iostat)) THEN
+          WRITE(msg, *) TRIM(this%config%restart_load_file), &
+               &": error: no transport state found, hoping for the best"
+          CALL error_message(msg)
+       ELSE
+          READ (runit, IOSTAT=iostat) (stype(s), s = 1, nspecies)
+          IF (iostat .NE. 0) THEN
+             WRITE(msg, *) TRIM(this%config%restart_load_file), &
+                  &": error: premature end of file in transport"
+             CALL error_message(msg, fatal=.TRUE.)
+          END IF
+          IF (nspecies .NE. this%scalars%nspecies) THEN
+             WRITE(msg, *) TRIM(this%config%restart_load_file), &
+                  &": error:  number of trannsported species do not match"
+             CALL error_message(msg, fatal=.TRUE.)
+          END IF
+          CALL this%links%read_trans_restart(runit, nspecies)
+       END IF
+    END IF
+
 
     WRITE (msg, *) 'done reading restart from ', TRIM(this%config%restart_load_file)
     CALL status_message(msg)
@@ -321,7 +353,9 @@ CONTAINS
     ELSE
        CALL this%set_initial()
     END IF
-    CALL this%links%hyupdate(this%config%grav, this%config%time%delta_t)
+    CALL this%links%hyupdate(this%config%grav, &
+         &this%config%unit_weight_h2o, &
+         &this%config%time%delta_t)
 
   END SUBROUTINE network_initialize
 
@@ -345,7 +379,8 @@ CONTAINS
     CLASS (network), INTENT(INOUT) :: this
 
     CALL this%links%backward(this%config%time%delta_t, &
-         &this%config%grav, this%config%dsbc_type)
+         &this%config%grav, this%config%unit_weight_h2o, &
+         &this%config%dsbc_type)
 
   END SUBROUTINE network_backward
 
@@ -360,6 +395,47 @@ CONTAINS
     CALL this%backward()
 
   END SUBROUTINE network_flow
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE network_transport
+  ! ----------------------------------------------------------------
+  SUBROUTINE network_transport(this)
+
+    IMPLICIT NONE
+    CLASS (network), INTENT(INOUT) :: this
+    INTEGER :: nsteps
+    DOUBLE PRECISION :: htime0, htime1
+    DOUBLE PRECISION :: tnow, tdeltat
+    INTEGER :: tsteps, i, ispec
+
+    htime0 = this%config%time%time
+    htime1 = htime0 + this%config%time%step
+
+    tnow = htime0
+    
+    IF (this%config%scalar_steps .GT. 0) THEN
+       tsteps = this%config%scalar_steps
+    ELSE
+       tsteps = this%links%transport_steps(this%config%time%step)
+       WRITE(*, '(" Using ", I5, " transport steps")') tsteps
+    END IF
+    tdeltat = this%config%time%delta_t
+    tdeltat = tdeltat/DBLE(tsteps)
+
+    DO i = 1, tsteps
+       CALL this%bcs%update(tnow)
+       CALL this%met%update(tnow)
+       CALL this%links%transport_interp(tnow, htime0, htime1)
+       DO ispec = 1, this%scalars%nspecies
+          CALL this%links%transport(ispec, tdeltat)
+       END DO
+       tnow = htime0 + i*this%config%time%step/DBLE(tsteps)
+    END DO
+    
+    
+
+  END SUBROUTINE network_transport
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE network_run_to_time
@@ -386,6 +462,10 @@ CONTAINS
           CALL this%flow()
        ENDIF
 
+       IF (this%config%do_transport) THEN
+          CALL this%transport()
+       END IF
+
        ! update time step here so correct
        ! time is placed in output
 
@@ -397,8 +477,10 @@ CONTAINS
        dooutput = (MOD(this%config%time%current_step, this%config%print_freq) == 0)
        
        IF (dooutput) THEN
-          IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
-          IF (this%config%do_profileout) CALL this%profiles%output(this%config%time%time)
+          IF (this%config%do_gageout) &
+               &CALL this%gages%output(this%config%time%time, this%scalars)
+          IF (this%config%do_profileout) &
+               &CALL this%profiles%output(this%config%time%time, this%scalars)
        END IF
           
        CALL decimal_to_date(this%config%time%time, date_string, time_string)
@@ -424,16 +506,20 @@ CONTAINS
     this%config%time%time = this%config%time%begin
 
     ! make sure initial conditions are in the output
-    IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
-    IF (this%config%do_profileout) CALL this%profiles%output(this%config%time%time)
+    IF (this%config%do_gageout) &
+         &CALL this%gages%output(this%config%time%time, this%scalars)
+    IF (this%config%do_profileout) &
+         &CALL this%profiles%output(this%config%time%time, this%scalars)
 
     CALL this%run_to(this%config%time%end)
 
     ! always write the last state, if not done already
     dooutput = (MOD(this%config%time%current_step, this%config%print_freq) == 0)
     IF (.NOT. dooutput) THEN
-       IF (this%config%do_gageout) CALL this%gages%output(this%config%time%time)
-       IF (this%config%do_profileout) CALL this%profiles%output(this%config%time%time)
+       IF (this%config%do_gageout) &
+            &CALL this%gages%output(this%config%time%time, this%scalars)
+       IF (this%config%do_profileout) &
+            &CALL this%profiles%output(this%config%time%time, this%scalars)
     END IF
 
     IF (this%config%do_restart) THEN

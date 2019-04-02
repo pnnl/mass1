@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2018-08-16 06:22:16 d3g096
+# Last Change: 2019-03-13 07:28:53 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -71,6 +71,7 @@ set_property(DIRECTORY
   output.out
   profile1.out
   status.out
+  error-warning.out
   plot.ps
   plot.eps
   plot-elev.ps

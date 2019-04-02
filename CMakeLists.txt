@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2019-02-04 11:46:56 d3g096
+# Last Change: 2019-03-15 08:30:53 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -30,7 +30,7 @@ list (APPEND CMAKE_MODULE_PATH "${MASS1_SOURCE_DIR}/cmake")
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
   # trap floating point exceptions and use preprocessor
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wall -ffpe-trap=invalid,zero,overflow -cpp")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wall -ffpe-trap=invalid,zero,overflow -cpp -fbacktrace")
 elseif (CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
   # w/ Intel, build static binaries that trap floating point exceptions
   # and turn on the preprocessor for all files
@@ -205,6 +205,7 @@ add_library(mass1lib
   coeff.f90
   cross_section.f90
   dlist_module.f90
+  flow_coeff.f90
   fluvial_link_module.f90
   gage_module.f90
   linear_link_module.f90
@@ -219,16 +220,24 @@ add_library(mass1lib
   hydrologic_link.f90
   point_module.f90
   profile_module.f90
+  scalar_module.f90
   section_handler.f90
+  transport_link_module.f90
+  transport_module.f90
   linear_interp.f90
   svgrp.f90
+  tdg_equation_coeff.f90
   mass1_dhsvm_module.f90
   mass1_dhsvm_api.f90
-)
+  )
+add_dependencies(mass1lib gastemp ts)
 add_executable(mass1_new
   mass1_new.f90
-)
+  )
+add_dependencies(mass1_new mass1lib)
 target_link_libraries(mass1_new mass1lib gastemp ts)
+install(TARGETS mass1_new DESTINATION bin)
+
 # save for running tests
 set(mass1newexe $<TARGET_FILE:mass1_new>)
 

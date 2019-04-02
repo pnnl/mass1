@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2018-08-21 15:02:06 d3g096
+! Last Change: 2019-04-02 10:27:42 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -22,6 +22,8 @@ MODULE link_module
   USE mass1_config
   USE section_handler_module
   USE point_module
+  USE scalar_module
+  USE transport_module
 
   IMPLICIT NONE
 
@@ -80,6 +82,7 @@ MODULE link_module
     INTEGER :: nup, dsid
     INTEGER :: bcid, dsbcid, gbcid, tbcid, mzone, lbcid, lgbcid, ltbcid
     DOUBLE PRECISION :: lpiexp
+    DOUBLE PRECISION :: gravity
   CONTAINS 
     PROCEDURE :: defaults => link_input_defaults
   END type link_input_data
@@ -93,6 +96,7 @@ MODULE link_module
      INTEGER :: dsid, usbcid, dsbcid
      CLASS (bc_t), POINTER :: usbc, dsbc, latbc
      CLASS (confluence_t), POINTER :: ucon, dcon
+     TYPE (link_scalar), DIMENSION(:), POINTER :: species
    CONTAINS
 
      PROCEDURE :: construct => link_construct
@@ -118,6 +122,8 @@ MODULE link_module
      PROCEDURE (set_initial_proc), DEFERRED :: set_initial
      PROCEDURE (read_restart_proc), DEFERRED :: read_restart
      PROCEDURE (write_restart_proc), DEFERRED :: write_restart
+     PROCEDURE (read_trans_restart_proc), DEFERRED :: read_trans_restart
+     PROCEDURE (write_trans_restart_proc), DEFERRED :: write_trans_restart
 
      ! hydrodynamics are computed with two sweeps
 
@@ -129,7 +135,8 @@ MODULE link_module
 
      PROCEDURE (max_tnumber_proc), DEFERRED :: max_courant
      PROCEDURE (max_tnumber_proc), DEFERRED :: max_diffuse
-     ! PROCEDURE (trans_interp_proc, DEFERRED :: trans_interp
+     PROCEDURE (trans_interp_proc), DEFERRED :: trans_interp
+     PROCEDURE (transport_proc), DEFERRED :: transport
 
      ! get a point on a link (if any)
 
@@ -142,13 +149,15 @@ MODULE link_module
   END type link_t
 
   ABSTRACT INTERFACE
-     FUNCTION init_proc(this, ldata, bcman) RESULT(ierr)
-       IMPORT :: link_t, link_input_data, bc_manager_t
+     FUNCTION init_proc(this, ldata, bcman, sclrman, metman) RESULT(ierr)
+       IMPORT :: link_t, link_input_data, bc_manager_t, scalar_manager, met_zone_manager_t
        IMPLICIT NONE
        INTEGER :: ierr
        CLASS (link_t), INTENT(INOUT) :: this
        CLASS (link_input_data), INTENT(IN) :: ldata
        CLASS (bc_manager_t), INTENT(IN) :: bcman
+       CLASS (scalar_manager), INTENT(IN) :: sclrman
+       CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
      END FUNCTION init_proc
 
      FUNCTION readpts_proc(this, theconfig, sectman, punit, lineno) RESULT (ierr)
@@ -197,6 +206,20 @@ MODULE link_module
        INTEGER, INTENT(IN) :: iunit
      END SUBROUTINE write_restart_proc
 
+     SUBROUTINE read_trans_restart_proc(this, iunit, nspecies)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(INOUT) :: this
+       INTEGER, INTENT(IN) :: iunit, nspecies
+     END SUBROUTINE read_trans_restart_proc
+
+     SUBROUTINE write_trans_restart_proc(this, iunit, nspecies)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(IN) :: this
+       INTEGER, INTENT(IN) :: iunit, nspecies
+     END SUBROUTINE write_trans_restart_proc
+
      SUBROUTINE fsweep_proc(this, deltat)
        IMPORT :: link_t
        IMPLICIT NONE
@@ -211,11 +234,11 @@ MODULE link_module
        INTEGER, INTENT(IN) :: dsbc_type
      END SUBROUTINE bsweep_proc
 
-     SUBROUTINE hupdate_proc(this, grav, dt)
+     SUBROUTINE hupdate_proc(this, grav, unitwt, dt)
        IMPORT :: link_t
        IMPLICIT NONE
        CLASS (link_t), INTENT(INOUT) :: this
-       DOUBLE PRECISION, INTENT(IN) :: grav, dt
+       DOUBLE PRECISION, INTENT(IN) :: grav, unitwt, dt
      END SUBROUTINE hupdate_proc
 
      DOUBLE PRECISION FUNCTION max_tnumber_proc(this, dt)
@@ -224,6 +247,21 @@ MODULE link_module
        CLASS (link_t), INTENT(IN) :: this
        DOUBLE PRECISION, INTENT(IN) :: dt
      END FUNCTION max_tnumber_proc
+
+     SUBROUTINE trans_interp_proc(this, tnow, htime0, htime1)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(INOUT) :: this
+       DOUBLE PRECISION, INTENT(IN) :: tnow, htime0, htime1
+     END SUBROUTINE trans_interp_proc
+
+     SUBROUTINE transport_proc(this, ispec, tdeltat)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(INOUT) :: this
+       INTEGER, INTENT(IN) :: ispec
+       DOUBLE PRECISION, INTENT(IN) :: tdeltat
+     END SUBROUTINE transport_proc
 
      SUBROUTINE destroy_proc(this)
        IMPORT :: link_t
@@ -299,13 +337,14 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION link_initialize(this, ldata, bcman) RESULT(ierr)
+  FUNCTION link_initialize(this, ldata, bcman, sclrman) RESULT(ierr)
 
     IMPLICIT NONE
     INTEGER :: ierr
     CLASS (link_t), INTENT(INOUT) :: this
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
     CHARACTER (LEN=1024) :: msg
 
 
@@ -569,7 +608,7 @@ CONTAINS
     CLASS (confluence_t), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: ispecies
     CLASS (link_t), POINTER :: link
-    DOUBLE PRECISION :: qin, qout, cavg
+    DOUBLE PRECISION :: qin, qout, cavg, c
     INTEGER :: n
     
     qin = 0.0
@@ -580,25 +619,32 @@ CONTAINS
     CALL this%ulink%begin()
     link => this%ulink%current()
     DO WHILE (ASSOCIATED(link))
-       cavg = cavg + link%c_down(ispecies)
+       c = link%c_down(ispecies)
+
+       cavg = cavg + c
+       n = n + 1
+
        IF (link%q_down() .GE. 0.0) THEN
           qin = qin + link%q_down()
-          uconc = link%q_down()*link%c_down(ispecies)
+          uconc = uconc + link%q_down()*c
        ELSE 
-          qout = qout + link%q_down()
+          qout = qout - link%q_down()
        END IF
 
        CALL this%ulink%next()
        link => this%ulink%current()
 
-       n = n + 1
     END DO
     
     link => this%dlink%p
-    cavg = cavg +  link%c_up(ispecies)
+    c = link%c_up(ispecies)
+
+    cavg = cavg +  c
+    n = n + 1
+    
     IF (link%q_up() .LT. 0.0) THEN
-       qin = qin + link%q_up()
-       uconc = link%q_up()*link%c_up(ispecies)
+       qin = qin - link%q_up()
+       uconc = uconc + link%q_up()*c
     ELSE 
        qout = qout + link%q_up()
     END IF
@@ -606,7 +652,7 @@ CONTAINS
     IF (qout .GT. 0.0) THEN
        uconc = uconc/qout
     ELSE 
-       uconc = cavg/REAL(n+1)
+       uconc = cavg/REAL(n)
     END IF
   END FUNCTION confluence_conc
 

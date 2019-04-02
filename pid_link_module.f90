@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January 30, 2018 by William A. Perkins
-! Last Change: 2018-08-07 09:02:08 d3g096
+! Last Change: 2019-03-14 11:50:34 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE pid_link_module
@@ -19,6 +19,7 @@ MODULE pid_link_module
   USE utility
   USE point_module
   USE link_module
+  USE scalar_module
   USE linear_link_module
   USE flow_coeff
   USE bc_module
@@ -111,7 +112,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION pid_link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION pid_link_initialize(this, ldata, bcman) RESULT(ierr)
+  FUNCTION pid_link_initialize(this, ldata, bcman, sclrman, metman) RESULT(ierr)
 
     IMPLICIT NONE
 
@@ -119,6 +120,8 @@ CONTAINS
     CLASS (pid_link), INTENT(INOUT) :: this
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
+    CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
 
     CHARACTER (LEN=1024) :: msg
 
@@ -128,7 +131,7 @@ CONTAINS
     NULLIFY(this%lagged)
     this%lagready = .FALSE.
 
-    ierr = this%linear_link_t%initialize(ldata, bcman)
+    ierr = this%linear_link_t%initialize(ldata, bcman, sclrman, metman)
 
     IF (.NOT. ASSOCIATED(this%usbc)) THEN 
        WRITE(msg, *) 'link ', this%id, &
@@ -141,7 +144,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION pid_flow_link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION pid_flow_link_initialize(this, ldata, bcman) RESULT(ierr)
+  FUNCTION pid_flow_link_initialize(this, ldata, bcman, sclrman, metman) RESULT(ierr)
 
     IMPLICIT NONE
 
@@ -149,8 +152,10 @@ CONTAINS
     CLASS (pid_flow_link), INTENT(INOUT) :: this
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
-   
-    ierr = this%pid_link%initialize(ldata, bcman)
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
+    CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
+
+    ierr = this%pid_link%initialize(ldata, bcman, sclrman, metman)
     this%followflow = .TRUE.
 
   END FUNCTION pid_flow_link_initialize
@@ -298,18 +303,18 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE pid_link_hupdate
   ! ----------------------------------------------------------------
-  SUBROUTINE pid_link_hupdate(this, grav, dt)
+  SUBROUTINE pid_link_hupdate(this, grav, unitwt, dt)
 
     IMPLICIT NONE
     CLASS (pid_link), INTENT(INOUT) ::this
-    DOUBLE PRECISION, INTENT(IN) :: grav, dt
+    DOUBLE PRECISION, INTENT(IN) :: grav, unitwt, dt
 
     INTEGER :: i, j
     CLASS (point_t), POINTER :: pt
 
     IF (.NOT. this%lagready) CALL this%lag_initialize()
 
-    CALL this%linear_link_t%hydro_update(grav, dt)
+    CALL this%linear_link_t%hydro_update(grav, unitwt, dt)
 
     DO i = 1, this%numflows
 

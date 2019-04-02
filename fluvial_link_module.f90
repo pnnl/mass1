@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2018-08-21 12:29:08 d3g096
+! Last Change: 2019-04-01 11:18:49 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -17,7 +17,8 @@ MODULE fluvial_link_module
   USE bc_module
   USE point_module
   USE link_module
-  USE linear_link_module
+  USE transport_link_module
+  USE scalar_module
   USE utility
   USE flow_coeff
 
@@ -25,9 +26,10 @@ MODULE fluvial_link_module
 
   PRIVATE
 
-  TYPE, PUBLIC, EXTENDS(linear_link_t) :: fluvial_link
+  TYPE, PUBLIC, EXTENDS(transport_link_t) :: fluvial_link
      DOUBLE PRECISION :: latq, latqold
      DOUBLE PRECISION :: lpiexp
+     DOUBLE PRECISION :: gravity
    CONTAINS
      PROCEDURE :: construct => fluvial_link_construct
      PROCEDURE :: initialize => fluvial_link_initialize
@@ -53,8 +55,7 @@ CONTAINS
     IMPLICIT NONE
     CLASS (fluvial_link), INTENT(INOUT) :: this
 
-    CALL this%linear_link_t%construct()
-    NULLIFY(this%latbc)
+    CALL this%transport_link_t%construct()
     this%latq = 0.0
     this%latqold = 0.0
     this%lpiexp = 0.0
@@ -65,18 +66,21 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION fluvial_link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION fluvial_link_initialize(this, ldata, bcman) RESULT(ierr)
+  FUNCTION fluvial_link_initialize(this, ldata, bcman, sclrman, metman) RESULT(ierr)
 
     IMPLICIT NONE
     INTEGER :: ierr
     CLASS (fluvial_link), INTENT(INOUT) :: this
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
+    CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
     CHARACTER (LEN=1024) :: msg
 
-    ierr = this%linear_link_t%initialize(ldata, bcman)
+    ierr = this%transport_link_t%initialize(ldata, bcman, sclrman, metman)
 
     this%lpiexp = ldata%lpiexp
+    this%gravity = ldata%gravity
     IF (ldata%lbcid .GT. 0) THEN
        this%latbc => bcman%find(LATFLOW_BC_TYPE, ldata%lbcid)
        IF (.NOT. ASSOCIATED(this%latbc)) THEN
@@ -111,7 +115,7 @@ CONTAINS
     ! FIXME: These need to come from the configuration:
     DOUBLE PRECISION :: gr
 
-    gr = 32.2
+    gr = this%gravity
 
     CALL pt1%assign(y1, d1, q1, a1, b1, k1, ky1, fr1)
     CALL pt2%assign(y2, d2, q2, a2, b2, k2, ky2, fr2)
@@ -142,16 +146,21 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE fluvial_link_hupdate
   ! ----------------------------------------------------------------
-  SUBROUTINE fluvial_link_hupdate(this, grav, dt)
+  SUBROUTINE fluvial_link_hupdate(this, grav, unitwt, dt)
     IMPLICIT NONE
     CLASS (fluvial_link), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: grav, dt
+    DOUBLE PRECISION, INTENT(IN) :: grav, unitwt, dt
 
-    CALL this%linear_link_t%hydro_update(grav, dt)
+    INTEGER :: i
+
+    CALL this%transport_link_t%hydro_update(grav, unitwt, dt)
 
     IF (ASSOCIATED(this%latbc)) THEN
        this%latqold = this%latq
        this%latq = this%latbc%current_value
+       DO i = 1, this%npoints
+          this%pt(i)%hnow%lateral_inflow = this%latq
+       END DO
     END IF
 
   END SUBROUTINE fluvial_link_hupdate
@@ -160,13 +169,16 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION fluvial_hydro_link_initialize
   ! ----------------------------------------------------------------
-  FUNCTION fluvial_hydro_link_initialize(this, ldata, bcman) RESULT(ierr)
+  FUNCTION fluvial_hydro_link_initialize(this, ldata, bcman, sclrman, metman) RESULT(ierr)
 
     IMPLICIT NONE
     INTEGER :: ierr
     CLASS (fluvial_hydro_link), INTENT(INOUT) :: this
     CLASS (link_input_data), INTENT(IN) :: ldata
     CLASS (bc_manager_t), INTENT(IN) :: bcman
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
+    CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
+
     CHARACTER (LEN=1024) :: msg
 
     ierr = 0
@@ -184,7 +196,7 @@ CONTAINS
        ierr = ierr + 1
     END IF
 
-    ierr = ierr + this%fluvial_link%initialize(ldata, bcman)
+    ierr = ierr + this%fluvial_link%initialize(ldata, bcman, sclrman, metman)
   END FUNCTION fluvial_hydro_link_initialize
 
   
