@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2019-04-01 10:33:59 d3g096
+! Last Change: 2019-04-01 12:36:17 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -606,7 +606,7 @@ CONTAINS
     CLASS (confluence_t), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: ispecies
     CLASS (link_t), POINTER :: link
-    DOUBLE PRECISION :: qin, qout, cavg
+    DOUBLE PRECISION :: qin, qout, cavg, c
     INTEGER :: n
     
     qin = 0.0
@@ -617,10 +617,14 @@ CONTAINS
     CALL this%ulink%begin()
     link => this%ulink%current()
     DO WHILE (ASSOCIATED(link))
-       cavg = cavg + link%c_down(ispecies)
+       c = link%c_down(ispecies)
+
+       cavg = cavg + c
+       n = n + 1
+
        IF (link%q_down() .GE. 0.0) THEN
           qin = qin + link%q_down()
-          uconc = link%q_down()*link%c_down(ispecies)
+          uconc = uconc + link%q_down()*c
        ELSE 
           qout = qout - link%q_down()
        END IF
@@ -628,14 +632,17 @@ CONTAINS
        CALL this%ulink%next()
        link => this%ulink%current()
 
-       n = n + 1
     END DO
     
     link => this%dlink%p
-    cavg = cavg +  link%c_up(ispecies)
+    c = link%c_up(ispecies)
+
+    cavg = cavg +  c
+    n = n + 1
+    
     IF (link%q_up() .LT. 0.0) THEN
        qin = qin - link%q_up()
-       uconc = link%q_up()*link%c_up(ispecies)
+       uconc = uconc + link%q_up()*c
     ELSE 
        qout = qout + link%q_up()
     END IF
@@ -643,7 +650,7 @@ CONTAINS
     IF (qout .GT. 0.0) THEN
        uconc = uconc/qout
     ELSE 
-       uconc = cavg/REAL(n+1)
+       uconc = cavg/REAL(n)
     END IF
   END FUNCTION confluence_conc
 
