@@ -11,6 +11,7 @@ MODULE mass1_dhsvm_module
   USE network_module
   USE link_module
   USE bc_module
+  USE met_zone
 
   IMPLICIT NONE
 
@@ -110,7 +111,9 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     CLASS (simple_bc_t), POINTER :: latbc
     CLASS (bc_t), POINTER :: stupid
+    TYPE (met_zone_t), POINTER :: zone
     DOUBLE PRECISION, PARAMETER :: zero(5) = 0.0, tempin(5) = 12.0
+    DOUBLE PRECISION :: coeff(4)
     INTEGER :: tidx
 
     CALL dnet%net%read(cfgdir)
@@ -171,6 +174,21 @@ CONTAINS
             stupid => latbc
             CALL bcs%push(TEMP_BC_TYPE, stupid)
             link%species(tidx)%latbc => latbc
+
+            IF (dnet%net%scalars%species(tidx)%p%needmet) THEN
+               coeff(1) = 0.46 ! wind function multiplier
+               coeff(2) = 9.2  ! wind function offset
+               coeff(3) = 0.47 ! conduction coefficient
+               coeff(4) = 0.65 ! "brunt" coefficient for lw atm radiation
+               
+               ALLOCATE(zone)
+               zone%id = link%id
+               zone%coeff = coeff
+               zone%met%ts%limit_mode = TS_LIMIT_FLAT
+
+               CALL dnet%net%met%zonelist%push(zone)
+               link%species(tidx)%met => zone
+            END IF
          END IF
          CALL links%next();
          link =>links%current();
