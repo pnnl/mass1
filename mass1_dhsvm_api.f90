@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  4, 2019 by William A. Perkins
-! Last Change: 2019-02-15 14:29:30 d3g096
+! Last Change: 2019-04-08 13:06:00 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -122,6 +122,95 @@ SUBROUTINE mass1_update_latq(cnet, linkid, latq, ddate) BIND(c)
 END SUBROUTINE mass1_update_latq
 
 ! ----------------------------------------------------------------
+! SUBROUTINE mass1_update_latt
+! ----------------------------------------------------------------
+SUBROUTINE mass1_update_latt(cnet, linkid, latt, ddate) BIND(c)
+  USE, INTRINSIC :: iso_c_binding
+  USE mass1_dhsvm_module
+  IMPLICIT NONE
+  TYPE (C_PTR), VALUE :: cnet
+  INTEGER(KIND=C_INT), VALUE :: linkid
+  REAL(KIND=C_FLOAT), VALUE :: latt 
+  TYPE (DHSVM_date) :: ddate
+
+  DOUBLE PRECISION :: lt(1), time
+  TYPE (DHSVM_network), POINTER :: dnet
+  CLASS (link_t), POINTER :: link
+  TYPE (time_series_rec), POINTER :: ts
+  INTEGER :: tidx
+  CHARACTER (LEN=1024) :: msg
+
+  CALL C_F_POINTER(cnet, dnet)
+
+  tidx = dnet%net%scalars%temp_index
+  link => dnet%link_lookup(linkid)%p
+
+  IF (tidx .GT. 0) THEN
+     time = dhsvm_to_decimal(ddate)
+     lt = latt
+     ts => link%species(tidx)%latbc%table()
+     CALL time_series_push(ts, time, lt)
+  ELSE 
+     WRITE(msg, *) 'mass1_update_latt: link ', link%id,&
+          &': ', ' temperature index not set'
+     CALL error_message(msg)
+  END IF
+
+
+END SUBROUTINE mass1_update_latt
+
+
+! ----------------------------------------------------------------
+! SUBROUTINE mass1_update_met
+! ----------------------------------------------------------------
+SUBROUTINE mass1_update_met(cnet, linkid, &
+     &airtemp, dewtemp, windsp, swrad, ddate) BIND(c)
+  USE, INTRINSIC :: iso_c_binding
+  USE mass1_dhsvm_module
+  IMPLICIT NONE
+  TYPE (C_PTR), VALUE :: cnet
+  INTEGER(KIND=C_INT), VALUE :: linkid
+  REAL(KIND=C_FLOAT), VALUE :: airtemp, dewtemp, windsp, swrad
+  TYPE (DHSVM_date) :: ddate
+
+  DOUBLE PRECISION :: time
+  TYPE (DHSVM_network), POINTER :: dnet
+  CLASS (link_t), POINTER :: link
+  TYPE (time_series_rec), POINTER :: ts
+  INTEGER :: tidx
+  DOUBLE PRECISION :: metvalues(5)
+  CHARACTER (LEN=1024) :: msg
+
+  CALL C_F_POINTER(cnet, dnet)
+
+  tidx = dnet%net%scalars%temp_index
+  link => dnet%link_lookup(linkid)%p
+
+  IF (tidx .GT. 0) THEN
+     IF (ASSOCIATED(link%species(tidx)%met)) THEN
+        time = dhsvm_to_decimal(ddate)
+        metvalues(1) = airtemp
+        metvalues(2) = dewtemp
+        metvalues(3) = windsp
+        metvalues(4) = 760.0
+        metvalues(5) = swrad
+        ts => link%species(tidx)%met%met%ts
+        CALL time_series_push(ts, time, metvalues)
+     ELSE
+        WRITE(msg, *) 'mass1_update_met: link ', link%id,&
+          &': ', ' met zone not set'
+        CALL error_message(msg)
+     END IF
+  ELSE 
+     WRITE(msg, *) 'mass1_update_met: link ', link%id,&
+          &': ', ' temperature index not set'
+     CALL error_message(msg)
+  END IF
+  
+
+END SUBROUTINE mass1_update_met
+
+! ----------------------------------------------------------------
 !  FUNCTION mass1_link_outflow
 ! ----------------------------------------------------------------
 FUNCTION mass1_link_outflow(cnet, linkid) RESULT (q) BIND(c)
@@ -166,6 +255,38 @@ FUNCTION mass1_link_inflow(cnet, linkid) RESULT (q) BIND(c)
 
 END FUNCTION mass1_link_inflow
 
+! ----------------------------------------------------------------
+!  FUNCTION mass1_link_temp
+! ----------------------------------------------------------------
+FUNCTION mass1_link_temp(cnet, linkid) RESULT (t) BIND(c)
+
+  USE, INTRINSIC :: iso_c_binding
+  USE mass1_dhsvm_module
+
+  IMPLICIT NONE
+  REAL(KIND=C_DOUBLE) :: t
+  TYPE (C_PTR), VALUE :: cnet
+  INTEGER(KIND=C_INT), VALUE :: linkid
+  TYPE (DHSVM_network), POINTER :: dnet
+  CLASS (link_t), POINTER :: link
+  INTEGER :: tidx
+  CHARACTER (LEN=1024) :: msg
+
+  CALL C_F_POINTER(cnet, dnet)
+
+  link => dnet%link_lookup(linkid)%p
+  tidx = dnet%net%scalars%temp_index
+
+  t = 0.0
+  IF (tidx .GT. 0) THEN
+     t = link%c_down(tidx)
+  ELSE 
+     WRITE(msg, *) 'mass1_link_temp: link ', link%id,&
+          &': ', ' temperature index not set'
+     CALL error_message(msg)
+  END IF
+
+END FUNCTION mass1_link_temp
 
 ! ----------------------------------------------------------------
 ! SUBROUTINE mass1_write_hotstart
