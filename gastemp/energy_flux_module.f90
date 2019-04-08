@@ -8,7 +8,7 @@
 ! distribution.
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
-! Last Change: 2017-06-22 09:17:09 d3g096
+! Last Change: 2019-04-08 13:32:37 d3g096
 ! ----------------------------------------------------------------
 
 MODULE energy_flux
@@ -191,6 +191,27 @@ CONTAINS
   !
   !vapor_press = rel_humid(t_air,t_dew)*sat_vapor_press(t_air)
   !END FUNCTION vapor_press
+
+  ! ----------------------------------------------------------------
+  ! DOUBLE PRECISION FUNCTION dew_point
+  !
+  ! Computes dew point (C) from atmospheric temperature (C) and
+  ! relative humidity (as a fraction).  Equation 2-7 in Hydrology for
+  ! Engineers.
+  ! ----------------------------------------------------------------
+  DOUBLE PRECISION FUNCTION dew_point(t_air, relh) 
+
+    IMPLICIT NONE
+    DOUBLE PRECISION, INTENT(IN) :: t_air, relh
+
+    DOUBLE PRECISION :: T, X
+
+    X = 1.00 - relh
+    T  = (14.55 + 0.114*t_air)*X + ((2.5 + 0.007*t_air)*X)**3 &
+         & + (15.9 + 0.117*t_air)*14
+
+    dew_point  = t_air - T
+  END FUNCTION dew_point
 
 
 
