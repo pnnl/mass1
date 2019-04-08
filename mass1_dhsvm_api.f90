@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  4, 2019 by William A. Perkins
-! Last Change: 2019-04-08 13:06:00 d3g096
+! Last Change: 2019-04-08 13:44:20 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -164,13 +164,14 @@ END SUBROUTINE mass1_update_latt
 ! SUBROUTINE mass1_update_met
 ! ----------------------------------------------------------------
 SUBROUTINE mass1_update_met(cnet, linkid, &
-     &airtemp, dewtemp, windsp, swrad, ddate) BIND(c)
+     &airtemp, rh, windsp, swrad, ddate) BIND(c)
   USE, INTRINSIC :: iso_c_binding
+  USE energy_flux
   USE mass1_dhsvm_module
   IMPLICIT NONE
   TYPE (C_PTR), VALUE :: cnet
   INTEGER(KIND=C_INT), VALUE :: linkid
-  REAL(KIND=C_FLOAT), VALUE :: airtemp, dewtemp, windsp, swrad
+  REAL(KIND=C_FLOAT), VALUE :: airtemp, rh, windsp, swrad
   TYPE (DHSVM_date) :: ddate
 
   DOUBLE PRECISION :: time
@@ -178,7 +179,7 @@ SUBROUTINE mass1_update_met(cnet, linkid, &
   CLASS (link_t), POINTER :: link
   TYPE (time_series_rec), POINTER :: ts
   INTEGER :: tidx
-  DOUBLE PRECISION :: metvalues(5)
+  DOUBLE PRECISION :: metvalues(5), dewtemp
   CHARACTER (LEN=1024) :: msg
 
   CALL C_F_POINTER(cnet, dnet)
@@ -189,6 +190,7 @@ SUBROUTINE mass1_update_met(cnet, linkid, &
   IF (tidx .GT. 0) THEN
      IF (ASSOCIATED(link%species(tidx)%met)) THEN
         time = dhsvm_to_decimal(ddate)
+        dewtemp = dew_point(airtemp, rh)
         metvalues(1) = airtemp
         metvalues(2) = dewtemp
         metvalues(3) = windsp
