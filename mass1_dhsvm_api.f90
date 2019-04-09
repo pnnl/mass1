@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  4, 2019 by William A. Perkins
-! Last Change: 2019-04-08 13:44:20 d3g096
+! Last Change: 2019-04-08 14:47:40 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -63,6 +63,50 @@ FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, pid, dotemp) RESULT(net) B
   net = C_LOC(f_net)
 
 END FUNCTION mass1_create
+
+! ----------------------------------------------------------------
+! SUBROUTINE mass1_update_met_coeff
+! ----------------------------------------------------------------
+SUBROUTINE mass1_update_met_coeff(cnet, linkid, a, b, c, brunt) BIND(c)
+
+  USE, INTRINSIC :: iso_c_binding
+  USE mass1_dhsvm_module
+
+  IMPLICIT NONE
+  TYPE (C_PTR), VALUE :: cnet
+  INTEGER(KIND=C_INT), VALUE :: linkid
+  REAL(KIND=C_FLOAT), VALUE :: a, b, c, brunt
+  DOUBLE PRECISION :: coeff(4)
+  TYPE (DHSVM_network), POINTER :: dnet
+  CLASS (link_t), POINTER :: link
+  INTEGER :: tidx
+  CHARACTER (LEN=1024) :: msg
+
+  CALL C_F_POINTER(cnet, dnet)
+
+  tidx = dnet%net%scalars%temp_index
+  link => dnet%link_lookup(linkid)%p
+
+  IF (tidx .GT. 0) THEN
+     IF (ASSOCIATED(link%species(tidx)%met)) THEN
+        coeff(1) = a        ! wind function multiplier
+        coeff(2) = b        ! wind function offset
+        coeff(3) = c        ! conduction coefficient
+        coeff(4) = brunt    ! "brunt" coefficient for lw atm radiation
+        link%species(tidx)%met%coeff = coeff
+     ELSE
+        WRITE(msg, *) 'mass1_update_met_coeff: link ', link%id,&
+          &': ', ' met zone not set'
+        CALL error_message(msg)
+     END IF
+  ELSE 
+     WRITE(msg, *) 'mass1_update_met_coeff: link ', link%id,&
+          &': ', ' temperature index not set'
+     CALL error_message(msg)
+  END IF
+
+END SUBROUTINE mass1_update_met_coeff
+
 
 ! ----------------------------------------------------------------
 ! SUBROUTINE mass1_route
@@ -179,7 +223,7 @@ SUBROUTINE mass1_update_met(cnet, linkid, &
   CLASS (link_t), POINTER :: link
   TYPE (time_series_rec), POINTER :: ts
   INTEGER :: tidx
-  DOUBLE PRECISION :: metvalues(5), dewtemp
+  DOUBLE PRECISION :: metvalues(5), dewtemp, rh8
   CHARACTER (LEN=1024) :: msg
 
   CALL C_F_POINTER(cnet, dnet)
@@ -190,8 +234,9 @@ SUBROUTINE mass1_update_met(cnet, linkid, &
   IF (tidx .GT. 0) THEN
      IF (ASSOCIATED(link%species(tidx)%met)) THEN
         time = dhsvm_to_decimal(ddate)
-        dewtemp = dew_point(airtemp, rh)
         metvalues(1) = airtemp
+        rh8 = rh
+        dewtemp = dew_point(metvalues(1), rh8)
         metvalues(2) = dewtemp
         metvalues(3) = windsp
         metvalues(4) = 760.0
