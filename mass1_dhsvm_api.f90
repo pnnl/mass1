@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  4, 2019 by William A. Perkins
-! Last Change: 2019-04-08 14:47:40 d3g096
+! Last Change: 2019-04-10 09:15:04 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -303,9 +303,42 @@ FUNCTION mass1_link_inflow(cnet, linkid) RESULT (q) BIND(c)
 END FUNCTION mass1_link_inflow
 
 ! ----------------------------------------------------------------
-!  FUNCTION mass1_link_temp
+!  FUNCTION mass1_link_inflow_temp
 ! ----------------------------------------------------------------
-FUNCTION mass1_link_temp(cnet, linkid) RESULT (t) BIND(c)
+FUNCTION mass1_link_inflow_temp(cnet, linkid) RESULT (t) BIND(c)
+
+  USE, INTRINSIC :: iso_c_binding
+  USE mass1_dhsvm_module
+
+  IMPLICIT NONE
+  REAL(KIND=C_DOUBLE) :: t
+  TYPE (C_PTR), VALUE :: cnet
+  INTEGER(KIND=C_INT), VALUE :: linkid
+  TYPE (DHSVM_network), POINTER :: dnet
+  CLASS (link_t), POINTER :: link
+  INTEGER :: tidx
+  CHARACTER (LEN=1024) :: msg
+
+  CALL C_F_POINTER(cnet, dnet)
+
+  link => dnet%link_lookup(linkid)%p
+  tidx = dnet%net%scalars%temp_index
+
+  t = 0.0
+  IF (tidx .GT. 0) THEN
+     t = link%c_up(tidx)
+  ELSE 
+     WRITE(msg, *) 'mass1_link_temp: link ', link%id,&
+          &': ', ' temperature index not set'
+     CALL error_message(msg)
+  END IF
+
+END FUNCTION mass1_link_inflow_temp
+
+! ----------------------------------------------------------------
+!  FUNCTION mass1_link_outflow_temp
+! ----------------------------------------------------------------
+FUNCTION mass1_link_outflow_temp(cnet, linkid) RESULT (t) BIND(c)
 
   USE, INTRINSIC :: iso_c_binding
   USE mass1_dhsvm_module
@@ -333,7 +366,7 @@ FUNCTION mass1_link_temp(cnet, linkid) RESULT (t) BIND(c)
      CALL error_message(msg)
   END IF
 
-END FUNCTION mass1_link_temp
+END FUNCTION mass1_link_outflow_temp
 
 ! ----------------------------------------------------------------
 ! SUBROUTINE mass1_write_hotstart
