@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2019-03-15 07:00:13 d3g096
+# Last Change: 2019-04-10 11:51:17 d3g096
 # -------------------------------------------------------------
 
 
@@ -36,4 +36,5 @@ add_subdirectory(flow/normal-metric)
 add_subdirectory(flow/normal)
 
 add_subdirectory(transport/advection-1-segment)
+add_subdirectory(transport/hlink-advection-1-segment)
 add_subdirectory(temperature/pond)

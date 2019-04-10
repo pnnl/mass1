@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2019-04-01 11:18:49 d3g096
+! Last Change: 2019-04-10 13:12:45 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -153,8 +153,6 @@ CONTAINS
 
     INTEGER :: i
 
-    CALL this%transport_link_t%hydro_update(grav, unitwt, dt)
-
     IF (ASSOCIATED(this%latbc)) THEN
        this%latqold = this%latq
        this%latq = this%latbc%current_value
@@ -162,6 +160,8 @@ CONTAINS
           this%pt(i)%hnow%lateral_inflow = this%latq
        END DO
     END IF
+
+    CALL this%transport_link_t%hydro_update(grav, unitwt, dt)
 
   END SUBROUTINE fluvial_link_hupdate
 
