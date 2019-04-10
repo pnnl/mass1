@@ -207,7 +207,7 @@ CONTAINS
     END IF
 
     this%inflow = invol
-    latvol = this%latq
+    latvol = this%latq*this%L
 
     ! use the downstream section to compute conveyance
     
@@ -286,6 +286,17 @@ CONTAINS
     CLASS (hydrologic_link), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: grav, unitwt, dt
     DOUBLE PRECISION :: q
+    INTEGER :: i
+
+    IF (ASSOCIATED(this%latbc)) THEN
+       q = this%latq
+       this%latq_old = q
+       q = this%latbc%current_value
+       this%latq = q
+       DO i = 1, this%npoints
+          this%pt(i)%hnow%lateral_inflow = this%latq
+       END DO
+    END IF
 
     CALL this%transport_link_t%hydro_update(grav, unitwt, dt)
 
@@ -293,12 +304,6 @@ CONTAINS
     this%inflow_old = this%inflow
     this%outflow_old = this%outflow
 
-    IF (ASSOCIATED(this%latbc)) THEN
-       q = this%latq
-       this%latq_old = q
-       q = this%latbc%current_value*this%L
-       this%latq = q
-    END IF
 
 
 
