@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February 18, 2019 by William A. Perkins
-  ! Last Change: 2019-04-01 12:29:02 d3g096
+  ! Last Change: 2019-04-11 07:47:52 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE transport_link_module
@@ -202,21 +202,41 @@ CONTAINS
 
     INTEGER :: i
 
-    DOUBLE PRECISION :: c, latc
+    DOUBLE PRECISION :: c, latc, cin, cout, avg_area, avg_latq
 
-    DO i = 2, this%npoints
-       c = this%c(i) 
-
+    IF (this%species(ispec)%scalar%dolatinflow) THEN
        IF (ASSOCIATED(this%species(ispec)%latbc)) THEN
           latc = this%species(ispec)%latbc%current_value
        ELSE
           latc = c
        END IF
 
-       c = this%species(ispec)%scalar%source(&
-            &c, this%pt(i)%trans, latc, tdeltat, met)
-       this%pt(i)%trans%cnow(ispec) = c
+       DO i = 2, this%npoints - 1
+          cin = this%c(i)
+          ASSOCIATE(pt => this%pt(i)%trans)
+            avg_area = (pt%xsprop%area + pt%xspropold%area)/2.0
+            IF (avg_area .GT. 0.0) THEN
+               avg_latq = (pt%hnow%lateral_inflow + pt%hold%lateral_inflow)/2.0
+               IF (avg_latq < 0.0) THEN
+                  c = cin
+               ELSE
+                  c = latc
+               END IF
+               this%c(i) = (cin*avg_area + c*avg_latq*tdeltat)/avg_area
+            END IF
+          END ASSOCIATE
+       END DO
+       this%c(this%npoints) = this%c(this%npoints - 1)
+    END IF
+
+    ! do scalar specific source term
+    DO i = 2, this%npoints - 1
+       cin = this%c(i) 
+       cout = this%species(ispec)%scalar%source(&
+            &cin, this%pt(i)%trans, tdeltat, met)
+       this%c(i) = cout
     END DO
+    this%c(this%npoints) = this%c(this%npoints - 1)
 
   END SUBROUTINE transport_link_source
 
@@ -307,12 +327,14 @@ CONTAINS
        END DO
        CALL this%diffusion(ispec, tdeltat)
     END IF
+    
+    CALL this%source(ispec, tdeltat, this%species(ispec)%met)
 
+    ! copy the temporary concentrations back into the point state
     DO i = 1, this%npoints
        this%pt(i)%trans%cnow(ispec) = this%c(i)
     END DO
     
-    CALL this%source(ispec, tdeltat, this%species(ispec)%met)
     
     ! adjust boundary concentrations to have zero concentration
     ! gradient w/ outflow

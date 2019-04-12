@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  7, 2019 by William A. Perkins
-! Last Change: 2019-04-02 10:24:23 d3g096
+! Last Change: 2019-04-11 07:46:34 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -137,34 +137,21 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION scalar_source
   ! ----------------------------------------------------------------
-  FUNCTION scalar_source(this, cin, pt, latc, deltat, met) RESULT (cout)
+  FUNCTION scalar_source(this, cin, pt, deltat, met) RESULT (cout)
 
     IMPLICIT NONE
     DOUBLE PRECISION :: cout
     CLASS(scalar_t), INTENT(IN) :: this
     TYPE (point_transport_state), INTENT(IN) :: pt
-    DOUBLE PRECISION, INTENT(IN) :: cin, latc, deltat
+    DOUBLE PRECISION, INTENT(IN) :: cin, deltat
     TYPE (met_zone_t), INTENT(INOUT) :: met
 
     DOUBLE PRECISION :: avg_area, avg_latq, c
 
     cout = cin
+
+    ! could do radioactive decay here
     
-    ! change in concentration due to lateral inflow
-
-    IF (this%dolatinflow) THEN
-       avg_area = (pt%xsprop%area + pt%xspropold%area)/2.0
-       IF (avg_area .GT. 0.0) THEN
-          avg_latq = (pt%hnow%lateral_inflow + pt%hold%lateral_inflow)/2.0
-          IF (avg_latq < 0.0) THEN
-             c = cin
-          ELSE
-             c = latc
-          END IF
-          cout = (cin*avg_area + c*avg_latq*deltat)/avg_area
-       END IF
-    END IF
-
   END FUNCTION scalar_source
 
   ! ----------------------------------------------------------------
@@ -189,19 +176,19 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION temperature_source
   ! ----------------------------------------------------------------
-  FUNCTION temperature_source(this, cin, pt, latc, deltat, met) RESULT (tout)
+  FUNCTION temperature_source(this, cin, pt, deltat, met) RESULT (tout)
 
     IMPLICIT NONE
 
     DOUBLE PRECISION :: tout
     CLASS(temperature), INTENT(IN) :: this
     TYPE (point_transport_state), INTENT(IN) :: pt
-    DOUBLE PRECISION, INTENT(IN) :: cin, latc, deltat
+    DOUBLE PRECISION, INTENT(IN) :: cin, deltat
     TYPE (met_zone_t), INTENT(INOUT) :: met
 
     DOUBLE PRECISION :: area, width
 
-    tout = this%scalar_t%source(cin, pt, latc, deltat, met)
+    tout = this%scalar_t%source(cin, pt, deltat, met)
 
     IF (this%dosource) THEN
        area = pt%xsprop%area
@@ -267,18 +254,18 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION tdg_source
   ! ----------------------------------------------------------------
-  FUNCTION tdg_source(this, cin, pt, latc, deltat, met) RESULT (cout)
+  FUNCTION tdg_source(this, cin, pt, deltat, met) RESULT (cout)
 
     IMPLICIT NONE
     DOUBLE PRECISION :: cout
     CLASS(tdg), INTENT(IN) :: this
     TYPE (point_transport_state), INTENT(IN) :: pt
-    DOUBLE PRECISION, INTENT(IN) :: cin, latc, deltat
+    DOUBLE PRECISION, INTENT(IN) :: cin, deltat
     TYPE (met_zone_t), INTENT(INOUT) :: met
 
     DOUBLE PRECISION :: area, width, twater, salinity
 
-    cout = this%scalar_t%source(cin, pt, latc, deltat, met)
+    cout = this%scalar_t%source(cin, pt, deltat, met)
     
     IF (this%dosource) THEN
        area = pt%xsprop%area
