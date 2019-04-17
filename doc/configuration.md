@@ -26,7 +26,7 @@ because they are no longer needed or computed internally.  Items
 |13 | 1 | flag | If true, read initial conditions from a hotstart file
 |   |   |      | otherwise, read [initial conditions file](init.md)
 |14 | 1 | flag | Write a hotstart file at the end of simulation
-|15 | 1 | int  | Units option: 1 = English, ~~2 = metric~~[^2]
+|15 | 1 | int  | Units option: 0 = English, ~~1 = metric~~[^2] (only 0 works)
 |16 | 1 | int  | Time option: ~~0 = real~~[^1], 1 = date/time
 |17 | 1 | int  | Units used for channel length in the [point file](point.md):
 |   |   |      |  0 = feet, 1 = meters, 2 = miles, 3 = kilometers
