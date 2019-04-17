@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2019-04-15 14:35:20 d3g096
+# Last Change: 2019-04-17 10:04:55 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -63,7 +63,7 @@ foreach(c ${CASES})
     COMMAND ${mass1newexe} > mass1.log
     COMMAND ${CMAKE_COMMAND} -E copy profile1.out profile1.${c}.out 
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    COMMENT "Running test transport/hlink-advection-1-segment (${c})"
+    COMMENT "Running test transport/hlink-advection-diffusion-1-segment (${c})"
     DEPENDS mass1_new "${CMAKE_CURRENT_BINARY_DIR}/mass1-${c}.cfg" ${testfiles} ${exdep}
     )
   if(NOT ${c} STREQUAL "warmup")
@@ -81,7 +81,7 @@ foreach(c ${CASES})
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${plot}
         COMMAND "${GNUPLOT_EXECUTABLE}" "${CMAKE_CURRENT_BINARY_DIR}/${gpfile}" > ${plot}
         WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-        COMMENT "Plotting test test transport/hlink-advection-1-segment (${c})"
+        COMMENT "Plotting test test transport/hlink-advection-diffusion-1-segment (${c})"
         DEPENDS 
         "${CMAKE_CURRENT_BINARY_DIR}/${out}"
         "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp"
