@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  8, 2018 by William A. Perkins
-! Last Change: 2019-03-21 07:28:11 d3g096
+! Last Change: 2019-04-17 08:38:06 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -62,6 +62,10 @@ MODULE gage_module
      PROCEDURE :: current => gage_list_current
   END type gage_list
 
+  INTERFACE gage_list
+     MODULE PROCEDURE new_gage_list
+  END INTERFACE gage_list
+
   ! ----------------------------------------------------------------
   ! TYPE gage_manager
   ! ----------------------------------------------------------------
@@ -72,6 +76,10 @@ MODULE gage_module
      PROCEDURE :: output => gage_manager_output
      PROCEDURE :: destroy => gage_manager_destroy
   END type gage_manager
+
+  INTERFACE gage_manager
+     MODULE PROCEDURE new_gage_manager
+  END INTERFACE gage_manager
 
   ! This is base for stupid Fortran I/O unit numbers for gage output. 
   INTEGER, PARAMETER :: gunit_base = 201
@@ -177,6 +185,18 @@ CONTAINS
 
 
   ! ----------------------------------------------------------------
+  !  FUNCTION new_gage_list
+  ! ----------------------------------------------------------------
+  FUNCTION new_gage_list()
+
+    IMPLICIT NONE
+    TYPE (gage_list) :: new_gage_list
+    NULLIFY(new_gage_list%head)
+    NULLIFY(new_gage_list%tail)
+  END FUNCTION new_gage_list
+
+  
+  ! ----------------------------------------------------------------
   ! SUBROUTINE gage_list_push
   ! ----------------------------------------------------------------
   SUBROUTINE gage_list_push(this, gage)
@@ -257,6 +277,17 @@ CONTAINS
        END IF
     END IF
   END FUNCTION gage_list_current
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION new_gage_manager
+  ! ----------------------------------------------------------------
+  FUNCTION new_gage_manager() RESULT(man)
+
+    IMPLICIT NONE
+    TYPE (gage_manager) :: man
+    man%gages = new_gage_list()
+  END FUNCTION new_gage_manager
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE gage_manager_read

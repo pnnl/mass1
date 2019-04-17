@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-03-29 09:55:37 d3g096
+! Last Change: 2019-04-17 08:40:38 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -74,10 +74,11 @@ CONTAINS
 
     IMPLICIT NONE
     TYPE (network) :: net
-    net%bcs = new_bc_manager()
+    net%bcs = bc_manager_t()
     net%met = met_zone_manager_t()
-    net%sections = new_section_handler()
-    net%links = new_link_manager()
+    net%sections = section_handler()
+    net%links = link_manager_t()
+    net%gages = gage_manager()
 
   END FUNCTION new_network
 
