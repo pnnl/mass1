@@ -28,14 +28,11 @@ find it useful.
 ## Obtaining the Code
 
 The MASS1 source code is currently hosted on PNNL's internal Git
-repository.  MASS1 shares some code with other applications, which is
-included in MASS1 as a Git sub-module.  Do the following to check out
-the code:
+repository.  Do the following to check out the code:
 
 ```
 git clone https://stash.pnnl.gov/scm/~d3g096/mass1.git
 cd mass1
-git submodule update --init
 ```
 
 ## Requirements
@@ -65,7 +62,7 @@ most applications, this is not noticable. In the past, Fortran
 compilers from [NAG](https://www.nag.com/nag-compiler),
 [Absoft](https://www.absoft.com/),
 [IBM](http://www-03.ibm.com/software/products/en/xlfortran-linux), and
-others have worked.  
+others have worked, but we no longer use them.  
 
 ## Optional Software
 
