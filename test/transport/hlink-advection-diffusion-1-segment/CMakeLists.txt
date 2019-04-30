@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2019-04-17 10:04:55 d3g096
+# Last Change: 2019-04-30 10:34:58 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -73,9 +73,8 @@ foreach(c ${CASES})
         WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
         COMMAND ${CMAKE_COMMAND} -E echo "set terminal postscript eps color solid \\\"Helvetica\\\" 14" > ${gpfile}
         COMMAND ${CMAKE_COMMAND} -E echo "set title \\\"Advective Diffusion Analytic Solution: ${c}\\\"" >> ${gpfile}
+        COMMAND ${CMAKE_COMMAND} -E echo "pfile = \\\"${CMAKE_CURRENT_BINARY_DIR}/${out}\\\"" >>  ${gpfile}
         COMMAND ${CMAKE_COMMAND} -E echo "load \\\"${CMAKE_CURRENT_SOURCE_DIR}/plot.gp\\\"" >> ${gpfile}
-        DEPENDS 
-        "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp"
         )
       add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${plot}
@@ -92,9 +91,7 @@ foreach(c ${CASES})
       list(APPEND rundeps "${CMAKE_CURRENT_BINARY_DIR}/profile1.${c}.out")
     endif (GNUPLOT_EXECUTABLE)
   endif()
-
-
-  endforeach()
+endforeach()
   
 add_custom_target(run_hlink_advection_diffusion_1_segment_test
   DEPENDS ${rundeps}

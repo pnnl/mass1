@@ -7,9 +7,11 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 22, 1999 by William A. Perkins
-# Last Change: 2019-04-15 13:58:19 d3g096
+# Last Change: 2019-04-30 10:19:14 d3g096
 # -------------------------------------------------------------
 # $Id$
+
+input = sprintf("<tail -n +310 %s", pfile)
 
 u = 2.0
 D = 30.0
@@ -35,6 +37,6 @@ plot C(x, 360.0) title "Analytic: t = 6.0 min", \
      C(x, 1080.0) title "Analytic: t = 18.0 min", \
      C(x, 1440.0) title "Analytic: t = 24.0 min", \
      C(x, 1800.0) title "Analytic: t = 30.0 min", \
-     '<tail -n +310 profile1.out' using (10584 - $4):10 title 'MASS1 Simulated' with points lt 7
+     input using (10584 - $4):10 title 'MASS1 Simulated' with points lt 7
 
 
