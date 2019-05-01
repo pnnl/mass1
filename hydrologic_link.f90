@@ -24,8 +24,8 @@ MODULE hydrologic_link_module
      DOUBLE PRECISION :: K
 
      ! inflow and outflow are stored as discharge, ft^3/s
-     DOUBLE PRECISION :: latq, inflow, outflow
-     DOUBLE PRECISION :: latq_old, inflow_old, outflow_old
+     DOUBLE PRECISION :: inflow, outflow
+     DOUBLE PRECISION :: inflow_old, outflow_old
 
      ! storage is in volume units, ft^3
      DOUBLE PRECISION :: storage, storage_old
@@ -58,8 +58,6 @@ CONTAINS
     this%outflow_old = 0.0
     this%storage = 0.0
     this%storage_old = 0.0
-    this%latq = 0.0
-    this%latq_old = 0.0
     
 
   END SUBROUTINE hydrologic_link_construct
@@ -205,6 +203,14 @@ CONTAINS
           invol = 0.0
        END IF
     END IF
+    
+    IF (ASSOCIATED(this%latbc)) THEN
+       this%latqold = this%latq
+       this%latq = this%latbc%current_value
+       DO i = 1, this%npoints
+          this%pt(i)%hnow%lateral_inflow = this%latq
+       END DO
+    END IF
 
     this%inflow = invol
     latvol = this%latq*this%L
@@ -244,11 +250,6 @@ CONTAINS
     this%pt(:)%sweep%e = 0.0
     this%pt(:)%sweep%f = 0.0
 
-    ! WRITE(*,*) 'Hydrologic link ', this%id, &
-    !      &": I = ", this%inflow, &
-    !      &", S = ", this%storage, &
-    !      &", O = ", this%outflow
-
   END SUBROUTINE hydrologic_link_forward
 
   ! ----------------------------------------------------------------
@@ -285,18 +286,6 @@ CONTAINS
     
     CLASS (hydrologic_link), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: grav, unitwt, dt
-    DOUBLE PRECISION :: q
-    INTEGER :: i
-
-    IF (ASSOCIATED(this%latbc)) THEN
-       q = this%latq
-       this%latq_old = q
-       q = this%latbc%current_value
-       this%latq = q
-       DO i = 1, this%npoints
-          this%pt(i)%hnow%lateral_inflow = this%latq
-       END DO
-    END IF
 
     CALL this%transport_link_t%hydro_update(grav, unitwt, dt)
 
@@ -304,8 +293,11 @@ CONTAINS
     this%inflow_old = this%inflow
     this%outflow_old = this%outflow
 
-
-
+    WRITE(*,*) 'Hydrologic link ', this%id, &
+         &": I = ", this%inflow, &
+         &", S = ", this%storage, &
+         &", O = ", this%outflow, &
+         &", V = ", this%volume()
 
   END SUBROUTINE hydrologic_link_hupdate
 
@@ -326,7 +318,7 @@ CONTAINS
     
     READ(iunit, IOSTAT=iostat) this%y, this%K, &
          &this%inflow, this%outflow, this%latq, &
-         &this%inflow_old, this%outflow_old, this%latq_old, &
+         &this%inflow_old, this%outflow_old, this%latqold, &
          &this%storage, this%storage_old
     IF (IS_IOSTAT_END(iostat)) THEN
        WRITE(msg, *) 'link ', this%id, &
@@ -360,7 +352,7 @@ CONTAINS
 
     WRITE(iunit) this%y, this%K, &
          &this%inflow, this%outflow, this%latq, &
-         &this%inflow_old, this%outflow_old, this%latq_old, &
+         &this%inflow_old, this%outflow_old, this%latqold, &
          &this%storage, this%storage_old
 
   END SUBROUTINE hydrologic_link_write_restart

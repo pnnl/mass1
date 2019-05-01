@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February 18, 2019 by William A. Perkins
-  ! Last Change: 2019-04-11 07:47:52 d3g096
+  ! Last Change: 2019-04-30 14:09:30 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE transport_link_module
@@ -92,13 +92,8 @@ CONTAINS
 
     DO i = 1, this%npoints - 1
 
-       IF (i .EQ. this%npoints) THEN
-          velave = this%pt(i)%trans%hold%q
-          ave_vel = this%pt(i)%trans%hnow%v
-       ELSE
-          velave = 0.5*(this%pt(i)%trans%hold%q + this%pt(i+1)%trans%hold%q)
-          ave_vel = 0.5*(this%pt(i)%trans%hnow%v + this%pt(i+1)%trans%hnow%v)
-       END IF
+       velave = 0.5*(this%pt(i)%trans%hold%q + this%pt(i+1)%trans%hold%q)
+       ave_vel = 0.5*(this%pt(i)%trans%hnow%v + this%pt(i+1)%trans%hnow%v)
 
        cflx = ave_vel*deltat/this%dxx(i)
 
@@ -133,6 +128,7 @@ CONTAINS
           ELSE
              phi = 0.0
           END IF
+          this%f(i) = velave*(this%c(i+1) + 0.5*(1.0 - cflx)*phi*this%f(i))
        END IF
     END DO
 
@@ -140,7 +136,9 @@ CONTAINS
        dtdx = deltat/this%dxx(i)
        a = this%pt(i)%trans%xsprop%area
        aold = this%pt(i)%trans%xspropold%area
-       this%c(i) = this%c(i)*aold/a - dtdx*(this%f(i) - this%f(i-1))/a
+       IF (a .GT. 0.0) THEN
+          this%c(i) = this%c(i)*aold/a - dtdx*(this%f(i) - this%f(i-1))/a
+       END IF
     END DO
 
   END SUBROUTINE transport_link_advection
@@ -180,7 +178,9 @@ CONTAINS
                  &(ABS(pt0%x - ptm1%x))
             dtdx = deltat/this%dxx(i)
             c = pt0%trans%cnow(ispec)
-            c = c + dtdx*(flux_e - flux_w)/pt0%trans%xspropold%area
+            IF (pt0%trans%xspropold%area .GT. 0.0) THEN
+               c = c + dtdx*(flux_e - flux_w)/pt0%trans%xspropold%area
+            END IF
             this%c(i) = c
          END IF
        END ASSOCIATE
@@ -205,38 +205,38 @@ CONTAINS
     DOUBLE PRECISION :: c, latc, cin, cout, avg_area, avg_latq
 
     IF (this%species(ispec)%scalar%dolatinflow) THEN
-       IF (ASSOCIATED(this%species(ispec)%latbc)) THEN
-          latc = this%species(ispec)%latbc%current_value
-       ELSE
-          latc = c
-       END IF
-
        DO i = 2, this%npoints - 1
           cin = this%c(i)
+          IF (ASSOCIATED(this%species(ispec)%latbc)) THEN
+             latc = this%species(ispec)%latbc%current_value
+          ELSE
+             latc = cin
+          END IF
+
           ASSOCIATE(pt => this%pt(i)%trans)
             avg_area = (pt%xsprop%area + pt%xspropold%area)/2.0
             IF (avg_area .GT. 0.0) THEN
                avg_latq = (pt%hnow%lateral_inflow + pt%hold%lateral_inflow)/2.0
                IF (avg_latq < 0.0) THEN
-                  c = cin
-               ELSE
-                  c = latc
+                  latc = this%c(i)
                END IF
-               this%c(i) = (cin*avg_area + c*avg_latq*tdeltat)/avg_area
+               c = (this%c(i)*avg_area + latc*avg_latq*tdeltat)/avg_area
+               this%c(i) = c
+               ! WRITE(*,*) this%id, i, this%c(i), latc, avg_area, avg_latq, tdeltat
             END IF
           END ASSOCIATE
        END DO
        this%c(this%npoints) = this%c(this%npoints - 1)
     END IF
 
-    ! do scalar specific source term
-    DO i = 2, this%npoints - 1
-       cin = this%c(i) 
-       cout = this%species(ispec)%scalar%source(&
-            &cin, this%pt(i)%trans, tdeltat, met)
-       this%c(i) = cout
-    END DO
-    this%c(this%npoints) = this%c(this%npoints - 1)
+    ! ! do scalar specific source term
+    ! DO i = 2, this%npoints - 1
+    !    cin = this%c(i) 
+    !    cout = this%species(ispec)%scalar%source(&
+    !         &cin, this%pt(i)%trans, tdeltat, met)
+    !    this%c(i) = cout
+    ! END DO
+    ! this%c(this%npoints) = this%c(this%npoints - 1)
 
   END SUBROUTINE transport_link_source
 
@@ -307,7 +307,7 @@ CONTAINS
                &ispec
           CALL error_message(msg)
        END IF
-       this%pt(1)%trans%cnow(ispec) = c
+       this%pt(this%npoints)%trans%cnow(ispec) = c
     END IF
       
     

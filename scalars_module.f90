@@ -790,6 +790,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
               END IF
               c(link,point) = (c(link,point)*avg_area + upstream_c*avg_latq*delta_t)/avg_area
               ! IF(c(link,point) < 0.0) c(link,point) = 0.0
+              ! WRITE(*,*) link, point, c(link,point), upstream_c, avg_area, avg_latq, delta_t
            END DO
            c(link,maxpoints(link)) = c(link,maxpoints(link)-1)
         END IF

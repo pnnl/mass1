@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-04-02 10:24:55 d3g096
+! Last Change: 2019-04-30 14:04:55 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -29,6 +29,7 @@ MODULE linear_link_module
   PRIVATE
 
   TYPE, PUBLIC, EXTENDS(link_t) :: linear_link_t
+     DOUBLE PRECISION :: latq, latqold
      INTEGER :: npoints
      INTEGER :: input_option
      TYPE (point_t), DIMENSION(:),POINTER :: pt
@@ -58,6 +59,7 @@ MODULE linear_link_module
      PROCEDURE :: check => linear_link_check
      PROCEDURE :: trans_interp => linear_link_trans_interp
      PROCEDURE :: transport => linear_link_transport
+     PROCEDURE :: volume => linear_link_volume
      PROCEDURE :: destroy => linear_link_destroy
   END type linear_link_t
 
@@ -112,6 +114,9 @@ CONTAINS
           END IF
        END IF
     END IF
+
+    this%latq = 0.0
+    this%latqold = 0.0
 
     IF (sclrman%nspecies .GT. 0) THEN
        DO i = 1, this%npoints
@@ -661,6 +666,14 @@ CONTAINS
        this%pt(point)%sweep%f = bcval - this%pt(point)%hnow%q
     END IF
 
+    IF (ASSOCIATED(this%latbc)) THEN
+       this%latqold = this%latq
+       this%latq = this%latbc%current_value
+       DO point = 1, this%npoints
+          this%pt(point)%hnow%lateral_inflow = this%latq
+       END DO
+    END IF
+
     DO point = 1, this%npoints - 1
        CALL this%coeff(deltat, this%pt(point), this%pt(point + 1), cf)
        denom = (cf%c*cf%dp - cf%cp*cf%d)
@@ -943,7 +956,29 @@ CONTAINS
 
   END SUBROUTINE linear_link_destroy
 
-  
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION linear_link_volume
+  ! ----------------------------------------------------------------
+  FUNCTION linear_link_volume(this) RESULT(v)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION :: v
+    CLASS (linear_link_t), INTENT(IN) :: this
+
+    INTEGER :: i
+    DOUBLE PRECISION :: x0, x1, a0, a1
+
+    v = 0
+    DO i = 2, this%npoints
+       x0 = this%pt(i-1)%x
+       x1 = this%pt(i)%x
+       a0 = this%pt(i-1)%xsprop%area
+       a1 = this%pt(i)%xsprop%area
+       v = v + 0.5*(a1+a0)*ABS(x1-x0)
+    END DO
+  END FUNCTION linear_link_volume
+
 
 
 END MODULE linear_link_module

@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-04-17 08:40:38 d3g096
+! Last Change: 2019-04-30 13:43:05 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -404,7 +404,6 @@ CONTAINS
 
     IMPLICIT NONE
     CLASS (network), INTENT(INOUT) :: this
-    INTEGER :: nsteps
     DOUBLE PRECISION :: htime0, htime1
     DOUBLE PRECISION :: tnow, tdeltat
     INTEGER :: tsteps, i, ispec

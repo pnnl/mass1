@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2019-04-10 13:12:45 d3g096
+! Last Change: 2019-04-30 13:59:16 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -27,14 +27,14 @@ MODULE fluvial_link_module
   PRIVATE
 
   TYPE, PUBLIC, EXTENDS(transport_link_t) :: fluvial_link
-     DOUBLE PRECISION :: latq, latqold
      DOUBLE PRECISION :: lpiexp
      DOUBLE PRECISION :: gravity
    CONTAINS
      PROCEDURE :: construct => fluvial_link_construct
      PROCEDURE :: initialize => fluvial_link_initialize
+     ! PROCEDURE :: forward_sweep => fluvial_link_forward
      PROCEDURE :: coeff => fluvial_link_coeff
-     PROCEDURE :: hydro_update => fluvial_link_hupdate
+     ! PROCEDURE :: hydro_update => fluvial_link_hupdate
   END type fluvial_link
 
   TYPE, PUBLIC, EXTENDS(fluvial_link) :: fluvial_hydro_link
@@ -93,6 +93,30 @@ CONTAINS
 
   END FUNCTION fluvial_link_initialize
 
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE fluvial_link_forward
+  ! ----------------------------------------------------------------
+  SUBROUTINE fluvial_link_forward(this, deltat)
+
+    IMPLICIT NONE
+    CLASS (fluvial_link), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: deltat
+
+    INTEGER :: i
+
+    IF (ASSOCIATED(this%latbc)) THEN
+       this%latqold = this%latq
+       this%latq = this%latbc%current_value
+       DO i = 1, this%npoints
+          this%pt(i)%hnow%lateral_inflow = this%latq
+       END DO
+    END IF
+
+    CALL this%transport_link_t%forward_sweep(deltat)
+
+
+  END SUBROUTINE fluvial_link_forward
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE fluvial_link_coeff
@@ -150,16 +174,6 @@ CONTAINS
     IMPLICIT NONE
     CLASS (fluvial_link), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: grav, unitwt, dt
-
-    INTEGER :: i
-
-    IF (ASSOCIATED(this%latbc)) THEN
-       this%latqold = this%latq
-       this%latq = this%latbc%current_value
-       DO i = 1, this%npoints
-          this%pt(i)%hnow%lateral_inflow = this%latq
-       END DO
-    END IF
 
     CALL this%transport_link_t%hydro_update(grav, unitwt, dt)
 
