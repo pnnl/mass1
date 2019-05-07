@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February 18, 2019 by William A. Perkins
-  ! Last Change: 2019-04-30 14:09:30 d3g096
+  ! Last Change: 2019-05-03 14:06:09 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE transport_link_module
@@ -222,7 +222,10 @@ CONTAINS
                END IF
                c = (this%c(i)*avg_area + latc*avg_latq*tdeltat)/avg_area
                this%c(i) = c
-               ! WRITE(*,*) this%id, i, this%c(i), latc, avg_area, avg_latq, tdeltat
+               WRITE(*,'(2I4,1X,9(1X,E11.4))') this%id, i, this%c(i), latc, avg_area, &
+                    &pt%hold%lateral_inflow, pt%hnow%lateral_inflow, avg_latq, &
+                    &this%pt(i)%hold%lateral_inflow, &
+                    &this%pt(i)%hnow%lateral_inflow, tdeltat
             END IF
           END ASSOCIATE
        END DO

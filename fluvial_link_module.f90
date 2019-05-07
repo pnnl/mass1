@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2019-04-30 13:59:16 d3g096
+! Last Change: 2019-05-03 12:03:46 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -103,14 +103,6 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: deltat
 
     INTEGER :: i
-
-    IF (ASSOCIATED(this%latbc)) THEN
-       this%latqold = this%latq
-       this%latq = this%latbc%current_value
-       DO i = 1, this%npoints
-          this%pt(i)%hnow%lateral_inflow = this%latq
-       END DO
-    END IF
 
     CALL this%transport_link_t%forward_sweep(deltat)
 

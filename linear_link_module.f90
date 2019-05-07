@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-04-30 14:04:55 d3g096
+! Last Change: 2019-05-06 14:12:22 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -651,6 +651,12 @@ CONTAINS
     DOUBLE PRECISION :: bcval, denom
     TYPE (coeff) :: cf
 
+    DO point = 1, this%npoints
+       ASSOCIATE (pt => this%pt(point))
+         pt%hold = pt%hnow
+       END ASSOCIATE
+    END DO
+
     point = 1
     IF (ASSOCIATED(this%ucon)) THEN
        this%pt(point)%sweep%e = this%ucon%coeff_e()
@@ -704,14 +710,16 @@ CONTAINS
     INTEGER, INTENT(IN) :: dsbc_type
     DOUBLE PRECISION :: bcval, dy, dq
     INTEGER :: point
+    CLASS (point_t), POINTER :: pt
     
 
     point = this%npoints
+    pt => this%pt(point)
     
     IF (ASSOCIATED(this%dcon)) THEN
 
-       dy = this%dcon%elev() - this%pt(point)%hnow%y
-       dq = this%pt(point)%sweep%e*dy + this%pt(point)%sweep%f
+       dy = this%dcon%elev() - pt%hnow%y
+       dq = pt%sweep%e*dy + pt%sweep%f
 
     ELSE IF (ASSOCIATED(this%dsbc)) THEN
 
@@ -719,27 +727,30 @@ CONTAINS
        SELECT CASE(dsbc_type)
        CASE(1)
           ! given downstream stage
-          dy = bcval - this%pt(point)%hnow%y
-          dq = this%pt(point)%sweep%e*dy + this%pt(point)%sweep%f
+          dy = bcval - pt%hnow%y
+          dq = pt%sweep%e*dy + pt%sweep%f
        CASE(2)
           ! given downstream discharge
-          dq = bcval - this%pt(point)%hnow%q
-          dy = (dq - this%pt(point)%sweep%f)/this%pt(point)%sweep%e
+          dq = bcval - pt%hnow%q
+          dy = (dq - pt%sweep%f)/pt%sweep%e
        END SELECT
     ELSE 
        CALL error_message("This should not happen in linear_link_backward", &
             &fatal=.TRUE.)
     END IF
 
-    this%pt(point)%hnow%y = this%pt(point)%hnow%y + dy
-    this%pt(point)%hnow%q = this%pt(point)%hnow%q + dq
+    pt%hnow%y = pt%hnow%y + dy
+    pt%hnow%q = pt%hnow%q + dq
 
     DO point = this%npoints - 1, 1, -1
-       dy = this%pt(point)%sweep%l*dy + this%pt(point)%sweep%m*dq + this%pt(point)%sweep%n
-       dq = this%pt(point)%sweep%e*dy + this%pt(point)%sweep%f
 
-       this%pt(point)%hnow%y = this%pt(point)%hnow%y + dy
-       this%pt(point)%hnow%q = this%pt(point)%hnow%q + dq
+       pt => this%pt(point)
+       
+       dy = pt%sweep%l*dy + pt%sweep%m*dq + pt%sweep%n
+       dq = pt%sweep%e*dy + pt%sweep%f
+
+       pt%hnow%y = pt%hnow%y + dy
+       pt%hnow%q = pt%hnow%q + dq
        
     END DO
 
@@ -881,6 +892,16 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: tnow, htime0, htime1
     INTEGER :: i
     CLASS (point_t), POINTER :: pt
+    DOUBLE PRECISION :: depth
+
+    IF (tnow .EQ. htime0) THEN
+       DO i = 1, this%points()
+          pt => this%point(i)
+          pt%trans%hnow = pt%hold
+          depth = pt%trans%hnow%y - pt%thalweg
+          CALL pt%xsection%p%props(depth, pt%trans%xsprop)
+       END DO
+    END IF
     
     DO i = 1, this%points()
        pt => this%point(i)
