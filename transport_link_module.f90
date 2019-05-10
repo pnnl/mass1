@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February 18, 2019 by William A. Perkins
-  ! Last Change: 2019-05-03 14:06:09 d3g096
+  ! Last Change: 2019-05-10 10:14:47 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE transport_link_module
@@ -93,7 +93,7 @@ CONTAINS
     DO i = 1, this%npoints - 1
 
        velave = 0.5*(this%pt(i)%trans%hold%q + this%pt(i+1)%trans%hold%q)
-       ave_vel = 0.5*(this%pt(i)%trans%hnow%v + this%pt(i+1)%trans%hnow%v)
+       ave_vel = 0.5*(this%pt(i)%trans%hold%v + this%pt(i+1)%trans%hold%v)
 
        cflx = ave_vel*deltat/this%dxx(i)
 
@@ -139,6 +139,13 @@ CONTAINS
        IF (a .GT. 0.0) THEN
           this%c(i) = this%c(i)*aold/a - dtdx*(this%f(i) - this%f(i-1))/a
        END IF
+       ! IF (i .EQ. 100) THEN
+       !    WRITE(*, '(*(1X,E10.3))') dtdx, &
+       !         &this%pt(i)%trans%hnow%q, this%pt(i)%trans%hold%q, &
+       !         &a, aold, &
+       !         &this%f(i), this%f(i-1)
+       ! END IF
+          
     END DO
 
   END SUBROUTINE transport_link_advection

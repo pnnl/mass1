@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2019-05-03 12:11:50 d3g096
+! Last Change: 2019-05-10 06:41:40 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -165,8 +165,6 @@ CONTAINS
 
     DOUBLE PRECISION :: depth
 
-    ! this%hold = this%hnow
-
     ASSOCIATE (h => this%hnow, xs => this%xsprop)
 
       depth = h%y - this%thalweg
@@ -211,6 +209,8 @@ CONTAINS
     DOUBLE PRECISION :: depth
 
     this%trans%hold = this%trans%hnow
+    this%trans%xspropold = this%trans%xsprop
+    
     CALL hydro_interp(tnow, htime0, htime1, &
          &this%hold, this%hnow, this%trans%hnow)
 

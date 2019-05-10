@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-05-06 14:12:22 d3g096
+! Last Change: 2019-05-10 09:53:50 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -654,6 +654,10 @@ CONTAINS
     DO point = 1, this%npoints
        ASSOCIATE (pt => this%pt(point))
          pt%hold = pt%hnow
+         IF (ASSOCIATED(this%species)) THEN
+            pt%trans%hold = pt%hold
+            pt%trans%xspropold = pt%xsprop
+         END IF
        END ASSOCIATE
     END DO
 
@@ -780,14 +784,6 @@ CONTAINS
        CALL this%pt(p)%hydro_update(grav, unitwt, dt, dx)
     END DO
 
-    ! Update the transport hydro state and section properties
-    IF (ASSOCIATED(this%species)) THEN
-       DO p = 1, this%npoints
-          this%pt(p)%trans%hnow = this%pt(p)%hnow
-          this%pt(p)%trans%xsprop = this%pt(p)%xsprop
-       END DO
-    END IF
-
   END SUBROUTINE linear_link_hupdate
 
   ! ----------------------------------------------------------------
@@ -894,15 +890,6 @@ CONTAINS
     CLASS (point_t), POINTER :: pt
     DOUBLE PRECISION :: depth
 
-    IF (tnow .EQ. htime0) THEN
-       DO i = 1, this%points()
-          pt => this%point(i)
-          pt%trans%hnow = pt%hold
-          depth = pt%trans%hnow%y - pt%thalweg
-          CALL pt%xsection%p%props(depth, pt%trans%xsprop)
-       END DO
-    END IF
-    
     DO i = 1, this%points()
        pt => this%point(i)
        pt%trans%hold = pt%trans%hnow
