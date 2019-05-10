@@ -188,7 +188,17 @@ CONTAINS
 
     DOUBLE PRECISION :: X, kstrick
     DOUBLE PRECISION :: invol, outvol, latvol, q, x0
-    INTEGER :: i
+    INTEGER :: i 
+
+    DO i = 1, this%npoints
+       ASSOCIATE (pt => this%pt(i))
+         pt%hold = pt%hnow
+         IF (ASSOCIATED(this%species)) THEN
+            pt%trans%hold = pt%hold
+            pt%trans%xspropold = pt%xsprop
+         END IF
+       END ASSOCIATE
+    END DO
 
     ! get upstream inflow (volume)
 
