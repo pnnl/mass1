@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2019-05-10 11:03:35 d3g096
+# Last Change: 2019-05-10 13:20:11 d3g096
 # -------------------------------------------------------------
 
 
@@ -41,4 +41,5 @@ add_subdirectory(transport/hlink-lateral-inflow)
 add_subdirectory(transport/hlink-advection-1-segment)
 add_subdirectory(transport/hlink-advection-diffusion-1-segment)
 add_subdirectory(transport/pulse)
+add_subdirectory(transport/hlink-pulse)
 add_subdirectory(temperature/pond)
