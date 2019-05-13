@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2019-04-17 09:38:36 d3g096
+! Last Change: 2019-05-13 12:24:22 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -135,6 +135,7 @@ MODULE link_module
 
      PROCEDURE (max_tnumber_proc), DEFERRED :: max_courant
      PROCEDURE (max_tnumber_proc), DEFERRED :: max_diffuse
+     PROCEDURE (trans_pre_proc), DEFERRED :: pre_transport
      PROCEDURE (trans_interp_proc), DEFERRED :: trans_interp
      PROCEDURE (transport_proc), DEFERRED :: transport
 
@@ -247,6 +248,12 @@ MODULE link_module
        CLASS (link_t), INTENT(IN) :: this
        DOUBLE PRECISION, INTENT(IN) :: dt
      END FUNCTION max_tnumber_proc
+
+     SUBROUTINE trans_pre_proc(this)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(INOUT) :: this
+     END SUBROUTINE trans_pre_proc
 
      SUBROUTINE trans_interp_proc(this, tnow, htime0, htime1)
        IMPORT :: link_t

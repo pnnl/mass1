@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February 18, 2019 by William A. Perkins
-  ! Last Change: 2019-05-10 12:08:35 d3g096
+  ! Last Change: 2019-05-13 13:40:09 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE transport_link_module
@@ -49,6 +49,7 @@ MODULE transport_link_module
      PROCEDURE :: advection => transport_link_advection
      PROCEDURE :: diffusion => transport_link_diffusion
      PROCEDURE :: source => transport_link_source
+     PROCEDURE :: pre_transport => transport_link_pre_transport
      PROCEDURE :: transport => transport_link_transport
      PROCEDURE :: destroy => transport_link_destroy
   END type transport_link_t
@@ -75,6 +76,44 @@ CONTAINS
     NULLIFY(this%dxx)
     NULLIFY(this%f)
   END FUNCTION transport_link_initialize
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE transport_link_pre_transport
+  ! ----------------------------------------------------------------
+  SUBROUTINE transport_link_pre_transport(this)
+
+    IMPLICIT NONE
+
+    CLASS (transport_link_t), INTENT(INOUT) :: this
+
+    INTEGER ::i
+    
+    IF (.NOT. ASSOCIATED(this%c)) THEN
+       ALLOCATE(this%c(0:this%npoints + 2))
+    END IF
+    IF (.NOT. ASSOCIATED(this%f)) THEN
+       ALLOCATE(this%f(this%npoints))
+    END IF
+    IF (.NOT. ASSOCIATED(this%dxx)) THEN
+       ALLOCATE(this%dxx(0:this%npoints+2))
+
+       ! Cell lengths used for transport
+    
+       this%dxx(1) = ABS(this%pt(2)%x - this%pt(1)%x)
+       this%dxx(0) = this%dxx(1)
+       DO i = 2, this%npoints - 1
+          this%dxx(i) = ABS(0.5*(this%pt(i)%x - this%pt(i-1)%x)) + &
+               &ABS(0.5*(this%pt(i+1)%x - this%pt(i)%x))
+       END DO
+       i = this%npoints
+       this%dxx(i) = ABS(this%pt(i)%x - this%pt(i-1)%x)
+       this%dxx(i+1) = this%dxx(i)
+       this%dxx(i+2) = this%dxx(i)
+    END IF
+
+  END SUBROUTINE transport_link_pre_transport
+
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE transport_link_advection
@@ -265,29 +304,6 @@ CONTAINS
     CHARACTER (LEN=1024) :: msg
     DOUBLE PRECISION :: c
 
-    IF (.NOT. ASSOCIATED(this%c)) THEN
-       ALLOCATE(this%c(0:this%npoints + 2))
-    END IF
-    IF (.NOT. ASSOCIATED(this%f)) THEN
-       ALLOCATE(this%f(this%npoints))
-    END IF
-    IF (.NOT. ASSOCIATED(this%dxx)) THEN
-       ALLOCATE(this%dxx(0:this%npoints+2))
-
-       ! Cell lengths used for transport
-    
-       this%dxx(1) = ABS(this%pt(2)%x - this%pt(1)%x)
-       this%dxx(0) = this%dxx(1)
-       DO i = 2, this%npoints - 1
-          this%dxx(i) = ABS(0.5*(this%pt(i)%x - this%pt(i-1)%x)) + &
-               &ABS(0.5*(this%pt(i+1)%x - this%pt(i)%x))
-       END DO
-       i = this%npoints
-       this%dxx(i) = ABS(this%pt(i)%x - this%pt(i-1)%x)
-       this%dxx(i+1) = this%dxx(i)
-       this%dxx(i+2) = this%dxx(i)
-    END IF
-    
     DO i = 1, this%npoints
        this%pt(i)%trans%cold(ispec) = this%pt(i)%trans%cnow(ispec)
     END DO

@@ -39,6 +39,7 @@ MODULE hydrologic_link_module
      PROCEDURE :: read_restart => hydrologic_link_read_restart
      PROCEDURE :: write_restart => hydrologic_link_write_restart
      PROCEDURE :: hydro_update => hydrologic_link_hupdate
+     PROCEDURE :: trans_interp => hydrologic_link_trans_interp
   END type hydrologic_link
 
 CONTAINS
@@ -367,5 +368,27 @@ CONTAINS
 
   END SUBROUTINE hydrologic_link_write_restart
 
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE hydrologic_link_trans_interp
+  ! ----------------------------------------------------------------
+  SUBROUTINE hydrologic_link_trans_interp(this, tnow, htime0, htime1)
+
+    IMPLICIT NONE
+    
+    CLASS (hydrologic_link), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: tnow, htime0, htime1
+    INTEGER :: i
+    CLASS (point_t), POINTER :: pt
+    DOUBLE PRECISION :: depth
+
+    ! Treat the current hydrodynamic solution as constant 
+    DO i = 1, this%points()
+       pt => this%point(i)
+       pt%trans%hnow = pt%hnow
+       pt%trans%hold = pt%hnow
+       pt%trans%xsprop = pt%xsprop
+       pt%trans%xspropold = pt%xsprop
+    END DO
+  END SUBROUTINE hydrologic_link_trans_interp
 
 END MODULE hydrologic_link_module

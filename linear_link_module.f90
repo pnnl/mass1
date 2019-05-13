@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-05-10 09:53:50 d3g096
+! Last Change: 2019-05-13 13:23:25 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -57,6 +57,7 @@ MODULE linear_link_module
      PROCEDURE :: max_diffuse => linear_link_max_diffuse
      PROCEDURE :: point => linear_link_point
      PROCEDURE :: check => linear_link_check
+     PROCEDURE :: pre_transport => linear_link_pre_transport
      PROCEDURE :: trans_interp => linear_link_trans_interp
      PROCEDURE :: transport => linear_link_transport
      PROCEDURE :: volume => linear_link_volume
@@ -877,6 +878,19 @@ CONTAINS
             
     END IF
   END FUNCTION linear_link_check
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE linear_link_pre_transport
+  ! ----------------------------------------------------------------
+  SUBROUTINE linear_link_pre_transport(this)
+
+    IMPLICIT NONE
+    CLASS (linear_link_t), INTENT(INOUT) :: this
+
+    ! do nothing
+
+  END SUBROUTINE linear_link_pre_transport
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE linear_link_trans_interp

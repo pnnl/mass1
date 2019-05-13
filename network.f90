@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-05-03 10:01:52 d3g096
+! Last Change: 2019-05-13 12:25:22 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -412,6 +412,8 @@ CONTAINS
     htime1 = htime0 + this%config%time%step
 
     tnow = htime0
+
+    CALL this%links%pre_transport()
     
     IF (this%config%scalar_steps .GT. 0) THEN
        tsteps = this%config%scalar_steps
