@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-05-13 13:23:25 d3g096
+! Last Change: 2019-05-13 14:40:14 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -655,6 +655,7 @@ CONTAINS
     DO point = 1, this%npoints
        ASSOCIATE (pt => this%pt(point))
          pt%hold = pt%hnow
+         pt%xspropold = pt%xsprop
          IF (ASSOCIATED(this%species)) THEN
             pt%trans%hold = pt%hold
             pt%trans%xspropold = pt%xsprop

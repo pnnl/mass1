@@ -39,6 +39,7 @@ MODULE hydrologic_link_module
      PROCEDURE :: read_restart => hydrologic_link_read_restart
      PROCEDURE :: write_restart => hydrologic_link_write_restart
      PROCEDURE :: hydro_update => hydrologic_link_hupdate
+     PROCEDURE :: pre_transport => hydrologic_link_pre_transport
      PROCEDURE :: trans_interp => hydrologic_link_trans_interp
   END type hydrologic_link
 
@@ -194,6 +195,7 @@ CONTAINS
     DO i = 1, this%npoints
        ASSOCIATE (pt => this%pt(i))
          pt%hold = pt%hnow
+         pt%xspropold = pt%xsprop
          IF (ASSOCIATED(this%species)) THEN
             pt%trans%hold = pt%hold
             pt%trans%xspropold = pt%xsprop
@@ -367,6 +369,36 @@ CONTAINS
          &this%storage, this%storage_old
 
   END SUBROUTINE hydrologic_link_write_restart
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE hydrologic_link_pre_transport
+  ! ----------------------------------------------------------------
+  SUBROUTINE hydrologic_link_pre_transport(this)
+
+    IMPLICIT NONE
+    CLASS (hydrologic_link), INTENT(INOUT) :: this
+
+    INTEGER :: i, nspecies, ispec
+    DOUBLE PRECISION :: vold, vnow, cold
+
+    CALL this%transport_link_t%pre_transport()
+
+    nspecies = SIZE(this%species)
+    DO ispec = 1, nspecies
+       DO i = 1, this%npoints - 1
+
+          ! FIXME: dry transport
+          
+          vold = this%pt(i)%xspropold%area*this%dxx(i)
+          vnow = this%pt(i)%xsprop%area*this%dxx(i)
+          
+          cold = this%pt(i)%trans%cnow(ispec)
+          this%pt(i)%trans%cnow(ispec) = cold*vold/vnow
+       END DO
+    END DO
+
+  END SUBROUTINE hydrologic_link_pre_transport
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE hydrologic_link_trans_interp
