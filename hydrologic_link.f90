@@ -39,7 +39,7 @@ MODULE hydrologic_link_module
      PROCEDURE :: read_restart => hydrologic_link_read_restart
      PROCEDURE :: write_restart => hydrologic_link_write_restart
      PROCEDURE :: hydro_update => hydrologic_link_hupdate
-     PROCEDURE :: pre_transport => hydrologic_link_pre_transport
+     !PROCEDURE :: pre_transport => hydrologic_link_pre_transport
      PROCEDURE :: trans_interp => hydrologic_link_trans_interp
   END type hydrologic_link
 
