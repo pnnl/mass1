@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February 18, 2019 by William A. Perkins
-  ! Last Change: 2019-05-13 13:40:09 d3g096
+  ! Last Change: 2019-05-16 08:45:37 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE transport_link_module
@@ -309,7 +309,7 @@ CONTAINS
     END DO
 
     ! FIXME: boundary conditions
-    IF (this%q_up() .GT. 0.0) THEN
+    IF (this%q_up() .GE. 0.0) THEN
        c = 0.0
        IF (ASSOCIATED(this%species(ispec)%usbc)) THEN
           c = this%species(ispec)%getusbc()
