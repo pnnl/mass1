@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February 18, 2019 by William A. Perkins
-  ! Last Change: 2019-05-16 08:45:37 d3g096
+  ! Last Change: 2019-05-22 08:00:50 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE transport_link_module
@@ -278,14 +278,14 @@ CONTAINS
        this%c(this%npoints) = this%c(this%npoints - 1)
     END IF
 
-    ! ! do scalar specific source term
-    ! DO i = 2, this%npoints - 1
-    !    cin = this%c(i) 
-    !    cout = this%species(ispec)%scalar%source(&
-    !         &cin, this%pt(i)%trans, tdeltat, met)
-    !    this%c(i) = cout
-    ! END DO
-    ! this%c(this%npoints) = this%c(this%npoints - 1)
+    ! do scalar specific source term
+    DO i = 2, this%npoints - 1
+       cin = this%c(i) 
+       cout = this%species(ispec)%scalar%source(&
+            &cin, this%pt(i)%trans, tdeltat, met)
+       this%c(i) = cout
+    END DO
+    this%c(this%npoints) = this%c(this%npoints - 1)
 
   END SUBROUTINE transport_link_source
 
