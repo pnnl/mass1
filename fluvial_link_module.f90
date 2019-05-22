@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2019-05-03 12:03:46 d3g096
+! Last Change: 2019-05-22 07:59:19 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -131,12 +131,20 @@ CONTAINS
     ! FIXME: These need to come from the configuration:
     DOUBLE PRECISION :: gr
 
+    CHARACTER (LEN=1024) :: msg
+
     gr = this%gravity
 
     CALL pt1%assign(y1, d1, q1, a1, b1, k1, ky1, fr1)
     CALL pt2%assign(y2, d2, q2, a2, b2, k2, ky2, fr2)
 
     dx = ABS(pt1%x - pt2%x)
+
+    IF (dx .LT. 1.0D-10) THEN
+       WRITE(msg, *) 'link ', this%id, ': zero length between points'
+       CALL error_message(msg, fatal=.TRUE.)
+    END IF
+       
     s1%y = y1
     s1%d = d1
     s1%q = q1
@@ -153,7 +161,7 @@ CONTAINS
     s2%k = k2
     s2%ky  = ky2
     s2%fr = fr2
-    
+
     CALL fluvial_coeff(s1, s2, cf, dx, dt, gr, &
          &this%latqold, this%latq, this%lpiexp, depth_threshold)
 
