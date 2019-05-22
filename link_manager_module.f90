@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2019-05-13 12:23:23 d3g096
+! Last Change: 2019-05-22 09:00:57 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -340,7 +340,7 @@ CONTAINS
             ALLOCATE(rec%flow(rec%nlag))
 
             IF (ASSOCIATED(rec%bc)) THEN
-               WRITE (msg,*) '     Link Boundary Condition #', rec%link%id, &
+               WRITE (msg,*) '     Link Boundary Condition #', rec%bc%id, &
                     &' lagged ', rec%lag, ' days'
             ELSE
                WRITE (msg,*) '     Point 1 on Link #', rec%link%id, &
