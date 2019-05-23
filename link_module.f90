@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2019-05-13 12:24:22 d3g096
+! Last Change: 2019-05-23 11:45:24 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -83,8 +83,10 @@ MODULE link_module
     INTEGER :: bcid, dsbcid, gbcid, tbcid, mzone, lbcid, lgbcid, ltbcid
     DOUBLE PRECISION :: lpiexp
     DOUBLE PRECISION :: gravity
-  CONTAINS 
+  CONTAINS
     PROCEDURE :: defaults => link_input_defaults
+    PROCEDURE link_input_assign
+    GENERIC :: ASSIGNMENT(=) => link_input_assign
   END type link_input_data
 
   ! ----------------------------------------------------------------
@@ -305,6 +307,36 @@ CONTAINS
     this%dsid = 0
 
   END SUBROUTINE link_input_defaults
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_input_assign
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_input_assign(other, self)
+
+    IMPLICIT NONE
+    CLASS (link_input_data), INTENT(OUT) :: other
+    CLASS (link_input_data), INTENT(IN) :: self
+    
+    other%linkid = self%linkid
+    other%inopt = self%inopt
+    other%npt = self%npt
+    other%lorder = self%lorder
+    other%ltype = self%ltype
+    other%nup = self%nup
+    other%dsid = self%dsid
+    other%bcid = self%bcid
+    other%dsbcid = self%dsbcid
+    other%gbcid = self%gbcid
+    other%tbcid = self%tbcid
+    other%mzone = self%mzone
+    other%lbcid = self%lbcid
+    other%lgbcid = self%lgbcid
+    other%ltbcid = self%ltbcid
+    other%lpiexp = self%lpiexp
+    other%gravity = self%gravity
+
+  END SUBROUTINE link_input_assign
+
 
 
   ! ! ----------------------------------------------------------------

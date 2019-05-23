@@ -1,2 +1,3 @@
-1 "@SRC@/../BCFiles/inflow-bc.dat"               /
-2 "@SRC@/tailwater-bc.dat"            /
+1 "@SRC@/inflow-bc.dat"               /
+2 "@SRC@/inflow-bc.dat"               /
+3 "@SRC@/tailwater-bc.dat"            /

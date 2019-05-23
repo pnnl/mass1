@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2019-05-13 14:38:35 d3g096
+! Last Change: 2019-05-23 09:37:14 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -78,7 +78,30 @@ MODULE point_module
      TYPE (point_t), POINTER :: p
   END type point_ptr
 
+  PUBLIC hydro_average
+
 CONTAINS
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE hydro_average
+  ! ----------------------------------------------------------------
+  SUBROUTINE hydro_average(h0, h1, h)
+
+    IMPLICIT NONE
+    TYPE (point_hydro_state), INTENT(IN) :: h0, h1
+    TYPE (point_hydro_state), INTENT(INOUT) :: h
+
+    h%y = 0.5*(h0%y + h1%y)
+    h%q = 0.5*(h0%q + h1%q)
+    h%v = 0.5*(h0%v + h1%v)
+    h%lateral_inflow = 0.5*(h0%lateral_inflow + h1%lateral_inflow)
+    h%friction_slope = 0.5*(h0%friction_slope + h1%friction_slope)
+    h%bed_shear = 0.5*(h0%bed_shear + h1%bed_shear)
+    h%courant_num = 0.5*(h0%courant_num + h1%courant_num)
+    h%diffuse_num = 0.5*(h0%diffuse_num + h1%diffuse_num)
+
+  END SUBROUTINE hydro_average
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE hydro_interp
