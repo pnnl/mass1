@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 22, 1999 by William A. Perkins
-# Last Change: Thu Sep 30 11:46:52 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+# Last Change: 2019-03-29 12:19:26 d3g096
 # -------------------------------------------------------------
 # $Id$
 
@@ -36,6 +36,6 @@ plot C(x, 360.0) title "Analytic: t = 6.0 min", \
      C(x, 1080.0) title "Analytic: t = 18.0 min", \
      C(x, 1440.0) title "Analytic: t = 24.0 min", \
      C(x, 1800.0) title "Analytic: t = 30.0 min", \
-     '<tail +310 profile1.out' using (10584 - $4):10 title 'MASS1 Simulated' with points lt 7
+     '<tail -n +310 profile1.out' using (10584 - $4):10 title 'MASS1 Simulated' with points lt 7
 
 

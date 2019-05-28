@@ -11,6 +11,7 @@ MODULE mass1_dhsvm_module
   USE network_module
   USE link_module
   USE bc_module
+  USE met_zone
 
   IMPLICIT NONE
 
@@ -104,12 +105,16 @@ CONTAINS
     TYPE (DHSVM_date), INTENT(INOUT) :: start, end
     LOGICAL, INTENT(IN) :: quiet, dotemp
 
-    CHARACTER (LEN=1024) :: path, msg
+    CHARACTER (LEN=1024) :: msg
     INTEGER :: id, n
 
     CLASS (link_t), POINTER :: link
     CLASS (simple_bc_t), POINTER :: latbc
-    DOUBLE PRECISION, PARAMETER :: zero(5) = 0.0
+    CLASS (bc_t), POINTER :: stupid
+    TYPE (met_zone_t), POINTER :: zone
+    DOUBLE PRECISION, PARAMETER :: zero(5) = 0.0, tempin(5) = 12.0
+    DOUBLE PRECISION :: coeff(4)
+    INTEGER :: tidx
 
     CALL dnet%net%read(cfgdir)
 
@@ -117,10 +122,13 @@ CONTAINS
       cfg%time%begin = dhsvm_to_decimal(start)
       cfg%time%end = dhsvm_to_decimal(end)
       cfg%time%time = cfg%time%begin
+
+      ! Temperature should be turned ON in the read
+      ! configuration. This is here to turn it off.
       cfg%do_temp = dotemp
       cfg%temp_diffusion = .TRUE.
-      cfg%temp_exchange = .TRUE.
-      cfg%met_required = cfg%do_temp
+      cfg%temp_exchange = .FALSE.
+      cfg%met_required = cfg%temp_exchange
       cfg%quiet = quiet
     END ASSOCIATE
 
@@ -142,13 +150,45 @@ CONTAINS
             latbc%tbl => time_series_alloc(id, 1, 1)
             latbc%tbl%limit_mode = TS_LIMIT_FLAT
             CALL time_series_push(latbc%tbl, dnet%net%config%time%begin, zero)
-            CALL bcs%push(LATFLOW_BC_TYPE, latbc)
+            stupid => latbc
+            CALL bcs%push(LATFLOW_BC_TYPE, stupid)
             link%latbc => latbc
             NULLIFY(latbc)
          ELSE
             WRITE (msg, *) 'link ', id, ': existing lateral inflow table ',&
                  &'may cause problems'
             CALL error_message(msg)
+         END IF
+         IF (dotemp) THEN
+            tidx = dnet%net%scalars%temp_index
+            IF (tidx .LE. 0) THEN
+               CALL error_message("Temperature requested by DHSVM, but not enabled in MASS1",&
+                    &fatal=.TRUE.)
+            END IF
+            ! create a temperature BC for lateral inflow
+            NULLIFY(latbc)
+            ALLOCATE(latbc)
+            latbc%tbl => time_series_alloc(id, 1, 1)
+            latbc%tbl%limit_mode = TS_LIMIT_FLAT
+            CALL time_series_push(latbc%tbl, dnet%net%config%time%begin, tempin)
+            stupid => latbc
+            CALL bcs%push(TEMP_BC_TYPE, stupid)
+            link%species(tidx)%latbc => latbc
+
+            IF (dnet%net%scalars%species(tidx)%p%needmet) THEN
+               coeff(1) = 0.46 ! wind function multiplier
+               coeff(2) = 9.2  ! wind function offset
+               coeff(3) = 0.47 ! conduction coefficient
+               coeff(4) = 0.65 ! "brunt" coefficient for lw atm radiation
+               
+               ALLOCATE(zone)
+               zone%id = link%id
+               zone%coeff = coeff
+               zone%met%ts%limit_mode = TS_LIMIT_FLAT
+
+               CALL dnet%net%met%zonelist%push(zone)
+               link%species(tidx)%met => zone
+            END IF
          END IF
          CALL links%next();
          link =>links%current();

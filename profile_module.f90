@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created January 10, 2018 by William A. Perkins
-  ! Last Change: 2019-02-13 10:16:44 d3g096
+  ! Last Change: 2019-03-21 07:27:31 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE profile_module
@@ -20,6 +20,7 @@ MODULE profile_module
   USE point_module
   USE link_manager_module
   USE mass1_config
+  USE scalar_module
 
   IMPLICIT NONE
 
@@ -118,6 +119,10 @@ MODULE profile_module
      PROCEDURE :: output => profile_manager_output
      PROCEDURE :: destroy => profile_manager_destroy
   END type profile_manager
+
+  INTERFACE profile_manager
+     MODULE PROCEDURE new_profile_manager
+  END INTERFACE
   
   ! This is base for stupid Fortran I/O unit numbers for profile output. 
   INTEGER, PARAMETER :: punit_base = 501
@@ -349,15 +354,18 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE profile_output
   ! ----------------------------------------------------------------
-  SUBROUTINE profile_output(this, date_string, time_string)
+  SUBROUTINE profile_output(this, date_string, time_string, sclrman)
 
     IMPLICIT NONE
     CLASS (profile_t), INTENT(INOUT) :: this
     CHARACTER (LEN=*), INTENT(IN) :: date_string, time_string
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
 
     CLASS (profile_pt), POINTER :: pt
     INTEGER :: j
     DOUBLE PRECISION :: depth
+    DOUBLE PRECISION :: tout, tdgout, tdgsat, tdgpress, cout(10)
+    INTEGER :: ncout, s
 
     IF (this%firstwrite) THEN
        CALL open_new(this%name(), this%punit)
@@ -379,13 +387,49 @@ CONTAINS
        j = j + 1
        depth = pt%pt%hnow%y - pt%pt%thalweg
 
+       ! FIXME: this copies original MASS1 output. it needs to be made
+       ! more general
+       cout = 0.0
+       tout = 0.0
+       tdgout = 0.0
+       tdgsat = 0.0
+       tdgpress = 0.0
+       DO s = 1, sclrman%nspecies
+          CALL sclrman%species(s)%p%output(s, pt%pt, cout, ncout)
+          SELECT CASE (sclrman%species(s)%p%bctype)
+          CASE (TRANS_BC_TYPE)
+             tdgout = cout(1)
+             IF (ncout .GT. 1) THEN
+                tdgsat = cout(2)
+                tdgpress = cout(3)
+             END IF
+          CASE DEFAULT
+             tout = cout(1)
+          END SELECT
+       END DO
+
        WRITE(this%punit,1000) &
-            &pt%link_id, pt%point_idx, j, pt%profx, &
-            &pt%pt%hnow%y, pt%pt%hnow%q, pt%pt%hnow%v, depth, &
-            &0.0, 0.0, 0.0, 0.0, &
-            &pt%pt%thalweg, pt%pt%xsprop%area, pt%pt%xsprop%topwidth,&
-            &pt%pt%xsprop%hydrad, pt%pt%hnow%froude_num, pt%pt%hnow%courant_num,&
-            &pt%pt%hnow%diffuse_num, pt%pt%hnow%friction_slope, pt%pt%hnow%bed_shear
+            &pt%link_id, &
+            &pt%point_idx, &
+            &j, &
+            &pt%profx, &
+            &pt%pt%hnow%y, &
+            &pt%pt%hnow%q, &
+            &pt%pt%hnow%v, &
+            &depth, &
+            &tdgout, &             ! TDG conc
+            &tout, &             ! Temperature
+            &tdgsat, &             ! TDG Sat
+            &tdgpress, &             ! TDG Pressure
+            &pt%pt%thalweg, &
+            &pt%pt%xsprop%area, &
+            &pt%pt%xsprop%topwidth,&
+            &pt%pt%xsprop%hydrad, &
+            &pt%pt%hnow%froude_num, &
+            &pt%pt%hnow%courant_num,&
+            &pt%pt%hnow%diffuse_num, &
+            &pt%pt%hnow%friction_slope, &
+            &pt%pt%hnow%bed_shear
        CALL this%pts%next()
        pt => this%pts%current()
     END DO
@@ -397,8 +441,8 @@ CONTAINS
           5x,'thalweg el',2x,'area ',2x,'top width',2x,'hyd rad',2x,'Fr #',2x,'Cr #',2x,'D #',2x,'frict slope', &
           2x,'bed shear')
 1000      FORMAT(i5,1x,i5,1x,i5,1x,f9.3,1x,f8.3,2x,f14.4,2x,f8.3,2x,f8.3,2x,f10.2,2x,f6.2,2x,f6.2,2x,f6.1,2x, &
-               f8.2,2x,es10.2,2x, &
-               f8.2,2x,f6.2,f6.2,f6.2,f6.2,es10.2,2x,es10.2)
+               f8.3,2x,es10.2,2x, &
+               f8.2,2x,f6.2,f6.2,f6.2,1x,f6.2,es10.2,2x,es10.2)
 
   END SUBROUTINE profile_output
 
@@ -510,6 +554,20 @@ CONTAINS
   END FUNCTION profile_list_current
 
   ! ----------------------------------------------------------------
+  !  FUNCTION new_profile_manager
+  ! ----------------------------------------------------------------
+  FUNCTION new_profile_manager() RESULT (m)
+
+    IMPLICIT NONE
+    TYPE (profile_manager) :: m
+    NULLIFY(m%profs%head)
+    NULLIFY(m%profs%cursor)
+    NULLIFY(m%profs%tail)
+    NULLIFY(m%profs%saved_cursor)
+  END FUNCTION new_profile_manager
+
+
+  ! ----------------------------------------------------------------
   ! SUBROUTINE profile_manager_read
   ! ----------------------------------------------------------------
   SUBROUTINE profile_manager_read(this, theconfig, linkman)
@@ -586,11 +644,12 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE profile_manager_output
   ! ----------------------------------------------------------------
-  SUBROUTINE profile_manager_output(this, time)
+  SUBROUTINE profile_manager_output(this, time, sclrman)
 
     IMPLICIT NONE
     CLASS (profile_manager), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: time
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
 
     CLASS (profile_t), POINTER :: p
     CHARACTER (LEN=20) :: date_string, time_string
@@ -601,7 +660,7 @@ CONTAINS
     p => this%profs%current()
 
     DO WHILE (ASSOCIATED(p))
-       CALL p%output(date_string, time_string)
+       CALL p%output(date_string, time_string, sclrman)
        CALL this%profs%next()
        p => this%profs%current()
     END DO

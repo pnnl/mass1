@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2017-01-19 11:41:09 d3g096
+# Last Change: 2019-04-02 10:34:37 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -46,10 +46,10 @@ set(testfiles
 
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/profile1.out"
-  COMMAND ${mass1exe} > mass1.log
+  COMMAND ${mass1newexe} > mass1.log
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Running test flow/MacDonald-4"
-  DEPENDS mass1 ${testfiles}
+  DEPENDS mass1_new ${testfiles}
 )
 set(rundeps "${CMAKE_CURRENT_BINARY_DIR}/profile1.out")
 
@@ -79,6 +79,7 @@ set_property(DIRECTORY
   output.out
   profile1.out
   status.out
+  error-warning.out
   plot-depth.eps
   plot-elev.eps
   mass1.log

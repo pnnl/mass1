@@ -4,7 +4,7 @@ MASS1 Configuration File - Version 0.82 $Id$
 0 	/ Do Gas
 0 	/ Do Temp
 0 	/ Do Printout
-0 	/ Do Gage Printout
+1 	/ Do Gage Printout
 1 	/ Do Profile Printout
 0 	/ Do Gas Dispersion
 0 	/ Do Gas Air/Water Exchange

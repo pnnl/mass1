@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2019-02-13 10:42:28 d3g096
+# Last Change: 2019-05-23 10:53:27 d3g096
 # -------------------------------------------------------------
 
 
@@ -24,6 +24,9 @@ add_subdirectory(flow/MacDonald-4)
 add_subdirectory(flow/MacDonald-3)
 add_subdirectory(flow/MacDonald-1)
 add_subdirectory(flow/storage)
+add_subdirectory(flow/slopebreak3-metric)
+add_subdirectory(flow/slopebreak2-metric)
+add_subdirectory(flow/slopebreak1-metric)
 add_subdirectory(flow/slopebreak3)
 add_subdirectory(flow/slopebreak2)
 add_subdirectory(flow/slopebreak1)
@@ -33,4 +36,10 @@ add_subdirectory(flow/normal-metric)
 add_subdirectory(flow/normal)
 
 add_subdirectory(transport/advection-1-segment)
+add_subdirectory(transport/lateral-inflow)
+add_subdirectory(transport/pulse)
+#add_subdirectory(transport/hlink-lateral-inflow)
+#add_subdirectory(transport/hlink-advection-1-segment)
+#add_subdirectory(transport/hlink-advection-diffusion-1-segment)
+#add_subdirectory(transport/hlink-pulse)
 add_subdirectory(temperature/pond)

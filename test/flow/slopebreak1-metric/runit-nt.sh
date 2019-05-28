@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 11, 1998 by William A. Perkins
-# Last Change: Thu Apr  1 11:48:24 1999 by William A. Perkins <perk@tophet>
+# Last Change: Tue Mar  7 21:45:01 2000 by William A. Perkins <perk@mack.pnl.gov>
 # -------------------------------------------------------------
 # $Id$
 
@@ -18,26 +18,15 @@ set -e
 
 model=../../../Release/mass1_v082
 
-rm -f mass1.cfg
-cp mass1-warmup.cfg mass1.cfg
-$model
-
-cp mass1-Cn=1.0.cfg mass1.cfg
 $model
 
 (echo \
-    'set terminal postscript landscape color solid "Helvetica" 14;' \
-    'set title "Advective Diffusion Analytic Solution\nCourant Number = 1.0";' \
-    'load "plot.gp";' ) | \
-        gnuplot > plot-Cn=1.0.ps
-
-cp mass1-Cn=0.1.cfg mass1.cfg
-$model
-
+    set terminal postscript landscape color solid \"Helvetica\" 14\; \
+    set title \"Normal Flow: 1000 cfs\"\; \
+    load \"plot.gp\"\; ) | \
+        gnuplot > plot.ps
 (echo \
-    'set terminal postscript landscape color solid "Helvetica" 14;' \
-    'set title "Advective Diffusion Analytic Solution\nCourant Number = 0.1";' \
-    'load "plot.gp";' ) | \
-        gnuplot > plot-Cn=0.1.ps
-
-rm -f mass1.cfg
+    set terminal postscript eps color solid \"Helvetica\" 14 \; \
+    set title \"Normal Flow: 1000 cfs\"\; \
+    load \"plot.gp\"\; ) | \
+        gnuplot > plot.ps

@@ -1,0 +1,128 @@
+# -------------------------------------------------------------
+# file: CMakeLists.txt
+# -------------------------------------------------------------
+# -------------------------------------------------------------
+# Battelle Memorial Institute
+# Pacific Northwest Laboratory
+# -------------------------------------------------------------
+# -------------------------------------------------------------
+# Created January 19, 2017 by William A. Perkins
+# Last Change: 2019-05-10 12:16:43 d3g096
+# -------------------------------------------------------------
+
+set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
+
+set(CASES "inflow" "outflow" "vary")
+set(TITLES
+  "Transport with Lateral Inflow"
+  "Transport with Lateral Outflow"
+  "Transport with Varying Lateral Flow")
+
+list(LENGTH CASES count)
+math(EXPR count "${count}-1")
+foreach(i RANGE ${count})
+  list(GET CASES ${i} c)
+  list(GET TITLES ${i} t)
+
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/mass1-${c}.cfg.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/mass1-${c}.cfg"
+    )
+endforeach()
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/link-bc-files.dat.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/link-bc-files.dat"
+)
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/lat-inflow-files.dat.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/lat-inflow-files.dat"
+)
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/lat-outflow-files.dat.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/lat-outflow-files.dat"
+)
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/temp-bc-files.dat.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/temp-bc-files.dat"
+)
+
+set(testfiles 
+  "${CMAKE_CURRENT_BINARY_DIR}/link-bc-files.dat"
+  "${CMAKE_CURRENT_BINARY_DIR}/temp-bc-files.dat"
+  "${CMAKE_CURRENT_SOURCE_DIR}/initial.dat"
+  "${CMAKE_CURRENT_SOURCE_DIR}/link.dat"
+  "${CMAKE_CURRENT_SOURCE_DIR}/point.dat"
+  "${CMAKE_CURRENT_SOURCE_DIR}/profile_control.dat"
+  "${CMAKE_CURRENT_SOURCE_DIR}/section.dat"
+  "${CMAKE_CURRENT_SOURCE_DIR}/inflow-bc.dat"
+  "${CMAKE_CURRENT_SOURCE_DIR}/tailwater-bc.dat"
+)
+
+set(rundeps)
+
+foreach(c ${CASES})
+
+  set(out "profile1.${c}.out")
+  set(gpfile "plot-${c}.gp")
+  set(plot "plot-${c}.eps")
+  set(exdep "")
+  
+  add_custom_command(
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${out}"
+    COMMAND ${CMAKE_COMMAND} -E copy mass1-${c}.cfg mass1.cfg
+    COMMAND ${mass1newexe} > mass1.log
+    COMMAND ${CMAKE_COMMAND} -E copy profile1.out profile1.${c}.out 
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    COMMENT "Running test transport/hlink-lateral-inflow (${c})"
+    DEPENDS mass1_new "${CMAKE_CURRENT_BINARY_DIR}/mass1-${c}.cfg" ${testfiles} ${exdep}
+    )
+
+  if (GNUPLOT_EXECUTABLE)
+    add_custom_command(
+      OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${gpfile}
+      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+      COMMAND ${CMAKE_COMMAND} -E echo "set terminal postscript portrait color solid \\\"Helvetica\\\" 14" > ${gpfile}
+      COMMAND ${CMAKE_COMMAND} -E echo "set title \\\"${t}\\\"" >> ${gpfile}
+      COMMAND ${CMAKE_COMMAND} -E echo "pfile = \\\"${CMAKE_CURRENT_BINARY_DIR}/${out}\\\"" >>  ${gpfile}
+      COMMAND ${CMAKE_COMMAND} -E echo "load \\\"${CMAKE_CURRENT_SOURCE_DIR}/plot.gp\\\"" >> ${gpfile}
+      DEPENDS
+      "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp"
+      )
+    add_custom_command(
+      OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${plot}
+      COMMAND "${GNUPLOT_EXECUTABLE}" "${CMAKE_CURRENT_BINARY_DIR}/${gpfile}" > ${plot}
+      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+      COMMENT "Plotting test transport/hlink-lateral-inflow (${c})"
+      DEPENDS 
+      "${CMAKE_CURRENT_BINARY_DIR}/${out}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp"
+      "${CMAKE_CURRENT_BINARY_DIR}/${gpfile}"
+      )
+    list(APPEND rundeps ${CMAKE_CURRENT_BINARY_DIR}/plot-${c}.eps)
+  else()
+    list(APPEND rundeps "${CMAKE_CURRENT_BINARY_DIR}/profile1.${c}.out")
+  endif (GNUPLOT_EXECUTABLE)
+endforeach()
+
+add_custom_target(run_hlink_lateral_inflow_transport_test
+  DEPENDS ${rundeps}
+)
+add_dependencies(runtests run_hlink_lateral_inflow_transport_test)
+
+set_property(DIRECTORY 
+  APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
+  debug.txt
+  output.out
+  profile1.out
+  profile1.warmup.out
+  status.out
+  error-warning.out
+  ts11.out ts1149.out
+  plot-depth.eps
+  plot-elev.eps
+  mass1.log
+)
+

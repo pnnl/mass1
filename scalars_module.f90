@@ -277,7 +277,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
   USE mass1_config
   USE transport_vars , ONLY : dxx
   USE link_vars
-  USE point_vars, ONLY: x, k_diff, thalweg
+  USE point_vars, ONLY: x, k_diff, thalweg, lateral_inflow, lateral_inflow_old
   
   USE energy_flux
   USE tdg_equation_coeff
@@ -716,7 +716,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
               f(point)=velave*( c(link,point+1) +        &
                    0.5*(1.0-cflx)*phi*f(point) )
            end if
-           
+
         END DO
         
         !update concentration values
@@ -727,6 +727,12 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
            c(link,point)=c(link,point)*area_old(link,point)/area(link,point) - &
                 &dtdx*(f(point) - f(point-1))/area(link,point)
            c_old(link,point) = c(link,point)                    
+           ! IF (point .EQ. 100) THEN
+           !    WRITE(*, '(*(1X,E10.3))') dtdx, &
+           !         &q(link, point), q_old(link,point),&
+           !         &area(link,point), area_old(link,point), &
+           !         &f(point), f(point-1)
+           ! END IF
         END DO
         
         c(link,maxpoints(link)) = c(link,maxpoints(link)-1)
@@ -790,6 +796,9 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
               END IF
               c(link,point) = (c(link,point)*avg_area + upstream_c*avg_latq*delta_t)/avg_area
               ! IF(c(link,point) < 0.0) c(link,point) = 0.0
+              ! WRITE(*,'(2I4,1X,9(1X,E11.4))') link, point, c(link,point), upstream_c, avg_area, &
+              !      &latq_old(link,point), latq(link,point), avg_latq, &
+              !      &lateral_inflow_old(link,point), lateral_inflow(link,point), delta_t
            END DO
            c(link,maxpoints(link)) = c(link,maxpoints(link)-1)
         END IF

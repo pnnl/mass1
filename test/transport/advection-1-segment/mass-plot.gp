@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 16, 2000 by William A. Perkins
-# Last Change: Thu Sep 30 11:50:19 2010 by William A. Perkins <d3g096@PE10900.pnl.gov>
+# Last Change: 2019-05-10 07:44:56 d3g096
 # -------------------------------------------------------------
 # $Id$
 
@@ -22,7 +22,11 @@ set ylabel 'Contaminant Mass'
 
 set key bottom
 
+infile = sprintf("ts11-%s.out", case)
+outfile = sprintf("ts1149-%s.out", case)
+cmdstr = "<awk '$0 !~ /^#/ {sum=sum+$4*$8*144; print $1, $2, sum; }' %s"
+
 plot 7200000 notitle with lines lt 0, \
-     "<awk '$0 !~ /^#/ {sum=sum+$4*$8*144; print $1, $2, sum; }' ts11.out" using 1:3 title 'Inflow' with lines lt 1, \
-     "<awk '$0 !~ /^#/ {sum=sum+$4*$8*144; print $1, $2, sum; }' ts1149.out" using 1:3 title 'Outflow' with lines lt 3
+     sprintf(cmdstr, infile) using 1:3 title 'Inflow' with lines lt 1, \
+     sprintf(cmdstr, outfile) using 1:3 title 'Outflow' with lines lt 3
      

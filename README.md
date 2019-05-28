@@ -28,14 +28,11 @@ find it useful.
 ## Obtaining the Code
 
 The MASS1 source code is currently hosted on PNNL's internal Git
-repository.  MASS1 shares some code with other applications, which is
-included in MASS1 as a Git sub-module.  Do the following to check out
-the code:
+repository.  Do the following to check out the code:
 
 ```
 git clone https://stash.pnnl.gov/scm/~d3g096/mass1.git
 cd mass1
-git submodule update --init
 ```
 
 ## Requirements
@@ -47,7 +44,7 @@ The following should work on Windows if [Cygwin](https://cygwin.com/)
 or [MinGW](http://www.mingw.org/) is utilized.  A native Windows build
 may be available in the future. 
 
-### Fortran 2003 compiler
+### Fortran 2003/2008 compiler
 
 MASS1 is written in Fortran and makes use of several
 [Fortran 2003](http://fortranwiki.org/fortran/show/Fortran+2003)
@@ -58,14 +55,14 @@ known to work:
 * [GNU Fortran](https://gcc.gnu.org/fortran/), Version 4.8 or higher
 
 * [Intel Fortran](https://software.intel.com/en-us/fortran-compilers),
-  Version 18 or higher 
+  Version 15 or higher 
 
 In general, the Intel compiler produces a faster executable, but for
 most applications, this is not noticable. In the past, Fortran
 compilers from [NAG](https://www.nag.com/nag-compiler),
 [Absoft](https://www.absoft.com/),
 [IBM](http://www-03.ibm.com/software/products/en/xlfortran-linux), and
-others have worked.  
+others have worked, but they are no longer used.  
 
 ## Optional Software
 
@@ -116,16 +113,20 @@ test cases. It's use is optional.
 MASS1 uses [CMake](https://cmake.org/) cross-platform tools to
 configure and build MASS1.  CMake queries  the system
 and determine if the compiler has sufficient capability to compile
-MASS1 and if optional software is available.  
+MASS1 and if optional software is available.  This works well on Mac
+and Linux systems, and should work on Windows, but the authors do not
+use or develop MASS1 on Windows.  
 
-A typical configuration:
+A typical configuration and build:
 
 1. In the top MASS1 source directory (where `CMakeLists.txt` is
    located), make a directory for the build, called `build` maybe, and
    change into that directory.
    
 2. If necessary, choose the Fortran compiler to use by setting `FC`
-   and `FCFLAGS` environment variables. For example, 
+   and `FCFLAGS` environment variables. This is recommended, because
+   [CMake](https://cmake.org/) will work very hard to choose the wrong
+   compiler. For example, in a Bourne-like shell,
 
 ```
 mkdir build
@@ -134,6 +135,24 @@ FC=gfortran
 export FC
 cmake -D CMAKE_BUILD_TYPE:STRING=Release ..
 ```
+
+3. To build MASS1, just run `make` in the `build` directory
+
+
+4. (Optional) Run tests. The `test` subdirectory contains several
+   tests and examples of various MASS1 capabilities.  Many of these
+   tests can be run with
+   
+```
+make runtests
+```
+
+   This will run a number of tests. The simulation output is not
+   actually checked, but if these tests run, output is usually
+   correct.  A number of graphics are created (if
+   [Gnuplot](http://www.gnuplot.info/) is available) for the tests.
+   Browse the `build/test` directory after `make runtests`
+   completion.
 
 ## Usage
 

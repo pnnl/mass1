@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2019-02-14 12:52:49 d3g096
+! Last Change: 2019-05-22 09:00:57 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -26,6 +26,7 @@ MODULE link_manager_module
   USE hydrologic_link_module
   USE bc_module
   USE section_handler_module
+  USE scalar_module
 
   IMPLICIT NONE
 
@@ -63,8 +64,12 @@ MODULE link_manager_module
      PROCEDURE :: hyupdate => link_manager_hyupdate
      PROCEDURE :: read_restart => link_manager_read_restart
      PROCEDURE :: write_restart => link_manager_write_restart
+     PROCEDURE :: read_trans_restart => link_manager_read_trans_restart
+     PROCEDURE :: write_trans_restart => link_manager_write_trans_restart
+     PROCEDURE :: pre_transport => link_manager_pre_transport
      PROCEDURE :: transport_steps => link_manager_transport_steps
-     ! PROCEDURE :: transport => link_manager_transport
+     PROCEDURE :: transport_interp => link_manager_transport_interp
+     PROCEDURE :: transport => link_manager_transport
      PROCEDURE :: destroy => link_manager_destroy
   END type link_manager_t
 
@@ -335,7 +340,7 @@ CONTAINS
             ALLOCATE(rec%flow(rec%nlag))
 
             IF (ASSOCIATED(rec%bc)) THEN
-               WRITE (msg,*) '     Link Boundary Condition #', rec%link%id, &
+               WRITE (msg,*) '     Link Boundary Condition #', rec%bc%id, &
                     &' lagged ', rec%lag, ' days'
             ELSE
                WRITE (msg,*) '     Point 1 on Link #', rec%link%id, &
@@ -463,7 +468,7 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_read
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_read(this, theconfig, bcman, sectman)
+  SUBROUTINE link_manager_read(this, theconfig, bcman, sectman, sclrman, metman)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
@@ -471,6 +476,8 @@ CONTAINS
     CLASS (bc_manager_t), INTENT(IN) :: bcman
     CLASS (link_t), POINTER :: link
     CLASS (section_handler), INTENT(INOUT) :: sectman
+    CLASS (scalar_manager), INTENT(IN) :: sclrman
+    CLASS (met_zone_manager_t), INTENT(INOUT) :: metman
     INTEGER, PARAMETER :: lunit = 21
     INTEGER :: recno, ierr, iostat, npid
     TYPE (link_input_data) :: ldata
@@ -502,6 +509,8 @@ CONTAINS
             & ldata%lgbcid, &
             & ldata%ltbcid, &
             & ldata%lpiexp
+
+       ldata%gravity = theconfig%grav
 
        IF (IS_IOSTAT_END(iostat)) THEN
           EXIT
@@ -583,7 +592,7 @@ CONTAINS
 
        CALL link%construct()
 
-       IF (link%initialize(ldata, bcman) .NE. 0) THEN
+       IF (link%initialize(ldata, bcman, sclrman, metman) .NE. 0) THEN
           WRITE(msg, *) TRIM(theconfig%link_file), ': link record ', recno, &
                & ', link id = ', ldata%linkid, ': error'
           CALL error_message(msg)
@@ -820,11 +829,11 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_flow_backward
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_flow_backward(this, deltat, grav, dsbc_type)
+  SUBROUTINE link_manager_flow_backward(this, deltat, grav, unitwt, dsbc_type)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: deltat, grav
+    DOUBLE PRECISION, INTENT(IN) :: deltat, grav, unitwt
     INTEGER, INTENT(IN) :: dsbc_type
 
     CLASS (link_t), POINTER :: link
@@ -836,7 +845,7 @@ CONTAINS
        DO WHILE (ASSOCIATED(link))
           IF (link%order .EQ. l) THEN
              CALL link%backward_sweep(dsbc_type)
-             CALL link%hydro_update(grav, deltat)
+             CALL link%hydro_update(grav, unitwt, deltat)
           END IF
           CALL this%links%next()
           link => this%links%current()
@@ -848,18 +857,18 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_hyupdate
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_hyupdate(this, grav, dt)
+  SUBROUTINE link_manager_hyupdate(this, grav, unitwt, dt)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
-    DOUBLE PRECISION, INTENT(IN) :: grav, dt
+    DOUBLE PRECISION, INTENT(IN) :: grav, unitwt, dt
     CLASS (link_t), POINTER :: link
     
     CALL this%links%begin()
     link => this%links%current()
 
     DO WHILE (ASSOCIATED(link))
-       CALL link%hydro_update(grav, dt)
+       CALL link%hydro_update(grav, unitwt, dt)
        CALL this%links%next()
        link => this%links%current()
     END DO
@@ -888,6 +897,27 @@ CONTAINS
   END SUBROUTINE link_manager_read_restart
 
   ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_read_trans_restart
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_read_trans_restart(this, iounit, nspecies)
+
+    IMPLICIT NONE
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: iounit, nspecies
+    CLASS (link_t), POINTER :: link
+
+    CALL this%links%begin()
+    link => this%links%current()
+
+    DO WHILE (ASSOCIATED(link))
+       CALL link%read_trans_restart(iounit, nspecies)
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+    
+  END SUBROUTINE link_manager_read_trans_restart
+
+  ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_write_restart
   ! ----------------------------------------------------------------
   SUBROUTINE link_manager_write_restart(this, iounit)
@@ -908,6 +938,49 @@ CONTAINS
     END DO
 
   END SUBROUTINE link_manager_write_restart
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_write_trans_restart
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_write_trans_restart(this, iounit, nspecies)
+
+    IMPLICIT NONE
+
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: iounit, nspecies
+    CLASS (link_t), POINTER :: link
+
+    CALL this%links%begin()
+    link => this%links%current()
+
+    DO WHILE (ASSOCIATED(link))
+       CALL link%write_trans_restart(iounit, nspecies)
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+
+  END SUBROUTINE link_manager_write_trans_restart
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_pre_transport
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_pre_transport(this)
+
+    IMPLICIT NONE
+
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    CLASS (link_t), POINTER :: link
+    
+    CALL this%links%begin()
+    link => this%links%current()
+
+    DO WHILE (ASSOCIATED(link))
+       CALL link%pre_transport()
+
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+  END SUBROUTINE link_manager_pre_transport
 
   ! ----------------------------------------------------------------
   ! INTEGER FUNCTION link_manager_transport_steps
@@ -958,6 +1031,52 @@ CONTAINS
 
   END FUNCTION link_manager_transport_steps
 
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_transport_interp
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_transport_interp(this, tnow, htime0, htime1)
+
+    IMPLICIT NONE
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: tnow, htime0, htime1
+    CLASS (link_t), POINTER :: link
+
+    CALL this%links%begin()
+    link => this%links%current()
+
+    DO WHILE (ASSOCIATED(link))
+       CALL link%trans_interp(tnow, htime0, htime1)
+
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+  END SUBROUTINE link_manager_transport_interp
+
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_transport
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_transport(this, ispec, tdeltat)
+
+    IMPLICIT NONE
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: ispec
+    DOUBLE PRECISION, INTENT(IN) :: tdeltat
+    
+    CLASS (link_t), POINTER :: link
+
+    CALL this%links%begin()
+    link => this%links%current()
+
+    DO WHILE (ASSOCIATED(link))
+       CALL link%transport(ispec, tdeltat)
+
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+
+  END SUBROUTINE link_manager_transport
 
 
   ! ----------------------------------------------------------------

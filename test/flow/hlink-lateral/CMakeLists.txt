@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2018-08-16 06:56:04 d3g096
+# Last Change: 2019-03-13 07:28:39 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -107,6 +107,7 @@ set_property(DIRECTORY
   profile1.inflow.out
   profile1.outflow.out
   status.out
+  error-warning.out
   plot-depth.eps
   plot-elev.eps
   mass1.log

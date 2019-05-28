@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2019-02-15 13:37:21 d3g096
+! Last Change: 2019-04-02 10:15:28 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE mass1_config
@@ -126,6 +126,8 @@ MODULE mass1_config
      CHARACTER(LEN=path_length) :: pid_file
 
      LOGICAL :: quiet
+
+     LOGICAL :: do_transport
 
    CONTAINS
      PROCEDURE :: read => configuration_read
@@ -531,9 +533,22 @@ CONTAINS
     this%time%delta_t = this%time%delta_t*3600.0
     this%time%current_step = 0
 
-    this%met_required = &
-         &(this%do_temp .AND. this%temp_exchange) .OR. &
-         &(this%do_gas .AND. this%gas_exchange)
+    this%do_transport = (this%do_temp .OR. this%do_gas)
+    IF (this%do_transport) THEN
+
+       IF (this%do_gas .AND. this%gas_exchange) THEN
+          IF (.NOT. this%do_temp) THEN
+             CALL error_message(&
+                  &"Simulating TDG with atmospheric exchange requries temperature", &
+                  &FATAL=.TRUE.)
+          END IF
+       END IF
+
+       this%met_required = &
+            &(this%do_temp .AND. this%temp_exchange) .OR. &
+            &(this%do_gas .AND. this%gas_exchange)
+
+    END IF
 
     RETURN 
 

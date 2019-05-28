@@ -15,12 +15,7 @@
 set -x
 set -e
 
-                                # to trap floating point errors on SGI
-
-TRAP_FPE='INVALID=ABORT(1);UNDERFL=ZERO;OVERFL=ABORT(1);INT_OVERFL=ABORT(1);DIVZERO=ABORT(1);DEBUG'
-export TRAP_FPE
-
-model=${MODEL-../../../build/mass1}
+model=${MODEL-../../../build/mass1_new}
 
 rm -f mass1.cfg
 ln -f -s mass1-warmup.cfg mass1.cfg
