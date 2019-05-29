@@ -249,6 +249,7 @@ CONTAINS
 
     ! get upstream inflow (volume)
 
+    invol = 0.0
     IF (ASSOCIATED(this%ucon)) THEN
        ! do something to get a discharge (there should only be
        ! hydrologic links upstream)
@@ -256,8 +257,6 @@ CONTAINS
     ELSE
        IF (ASSOCIATED(this%usbc)) THEN
           invol = this%usbc%current_value
-       ELSE 
-          invol = 0.0
        END IF
     END IF
     
