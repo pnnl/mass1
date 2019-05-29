@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-03-29 09:55:37 d3g096
+! Last Change: 2019-05-13 12:25:22 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -74,10 +74,11 @@ CONTAINS
 
     IMPLICIT NONE
     TYPE (network) :: net
-    net%bcs = new_bc_manager()
+    net%bcs = bc_manager_t()
     net%met = met_zone_manager_t()
-    net%sections = new_section_handler()
-    net%links = new_link_manager()
+    net%sections = section_handler()
+    net%links = link_manager_t()
+    net%gages = gage_manager()
 
   END FUNCTION new_network
 
@@ -403,7 +404,6 @@ CONTAINS
 
     IMPLICIT NONE
     CLASS (network), INTENT(INOUT) :: this
-    INTEGER :: nsteps
     DOUBLE PRECISION :: htime0, htime1
     DOUBLE PRECISION :: tnow, tdeltat
     INTEGER :: tsteps, i, ispec
@@ -412,6 +412,8 @@ CONTAINS
     htime1 = htime0 + this%config%time%step
 
     tnow = htime0
+
+    CALL this%links%pre_transport()
     
     IF (this%config%scalar_steps .GT. 0) THEN
        tsteps = this%config%scalar_steps
@@ -425,7 +427,8 @@ CONTAINS
     DO i = 1, tsteps
        CALL this%bcs%update(tnow)
        CALL this%met%update(tnow)
-       CALL this%links%transport_interp(tnow, htime0, htime1)
+       CALL this%links%transport_interp(&
+            &tnow + this%config%time%step/DBLE(tsteps), htime0, htime1)
        DO ispec = 1, this%scalars%nspecies
           CALL this%links%transport(ispec, tdeltat)
        END DO

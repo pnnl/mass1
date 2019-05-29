@@ -133,16 +133,18 @@ SUBROUTINE flow_sim
            s1%ky = dkdy
            s1%fr = froude_num(link,point)
 
-           IF (s1%a .GT. 0.0D00) THEN
-              vel(link,point_num) = s1%q/s1%a
-              area_old(link,point_num) = s1%a
-           ELSE 
-              vel(link,point_num) = 0.0
-              area_old(link,point_num) = 0.0
+           IF (point .EQ. 1) THEN
+              IF (s1%a .GT. 0.0D00) THEN
+                 vel(link,point_num) = s1%q/s1%a
+                 area_old(link,point_num) = s1%a
+              ELSE 
+                 vel(link,point_num) = 0.0
+                 area_old(link,point_num) = 0.0
+              END IF
+              q_old(link,point_num) = s1%q
+              y_old(link,point_num) = s1%y
            END IF
-           q_old(link,point_num) = s1%q
-           y_old(link,point_num) = s1%y
-
+           
            point_num = point + 1
            depth = y(link,point+1) - thalweg(link,point+1)
            depth = MAX(depth, depth_minimum)

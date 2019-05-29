@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-04-02 10:24:55 d3g096
+! Last Change: 2019-05-13 14:40:14 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -29,6 +29,7 @@ MODULE linear_link_module
   PRIVATE
 
   TYPE, PUBLIC, EXTENDS(link_t) :: linear_link_t
+     DOUBLE PRECISION :: latq, latqold
      INTEGER :: npoints
      INTEGER :: input_option
      TYPE (point_t), DIMENSION(:),POINTER :: pt
@@ -56,8 +57,10 @@ MODULE linear_link_module
      PROCEDURE :: max_diffuse => linear_link_max_diffuse
      PROCEDURE :: point => linear_link_point
      PROCEDURE :: check => linear_link_check
+     PROCEDURE :: pre_transport => linear_link_pre_transport
      PROCEDURE :: trans_interp => linear_link_trans_interp
      PROCEDURE :: transport => linear_link_transport
+     PROCEDURE :: volume => linear_link_volume
      PROCEDURE :: destroy => linear_link_destroy
   END type linear_link_t
 
@@ -112,6 +115,9 @@ CONTAINS
           END IF
        END IF
     END IF
+
+    this%latq = 0.0
+    this%latqold = 0.0
 
     IF (sclrman%nspecies .GT. 0) THEN
        DO i = 1, this%npoints
@@ -646,6 +652,17 @@ CONTAINS
     DOUBLE PRECISION :: bcval, denom
     TYPE (coeff) :: cf
 
+    DO point = 1, this%npoints
+       ASSOCIATE (pt => this%pt(point))
+         pt%hold = pt%hnow
+         pt%xspropold = pt%xsprop
+         IF (ASSOCIATED(this%species)) THEN
+            pt%trans%hold = pt%hold
+            pt%trans%xspropold = pt%xsprop
+         END IF
+       END ASSOCIATE
+    END DO
+
     point = 1
     IF (ASSOCIATED(this%ucon)) THEN
        this%pt(point)%sweep%e = this%ucon%coeff_e()
@@ -659,6 +676,14 @@ CONTAINS
        this%pt(point)%hnow%q = bcval
        this%pt(point)%sweep%e = 0.0
        this%pt(point)%sweep%f = bcval - this%pt(point)%hnow%q
+    END IF
+
+    IF (ASSOCIATED(this%latbc)) THEN
+       this%latqold = this%latq
+       this%latq = this%latbc%current_value
+       DO point = 1, this%npoints
+          this%pt(point)%hnow%lateral_inflow = this%latq
+       END DO
     END IF
 
     DO point = 1, this%npoints - 1
@@ -691,14 +716,16 @@ CONTAINS
     INTEGER, INTENT(IN) :: dsbc_type
     DOUBLE PRECISION :: bcval, dy, dq
     INTEGER :: point
+    CLASS (point_t), POINTER :: pt
     
 
     point = this%npoints
+    pt => this%pt(point)
     
     IF (ASSOCIATED(this%dcon)) THEN
 
-       dy = this%dcon%elev() - this%pt(point)%hnow%y
-       dq = this%pt(point)%sweep%e*dy + this%pt(point)%sweep%f
+       dy = this%dcon%elev() - pt%hnow%y
+       dq = pt%sweep%e*dy + pt%sweep%f
 
     ELSE IF (ASSOCIATED(this%dsbc)) THEN
 
@@ -706,27 +733,30 @@ CONTAINS
        SELECT CASE(dsbc_type)
        CASE(1)
           ! given downstream stage
-          dy = bcval - this%pt(point)%hnow%y
-          dq = this%pt(point)%sweep%e*dy + this%pt(point)%sweep%f
+          dy = bcval - pt%hnow%y
+          dq = pt%sweep%e*dy + pt%sweep%f
        CASE(2)
           ! given downstream discharge
-          dq = bcval - this%pt(point)%hnow%q
-          dy = (dq - this%pt(point)%sweep%f)/this%pt(point)%sweep%e
+          dq = bcval - pt%hnow%q
+          dy = (dq - pt%sweep%f)/pt%sweep%e
        END SELECT
     ELSE 
        CALL error_message("This should not happen in linear_link_backward", &
             &fatal=.TRUE.)
     END IF
 
-    this%pt(point)%hnow%y = this%pt(point)%hnow%y + dy
-    this%pt(point)%hnow%q = this%pt(point)%hnow%q + dq
+    pt%hnow%y = pt%hnow%y + dy
+    pt%hnow%q = pt%hnow%q + dq
 
     DO point = this%npoints - 1, 1, -1
-       dy = this%pt(point)%sweep%l*dy + this%pt(point)%sweep%m*dq + this%pt(point)%sweep%n
-       dq = this%pt(point)%sweep%e*dy + this%pt(point)%sweep%f
 
-       this%pt(point)%hnow%y = this%pt(point)%hnow%y + dy
-       this%pt(point)%hnow%q = this%pt(point)%hnow%q + dq
+       pt => this%pt(point)
+       
+       dy = pt%sweep%l*dy + pt%sweep%m*dq + pt%sweep%n
+       dq = pt%sweep%e*dy + pt%sweep%f
+
+       pt%hnow%y = pt%hnow%y + dy
+       pt%hnow%q = pt%hnow%q + dq
        
     END DO
 
@@ -755,14 +785,6 @@ CONTAINS
        END IF
        CALL this%pt(p)%hydro_update(grav, unitwt, dt, dx)
     END DO
-
-    ! Update the transport hydro state and section properties
-    IF (ASSOCIATED(this%species)) THEN
-       DO p = 1, this%npoints
-          this%pt(p)%trans%hnow = this%pt(p)%hnow
-          this%pt(p)%trans%xsprop = this%pt(p)%xsprop
-       END DO
-    END IF
 
   END SUBROUTINE linear_link_hupdate
 
@@ -859,6 +881,19 @@ CONTAINS
   END FUNCTION linear_link_check
 
   ! ----------------------------------------------------------------
+  ! SUBROUTINE linear_link_pre_transport
+  ! ----------------------------------------------------------------
+  SUBROUTINE linear_link_pre_transport(this)
+
+    IMPLICIT NONE
+    CLASS (linear_link_t), INTENT(INOUT) :: this
+
+    ! do nothing
+
+  END SUBROUTINE linear_link_pre_transport
+
+
+  ! ----------------------------------------------------------------
   ! SUBROUTINE linear_link_trans_interp
   ! ----------------------------------------------------------------
   SUBROUTINE linear_link_trans_interp(this, tnow, htime0, htime1)
@@ -868,7 +903,8 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: tnow, htime0, htime1
     INTEGER :: i
     CLASS (point_t), POINTER :: pt
-    
+    DOUBLE PRECISION :: depth
+
     DO i = 1, this%points()
        pt => this%point(i)
        pt%trans%hold = pt%trans%hnow
@@ -943,7 +979,29 @@ CONTAINS
 
   END SUBROUTINE linear_link_destroy
 
-  
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION linear_link_volume
+  ! ----------------------------------------------------------------
+  FUNCTION linear_link_volume(this) RESULT(v)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION :: v
+    CLASS (linear_link_t), INTENT(IN) :: this
+
+    INTEGER :: i
+    DOUBLE PRECISION :: x0, x1, a0, a1
+
+    v = 0
+    DO i = 2, this%npoints
+       x0 = this%pt(i-1)%x
+       x1 = this%pt(i)%x
+       a0 = this%pt(i-1)%xsprop%area
+       a1 = this%pt(i)%xsprop%area
+       v = v + 0.5*(a1+a0)*ABS(x1-x0)
+    END DO
+  END FUNCTION linear_link_volume
+
 
 
 END MODULE linear_link_module

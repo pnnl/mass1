@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2019-04-02 10:27:42 d3g096
+! Last Change: 2019-05-23 11:45:24 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -83,8 +83,10 @@ MODULE link_module
     INTEGER :: bcid, dsbcid, gbcid, tbcid, mzone, lbcid, lgbcid, ltbcid
     DOUBLE PRECISION :: lpiexp
     DOUBLE PRECISION :: gravity
-  CONTAINS 
+  CONTAINS
     PROCEDURE :: defaults => link_input_defaults
+    PROCEDURE link_input_assign
+    GENERIC :: ASSIGNMENT(=) => link_input_assign
   END type link_input_data
 
   ! ----------------------------------------------------------------
@@ -135,6 +137,7 @@ MODULE link_module
 
      PROCEDURE (max_tnumber_proc), DEFERRED :: max_courant
      PROCEDURE (max_tnumber_proc), DEFERRED :: max_diffuse
+     PROCEDURE (trans_pre_proc), DEFERRED :: pre_transport
      PROCEDURE (trans_interp_proc), DEFERRED :: trans_interp
      PROCEDURE (transport_proc), DEFERRED :: transport
 
@@ -248,6 +251,12 @@ MODULE link_module
        DOUBLE PRECISION, INTENT(IN) :: dt
      END FUNCTION max_tnumber_proc
 
+     SUBROUTINE trans_pre_proc(this)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(INOUT) :: this
+     END SUBROUTINE trans_pre_proc
+
      SUBROUTINE trans_interp_proc(this, tnow, htime0, htime1)
        IMPORT :: link_t
        IMPLICIT NONE
@@ -299,6 +308,36 @@ CONTAINS
 
   END SUBROUTINE link_input_defaults
 
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_input_assign
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_input_assign(other, self)
+
+    IMPLICIT NONE
+    CLASS (link_input_data), INTENT(OUT) :: other
+    CLASS (link_input_data), INTENT(IN) :: self
+    
+    other%linkid = self%linkid
+    other%inopt = self%inopt
+    other%npt = self%npt
+    other%lorder = self%lorder
+    other%ltype = self%ltype
+    other%nup = self%nup
+    other%dsid = self%dsid
+    other%bcid = self%bcid
+    other%dsbcid = self%dsbcid
+    other%gbcid = self%gbcid
+    other%tbcid = self%tbcid
+    other%mzone = self%mzone
+    other%lbcid = self%lbcid
+    other%lgbcid = self%lgbcid
+    other%ltbcid = self%ltbcid
+    other%lpiexp = self%lpiexp
+    other%gravity = self%gravity
+
+  END SUBROUTINE link_input_assign
+
+
 
   ! ! ----------------------------------------------------------------
   ! !  FUNCTION new_link_t
@@ -347,6 +386,7 @@ CONTAINS
     CLASS (scalar_manager), INTENT(IN) :: sclrman
     CHARACTER (LEN=1024) :: msg
 
+    ierr = 0
 
   END FUNCTION link_initialize
 

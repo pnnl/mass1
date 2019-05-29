@@ -11,7 +11,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 15, 2011 by William A. Perkins
-# Last Change: 2017-06-22 11:43:34 d3g096
+# Last Change: 2019-04-16 08:05:55 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -49,10 +49,10 @@ def interpolate_profile(prof, qprof):
         prm0 = prof[idx-1]['distance']
         prm1 = prof[idx]['distance']
 
-        tmpprof = prof[idx]
+        tmpprof = prof[idx].copy()
         tmpprof['distance'] = rm
         if (rm == prm0):
-            tmpprof = prof[idx-1]
+            tmpprof = prof[idx-1].copy()
         else:
             f = (rm - prm0)/(prm1-prm0)
             for k in tmpprof.keys():
@@ -291,6 +291,9 @@ parser.add_option("-S", "--start", dest="start", action="store",
 parser.add_option("-E", "--end", dest="end", action="store", 
                   help="ending output date/time (MM/DD/YYYY HH:MM)")
 
+parser.add_option("-e", "--elapsed", dest="elapsed", action="store_true", default=False,
+                  help="output elapsed time (hr) from file start or --start in addition to date/time")
+
 
 parser.add_option("-r", "--river-mile", type="float",
                   action="store", dest="rm",
@@ -312,6 +315,7 @@ dosection = options.section
 doheader = options.column
 theid = options.id
 dometric=options.metric
+doelapsed = options.elapsed
 
 if (options.start):
     try:
@@ -343,6 +347,7 @@ if (len(args) != 1):
     sys.exit(3)
     
 profilename = args[0]
+estartdate = startdate
 
 # -------------------------------------------------------------
 # main program
@@ -356,10 +361,13 @@ except IOError:
     sys.exit(3)
 
 pdata = []
+first = True
 while (True):
     (pdatetime, profile) = read_next_profile(pfile, dometric)
     profile.reverse()
     if (pdatetime):
+        if (first and pdatetime > estartdate):
+            estartdate = pdatetime
         if (pdatetime > enddate):
             break
         if (pdatetime >= startdate):
@@ -369,6 +377,7 @@ while (True):
                 #(box, rm, e, q, t) = tpl
                 #tpl = (pdatetime, box, rm, e, q, t)
                 pdata.append(tpl)
+        first = False
     else:
         break
         
@@ -379,7 +388,10 @@ pdata.sort(key=itemgetter('id','date'), reverse=False)
 if (doheader):
     if (rmlist[0][0] >= 0):
         sys.stdout.write("ID, ")
-    sys.stdout.write("Date, Rivermile")
+    sys.stdout.write("Date")
+    if (doelapsed):
+        sys.stdout.write(", Elapsed")
+    sys.stdout.write(", Rivermile")
     for f in basic_fields:
         sys.stdout.write(", %s" % (f));
     if (dotemp):
@@ -401,8 +413,11 @@ for p in pdata:
     
     if (box >= 0):
         sys.stdout.write("%d, " % (box))
-    sys.stdout.write("%s, %.2f" %
-                (pdatetime.strftime("%m/%d/%Y %H:%M:%S"), rm))
+    sys.stdout.write("%s" % (pdatetime.strftime("%m/%d/%Y %H:%M:%S")))
+    if (doelapsed):
+        e = pdatetime - estartdate
+        sys.stdout.write(", %.3f" % (e.total_seconds()/3600.0))
+    sys.stdout.write(", %.2f" % (rm))
     for f in basic_fields:
         sys.stdout.write(", %.2f" % (p[f]));
 

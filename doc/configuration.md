@@ -26,7 +26,7 @@ because they are no longer needed or computed internally.  Items
 |13 | 1 | flag | If true, read initial conditions from a hotstart file
 |   |   |      | otherwise, read [initial conditions file](init.md)
 |14 | 1 | flag | Write a hotstart file at the end of simulation
-|15 | 1 | int  | Units option: 1 = English, ~~2 = metric~~[^2]
+|15 | 1 | int  | Units option: 0 = English, ~~1 = metric
 |16 | 1 | int  | Time option: ~~0 = real~~[^1], 1 = date/time
 |17 | 1 | int  | Units used for channel length in the [point file](point.md):
 |   |   |      |  0 = feet, 1 = meters, 2 = miles, 3 = kilometers
@@ -57,7 +57,7 @@ because they are no longer needed or computed internally.  Items
 |41 | 1 | string | Simulation start time (HH:MM:SS)
 |42 | 1 | string | Simulation end date (mm-dd-yyyy)
 |43 | 1 | string | Simulation end time (HH:MM:SS)
-|44 | 1 | real   | Hydrodynamics time step
+|44 | 1 | real   | Hydrodynamics time step 
 |   | 2 | string | Optional time step units, one of: `hr`, `min`, `day`, and `sec`. `hr` is default.
 |45 | 1 | int    | Gage and profile output frequency (time steps)
 
@@ -119,10 +119,3 @@ MASS1 Configuration File - Version 0.83
 
 [^1]: Using decimal time in time series input no longer works, so
 don't try it. 
-
-[^2]: The metric units option is untested and probably doesn't work.
-
-[^3]: Units are hours unless units are specified.  The real value can
-be followed by a units label. The following are understood: `hr`,
-`min`, `day`, and `sec`.  
-

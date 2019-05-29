@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2019-04-10 11:49:26 d3g096
+# Last Change: 2019-04-30 12:22:17 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -53,6 +53,8 @@ foreach(c ${CASES})
     set(exdep)
   else()
     set(out "profile1.${c}.out")
+    set(gpfile "plot-${c}.gp")
+    set(plot "plot-${c}.eps")
     set(exdep "${CMAKE_CURRENT_BINARY_DIR}/hotstart-warmup.dat")
   endif()
   
@@ -69,20 +71,32 @@ foreach(c ${CASES})
     list(APPEND rundeps "${CMAKE_CURRENT_BINARY_DIR}/profile1.${c}.out")
   endif()
 
-# if (GNUPLOT_EXECUTABLE) 
-#   add_custom_command(
-#     OUTPUT plot-depth.eps plot-elev.eps
-#     COMMAND "${GNUPLOT_EXECUTABLE}" "plot-depth.gp" > plot-depth.eps
-#     COMMAND "${GNUPLOT_EXECUTABLE}" "plot-elev.gp" > plot-elev.eps
-#     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-#     COMMENT "Plotting test flow/MacDonald-1"
-#     DEPENDS 
-#     "${CMAKE_CURRENT_BINARY_DIR}/profile1.out"
-#     "${CMAKE_CURRENT_BINARY_DIR}/plot-depth.gp"
-#     "${CMAKE_CURRENT_BINARY_DIR}/plot-elev.gp"
-#   )
-#   set(rundeps plot-depth.eps plot-elev.eps)
-# endif (GNUPLOT_EXECUTABLE)
+  if(NOT ${c} STREQUAL "warmup")
+    if (GNUPLOT_EXECUTABLE)
+      add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${gpfile}
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E echo "set terminal postscript eps color solid \\\"Helvetica\\\" 14" > ${gpfile}
+        COMMAND ${CMAKE_COMMAND} -E echo "set title \\\"Advection: ${c}\\\"" >> ${gpfile}
+        COMMAND ${CMAKE_COMMAND} -E echo "pfile = \\\"${CMAKE_CURRENT_BINARY_DIR}/${out}\\\"" >>  ${gpfile}
+        COMMAND ${CMAKE_COMMAND} -E echo "load \\\"${CMAKE_CURRENT_SOURCE_DIR}/plot.gp\\\"" >> ${gpfile}
+        )
+      add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${plot}
+        COMMAND "${GNUPLOT_EXECUTABLE}" "${CMAKE_CURRENT_BINARY_DIR}/${gpfile}" > ${plot}
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        COMMENT "Plotting test test transport/hlink-advection-1-segment (${c})"
+        DEPENDS 
+        "${CMAKE_CURRENT_BINARY_DIR}/${out}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp"
+        "${CMAKE_CURRENT_BINARY_DIR}/${gpfile}"
+        )
+      list(APPEND rundeps ${CMAKE_CURRENT_BINARY_DIR}/plot-${c}.eps)
+    else()
+      list(APPEND rundeps "${CMAKE_CURRENT_BINARY_DIR}/profile1.${c}.out")
+    endif (GNUPLOT_EXECUTABLE)
+  endif()
+  
 endforeach()
 
 add_custom_target(run_hlink_advection_1_segment_test

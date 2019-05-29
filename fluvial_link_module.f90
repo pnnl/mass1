@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2019-04-10 13:12:45 d3g096
+! Last Change: 2019-05-22 07:59:19 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -27,14 +27,14 @@ MODULE fluvial_link_module
   PRIVATE
 
   TYPE, PUBLIC, EXTENDS(transport_link_t) :: fluvial_link
-     DOUBLE PRECISION :: latq, latqold
      DOUBLE PRECISION :: lpiexp
      DOUBLE PRECISION :: gravity
    CONTAINS
      PROCEDURE :: construct => fluvial_link_construct
      PROCEDURE :: initialize => fluvial_link_initialize
+     ! PROCEDURE :: forward_sweep => fluvial_link_forward
      PROCEDURE :: coeff => fluvial_link_coeff
-     PROCEDURE :: hydro_update => fluvial_link_hupdate
+     ! PROCEDURE :: hydro_update => fluvial_link_hupdate
   END type fluvial_link
 
   TYPE, PUBLIC, EXTENDS(fluvial_link) :: fluvial_hydro_link
@@ -93,6 +93,22 @@ CONTAINS
 
   END FUNCTION fluvial_link_initialize
 
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE fluvial_link_forward
+  ! ----------------------------------------------------------------
+  SUBROUTINE fluvial_link_forward(this, deltat)
+
+    IMPLICIT NONE
+    CLASS (fluvial_link), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: deltat
+
+    INTEGER :: i
+
+    CALL this%transport_link_t%forward_sweep(deltat)
+
+
+  END SUBROUTINE fluvial_link_forward
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE fluvial_link_coeff
@@ -115,12 +131,20 @@ CONTAINS
     ! FIXME: These need to come from the configuration:
     DOUBLE PRECISION :: gr
 
+    CHARACTER (LEN=1024) :: msg
+
     gr = this%gravity
 
     CALL pt1%assign(y1, d1, q1, a1, b1, k1, ky1, fr1)
     CALL pt2%assign(y2, d2, q2, a2, b2, k2, ky2, fr2)
 
     dx = ABS(pt1%x - pt2%x)
+
+    IF (dx .LT. 1.0D-10) THEN
+       WRITE(msg, *) 'link ', this%id, ': zero length between points'
+       CALL error_message(msg, fatal=.TRUE.)
+    END IF
+       
     s1%y = y1
     s1%d = d1
     s1%q = q1
@@ -137,7 +161,7 @@ CONTAINS
     s2%k = k2
     s2%ky  = ky2
     s2%fr = fr2
-    
+
     CALL fluvial_coeff(s1, s2, cf, dx, dt, gr, &
          &this%latqold, this%latq, this%lpiexp, depth_threshold)
 
@@ -150,16 +174,6 @@ CONTAINS
     IMPLICIT NONE
     CLASS (fluvial_link), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: grav, unitwt, dt
-
-    INTEGER :: i
-
-    IF (ASSOCIATED(this%latbc)) THEN
-       this%latqold = this%latq
-       this%latq = this%latbc%current_value
-       DO i = 1, this%npoints
-          this%pt(i)%hnow%lateral_inflow = this%latq
-       END DO
-    END IF
 
     CALL this%transport_link_t%hydro_update(grav, unitwt, dt)
 

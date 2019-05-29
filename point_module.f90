@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2019-03-15 10:15:29 d3g096
+! Last Change: 2019-05-23 09:37:14 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -59,7 +59,7 @@ MODULE point_module
      DOUBLE PRECISION :: x, thalweg
      DOUBLE PRECISION :: manning, k_diff, kstrick
      TYPE (xsection_ptr) :: xsection
-     TYPE (xsection_prop) :: xsprop
+     TYPE (xsection_prop) :: xsprop, xspropold
      TYPE (point_hydro_state) :: hnow, hold
      TYPE (point_sweep_coeff) :: sweep
      TYPE (point_transport_state) :: trans
@@ -78,7 +78,30 @@ MODULE point_module
      TYPE (point_t), POINTER :: p
   END type point_ptr
 
+  PUBLIC hydro_average
+
 CONTAINS
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE hydro_average
+  ! ----------------------------------------------------------------
+  SUBROUTINE hydro_average(h0, h1, h)
+
+    IMPLICIT NONE
+    TYPE (point_hydro_state), INTENT(IN) :: h0, h1
+    TYPE (point_hydro_state), INTENT(INOUT) :: h
+
+    h%y = 0.5*(h0%y + h1%y)
+    h%q = 0.5*(h0%q + h1%q)
+    h%v = 0.5*(h0%v + h1%v)
+    h%lateral_inflow = 0.5*(h0%lateral_inflow + h1%lateral_inflow)
+    h%friction_slope = 0.5*(h0%friction_slope + h1%friction_slope)
+    h%bed_shear = 0.5*(h0%bed_shear + h1%bed_shear)
+    h%courant_num = 0.5*(h0%courant_num + h1%courant_num)
+    h%diffuse_num = 0.5*(h0%diffuse_num + h1%diffuse_num)
+
+  END SUBROUTINE hydro_average
+
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE hydro_interp
@@ -165,8 +188,6 @@ CONTAINS
 
     DOUBLE PRECISION :: depth
 
-    this%hold = this%hnow
-
     ASSOCIATE (h => this%hnow, xs => this%xsprop)
 
       depth = h%y - this%thalweg
@@ -211,6 +232,8 @@ CONTAINS
     DOUBLE PRECISION :: depth
 
     this%trans%hold = this%trans%hnow
+    this%trans%xspropold = this%trans%xsprop
+    
     CALL hydro_interp(tnow, htime0, htime1, &
          &this%hold, this%hnow, this%trans%hnow)
 

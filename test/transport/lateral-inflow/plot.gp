@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created July  2, 1999 by William A. Perkins
-# Last Change: 2019-03-29 12:35:50 d3g096
+# Last Change: 2019-05-01 12:51:22 d3g096
 # -------------------------------------------------------------
 # $Id$
 
@@ -27,7 +27,7 @@ set xlabel ''
 set ylabel "Simulated Discharge, cfs"
 set yrange [0:2000]
 
-plot '<tail -n +155 profile1.out' using (10656 - $4):6 with linespoints
+plot sprintf("<tail -n +155 %s", pfile) using (10656 - $4):6 with linespoints
 
 set origin 0.0, 0.0
 set size 1.0, 0.5
@@ -41,6 +41,6 @@ set yrange [12:18]
 set grid
 
 
-plot 'profile1.out' using (10656 - $4):10 with lines
+plot pfile using (10656 - $4):10 with lines
 
 set nomultiplot

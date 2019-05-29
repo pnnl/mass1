@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2019-03-14 11:52:53 d3g096
+! Last Change: 2019-05-22 09:00:57 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -66,6 +66,7 @@ MODULE link_manager_module
      PROCEDURE :: write_restart => link_manager_write_restart
      PROCEDURE :: read_trans_restart => link_manager_read_trans_restart
      PROCEDURE :: write_trans_restart => link_manager_write_trans_restart
+     PROCEDURE :: pre_transport => link_manager_pre_transport
      PROCEDURE :: transport_steps => link_manager_transport_steps
      PROCEDURE :: transport_interp => link_manager_transport_interp
      PROCEDURE :: transport => link_manager_transport
@@ -339,7 +340,7 @@ CONTAINS
             ALLOCATE(rec%flow(rec%nlag))
 
             IF (ASSOCIATED(rec%bc)) THEN
-               WRITE (msg,*) '     Link Boundary Condition #', rec%link%id, &
+               WRITE (msg,*) '     Link Boundary Condition #', rec%bc%id, &
                     &' lagged ', rec%lag, ' days'
             ELSE
                WRITE (msg,*) '     Point 1 on Link #', rec%link%id, &
@@ -959,6 +960,27 @@ CONTAINS
     END DO
 
   END SUBROUTINE link_manager_write_trans_restart
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE link_manager_pre_transport
+  ! ----------------------------------------------------------------
+  SUBROUTINE link_manager_pre_transport(this)
+
+    IMPLICIT NONE
+
+    CLASS (link_manager_t), INTENT(INOUT) :: this
+    CLASS (link_t), POINTER :: link
+    
+    CALL this%links%begin()
+    link => this%links%current()
+
+    DO WHILE (ASSOCIATED(link))
+       CALL link%pre_transport()
+
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+  END SUBROUTINE link_manager_pre_transport
 
   ! ----------------------------------------------------------------
   ! INTEGER FUNCTION link_manager_transport_steps
