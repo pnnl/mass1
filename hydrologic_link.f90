@@ -16,6 +16,7 @@ MODULE hydrologic_link_module
   IMPLICIT NONE
 
   INTEGER, PRIVATE, PARAMETER :: hydrologic_link_maxpt = 2
+  DOUBLE PRECISION, PRIVATE, PARAMETER :: hydrologic_min_storage = 1.0D-10
 
   ! ----------------------------------------------------------------
   ! TYPE hydrologic_link
@@ -266,6 +267,7 @@ CONTAINS
        DO i = 1, this%npoints
           this%pt(i)%hnow%lateral_inflow = this%latq
        END DO
+       this%avgpt%hnow%lateral_inflow = this%latq
     END IF
 
     this%inflow = invol
@@ -531,14 +533,20 @@ CONTAINS
     DOUBLE PRECISION :: inflow, outflow, latflow
     DOUBLE PRECISION :: ci, co, csnow, csold, clat
 
+    INTEGER :: i
     CHARACTER (LEN=1024) :: msg
 
     ! if there is no storage, just copy the upstream concencentration 
-    IF (this%trans_storage .LT. 1.0E-10) THEN
+    IF (this%trans_storage .LT. hydrologic_min_storage) THEN
        CALL this%linear_link_t%transport(ispec, tdeltat)
        this%avgpt%trans%cnow(ispec) = this%pt(1)%trans%cnow(ispec)
        RETURN
     END IF
+
+    DO i = 1, this%npoints
+       this%pt(i)%trans%cold(ispec) = this%pt(i)%trans%cnow(ispec)
+    END DO
+    this%avgpt%trans%cold(ispec) = this%avgpt%trans%cnow(ispec)
 
     inflow = this%pt(1)%trans%hnow%q
     outflow = this%pt(this%npoints)%trans%hnow%q
@@ -551,11 +559,13 @@ CONTAINS
        ci = this%species(ispec)%getusbc()
     ELSE IF (ASSOCIATED(this%ucon)) THEN
        ci = this%ucon%conc(ispec)
-    ELSE 
-       WRITE(msg, *) 'link ', this%id, &
-            &': error: upstream inflow w/o conc BC for species ', &
-            &ispec
-       CALL error_message(msg)
+    ELSE
+       IF (inflow .GT. 0.0) THEN
+          WRITE(msg, *) 'link ', this%id, &
+               &': error: upstream inflow w/o conc BC for species ', &
+               &ispec
+          CALL error_message(msg)
+       END IF
     END IF
     this%pt(1)%trans%cnow(ispec) = ci
 
@@ -570,14 +580,27 @@ CONTAINS
        END IF
     END IF
 
-    co = csold                  ! explicit upwind
-
-    csnow = tdeltat*inflow*ci &
-         &+ tdeltat*latflow*clat &
-         &- tdeltat*outflow*co &
-         &+ csold*this%trans_storage_old
-    csnow = csnow/this%trans_storage
+    csnow = csold               ! fall back
     
+#if 0
+    co = csold                  ! explicit upwind
+    IF (this%trans_storage .GT. hydrologic_min_storage) THEN
+       csnow = tdeltat*inflow*ci &
+            &+ tdeltat*latflow*this%L*clat &
+            &- tdeltat*outflow*co &
+            &+ csold*this%trans_storage_old
+       csnow = csnow/this%trans_storage
+    END IF
+#else
+    ! implicit upwind
+    IF ((tdeltat*outflow + this%trans_storage) .GT. hydrologic_min_storage) THEN
+       csnow = tdeltat*inflow*ci &
+            &+ tdeltat*latflow*this%L*clat &
+            &+ csold*this%trans_storage_old
+       csnow = csnow/(tdeltat*outflow+this%trans_storage)
+       co = csnow
+    END IF
+#endif
     this%avgpt%trans%cnow(ispec) = csnow
     this%pt(this%npoints)%trans%cnow = co
 
