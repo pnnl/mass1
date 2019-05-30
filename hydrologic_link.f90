@@ -246,6 +246,11 @@ CONTAINS
          END IF
        END ASSOCIATE
     END DO
+    this%avgpt%hold = this%avgpt%hnow
+    IF (ASSOCIATED(this%species)) THEN
+       this%avgpt%trans%hold = this%avgpt%hold
+       this%avgpt%trans%xspropold = this%avgpt%xsprop
+    END IF
 
     ! get upstream inflow (volume)
 
