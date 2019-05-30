@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2019-03-13 07:30:21 d3g096
+# Last Change: 2019-05-30 08:56:36 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -38,7 +38,7 @@ add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/profile1.out"
   COMMAND ${mass1newexe} > mass1.log
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-  COMMENT "Running test flow/slopebreak1"
+  COMMENT "Running test flow/hlink-upstream"
   DEPENDS mass1_new ${testfiles}
 )
 set(rundeps "${CMAKE_CURRENT_BINARY_DIR}/profile1.out")
@@ -49,7 +49,7 @@ if (GNUPLOT_EXECUTABLE)
     COMMAND "${GNUPLOT_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp" > plot.eps
     COMMAND "${GNUPLOT_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/plot-elev.gp" > plot-elev.eps
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    COMMENT "Plotting test flow/slopebreak1"
+    COMMENT "Plotting test flow/hlink-upstream"
     DEPENDS 
     "${CMAKE_CURRENT_BINARY_DIR}/profile1.out"
     "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp"
