@@ -25,7 +25,7 @@ MASS1 Configuration File - Version 0.83 $Id$
 4 	/ max bc table
 10 	/ max times in a bc table
 1 	/ total number of x-sections
-10       / number of transport substeps
+0       / number of transport substeps
 1 	/ debug print flag
 "@SRC@/link.dat" 		/ link file name
 "@SRC@/point.dat" 		/ point file name
@@ -43,9 +43,9 @@ no-hotstart	 	                / Read Hotstart file name
 no_gage_control 	                / gage control file name
 "@SRC@/profile_control.dat" 	 	/ profile file name
 "lat-outflow-files.dat"		/ lateral inflow bs file name
-01-01-1997 	 	/ date run begins
-18:00:00 	 	/ time run begins
-01-01-1997 	 	/ date run ends
-20:59:59 	 	/ time run ends
-0.02000000 	 	/ delta t in hours (4*36s=144s)
-150              / printout frequency
+01-02-1997 	 	/ date run begins
+06:00:00 	 	/ time run begins
+01-03-1997 	 	/ date run ends
+05:59:59 	 	/ time run ends
+0.5000000 	 	/ delta t in hours (4*36s=144s)
+48              / printout frequency

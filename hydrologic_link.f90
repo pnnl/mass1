@@ -105,7 +105,7 @@ CONTAINS
     IF (my_ldata%npt .NE. hydrologic_link_maxpt) THEN
        WRITE (msg, *) 'link ', ldata%linkid, &
             &': hydrologic link can only have ', hydrologic_link_maxpt, ' points, got ', &
-            &my_ldata%npt, " -- continuing with 3 points"
+            &my_ldata%npt, " -- continuing with ", hydrologic_link_maxpt, " points"
        CALL error_message(msg)
        my_ldata%npt = hydrologic_link_maxpt
     END IF
@@ -246,6 +246,11 @@ CONTAINS
          END IF
        END ASSOCIATE
     END DO
+    this%avgpt%hold = this%avgpt%hnow
+    IF (ASSOCIATED(this%species)) THEN
+       this%avgpt%trans%hold = this%avgpt%hold
+       this%avgpt%trans%xspropold = this%avgpt%xsprop
+    END IF
 
     ! get upstream inflow (volume)
 
@@ -549,7 +554,13 @@ CONTAINS
 
     inflow = this%pt(1)%trans%hnow%q
     outflow = this%pt(this%npoints)%trans%hnow%q
-    latflow = this%avgpt%trans%hnow%lateral_inflow
+    latflow = this%avgpt%trans%hnow%lateral_inflow*this%L
+
+    ! if lateral outflow, just add it to outflow
+    IF (latflow .LE. 0.0) THEN
+       outflow = outflow - latflow
+       latflow = 0.0
+    END IF
 
     ! reverse flow is not allow, so just get upstream conc
     
@@ -585,7 +596,7 @@ CONTAINS
     co = csold                  ! explicit upwind
     IF (this%trans_storage .GT. hydrologic_min_storage) THEN
        csnow = tdeltat*inflow*ci &
-            &+ tdeltat*latflow*this%L*clat &
+            &+ tdeltat*latflow*clat &
             &- tdeltat*outflow*co &
             &+ csold*this%trans_storage_old
        csnow = csnow/this%trans_storage
@@ -594,7 +605,7 @@ CONTAINS
     ! implicit upwind
     IF ((tdeltat*outflow + this%trans_storage) .GT. hydrologic_min_storage) THEN
        csnow = tdeltat*inflow*ci &
-            &+ tdeltat*latflow*this%L*clat &
+            &+ tdeltat*latflow*clat &
             &+ csold*this%trans_storage_old
        csnow = csnow/(tdeltat*outflow+this%trans_storage)
        co = csnow

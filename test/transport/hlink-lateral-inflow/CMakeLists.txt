@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2019-05-10 12:16:43 d3g096
+# Last Change: 2019-05-30 07:46:55 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -56,6 +56,7 @@ set(testfiles
   "${CMAKE_CURRENT_SOURCE_DIR}/link.dat"
   "${CMAKE_CURRENT_SOURCE_DIR}/point.dat"
   "${CMAKE_CURRENT_SOURCE_DIR}/profile_control.dat"
+  "${CMAKE_CURRENT_SOURCE_DIR}/gage_control.dat"
   "${CMAKE_CURRENT_SOURCE_DIR}/section.dat"
   "${CMAKE_CURRENT_SOURCE_DIR}/inflow-bc.dat"
   "${CMAKE_CURRENT_SOURCE_DIR}/tailwater-bc.dat"
@@ -120,9 +121,7 @@ set_property(DIRECTORY
   profile1.warmup.out
   status.out
   error-warning.out
-  ts11.out ts1149.out
-  plot-depth.eps
-  plot-elev.eps
+  tsinlet.out tsoutlet.out
   mass1.log
 )
 
