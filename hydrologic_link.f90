@@ -359,11 +359,11 @@ CONTAINS
     
     CALL this%avgpt%hydro_update(grav, unitwt, dt, this%L)
 
-    WRITE(*,*) 'Hydrologic link ', this%id, &
-         &": I = ", this%inflow, &
-         &", S = ", this%storage, &
-         &", O = ", this%outflow, &
-         &", V = ", this%volume()
+    ! WRITE(*,*) 'Hydrologic link ', this%id, &
+    !      &": I = ", this%inflow, &
+    !      &", S = ", this%storage, &
+    !      &", O = ", this%outflow, &
+    !      &", V = ", this%volume()
 
   END SUBROUTINE hydrologic_link_hupdate
 
