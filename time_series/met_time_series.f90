@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  1, 2013 by William A. Perkins
-! Last Change: 2017-06-22 09:23:41 d3g096
+! Last Change: 2019-05-30 13:01:57 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -40,6 +40,22 @@ MODULE met_time_series
        &MET_SWRAD = 5
 
 CONTAINS
+
+  ! ----------------------------------------------------------------
+  ! TYPE(MET_TIME_SERIES_REC) FUNCTION met_time_series_alloc
+  ! ----------------------------------------------------------------
+  TYPE(MET_TIME_SERIES_REC) FUNCTION met_time_series_alloc(id, len) RESULT (metts)
+
+    IMPLICIT NONE
+    INTEGER, INTENT(IN) :: id, len
+    POINTER metts
+
+    ALLOCATE(metts)
+    metts%ts => time_series_alloc(id, met_fields, len)
+    metts%current => metts%ts%current
+    
+  END FUNCTION met_time_series_alloc
+
 
   ! ----------------------------------------------------------------
   ! TYPE(MET_TIME_SERIES_REC) FUNCTION met_time_series_read

@@ -8,6 +8,7 @@ MODULE mass1_dhsvm_module
   USE julian
   USE date_time
   USE time_series
+  USE met_time_series
   USE network_module
   USE link_module
   USE bc_module
@@ -184,6 +185,8 @@ CONTAINS
                ALLOCATE(zone)
                zone%id = link%id
                zone%coeff = coeff
+
+               zone%met => met_time_series_alloc(link%id, 1)
                zone%met%ts%limit_mode = TS_LIMIT_FLAT
 
                CALL dnet%net%met%zonelist%push(zone)

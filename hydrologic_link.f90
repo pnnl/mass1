@@ -612,8 +612,15 @@ CONTAINS
     END IF
 #endif
     this%avgpt%trans%cnow(ispec) = csnow
-    this%pt(this%npoints)%trans%cnow = co
+    this%pt(this%npoints)%trans%cnow(ispec) = co
 
+    ! do scalar specifiec source term
+    ci = this%avgpt%trans%cnow(ispec)
+    co = this%species(ispec)%scalar%source(&
+            &ci, this%avgpt%trans, tdeltat, &
+            &this%species(ispec)%met)
+    this%avgpt%trans%cnow(ispec) = co
+    
   END SUBROUTINE hydrologic_link_transport
 
 

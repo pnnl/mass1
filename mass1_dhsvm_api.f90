@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  4, 2019 by William A. Perkins
-! Last Change: 2019-05-29 11:57:51 d3g096
+! Last Change: 2019-05-31 06:07:14 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -243,6 +243,7 @@ SUBROUTINE mass1_update_met(cnet, linkid, &
         metvalues(5) = swrad
         ts => link%species(tidx)%met%met%ts
         CALL time_series_push(ts, time, metvalues)
+        ! WRITE(*,*) "met for link", linkid, ": ", swrad, airtemp, dewtemp, windsp, rh8
      ELSE
         WRITE(msg, *) 'mass1_update_met: link ', link%id,&
           &': ', ' met zone not set'
