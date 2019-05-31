@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-05-13 14:40:14 d3g096
+! Last Change: 2019-05-31 08:02:45 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -435,6 +435,9 @@ CONTAINS
        this%pt(i)%hold%y = this%pt(i)%hnow%y
        this%pt(i)%hnow%q = discharge
        this%pt(i)%hold%q = this%pt(i)%hnow%q
+       this%pt(i)%hnow%lateral_inflow = 0.0
+       this%pt(i)%hold%lateral_inflow = 0.0
+       
 
        this%pt(i)%trans%hnow = this%pt(i)%hnow
        this%pt(i)%trans%hold = this%pt(i)%hnow
@@ -477,6 +480,7 @@ CONTAINS
        READ(iunit, IOSTAT=iostat) junk, junk, &
             &this%pt(i)%hnow%q, &
             &this%pt(i)%hnow%y
+       this%pt(i)%hnow%lateral_inflow = 0.0
 
        ! FIXME: should the transport states be saved too?
        this%pt(i)%trans%hnow%q = this%pt(i)%hnow%q

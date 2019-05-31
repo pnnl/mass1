@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  7, 2019 by William A. Perkins
-! Last Change: 2019-04-11 07:46:34 d3g096
+! Last Change: 2019-05-30 14:03:35 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -186,7 +186,7 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: cin, deltat
     TYPE (met_zone_t), INTENT(INOUT) :: met
 
-    DOUBLE PRECISION :: area, width
+    DOUBLE PRECISION :: t, area, width, factor
 
     tout = this%scalar_t%source(cin, pt, deltat, met)
 
@@ -196,7 +196,14 @@ CONTAINS
 
        IF (area .GT. 0.0) THEN
           ! FIXME: metric units
-          tout = tout + met%energy_flux(tout)*deltat*width/area
+          IF (this%dometric) THEN
+             factor = 1.0/3.2808
+          ELSE
+             factor = 1.0
+          END IF
+          t = tout
+          tout = t + factor*met%energy_flux(tout)*deltat*width/area
+          WRITE(*,*) "temperature_source: ", t, tout, width, area
        END IF
     END IF
   END FUNCTION temperature_source

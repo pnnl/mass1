@@ -359,11 +359,11 @@ CONTAINS
     
     CALL this%avgpt%hydro_update(grav, unitwt, dt, this%L)
 
-    WRITE(*,*) 'Hydrologic link ', this%id, &
-         &": I = ", this%inflow, &
-         &", S = ", this%storage, &
-         &", O = ", this%outflow, &
-         &", V = ", this%volume()
+    ! WRITE(*,*) 'Hydrologic link ', this%id, &
+    !      &": I = ", this%inflow, &
+    !      &", S = ", this%storage, &
+    !      &", O = ", this%outflow, &
+    !      &", V = ", this%volume()
 
   END SUBROUTINE hydrologic_link_hupdate
 
@@ -375,6 +375,7 @@ CONTAINS
     IMPLICIT NONE
     CLASS (hydrologic_link), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: iunit
+    INTEGER :: i
     INTEGER :: ierr, iostat
     CHARACTER (LEN=1024) :: msg
 
@@ -386,6 +387,12 @@ CONTAINS
          &this%inflow, this%outflow, this%latq, &
          &this%inflow_old, this%outflow_old, this%latqold, &
          &this%storage, this%storage_old
+
+    DO i = 1, this%npoints
+       this%pt(i)%hnow%lateral_inflow = this%latq
+       this%pt(i)%hold%lateral_inflow = this%latqold
+    END DO
+
     IF (IS_IOSTAT_END(iostat)) THEN
        WRITE(msg, *) 'link ', this%id, &
             &': premature end of file for hydrologic link'
@@ -404,6 +411,7 @@ CONTAINS
     END IF
 
     CALL hydro_average(this%pt(1)%hnow, this%pt(this%npoints)%hnow, this%avgpt%hnow)
+    
 
   END SUBROUTINE hydrologic_link_read_restart
 
@@ -446,6 +454,8 @@ CONTAINS
        this%avgpt%trans%cnow(s) = c(s)
        this%avgpt%trans%cold(s) = cold(s)
     END DO
+    this%avgpt%trans%hnow = this%avgpt%hnow
+    this%avgpt%trans%hold = this%avgpt%trans%hnow
 
 
     IF (ierr .GT. 0) THEN
@@ -610,10 +620,19 @@ CONTAINS
        csnow = csnow/(tdeltat*outflow+this%trans_storage)
        co = csnow
     END IF
+    ! WRITE(*,*) inflow, outflow, latflow, this%trans_storage_old, this%trans_storage
+    ! WRITE(*,*) ci, co, csold, csnow
 #endif
     this%avgpt%trans%cnow(ispec) = csnow
-    this%pt(this%npoints)%trans%cnow = co
+    this%pt(this%npoints)%trans%cnow(ispec) = co
 
+    ! do scalar specifiec source term
+    ci = this%avgpt%trans%cnow(ispec)
+    co = this%species(ispec)%scalar%source(&
+            &ci, this%avgpt%trans, tdeltat, &
+            &this%species(ispec)%met)
+    this%avgpt%trans%cnow(ispec) = co
+    
   END SUBROUTINE hydrologic_link_transport
 
 
