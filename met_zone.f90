@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 21, 2017 by William A. Perkins
-! Last Change: 2019-05-30 14:11:38 d3g096
+! Last Change: 2019-05-31 10:47:55 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE met_zone
@@ -151,8 +151,8 @@ CONTAINS
     ! FIXME: Metric units
     flux = flux/(1000.0*4186.0/3.2808) ! rho*specifc heat*depth in feet
 
-    WRITE(*,*) this%current%rad, this%current%temp, this%current%dew, &
-         &this%current%wind
+    ! WRITE(*,*) this%current%rad, this%current%temp, this%current%dew, &
+    !      &this%current%wind
     
   END FUNCTION met_zone_energy_flux
 
