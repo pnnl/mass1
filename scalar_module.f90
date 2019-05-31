@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  7, 2019 by William A. Perkins
-! Last Change: 2019-05-30 14:03:35 d3g096
+! Last Change: 2019-05-31 10:40:00 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -203,7 +203,7 @@ CONTAINS
           END IF
           t = tout
           tout = t + factor*met%energy_flux(tout)*deltat*width/area
-          WRITE(*,*) "temperature_source: ", t, tout, width, area
+          ! WRITE(*,*) "temperature_source: ", t, tout, width, area
        END IF
     END IF
   END FUNCTION temperature_source
