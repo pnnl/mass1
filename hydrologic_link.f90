@@ -291,9 +291,13 @@ CONTAINS
     !      &"K = ", this%K, ", "&
     !      &"X = ", X 
 
-    this%storage = (invol + latvol)/this%K + &
-         &X*(this%storage_old - (invol + latvol)/this%K)
-
+    IF (this%K .GT. 0.0) THEN
+       this%storage = (invol + latvol)/this%K + &
+            &X*(this%storage_old - (invol + latvol)/this%K)
+    ELSE
+       this%storage = 0.0
+    END IF
+    
     outvol = invol + latvol - (this%storage - this%storage_old)/deltat
     this%outflow = outvol
 
