@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2019-06-06 08:42:25 d3g096
+! Last Change: 2019-06-06 09:00:18 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -972,15 +972,11 @@ CONTAINS
 
     CLASS (link_manager_t), INTENT(INOUT) :: this
     CLASS (link_t), POINTER :: link
-    
-    CALL this%links%begin()
-    link => this%links%current()
+    INTEGER :: l
 
-    DO WHILE (ASSOCIATED(link))
+    DO l = 1, this%maxorder
+       link => this%links_by_order(l)%p
        CALL link%pre_transport()
-
-       CALL this%links%next()
-       link => this%links%current()
     END DO
   END SUBROUTINE link_manager_pre_transport
 
@@ -1043,16 +1039,13 @@ CONTAINS
     CLASS (link_manager_t), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: tnow, htime0, htime1
     CLASS (link_t), POINTER :: link
+    INTEGER :: l
 
-    CALL this%links%begin()
-    link => this%links%current()
-
-    DO WHILE (ASSOCIATED(link))
+    DO l = 1, this%maxorder
+       link => this%links_by_order(l)%p
        CALL link%trans_interp(tnow, htime0, htime1)
-
-       CALL this%links%next()
-       link => this%links%current()
     END DO
+
   END SUBROUTINE link_manager_transport_interp
 
 
@@ -1067,15 +1060,11 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: tdeltat
     
     CLASS (link_t), POINTER :: link
+    INTEGER :: l
 
-    CALL this%links%begin()
-    link => this%links%current()
-
-    DO WHILE (ASSOCIATED(link))
+    DO l = this%maxorder, 1, -1
+       link => this%links_by_order(l)%p
        CALL link%transport(ispec, tdeltat)
-
-       CALL this%links%next()
-       link => this%links%current()
     END DO
 
   END SUBROUTINE link_manager_transport
