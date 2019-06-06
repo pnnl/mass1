@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2019-02-14 13:21:31 d3g096
+! Last Change: 2019-06-06 09:53:46 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -350,7 +350,8 @@ CONTAINS
     props%topwidth = this%bottom_width
     IF (props%area .GT. 0.0) THEN
        props%hydrad = props%area/props%wetperim
-       props%conveyance = (props%area**(5./3.))/(props%wetperim**(2./3.))
+       ! props%conveyance = (props%area**(5./3.))/(props%wetperim**(2./3.))
+       props%conveyance = (props%area**5/props%wetperim**2)**(1.0/3.0)
        props%dkdy =  props%conveyance*(5.0*this%bottom_width/props%area - 4.0/props%wetperim)/3.0
     ELSE 
        props%hydrad = 0.0

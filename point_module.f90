@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2019-05-23 09:37:14 d3g096
+! Last Change: 2019-06-06 09:59:36 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -199,9 +199,9 @@ CONTAINS
 
       IF (xs%area .GT. 0.0) THEN
          h%froude_num = &
-              &SQRT((h%q*h%q*xs%topwidth)/(grav*xs%area**3))
+              &SQRT((h%q*h%q*xs%topwidth)/(grav*xs%area*xs%area*xs%area))
          h%friction_slope = &
-              &((h%q)/(this%kstrick*xs%area*(xs%hydrad**2)**0.3333333))**2.0
+              &((h%q)/(this%kstrick*xs%area*(xs%hydrad*xs%hydrad)**0.3333333))**2
          IF (deltax .GT. 0.0) THEN
             h%courant_num = &
                  &ABS(h%q)/xs%area*deltat/deltax
