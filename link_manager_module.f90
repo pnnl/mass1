@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2019-05-22 09:00:57 d3g096
+! Last Change: 2019-06-06 09:00:18 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -51,6 +51,7 @@ MODULE link_manager_module
      TYPE (link_list) :: links
      CLASS (link_t), POINTER :: dslink
      INTEGER :: maxorder
+     TYPE (link_ptr), DIMENSION(:), ALLOCATABLE :: links_by_order
    CONTAINS
      PROCEDURE, NOPASS :: scan => link_manager_scan
      PROCEDURE :: read => link_manager_read
@@ -652,7 +653,7 @@ CONTAINS
     CLASS (link_t), POINTER :: link, dlink
 
     INTEGER :: ierr
-    INTEGER :: nds
+    INTEGER :: nds, order
     TYPE (confluence_t), POINTER :: con
     CHARACTER(LEN=1024) :: msg, lbl
 
@@ -731,10 +732,10 @@ CONTAINS
             &fatal=.TRUE.)
     END IF
 
-    ! compute computational order
+    ! compute computational order: each link gets a unique order
 
-    this%maxorder = this%dslink%set_order(1)
-    IF (this%maxorder-1 .NE. this%links%size()) THEN
+    this%maxorder = this%dslink%set_order(1) - 1
+    IF (this%maxorder .NE. this%links%size()) THEN
        CALL error_message("link_manager_connect: this should not happen")
     END IF
 
@@ -762,6 +763,21 @@ CONTAINS
        CALL this%links%next()
        dlink => this%links%current()
     END DO
+
+    ! Each link should have a unique order. Organize them into an
+    ! array so traversing the links is more efficient
+
+    ALLOCATE(this%links_by_order(this%maxorder))
+    CALL this%links%begin()
+    link => this%links%current()
+
+    DO WHILE (ASSOCIATED(link))
+       order = link%order
+       this%links_by_order(order)%p => link
+       CALL this%links%next()
+       link => this%links%current()
+    END DO
+    
   END SUBROUTINE link_manager_connect
 
 
@@ -813,15 +829,8 @@ CONTAINS
     INTEGER :: l
 
     DO l = 1, this%maxorder
-       CALL this%links%begin()
-       link => this%links%current()
-       DO WHILE (ASSOCIATED(link))
-          IF (link%order .EQ. l) THEN
-             CALL link%forward_sweep(deltat)
-          END IF
-          CALL this%links%next()
-          link => this%links%current()
-       END DO
+       link => this%links_by_order(l)%p
+       CALL link%forward_sweep(deltat)
     END DO
 
   END SUBROUTINE link_manager_flow_forward
@@ -840,16 +849,9 @@ CONTAINS
     INTEGER :: l
 
     DO l = this%maxorder, 1, -1
-       CALL this%links%begin()
-       link => this%links%current()
-       DO WHILE (ASSOCIATED(link))
-          IF (link%order .EQ. l) THEN
-             CALL link%backward_sweep(dsbc_type)
-             CALL link%hydro_update(grav, unitwt, deltat)
-          END IF
-          CALL this%links%next()
-          link => this%links%current()
-       END DO
+       link => this%links_by_order(l)%p
+       CALL link%backward_sweep(dsbc_type)
+       CALL link%hydro_update(grav, unitwt, deltat)
     END DO
 
   END SUBROUTINE link_manager_flow_backward
@@ -970,15 +972,11 @@ CONTAINS
 
     CLASS (link_manager_t), INTENT(INOUT) :: this
     CLASS (link_t), POINTER :: link
-    
-    CALL this%links%begin()
-    link => this%links%current()
+    INTEGER :: l
 
-    DO WHILE (ASSOCIATED(link))
+    DO l = 1, this%maxorder
+       link => this%links_by_order(l)%p
        CALL link%pre_transport()
-
-       CALL this%links%next()
-       link => this%links%current()
     END DO
   END SUBROUTINE link_manager_pre_transport
 
@@ -1041,16 +1039,13 @@ CONTAINS
     CLASS (link_manager_t), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: tnow, htime0, htime1
     CLASS (link_t), POINTER :: link
+    INTEGER :: l
 
-    CALL this%links%begin()
-    link => this%links%current()
-
-    DO WHILE (ASSOCIATED(link))
+    DO l = 1, this%maxorder
+       link => this%links_by_order(l)%p
        CALL link%trans_interp(tnow, htime0, htime1)
-
-       CALL this%links%next()
-       link => this%links%current()
     END DO
+
   END SUBROUTINE link_manager_transport_interp
 
 
@@ -1065,15 +1060,11 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: tdeltat
     
     CLASS (link_t), POINTER :: link
+    INTEGER :: l
 
-    CALL this%links%begin()
-    link => this%links%current()
-
-    DO WHILE (ASSOCIATED(link))
+    DO l = this%maxorder, 1, -1
+       link => this%links_by_order(l)%p
        CALL link%transport(ispec, tdeltat)
-
-       CALL this%links%next()
-       link => this%links%current()
     END DO
 
   END SUBROUTINE link_manager_transport
