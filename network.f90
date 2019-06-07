@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-05-13 12:25:22 d3g096
+! Last Change: 2019-06-07 07:34:08 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -301,6 +301,14 @@ CONTAINS
                   &": error:  number of trannsported species do not match"
              CALL error_message(msg, fatal=.TRUE.)
           END IF
+
+          DO s = 1, nspecies
+             IF (stype(s) .NE. this%scalars%species(s)%p%bctype) THEN
+                WRITE(msg, *)  TRIM(this%config%restart_load_file), &
+                     &": type mismatch for species ", s
+                CALL error_message(msg, fatal=.TRUE.)
+             END IF
+          END DO
           CALL this%links%read_trans_restart(runit, nspecies)
        END IF
     END IF
@@ -320,7 +328,7 @@ CONTAINS
     IMPLICIT NONE
     CLASS (network), INTENT(INOUT) :: this
     INTEGER, PARAMETER :: runit = 31
-    INTEGER :: status
+    INTEGER :: status, i
     CHARACTER (LEN=1024) :: msg
 
     OPEN(runit, file=this%config%restart_save_file, form='UNFORMATTED', iostat=status)
@@ -334,6 +342,18 @@ CONTAINS
     END IF
 
     CALL this%links%write_restart(runit)
+
+    IF (this%config%do_transport) THEN
+       WRITE(runit, IOSTAT=status) this%scalars%nspecies
+       IF (status .NE. 0) THEN
+          WRITE(msg, *) TRIM(this%config%restart_save_file), &
+               &": error writing hotstart"
+          CALL error_message(msg, fatal=.TRUE.)
+       END IF
+       WRITE(runit, IOSTAT=status) &
+            &(this%scalars%species(i)%p%bctype, i = 1, this%scalars%nspecies)
+       CALL this%links%write_trans_restart(runit, this%scalars%nspecies)
+    END IF
 
     WRITE (msg, *) 'done writing restart to ', TRIM(this%config%restart_save_file)
     CALL status_message(msg)
