@@ -85,6 +85,9 @@ SUBROUTINE mass1_update_met_coeff(cnet, linkid, a, b, c, brunt) BIND(c)
   CALL C_F_POINTER(cnet, dnet)
 
   tidx = dnet%net%scalars%temp_index
+
+  IF (.NOT. dnet%net%scalars%species(tidx)%p%needmet) RETURN
+
   link => dnet%link_lookup(linkid)%p
 
   IF (tidx .GT. 0) THEN
@@ -229,6 +232,9 @@ SUBROUTINE mass1_update_met(cnet, linkid, &
   CALL C_F_POINTER(cnet, dnet)
 
   tidx = dnet%net%scalars%temp_index
+
+  IF (.NOT. dnet%net%scalars%species(tidx)%p%needmet) RETURN
+
   link => dnet%link_lookup(linkid)%p
 
   IF (tidx .GT. 0) THEN
