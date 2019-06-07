@@ -244,7 +244,7 @@ CONTAINS
     CLASS (transport_link_t), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: ispec
     DOUBLE PRECISION, INTENT(IN) :: tdeltat
-    TYPE (met_zone_t), INTENT(INOUT) :: met
+    CLASS (met_zone_t), INTENT(INOUT), POINTER :: met
 
     INTEGER :: i
 

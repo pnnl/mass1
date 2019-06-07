@@ -144,7 +144,7 @@ CONTAINS
     CLASS(scalar_t), INTENT(IN) :: this
     TYPE (point_transport_state), INTENT(IN) :: pt
     DOUBLE PRECISION, INTENT(IN) :: cin, deltat
-    TYPE (met_zone_t), INTENT(INOUT) :: met
+    CLASS (met_zone_t), INTENT(INOUT), POINTER :: met
 
     DOUBLE PRECISION :: avg_area, avg_latq, c
 
@@ -184,26 +184,28 @@ CONTAINS
     CLASS(temperature), INTENT(IN) :: this
     TYPE (point_transport_state), INTENT(IN) :: pt
     DOUBLE PRECISION, INTENT(IN) :: cin, deltat
-    TYPE (met_zone_t), INTENT(INOUT) :: met
+    CLASS (met_zone_t), INTENT(INOUT), POINTER :: met
 
     DOUBLE PRECISION :: t, area, width, factor
 
     tout = this%scalar_t%source(cin, pt, deltat, met)
 
     IF (this%dosource) THEN
-       area = pt%xsprop%area
-       width = pt%xsprop%topwidth
-
-       IF (area .GT. 0.0) THEN
-          ! FIXME: metric units
-          IF (this%dometric) THEN
-             factor = 1.0/3.2808
-          ELSE
-             factor = 1.0
+       IF (ASSOCIATED(met)) THEN
+          area = pt%xsprop%area
+          width = pt%xsprop%topwidth
+          
+          IF (area .GT. 0.0) THEN
+             ! FIXME: metric units
+             IF (this%dometric) THEN
+                factor = 1.0/3.2808
+             ELSE
+                factor = 1.0
+             END IF
+             t = tout
+             tout = t + factor*met%energy_flux(tout)*deltat*width/area
+             ! WRITE(*,*) "temperature_source: ", t, tout, width, area
           END IF
-          t = tout
-          tout = t + factor*met%energy_flux(tout)*deltat*width/area
-          ! WRITE(*,*) "temperature_source: ", t, tout, width, area
        END IF
     END IF
   END FUNCTION temperature_source
@@ -268,19 +270,21 @@ CONTAINS
     CLASS(tdg), INTENT(IN) :: this
     TYPE (point_transport_state), INTENT(IN) :: pt
     DOUBLE PRECISION, INTENT(IN) :: cin, deltat
-    TYPE (met_zone_t), INTENT(INOUT) :: met
+    CLASS (met_zone_t), INTENT(INOUT), POINTER :: met
 
     DOUBLE PRECISION :: area, width, twater, salinity
 
     cout = this%scalar_t%source(cin, pt, deltat, met)
     
     IF (this%dosource) THEN
-       area = pt%xsprop%area
-       width = pt%xsprop%topwidth
-       twater = pt%twater
-       salinity = 0.0
-       IF (area .GT. 0.0) THEN
-          cout = cout + met%gas_exchange(twater, cout, salinity)*deltat*width/area
+       IF (ASSOCIATED(met)) THEN
+          area = pt%xsprop%area
+          width = pt%xsprop%topwidth
+          twater = pt%twater
+          salinity = 0.0
+          IF (area .GT. 0.0) THEN
+             cout = cout + met%gas_exchange(twater, cout, salinity)*deltat*width/area
+          END IF
        END IF
     END IF
   END FUNCTION tdg_source
