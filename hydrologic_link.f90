@@ -57,6 +57,8 @@ MODULE hydrologic_link_module
      PROCEDURE :: read_restart => hydrologic_link_read_restart
      PROCEDURE :: write_restart => hydrologic_link_write_restart
      PROCEDURE :: hydro_update => hydrologic_link_hupdate
+     PROCEDURE :: max_courant => hydrologic_link_max_courant
+     PROCEDURE :: max_diffuse => hydrologic_link_max_diffuse
      PROCEDURE :: trans_interp => hydrologic_link_trans_interp
      PROCEDURE :: transport => hydrologic_link_transport
   END type hydrologic_link
@@ -370,6 +372,34 @@ CONTAINS
     !      &", V = ", this%volume()
 
   END SUBROUTINE hydrologic_link_hupdate
+
+  ! ----------------------------------------------------------------
+  ! DOUBLE PRECISION FUNCTION hydrologic_link_max_courant
+  ! ----------------------------------------------------------------
+  FUNCTION hydrologic_link_max_courant(this, dt) RESULT(cnmax)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION :: cnmax
+    CLASS (hydrologic_link), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: dt
+
+    cnmax = 0.0
+
+  END FUNCTION hydrologic_link_max_courant
+
+  ! ----------------------------------------------------------------
+  ! DOUBLE PRECISION FUNCTION hydrologic_link_max_diffuse
+  ! ----------------------------------------------------------------
+  FUNCTION hydrologic_link_max_diffuse(this, dt) RESULT(dmax)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION :: dmax
+    CLASS (hydrologic_link), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: dt
+
+    dmax = 0.0
+
+  END FUNCTION hydrologic_link_max_diffuse
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE hydrologic_link_read_restart
