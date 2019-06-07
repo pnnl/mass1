@@ -56,6 +56,8 @@ MODULE hydrologic_link_module
      PROCEDURE :: backward_sweep => hydrologic_link_backward
      PROCEDURE :: read_restart => hydrologic_link_read_restart
      PROCEDURE :: write_restart => hydrologic_link_write_restart
+     PROCEDURE :: read_trans_restart => hydrologic_link_read_trans_restart
+     PROCEDURE :: write_trans_restart => hydrologic_link_write_trans_restart
      PROCEDURE :: hydro_update => hydrologic_link_hupdate
      PROCEDURE :: trans_interp => hydrologic_link_trans_interp
      PROCEDURE :: transport => hydrologic_link_transport
