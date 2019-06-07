@@ -56,6 +56,8 @@ MODULE hydrologic_link_module
      PROCEDURE :: backward_sweep => hydrologic_link_backward
      PROCEDURE :: read_restart => hydrologic_link_read_restart
      PROCEDURE :: write_restart => hydrologic_link_write_restart
+     PROCEDURE :: read_trans_restart => hydrologic_link_read_trans_restart
+     PROCEDURE :: write_trans_restart => hydrologic_link_write_trans_restart
      PROCEDURE :: hydro_update => hydrologic_link_hupdate
      PROCEDURE :: max_courant => hydrologic_link_max_courant
      PROCEDURE :: max_diffuse => hydrologic_link_max_diffuse
