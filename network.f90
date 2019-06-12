@@ -162,11 +162,11 @@ CONTAINS
        WRITE(mybase, *) "network_read: cannot change to ", TRIM(base), " from ", TRIM(cwd)
        CALL error_message(mybase, fatal=.TRUE.)
     END IF
-    istatus = getcwd(cwd)       ! FIXME: GNU specfic
+    istatus = getcwd(mybase)       ! FIXME: GNU specfic
     IF (istatus .NE. 0) THEN 
        CALL error_message("network_read: cannot get current working directory")
     END IF
-    this%basedir = cwd
+    this%basedir = mybase
 
     CALL this%config%read()
 
@@ -194,6 +194,12 @@ CONTAINS
     IF (this%config%do_profileout) THEN
        this%profiles = profile_manager()
        CALL this%profiles%read(this%config, this%links)
+    END IF
+
+    istatus = chdir(cwd)
+    IF (istatus .NE. 0) then
+       WRITE(mybase, *) "network_read: cannot change to ", TRIM(cwd), " from ", TRIM(base)
+       CALL error_message(mybase, fatal=.TRUE.)
     END IF
 
   END SUBROUTINE network_read
@@ -369,11 +375,34 @@ CONTAINS
     IMPLICIT NONE
     CLASS (network), INTENT(INOUT) :: this
 
+    INTEGER :: istatus
+    CHARACTER(LEN=path_length) :: cwd, msg
+
+
+    istatus = getcwd(cwd)       ! FIXME: GNU specfic
+    IF (istatus .NE. 0) THEN 
+       CALL error_message("network_initialize: cannot get current working directory")
+    END IF
+    istatus = chdir(this%basedir)
+    IF (istatus .NE. 0) then
+       WRITE(msg, *) "network_initialize: cannot change to ", &
+            &TRIM(this%basedir), " from ", TRIM(cwd)
+       CALL error_message(msg, fatal=.TRUE.)
+    END IF
+
     IF (this%config%do_hotstart) THEN
        CALL this%read_restart()
     ELSE
        CALL this%set_initial()
     END IF
+
+    istatus = chdir(cwd)
+    IF (istatus .NE. 0) then
+       WRITE(msg, *) "network_initialize: cannot change to ", &
+            &TRIM(cwd), " from ", TRIM(this%basedir)
+       CALL error_message(msg, fatal=.TRUE.)
+    END IF
+
     CALL this%links%hyupdate(this%config%grav, &
          &this%config%unit_weight_h2o, &
          &this%config%time%delta_t)
