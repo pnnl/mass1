@@ -163,6 +163,7 @@ CONTAINS
        this%avgpt%manning = this%pt(1)%manning
        this%avgpt%kstrick = this%pt(1)%kstrick
        this%avgpt%k_diff = this%pt(1)%k_diff
+       this%avgpt%thalweg = 0.5*(this%pt(1)%thalweg + this%pt(this%npoints)%thalweg)
     END SELECT
 
     this%L = ABS(this%pt(1)%x - this%pt(this%npoints)%x)
