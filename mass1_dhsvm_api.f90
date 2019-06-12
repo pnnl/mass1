@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  4, 2019 by William A. Perkins
-! Last Change: 2019-05-31 06:07:14 d3g096
+! Last Change: 2019-06-07 11:23:04 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -63,6 +63,30 @@ FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, pid, dotemp) RESULT(net) B
   net = C_LOC(f_net)
 
 END FUNCTION mass1_create
+
+
+! ----------------------------------------------------------------
+! SUBROUTINE mass1_prepare_segment
+! ----------------------------------------------------------------
+SUBROUTINE mass1_prepare_segment(cnet, linkid) BIND(c)
+
+  USE, INTRINSIC :: iso_c_binding
+  USE mass1_dhsvm_module
+
+  IMPLICIT NONE
+  TYPE (C_PTR), VALUE :: cnet
+  INTEGER(KIND=C_INT), VALUE :: linkid
+  
+  TYPE (DHSVM_network), POINTER :: dnet
+  INTEGER :: id
+  
+  CALL C_F_POINTER(cnet, dnet)
+  id = linkid
+
+  CALL mass1_prepare_link(dnet, id)
+  
+END SUBROUTINE mass1_prepare_segment
+
 
 ! ----------------------------------------------------------------
 ! SUBROUTINE mass1_update_met_coeff
