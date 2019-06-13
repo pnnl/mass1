@@ -16,7 +16,7 @@ MODULE hydrologic_link_module
   IMPLICIT NONE
 
   INTEGER, PRIVATE, PARAMETER :: hydrologic_link_maxpt = 2
-  DOUBLE PRECISION, PRIVATE, PARAMETER :: hydrologic_min_storage = 1.0D-10
+  DOUBLE PRECISION, PRIVATE, PARAMETER :: hydrologic_min_storage = 1.0D-05
 
   ! ----------------------------------------------------------------
   ! TYPE hydrologic_link

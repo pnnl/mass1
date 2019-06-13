@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  7, 2019 by William A. Perkins
-! Last Change: 2019-05-31 10:40:00 d3g096
+! Last Change: 2019-06-13 07:55:57 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -26,6 +26,7 @@ MODULE scalar_module
   USE bc_module
   USE met_zone
   USE gas_functions
+  USE general_vars, ONLY: depth_minimum
 
   IMPLICIT NONE
 
@@ -186,16 +187,17 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: cin, deltat
     CLASS (met_zone_t), INTENT(INOUT), POINTER :: met
 
-    DOUBLE PRECISION :: t, area, width, factor
+    DOUBLE PRECISION :: t, depth, area, width, factor
 
     tout = this%scalar_t%source(cin, pt, deltat, met)
 
     IF (this%dosource) THEN
        IF (ASSOCIATED(met)) THEN
+          depth = pt%xsprop%depth
           area = pt%xsprop%area
           width = pt%xsprop%topwidth
           
-          IF (area .GT. 0.0) THEN
+          IF (depth .GT. depth_minimum .AND. area .GT. 0.0) THEN
              ! FIXME: metric units
              IF (this%dometric) THEN
                 factor = 1.0/3.2808
