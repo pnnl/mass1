@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  7, 2019 by William A. Perkins
-! Last Change: 2019-06-13 07:55:57 d3g096
+! Last Change: 2019-06-13 09:41:48 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -82,6 +82,18 @@ MODULE scalar_module
   INTERFACE temperature
      MODULE PROCEDURE new_temperature
   END INTERFACE temperature
+
+  ! This is for backwards compatibility.  Throughout it's history
+  ! MASS1 would let temperature go below 0 (C), which is not
+  ! realistic.  This should be .TRUE. to keep temperature above zero
+  ! (and below 100).  This is only affects the application of
+  ! atmospheric exchange. It does not artificially correct numerical
+  ! transport issues.
+  LOGICAL, PUBLIC :: temperature_limits = .FALSE.
+
+  DOUBLE PRECISION, PRIVATE, PARAMETER :: temperature_min = 0.0D0
+  DOUBLE PRECISION, PRIVATE, PARAMETER :: temperature_max = 1.0D2
+  
 
   ! ----------------------------------------------------------------
   ! TYPE tdg_scalar
@@ -187,7 +199,7 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: cin, deltat
     CLASS (met_zone_t), INTENT(INOUT), POINTER :: met
 
-    DOUBLE PRECISION :: t, depth, area, width, factor
+    DOUBLE PRECISION :: t, depth, area, width, factor, dt
 
     tout = this%scalar_t%source(cin, pt, deltat, met)
 
@@ -203,10 +215,43 @@ CONTAINS
                 factor = 1.0/3.2808
              ELSE
                 factor = 1.0
-             END IF
+             END IF 
              t = tout
-             tout = t + factor*met%energy_flux(tout)*deltat*width/area
+
+             ! Don't use a wacky value 
+             IF (temperature_limits) THEN
+                tout = MAX(temperature_min, tout)
+                tout = MIN(temperature_max, tout)
+             END IF
+
+             dt = factor*met%energy_flux(tout)*deltat*width/area
+
+             ! This tortured logic is to fix temperature range
+             ! problems caused by atmospheric exchange (e.g. really
+             ! small volumes), and NOT fix transport errors that may
+             ! have occured elsewhere.
+             
+             t = tout + dt
+             IF (temperature_limits) THEN
+                IF (t .GE. temperature_max) THEN
+                   IF (tout .GE. temperature_max) THEN
+                      t = tout
+                   ELSE
+                      t = temperature_max
+                   END IF
+                END IF
+                IF (t .LE. temperature_min) THEN
+                   IF (tout .LE. temperature_min) THEN
+                      t = tout
+                   ELSE
+                      t = temperature_min
+                   END IF
+                END IF
+             END IF
+             tout = t
              ! WRITE(*,*) "temperature_source: ", t, tout, width, area
+
+             ! If called for, keep temperature in the liquid range
           END IF
        END IF
     END IF

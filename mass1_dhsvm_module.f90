@@ -12,7 +12,7 @@ MODULE mass1_dhsvm_module
   USE network_module
   USE link_module
   USE bc_module
-  USE met_zone
+  USE scalar_module
 
   IMPLICIT NONE
 
@@ -116,6 +116,11 @@ CONTAINS
     DOUBLE PRECISION, PARAMETER :: zero(5) = 0.0, tempin(5) = 12.0
     DOUBLE PRECISION :: coeff(4)
     INTEGER :: tidx
+
+    ! When using MASS1 from DHSVM, keep temperature between 0 and 100 C
+    IF (dotemp) THEN
+       temperature_limits = .TRUE.
+    END IF
 
     CALL dnet%net%read(cfgdir)
 
