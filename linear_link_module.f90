@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-05-31 08:02:45 d3g096
+! Last Change: 2019-06-20 06:39:41 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -270,7 +270,7 @@ CONTAINS
             &kdiff, &
             &ksurf
 
-       ! Convert lengths to internal length units
+       ! Convert length to internal length units
        length = length*cl_factor
 
        IF (manning .LE. 0.0) THEN
@@ -447,6 +447,12 @@ CONTAINS
        !    this%pt(i)%trans%cnow(s) = c(s)
        !    this%pt(i)%trans%cold(s) = c(s)
        ! END DO
+
+       IF (nspecies .GT. 0) THEN
+          this%pt(i)%trans%hnow = this%pt(i)%hnow
+          this%pt(i)%trans%hold = this%pt(i)%trans%hnow
+       END IF
+          
 
        DO s = 1, nspecies
           SELECT CASE (this%species(s)%scalar%bctype)

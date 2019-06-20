@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2019-06-06 09:59:36 d3g096
+! Last Change: 2019-06-20 06:41:25 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -151,6 +151,7 @@ CONTAINS
          this%hnow%v = 0.0
          this%xsprop%area = 0.0
       END IF
+      !this%trans%xsprop = this%xsprop
     END ASSOCIATE
 
   END SUBROUTINE point_section_update
