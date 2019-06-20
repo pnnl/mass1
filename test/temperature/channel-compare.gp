@@ -1,6 +1,6 @@
 
 set term post enh eps color solid "Helvetica" 18
-set key font "Helvetica, 16"
+set key font "Helvetica, 18"
 
 set xdata time
 set timefmt "%m-%d-%Y %H:%M:%S"
@@ -12,6 +12,7 @@ set colors classic
 
 set key bottom
 set key maxrows 3
+set key width -5
 
 
 set ylabel "Temperature, {/Symbol \260}C"

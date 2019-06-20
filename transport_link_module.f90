@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February 18, 2019 by William A. Perkins
-  ! Last Change: 2019-05-22 08:00:50 d3g096
+  ! Last Change: 2019-06-19 12:35:53 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE transport_link_module
@@ -178,6 +178,7 @@ CONTAINS
        IF (a .GT. 0.0) THEN
           this%c(i) = this%c(i)*aold/a - dtdx*(this%f(i) - this%f(i-1))/a
        END IF
+       ! WRITE(*,*) i, this%c(i), aold, a, this%f(i), this%f(i-1)
        ! IF (i .EQ. 100) THEN
        !    WRITE(*, '(*(1X,E10.3))') dtdx, &
        !         &this%pt(i)%trans%hnow%q, this%pt(i)%trans%hold%q, &
@@ -224,9 +225,8 @@ CONTAINS
                  &(ABS(pt0%x - ptm1%x))
             dtdx = deltat/this%dxx(i)
             c = pt0%trans%cnow(ispec)
-            IF (pt0%trans%xspropold%area .GT. 0.0) THEN
-               c = c + dtdx*(flux_e - flux_w)/pt0%trans%xspropold%area
-            END IF
+            c = c + dtdx*(flux_e - flux_w)/pt0%trans%xspropold%area
+            ! WRITE(*,*) i, pt0%trans%cnow(ispec), c
             this%c(i) = c
          END IF
        END ASSOCIATE
@@ -305,7 +305,8 @@ CONTAINS
     DOUBLE PRECISION :: c
 
     DO i = 1, this%npoints
-       this%pt(i)%trans%cold(ispec) = this%pt(i)%trans%cnow(ispec)
+       c = this%pt(i)%trans%cnow(ispec)
+       this%pt(i)%trans%cold(ispec) = c
     END DO
 
     ! FIXME: boundary conditions
@@ -321,7 +322,7 @@ CONTAINS
                &ispec
           CALL error_message(msg)
        END IF
-       this%pt(1)%trans%cnow = c
+       this%pt(1)%trans%cnow(ispec) = c
     END IF
     IF (this%q_down() .LT. 0.0) THEN
        c = 0.0
@@ -338,7 +339,8 @@ CONTAINS
       
     
     DO i = 1, this%npoints
-       this%c(i) = this%pt(i)%trans%cnow(ispec)
+       c = this%pt(i)%trans%cnow(ispec)
+       this%c(i) = c
     END DO
     this%c(0) = this%c(1)
     this%c(this%npoints+1) = this%c(this%npoints)
