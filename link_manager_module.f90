@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2019-06-06 09:00:18 d3g096
+! Last Change: 2019-06-20 09:34:50 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -1062,7 +1062,7 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     INTEGER :: l
 
-    DO l = this%maxorder, 1, -1
+    DO l = 1, this%maxorder, 1
        link => this%links_by_order(l)%p
        CALL link%transport(ispec, tdeltat)
     END DO
