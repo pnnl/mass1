@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  4, 2019 by William A. Perkins
-! Last Change: 2019-06-07 11:23:04 d3g096
+! Last Change: 2019-06-19 08:05:19 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -32,6 +32,7 @@ FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, pid, dotemp) RESULT(net) B
   ALLOCATE(f_net)
   ALLOCATE(f_net%net)
   f_net%net = network()
+  f_net%net%config%quiet = (pid .GT. 0)
   f_dotemp = (dotemp .NE. 0)
 
   utility_error_iounit = 11
