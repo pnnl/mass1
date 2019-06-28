@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-06-07 07:34:08 d3g096
+! Last Change: 2019-06-28 12:34:54 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -468,7 +468,9 @@ CONTAINS
        tsteps = this%config%scalar_steps
     ELSE
        tsteps = this%links%transport_steps(this%config%time%step)
-       WRITE(*, '(" Using ", I5, " transport steps")') tsteps
+       IF (.NOT. this%config%quiet) THEN
+          WRITE(*, '(" Using ", I5, " transport steps")') tsteps
+       END IF
     END IF
     tdeltat = this%config%time%delta_t
     tdeltat = tdeltat/DBLE(tsteps)
