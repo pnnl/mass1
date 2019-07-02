@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2019-05-23 11:45:24 d3g096
+! Last Change: 2019-07-01 14:19:58 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -706,14 +706,14 @@ CONTAINS
     CLASS (confluence_t), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: order0
     CLASS (link_t), POINTER :: link
-    INTEGER :: o
+    INTEGER :: o, omax
 
     o = order0
 
     CALL this%ulink%begin()
     link => this%ulink%current()
     DO WHILE (ASSOCIATED(link))
-       o = link%set_order(o)
+       o = MAX(o, link%set_order(order0))
        CALL this%ulink%next()
        link => this%ulink%current()
     END DO
@@ -759,9 +759,11 @@ CONTAINS
     o = order0
     IF (ASSOCIATED(this%ucon)) THEN
        o = this%ucon%set_order(o)
+       this%order = o + 1
+    ELSE
+       this%order = o
     END IF
-    this%order = o
-    order = o + 1
+    order = this%order
 
   END FUNCTION link_set_order
 

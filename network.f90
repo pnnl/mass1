@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-06-28 12:34:54 d3g096
+! Last Change: 2019-07-02 06:19:30 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -293,18 +293,18 @@ CONTAINS
        READ (runit, IOSTAT=iostat) nspecies
        IF (IS_IOSTAT_END(iostat)) THEN
           WRITE(msg, *) TRIM(this%config%restart_load_file), &
-               &": error: no transport state found, hoping for the best"
+               &": no transport state found, hoping for the best"
           CALL error_message(msg)
        ELSE
           READ (runit, IOSTAT=iostat) (stype(s), s = 1, nspecies)
           IF (iostat .NE. 0) THEN
              WRITE(msg, *) TRIM(this%config%restart_load_file), &
-                  &": error: premature end of file in transport"
+                  &": premature end of file in transport"
              CALL error_message(msg, fatal=.TRUE.)
           END IF
           IF (nspecies .NE. this%scalars%nspecies) THEN
              WRITE(msg, *) TRIM(this%config%restart_load_file), &
-                  &": error:  number of trannsported species do not match"
+                  &":  number of trannsported species do not match"
              CALL error_message(msg, fatal=.TRUE.)
           END IF
 

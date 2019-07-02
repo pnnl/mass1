@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2019-06-20 09:34:50 d3g096
+! Last Change: 2019-07-01 14:51:14 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -51,7 +51,8 @@ MODULE link_manager_module
      TYPE (link_list) :: links
      CLASS (link_t), POINTER :: dslink
      INTEGER :: maxorder
-     TYPE (link_ptr), DIMENSION(:), ALLOCATABLE :: links_by_order
+     INTEGER, DIMENSION(:), ALLOCATABLE :: norder
+     TYPE (link_ptr), DIMENSION(:,:), ALLOCATABLE :: links_by_order
    CONTAINS
      PROCEDURE, NOPASS :: scan => link_manager_scan
      PROCEDURE :: read => link_manager_read
@@ -653,7 +654,7 @@ CONTAINS
     CLASS (link_t), POINTER :: link, dlink
 
     INTEGER :: ierr
-    INTEGER :: nds, order
+    INTEGER :: nds, order, idx, o
     TYPE (confluence_t), POINTER :: con
     CHARACTER(LEN=1024) :: msg, lbl
 
@@ -734,24 +735,27 @@ CONTAINS
 
     ! compute computational order: each link gets a unique order
 
-    this%maxorder = this%dslink%set_order(1) - 1
-    IF (this%maxorder .NE. this%links%size()) THEN
-       CALL error_message("link_manager_connect: this should not happen")
-    END IF
+    this%maxorder = this%dslink%set_order(1)
+    ! IF (this%maxorder .NE. this%links%size()) THEN
+    !    CALL error_message("link_manager_connect: this should not happen")
+    ! END IF
 
-    ! spit out connectivity and order information 
+    ! spit out connectivity and order information
+
+    ALLOCATE(this%norder(this%maxorder))
+    this%norder = 0
 
     CALL this%links%begin()
     dlink => this%links%current()
 
     DO WHILE (ASSOCIATED(dlink))
-       WRITE(msg, '("link ", I4, "(order = ", I4, ") upstream links:")') &
+       WRITE(msg, '("link ", I5, "(order = ", I5, ") upstream links:")') &
             &dlink%id, dlink%order
        IF (ASSOCIATED(dlink%ucon)) THEN
           CALL dlink%ucon%ulink%begin()
           link => dlink%ucon%ulink%current()
           DO WHILE (ASSOCIATED(link))
-             WRITE(lbl, '(I4)') link%id
+             WRITE(lbl, '(I5)') link%id
              msg = TRIM(msg) // " " // TRIM(lbl)
              CALL dlink%ucon%ulink%next()
              link => dlink%ucon%ulink%current()
@@ -759,6 +763,7 @@ CONTAINS
        ELSE 
           msg = TRIM(msg) // " none"
        END IF
+       this%norder(dlink%order) = this%norder(dlink%order) + 1
        CALL status_message(msg)
        CALL this%links%next()
        dlink => this%links%current()
@@ -767,17 +772,28 @@ CONTAINS
     ! Each link should have a unique order. Organize them into an
     ! array so traversing the links is more efficient
 
-    ALLOCATE(this%links_by_order(this%maxorder))
+    o = MAXVAL(this%norder) + 1
+    ALLOCATE(this%links_by_order(this%maxorder, o))
+    ! Just to make sure
+    DO order = 1, this%maxorder
+       DO idx = 1, o
+          NULLIFY(this%links_by_order(order, idx)%p)
+       END DO
+    END DO
+    this%norder = 0
+
+    
     CALL this%links%begin()
     link => this%links%current()
 
     DO WHILE (ASSOCIATED(link))
        order = link%order
-       this%links_by_order(order)%p => link
+       this%norder(order) = this%norder(order) + 1
+       this%links_by_order(order, this%norder(order))%p => link
        CALL this%links%next()
        link => this%links%current()
     END DO
-    
+
   END SUBROUTINE link_manager_connect
 
 
@@ -826,11 +842,13 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: deltat
 
     CLASS (link_t), POINTER :: link
-    INTEGER :: l
+    INTEGER :: l, o
 
-    DO l = 1, this%maxorder
-       link => this%links_by_order(l)%p
-       CALL link%forward_sweep(deltat)
+    DO o = 1, this%maxorder, 1
+       DO l = 1, this%norder(o)
+          link => this%links_by_order(o, l)%p
+          CALL link%forward_sweep(deltat)
+       END DO
     END DO
 
   END SUBROUTINE link_manager_flow_forward
@@ -846,12 +864,14 @@ CONTAINS
     INTEGER, INTENT(IN) :: dsbc_type
 
     CLASS (link_t), POINTER :: link
-    INTEGER :: l
+    INTEGER :: l, o 
 
-    DO l = this%maxorder, 1, -1
-       link => this%links_by_order(l)%p
-       CALL link%backward_sweep(dsbc_type)
-       CALL link%hydro_update(grav, unitwt, deltat)
+    DO o = this%maxorder, 1, -1
+       DO l = 1, this%norder(o)
+          link => this%links_by_order(o, l)%p
+          CALL link%backward_sweep(dsbc_type)
+          CALL link%hydro_update(grav, unitwt, deltat)
+       END DO
     END DO
 
   END SUBROUTINE link_manager_flow_backward
@@ -972,11 +992,13 @@ CONTAINS
 
     CLASS (link_manager_t), INTENT(INOUT) :: this
     CLASS (link_t), POINTER :: link
-    INTEGER :: l
+    INTEGER :: l, o
 
-    DO l = 1, this%maxorder
-       link => this%links_by_order(l)%p
-       CALL link%pre_transport()
+    DO o = 1, this%maxorder
+       DO l = 1, this%norder(o)
+          link => this%links_by_order(o, l)%p
+          CALL link%pre_transport()
+       END DO
     END DO
   END SUBROUTINE link_manager_pre_transport
 
@@ -1039,11 +1061,13 @@ CONTAINS
     CLASS (link_manager_t), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: tnow, htime0, htime1
     CLASS (link_t), POINTER :: link
-    INTEGER :: l
+    INTEGER :: l, o
 
-    DO l = 1, this%maxorder
-       link => this%links_by_order(l)%p
-       CALL link%trans_interp(tnow, htime0, htime1)
+    DO o = 1, this%maxorder
+       DO l = 1, this%norder(o)
+          link => this%links_by_order(o, l)%p
+          CALL link%trans_interp(tnow, htime0, htime1)
+       END DO
     END DO
 
   END SUBROUTINE link_manager_transport_interp
@@ -1060,11 +1084,14 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: tdeltat
     
     CLASS (link_t), POINTER :: link
-    INTEGER :: l
+    INTEGER :: l, o
 
-    DO l = 1, this%maxorder, 1
-       link => this%links_by_order(l)%p
-       CALL link%transport(ispec, tdeltat)
+    
+    DO o = 1, this%maxorder, 1
+       DO l = 1, this%norder(o)
+          link => this%links_by_order(o, l)%p
+          CALL link%transport(ispec, tdeltat)
+       END DO
     END DO
 
   END SUBROUTINE link_manager_transport
