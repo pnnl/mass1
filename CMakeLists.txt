@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2019-03-15 08:30:53 d3g096
+# Last Change: 2019-07-02 13:30:57 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -28,13 +28,24 @@ list (APPEND CMAKE_MODULE_PATH "${MASS1_SOURCE_DIR}/cmake")
 # Compiler options
 # -------------------------------------------------------------
 
+option(MASS1_ENABLE_OPENMP "Enable the use of OpenMP" OFF)
+
+if (MASS1_ENABLE_OPENMP)
+  find_package(OpenMP COMPONENTS Fortran)
+  if (OpenMP_Fortran_FOUND)
+    message(STATUS "OpenMP Enabled")
+  else (OpenMP_Fortran_FOUND)
+    message(WARNING "OpenMP asked for but apparently not supported by the compiler")
+  endif (OpenMP_Fortran_FOUND)
+endif (MASS1_ENABLE_OPENMP)
+
 if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
   # trap floating point exceptions and use preprocessor
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wall -ffpe-trap=invalid,zero,overflow -cpp -fbacktrace")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wall -ffpe-trap=invalid,zero,overflow -cpp -fbacktrace ${OpenMP_Fortran_FLAGS}")
 elseif (CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
   # w/ Intel, build static binaries that trap floating point exceptions
   # and turn on the preprocessor for all files
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpe0 -fpp")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpe0 -fpp ${OpenMP_Fortran_FLAGS}")
 endif()
 
 # -------------------------------------------------------------
