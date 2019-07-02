@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2019-07-01 14:51:14 d3g096
+! Last Change: 2019-07-02 12:18:20 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -844,12 +844,16 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     INTEGER :: l, o
 
+    !$omp parallel 
     DO o = 1, this%maxorder, 1
+       !$omp do private(l, link)
        DO l = 1, this%norder(o)
           link => this%links_by_order(o, l)%p
           CALL link%forward_sweep(deltat)
        END DO
+       !$omp end  do
     END DO
+    !$omp end parallel
 
   END SUBROUTINE link_manager_flow_forward
 
@@ -866,13 +870,17 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     INTEGER :: l, o 
 
+    !$omp parallel
     DO o = this%maxorder, 1, -1
+       !$omp do private(l, link)
        DO l = 1, this%norder(o)
           link => this%links_by_order(o, l)%p
           CALL link%backward_sweep(dsbc_type)
           CALL link%hydro_update(grav, unitwt, deltat)
        END DO
+       !$omp end do
     END DO
+    !$omp end parallel
 
   END SUBROUTINE link_manager_flow_backward
 
@@ -994,12 +1002,17 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     INTEGER :: l, o
 
+    !$omp parallel 
     DO o = 1, this%maxorder
+       !$omp do private(l, link)
        DO l = 1, this%norder(o)
           link => this%links_by_order(o, l)%p
           CALL link%pre_transport()
        END DO
+       !$omp end do
     END DO
+    !$omp end parallel
+
   END SUBROUTINE link_manager_pre_transport
 
   ! ----------------------------------------------------------------
@@ -1063,12 +1076,16 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     INTEGER :: l, o
 
+    !$omp parallel 
     DO o = 1, this%maxorder
+       !$omp do private(l, link)
        DO l = 1, this%norder(o)
           link => this%links_by_order(o, l)%p
           CALL link%trans_interp(tnow, htime0, htime1)
        END DO
+       !$omp end do
     END DO
+    !$omp end parallel
 
   END SUBROUTINE link_manager_transport_interp
 
@@ -1087,12 +1104,16 @@ CONTAINS
     INTEGER :: l, o
 
     
+    !$omp parallel 
     DO o = 1, this%maxorder, 1
+       !$omp do private(l, link)
        DO l = 1, this%norder(o)
           link => this%links_by_order(o, l)%p
           CALL link%transport(ispec, tdeltat)
        END DO
+       !$omp end do
     END DO
+    !$omp end parallel
 
   END SUBROUTINE link_manager_transport
 
