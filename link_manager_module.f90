@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2019-07-03 06:07:36 d3g096
+! Last Change: 2019-07-04 05:56:20 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -1026,20 +1026,25 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: dt
 
     DOUBLE PRECISION :: cmax, dmax, a_transdt, d_transdt
+    INTEGER :: o, l
     CLASS (link_t), POINTER :: link
 
     DOUBLE PRECISION, PARAMETER :: max_courant = 0.99, max_diffuse = 0.99
 
-    CALL this%links%begin()
-    link => this%links%current()
+    cmax = 0.0
+    dmax = 0.0
 
-    DO WHILE (ASSOCIATED(link))
-       cmax = MAX(cmax, link%max_courant(dt))
-       dmax = MAX(dmax, link%max_diffuse(dt))
-
-       CALL this%links%next()
-       link => this%links%current()
+    !$omp parallel default(shared)
+    DO o = 1, this%maxorder
+       !$omp do private(l, link) reduction(MAX: cmax, dmax)
+       DO l = 1, this%norder(o)
+          link => this%links_by_order(o, l)%p
+          cmax = MAX(cmax, link%max_courant(dt))
+          dmax = MAX(dmax, link%max_diffuse(dt))
+       END DO
+       !$omp end do
     END DO
+    !$omp end parallel
 
     IF (cmax .GT. max_courant) THEN 
        a_transdt = max_courant/cmax*dt
