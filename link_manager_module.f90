@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2019-07-02 12:18:20 d3g096
+! Last Change: 2019-07-03 06:07:36 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -844,7 +844,7 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     INTEGER :: l, o
 
-    !$omp parallel 
+    !$omp parallel default(shared)
     DO o = 1, this%maxorder, 1
        !$omp do private(l, link)
        DO l = 1, this%norder(o)
@@ -870,7 +870,7 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     INTEGER :: l, o 
 
-    !$omp parallel
+    !$omp parallel default(shared)
     DO o = this%maxorder, 1, -1
        !$omp do private(l, link)
        DO l = 1, this%norder(o)
@@ -1002,7 +1002,7 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     INTEGER :: l, o
 
-    !$omp parallel 
+    !$omp parallel default(shared)
     DO o = 1, this%maxorder
        !$omp do private(l, link)
        DO l = 1, this%norder(o)
@@ -1076,7 +1076,7 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     INTEGER :: l, o
 
-    !$omp parallel 
+    !$omp parallel default(shared)
     DO o = 1, this%maxorder
        !$omp do private(l, link)
        DO l = 1, this%norder(o)
@@ -1104,7 +1104,7 @@ CONTAINS
     INTEGER :: l, o
 
     
-    !$omp parallel 
+    !$omp parallel default(shared)
     DO o = 1, this%maxorder, 1
        !$omp do private(l, link)
        DO l = 1, this%norder(o)
