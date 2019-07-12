@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2019-07-04 05:56:20 d3g096
+! Last Change: 2019-07-08 06:33:53 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -733,7 +733,7 @@ CONTAINS
             &fatal=.TRUE.)
     END IF
 
-    ! compute computational order: each link gets a unique order
+    ! compute computational order
 
     this%maxorder = this%dslink%set_order(1)
     ! IF (this%maxorder .NE. this%links%size()) THEN
@@ -769,8 +769,9 @@ CONTAINS
        dlink => this%links%current()
     END DO
 
-    ! Each link should have a unique order. Organize them into an
-    ! array so traversing the links is more efficient
+    ! Organize the links into an array so traversing the links is more
+    ! efficient, and links with the same order can be handled in
+    ! parallel
 
     o = MAXVAL(this%norder) + 1
     ALLOCATE(this%links_by_order(this%maxorder, o))
