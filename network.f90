@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-06-07 07:34:08 d3g096
+! Last Change: 2019-09-06 12:13:01 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -142,13 +142,14 @@ CONTAINS
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE network_read
-
+  ! 
   ! ----------------------------------------------------------------
-  SUBROUTINE network_read(this, base)
+  SUBROUTINE network_read(this, base, dotemp_override)
     USE general_vars
     IMPLICIT NONE
     CLASS (network), INTENT(INOUT) :: this
     CHARACTER (LEN=*), INTENT(IN) :: base
+    LOGICAL, INTENT(IN), OPTIONAL :: dotemp_override
     INTEGER :: istatus
     CHARACTER(LEN=path_length) :: cwd, mybase
 
@@ -169,6 +170,15 @@ CONTAINS
     this%basedir = mybase
 
     CALL this%config%read()
+
+    ! Some things can be overridden (i.e. DHSVM) can override some
+    ! things in the configuration
+    IF (PRESENT(dotemp_override)) THEN
+       this%config%do_temp = dotemp_override
+       this%config%do_transport = this%config%do_temp
+       this%config%met_required = &
+            &(this%config%do_temp .AND. this%config%temp_exchange)
+    END IF
 
     ! things that should be in the configuration
 
@@ -293,18 +303,18 @@ CONTAINS
        READ (runit, IOSTAT=iostat) nspecies
        IF (IS_IOSTAT_END(iostat)) THEN
           WRITE(msg, *) TRIM(this%config%restart_load_file), &
-               &": error: no transport state found, hoping for the best"
+               &": no transport state found, hoping for the best"
           CALL error_message(msg)
        ELSE
           READ (runit, IOSTAT=iostat) (stype(s), s = 1, nspecies)
           IF (iostat .NE. 0) THEN
              WRITE(msg, *) TRIM(this%config%restart_load_file), &
-                  &": error: premature end of file in transport"
+                  &": premature end of file in transport"
              CALL error_message(msg, fatal=.TRUE.)
           END IF
           IF (nspecies .NE. this%scalars%nspecies) THEN
              WRITE(msg, *) TRIM(this%config%restart_load_file), &
-                  &": error:  number of trannsported species do not match"
+                  &":  number of trannsported species do not match"
              CALL error_message(msg, fatal=.TRUE.)
           END IF
 
@@ -468,7 +478,9 @@ CONTAINS
        tsteps = this%config%scalar_steps
     ELSE
        tsteps = this%links%transport_steps(this%config%time%step)
-       WRITE(*, '(" Using ", I5, " transport steps")') tsteps
+       IF (.NOT. this%config%quiet) THEN
+          WRITE(*, '(" Using ", I5, " transport steps")') tsteps
+       END IF
     END IF
     tdeltat = this%config%time%delta_t
     tdeltat = tdeltat/DBLE(tsteps)

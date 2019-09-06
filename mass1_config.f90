@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2019-04-02 10:15:28 d3g096
+! Last Change: 2019-06-28 12:00:14 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE mass1_config
@@ -163,7 +163,6 @@ CONTAINS
     READ(iunit,1000, ERR=110) this%config_version
     line = line + 1
 1000 FORMAT(a100)
-    WRITE(*, *) TRIM(this%config_version)
     CALL status_message("Run Title: " // TRIM(this%config_version))
 
     READ(iunit,*, ERR=110)dumlog

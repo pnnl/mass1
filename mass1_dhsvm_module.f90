@@ -122,19 +122,13 @@ CONTAINS
        temperature_limits = .TRUE.
     END IF
 
-    CALL dnet%net%read(cfgdir)
+    CALL dnet%net%read(cfgdir, dotemp)
 
     ASSOCIATE (cfg => dnet%net%config)
       cfg%time%begin = dhsvm_to_decimal(start)
       cfg%time%end = dhsvm_to_decimal(end)
       cfg%time%time = cfg%time%begin
 
-      ! Temperature should be turned ON in the read
-      ! configuration. This is here to turn it off.
-      cfg%do_temp = dotemp
-      cfg%temp_diffusion = .TRUE.
-      cfg%temp_exchange = .FALSE.
-      cfg%met_required = cfg%temp_exchange
       cfg%quiet = quiet
     END ASSOCIATE
 

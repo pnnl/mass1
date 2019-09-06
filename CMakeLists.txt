@@ -7,13 +7,13 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2019-03-15 08:30:53 d3g096
+# Last Change: 2019-07-03 13:23:44 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
 # General set up
 # -------------------------------------------------------------
-cmake_minimum_required (VERSION 2.8.12)
+cmake_minimum_required (VERSION 3.1)
 
 project(MASS1 Fortran)
 
@@ -27,6 +27,23 @@ list (APPEND CMAKE_MODULE_PATH "${MASS1_SOURCE_DIR}/cmake")
 # -------------------------------------------------------------
 # Compiler options
 # -------------------------------------------------------------
+
+option(MASS1_ENABLE_OPENMP "Enable the use of OpenMP" OFF)
+
+# It is assumed here that the compiler does all the correct things if
+# it is given the flags detected by FindOpenMP -- module and library
+# paths are set correctly.
+
+if (MASS1_ENABLE_OPENMP)
+  # CMake version 3.1 or greater is required for FindOpenMP to test Fortran
+  find_package(OpenMP)
+  if (OpenMP_FOUND)
+    message(STATUS "OpenMP Enabled")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS}  ${OpenMP_Fortran_FLAGS}")
+  else (OpenMP_FOUND)
+    message(WARNING "OpenMP asked for but apparently not supported by the compiler")
+  endif (OpenMP_FOUND)
+endif (MASS1_ENABLE_OPENMP)
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
   # trap floating point exceptions and use preprocessor

@@ -153,6 +153,38 @@ make runtests
    [Gnuplot](http://www.gnuplot.info/) is available) for the tests.
    Browse the `build/test` directory after `make runtests`
    completion.
+   
+### OpenMP
+
+MASS1 can utilize [OpenMP](https://www.openmp.org/) to partially
+parallelize computations.  This can provide significant speed up of
+large networks on multi-processor platforms.  To enable, add 
+
+```
+-D MASS1_ENABLE_OPENMP:BOOL=ON
+```
+to the [CMake](https://cmake.org/) command. 
+
+MASS1 utilizes [OpenMP](https://www.openmp.org/) to parallelize the
+computation of links with the same order.  So, OpenMP really only
+helps with large networks with hundreds or thousands of links and a large
+order range.  OpenMP can help with transport in smaller network,
+particularly if small transport time steps are needed, but the
+benefits are much lower.  
+
+The number of threads used needs to be limited. The benefits of OpenMP
+are usually lost with more than just a few threads.  Of course, some
+experimentation is needed for a particular application.  The maximum
+number of threads is set using the environment variable
+`OMP_NUM_THREADS`, e.g.,
+
+```
+OMP_NUM_THREADS=4
+export OMP_NUM_THREADS
+```
+before running MASS1.   Using too many threads will make MASS1 run
+slower.  
+
 
 ## Usage
 
@@ -174,7 +206,8 @@ equations are discretized.
 
 
 When run, MASS1 expects to find a
-[configuration file](doc/configuration.md) named `mass1.cfg`.  
+[configuration file](doc/configuration.md) named `mass1.cfg` in the
+current directory
 
 ## Citation
 

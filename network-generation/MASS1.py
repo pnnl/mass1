@@ -9,7 +9,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created October 24, 2011 by William A. Perkins
-# Last Change: 2018-08-16 08:55:07 d3g096
+# Last Change: 2019-07-01 14:53:46 d3g096
 # -------------------------------------------------------------
 
 from inspect import *
@@ -250,6 +250,7 @@ class Link(object):
     def get_npoints(self):
         npt = int(self.point.length/5280.0*16.0) + 1 # put points every 1/162th of a mile
         if (npt < 2): npt = 2
+        npt = 2
         return npt
     npoints = property(get_npoints)
 
