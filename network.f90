@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-07-02 06:19:30 d3g096
+! Last Change: 2019-09-06 12:13:01 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -142,13 +142,14 @@ CONTAINS
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE network_read
-
+  ! 
   ! ----------------------------------------------------------------
-  SUBROUTINE network_read(this, base)
+  SUBROUTINE network_read(this, base, dotemp_override)
     USE general_vars
     IMPLICIT NONE
     CLASS (network), INTENT(INOUT) :: this
     CHARACTER (LEN=*), INTENT(IN) :: base
+    LOGICAL, INTENT(IN), OPTIONAL :: dotemp_override
     INTEGER :: istatus
     CHARACTER(LEN=path_length) :: cwd, mybase
 
@@ -169,6 +170,15 @@ CONTAINS
     this%basedir = mybase
 
     CALL this%config%read()
+
+    ! Some things can be overridden (i.e. DHSVM) can override some
+    ! things in the configuration
+    IF (PRESENT(dotemp_override)) THEN
+       this%config%do_temp = dotemp_override
+       this%config%do_transport = this%config%do_temp
+       this%config%met_required = &
+            &(this%config%do_temp .AND. this%config%temp_exchange)
+    END IF
 
     ! things that should be in the configuration
 

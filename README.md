@@ -156,7 +156,7 @@ make runtests
    
 ### OpenMP
 
-MASS1 can use [OpenMP](https://www.openmp.org/) to partially
+MASS1 can utilize [OpenMP](https://www.openmp.org/) to partially
 parallelize computations.  This can provide significant speed up of
 large networks on multi-processor platforms.  To enable, add 
 
@@ -170,7 +170,7 @@ computation of links with the same order.  So, OpenMP really only
 helps with large networks with hundreds or thousands of links and a large
 order range.  OpenMP can help with transport in smaller network,
 particularly if small transport time steps are needed, but the
-benefits are much lower  
+benefits are much lower.  
 
 The number of threads used needs to be limited. The benefits of OpenMP
 are usually lost with more than just a few threads.  Of course, some
