@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2019-02-15 11:08:35 d3g096
+! Last Change: 2019-09-27 07:46:13 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! SUBROUTINE banner
@@ -17,11 +17,19 @@
 SUBROUTINE banner()
 
   USE iso_fortran_env
+#ifdef _OPENMP
+  USE OMP_LIB
+#endif
   
   IMPLICIT NONE
   WRITE (output_unit, 10)
   WRITE(output_unit, 11)
   WRITE (output_unit, 15) '@MASS1_BRANCH@: @MASS1_REVISION@ (@MASS1_REVISION_DATE@)'
+#ifdef _OPENMP
+  WRITE(output_unit, 16) omp_get_max_threads()
+#else
+  WRITE(output_unit, 17)
+#endif
 
   CALL FLUSH(output_unit)
 10 FORMAT(&
@@ -46,5 +54,7 @@ SUBROUTINE banner()
         &T4, 'Contact:', /,&
         &T8, 'Dr. Marshall C. Richmond (marshall.richmond@pnnl.gov)', /,&
         &T8, 'William A. Perkins (william.perkins@pnnl.gov)', /)
+16 FORMAT(T4, "OpenMP ENABLED with ", I2, " threads available", /)
+17 FORMAT(T4, "OpenMP disabled", /)
 
 END SUBROUTINE banner
