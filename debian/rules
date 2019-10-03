@@ -28,8 +28,10 @@ binary-indep:
 
 binary-arch:
 	make -C $(BUILDDIR) install/strip  DESTDIR="../debian/tmp/"
+	dpkg-shlibdeps debian/tmp/usr/bin/mass1 debian/tmp/usr/bin/mass1_new
+	dh_installchangelogs debian/changelog
 	mkdir debian/tmp/DEBIAN
-	dpkg-gencontrol -pgridpack-dev
+	dpkg-gencontrol -pmass1
 	dpkg --build debian/tmp ..
 
 # firstly called by launchpad
