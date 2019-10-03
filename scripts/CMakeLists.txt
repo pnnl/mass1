@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 30, 2016 by William A. Perkins
-# Last Change: 2017-08-29 09:50:32 d3g096
+# Last Change: 2019-10-03 11:36:01 d3g096
 # -------------------------------------------------------------
 
 if (PERLMODULES_FOUND) 
@@ -39,7 +39,7 @@ install(FILES
   xy-looper-png.mcr
   xy-looper.mcr
   README.md
-  DESTINATION share/mass1
+  DESTINATION share/doc/mass1
   )
 install(FILES
   cross-section/CHARIMAarea.pl
@@ -58,6 +58,6 @@ install(FILES
   cross-section/XSection.pm
   cross-section/section-fix.awk
   cross-section/section-unfix.awk
-  DESTINATION share/mass1/cross-section
+  DESTINATION share/doc/mass1/cross-section
 )
 

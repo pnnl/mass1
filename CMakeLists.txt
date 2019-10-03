@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2019-07-03 13:23:44 d3g096
+# Last Change: 2019-10-03 11:37:15 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -267,3 +267,14 @@ add_custom_target(runtests
 
 # target runtests must exist before doing this
 add_subdirectory(test)
+
+# -------------------------------------------------------------
+# Installation
+# -------------------------------------------------------------
+install(FILES
+  README.md
+  debian/changelog
+  debian/copyright
+  FILES share/doc/mass1
+  )
+  
