@@ -9,7 +9,7 @@ Standards-Version: 3.9.7
 
 Package: mass1
 Architecture: any
-Depends: gfortran
+Depends: gfortran, ${shlibs:Depends}
 Suggests: gnuplot (>= 4.6), perl, python
 Description: Modular Aquatic Simulation System in One Dimension
   MASS1 is a one-dimensional unsteady hydrodynamic and water quality

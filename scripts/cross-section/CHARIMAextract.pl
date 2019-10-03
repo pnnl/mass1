@@ -1,4 +1,4 @@
-#! /usr/unsupported/bin/perl5 -I/home/perk/gas-transport/utilities
+#! /usr/bin/env perl
 # -*- cperl -*-
 # -------------------------------------------------------------
 # file: CHARIMAextract.pl

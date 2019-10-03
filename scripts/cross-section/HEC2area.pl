@@ -1,4 +1,4 @@
-#! /usr/unsupported/bin/perl
+#! /usr/bin/env perl
 # -*- cperl -*-
 # -------------------------------------------------------------
 # file: HEC2area.pl
