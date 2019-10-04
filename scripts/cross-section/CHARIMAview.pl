@@ -1,4 +1,4 @@
-#! /usr/bin/env perl -I/home/perk/gas-transport/utilities
+#! /usr/bin/env perl
 # -*- mode: cperl -*-
 # -------------------------------------------------------------
 # file: CHARIMAview.pl
@@ -11,7 +11,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 23, 2005 by William A. Perkins
-# Last Change: 2017-06-22 11:40:48 d3g096
+# Last Change: 2019-07-15 11:38:51 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -27,7 +27,7 @@ use PDL::Graphics::PGPLOT::Window;
 # -------------------------------------------------------------
 my $program;
 ($program = $0) =~ s/.*\///;
-my $usage = "usage: $program [-d device] file";
+my $usage = "usage: $program [-m] [-d device] file";
 
 my $device = "/xserve";
 
@@ -41,6 +41,7 @@ my $plotopts =
    { color => 'DARKGRAY' },
    { color => 'CYAN' }
   ];
+my $dometric = undef;
 
 # -------------------------------------------------------------
 # read_section_file
@@ -67,9 +68,10 @@ sub read_section_file {
 # handle command line
 # -------------------------------------------------------------
 my %opts;
-die "$usage" if (!getopts('sd:', \%opts));
+die "$usage" if (!getopts('msd:', \%opts));
 
 $device = $opts{'d'} if (defined($opts{'d'}));
+$dometric = 1 if (defined($opts{'m'}));
 
 my @basefile;
 while (@ARGV) {
@@ -154,7 +156,11 @@ while (not $done) {
       push(@{$leg->{Symbol}}, $i);
     }
   }
-  $plot->label_axes("Station, ft", "Elevation, ft", $id, {COLOR=>'BLACK'});
+  if ($dometric) {
+    $plot->label_axes("Station, m", "Elevation, m", $id, {COLOR=>'BLACK'});
+  } else {
+    $plot->label_axes("Station, ft", "Elevation, ft", $id, {COLOR=>'BLACK'});
+  }
   $leg->{Width} = 0.25*($xmax - $xmin);
   $leg->{Height} = 0.03*($ymax - $ymin)*scalar(@{$leg->{Text}});
   $leg->{TextColour} = $leg->{Color};

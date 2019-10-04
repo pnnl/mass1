@@ -8,22 +8,24 @@
 ! distribution.
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
-! Last Change: 2019-05-30 13:59:27 d3g096
+! Last Change: 2019-10-04 09:33:25 d3g096
 ! ----------------------------------------------------------------
 
 MODULE energy_flux
 
   IMPLICIT NONE
 
-  PRIVATE :: net_solar_rad, net_longwave, back_radiation
+  PRIVATE :: net_solar_rad, back_radiation
   PRIVATE :: evaporation, conduction, windspeed, rel_humid, sat_vapor_press
+  PUBLIC :: net_longwave
 
   DOUBLE PRECISION :: stephan_boltz = 5.67e-8 !stephan-boltzmann constant in W/m2-K4
 
 
 CONTAINS
   !######################################################################
-  DOUBLE PRECISION FUNCTION net_heat_flux(coeff, net_solar, t_water, t_air, t_dew, wind_speed)
+  DOUBLE PRECISION FUNCTION net_heat_flux(coeff, &
+       &net_solar, t_water, t_air, t_dew, wind_speed, lwrad)
     !
     ! Hnet - (watts/m^2)
     !
@@ -31,12 +33,19 @@ CONTAINS
     ! equations in the report
     !
     IMPLICIT NONE
-    DOUBLE PRECISION :: coeff(*)
-    DOUBLE PRECISION :: net_solar,t_water, t_air, t_dew, wind_speed
+    DOUBLE PRECISION, INTENT(IN) :: coeff(*)
+    DOUBLE PRECISION, INTENT(IN) :: net_solar,t_water, t_air, t_dew, wind_speed
+    DOUBLE PRECISION, INTENT(IN), OPTIONAL :: lwrad
 
+    DOUBLE PRECISION :: tmplw
 
+    IF (PRESENT(lwrad)) THEN
+       tmplw = lwrad
+    ELSE
+       tmplw = net_longwave(coeff, t_air, t_dew)
+    END IF
     net_heat_flux = net_solar + &
-         &net_longwave(coeff, t_air, t_dew) + &
+         &tmplw + &
          &back_radiation(t_water) + &
          &evaporation(coeff, t_water, t_dew, wind_speed) + &
          &conduction(coeff, t_water, t_air, wind_speed) 

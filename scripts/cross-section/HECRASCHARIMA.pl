@@ -1,4 +1,4 @@
-#! /usr/bin/env perl -I/home/perk/gas-transport/utilities
+#! /usr/bin/env perl
 # -*- mode: cperl -*-
 # -------------------------------------------------------------
 # file: HECRASCHARIMA.pl

@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2019-07-03 13:23:44 d3g096
+# Last Change: 2019-10-04 08:34:21 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -258,6 +258,10 @@ install(TARGETS mass1_new DESTINATION bin)
 # save for running tests
 set(mass1newexe $<TARGET_FILE:mass1_new>)
 
+add_executable(mass1_met_add_lw  mass1_met_add_lw.f90)
+add_dependencies(mass1_met_add_lw mass1lib)
+target_link_libraries(mass1_met_add_lw mass1lib gastemp ts)
+
 # -------------------------------------------------------------
 # custom test target
 # -------------------------------------------------------------
@@ -267,3 +271,14 @@ add_custom_target(runtests
 
 # target runtests must exist before doing this
 add_subdirectory(test)
+
+# -------------------------------------------------------------
+# Installation
+# -------------------------------------------------------------
+install(FILES
+  README.md
+  debian/changelog
+  debian/copyright
+  DESTINATION share/doc/mass1
+  )
+  

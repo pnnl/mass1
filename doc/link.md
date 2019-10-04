@@ -26,7 +26,7 @@ a slash at the end of the data. The field descriptions that are
 |  | 8 | int | Downstream hydrodynamic BC identifier | 0
 |  | 9 | int | TDG (species 2) BC identifier | 0
 |  | 10 | int | Temperature (species 1) BC identifier | 0
-|  | 11 | int | Meteorological zone identifier | 0
+|  | 11 | int | Meteorologic zone identifier | 0
 |  | 12 | int | Lateral inflow series identifier | 0
 |  | 13 | int | Lateral inflow TDG series identifier | 0
 |  | 14 | int | Lateral inflow temperature series identifier | 0
@@ -50,10 +50,10 @@ definitions can be in any order, but
 | 12 | Discharge following PID 
 | 13 | Stage following PID 
 | 20 | Normal fluvial link with upstream TDG specified as saturation rather than concentration
-| 21 | Hydroelectric inflow link: like 1 but with generation and spill discharges specified in a [hydro BC](bc.md) file.  
+| 21 | Hydroelectric inflow link: like 1, but with generation and spill discharges specified in a [hydro BC](bc.md) file.  
 | 4 | Imposed Downstream stage 
 | 5 | Tributary inflow
-| 6 | Imposed hydroelectric dam discharge
+| 6 | Imposed hydroelectric dam discharge: like 2, but with generation and spill discharges specified in a [hydro BC](bc.md) file.
 | 60 | Hydrologic routing link 
 
 ## Point Input Option
@@ -69,6 +69,8 @@ Link points can be specified in one of two ways:
    properties (except for thalweg).  
 
 ## Boundary Condition (BC) and Lateral Inflow Identifiers
+
+
 
 
 ## Example

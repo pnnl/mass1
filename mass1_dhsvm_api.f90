@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  4, 2019 by William A. Perkins
-! Last Change: 2019-06-07 11:23:04 d3g096
+! Last Change: 2019-10-04 14:13:58 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -235,14 +235,14 @@ END SUBROUTINE mass1_update_latt
 ! SUBROUTINE mass1_update_met
 ! ----------------------------------------------------------------
 SUBROUTINE mass1_update_met(cnet, linkid, &
-     &airtemp, rh, windsp, swrad, ddate) BIND(c)
+     &airtemp, rh, windsp, swrad, lwrad, ddate) BIND(c)
   USE, INTRINSIC :: iso_c_binding
   USE energy_flux
   USE mass1_dhsvm_module
   IMPLICIT NONE
   TYPE (C_PTR), VALUE :: cnet
   INTEGER(KIND=C_INT), VALUE :: linkid
-  REAL(KIND=C_FLOAT), VALUE :: airtemp, rh, windsp, swrad
+  REAL(KIND=C_FLOAT), VALUE :: airtemp, rh, windsp, swrad, lwrad
   TYPE (DHSVM_date) :: ddate
 
   DOUBLE PRECISION :: time
@@ -250,7 +250,7 @@ SUBROUTINE mass1_update_met(cnet, linkid, &
   CLASS (link_t), POINTER :: link
   TYPE (time_series_rec), POINTER :: ts
   INTEGER :: tidx
-  DOUBLE PRECISION :: metvalues(5), dewtemp, rh8
+  DOUBLE PRECISION :: metvalues(6), dewtemp, rh8
   CHARACTER (LEN=1024) :: msg
 
   CALL C_F_POINTER(cnet, dnet)
@@ -271,6 +271,7 @@ SUBROUTINE mass1_update_met(cnet, linkid, &
         metvalues(3) = windsp
         metvalues(4) = 760.0
         metvalues(5) = swrad
+        metvalues(6) = lwrad
         ts => link%species(tidx)%met%met%ts
         CALL time_series_push(ts, time, metvalues)
         ! WRITE(*,*) "met for link", linkid, ": ", swrad, airtemp, dewtemp, windsp, rh8

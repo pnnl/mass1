@@ -26,7 +26,7 @@ because they are no longer needed or computed internally.  Items
 |13 | 1 | flag | If true, read initial conditions from a hotstart file
 |   |   |      | otherwise, read [initial conditions file](init.md)
 |14 | 1 | flag | Write a hotstart file at the end of simulation
-|15 | 1 | int  | Units option: 0 = English, ~~1 = metric
+|15 | 1 | int  | Units option: 0 = English, ~~1 = metric[^2]
 |16 | 1 | int  | Time option: ~~0 = real~~[^1], 1 = date/time
 |17 | 1 | int  | Units used for channel length in the [point file](point.md):
 |   |   |      |  0 = feet, 1 = meters, 2 = miles, 3 = kilometers
@@ -60,6 +60,7 @@ because they are no longer needed or computed internally.  Items
 |44 | 1 | real   | Hydrodynamics time step 
 |   | 2 | string | Optional time step units, one of: `hr`, `min`, `day`, and `sec`. `hr` is default.
 |45 | 1 | int    | Gage and profile output frequency (time steps)
+
 
 ## Example
 
@@ -119,3 +120,7 @@ MASS1 Configuration File - Version 0.83
 
 [^1]: Using decimal time in time series input no longer works, so
 don't try it. 
+
+[^2]: With metric units, all units, except channel length and met
+data, are SI.  This includes things easily missed like cross section
+dimensions and longitudinal dispersivity.  

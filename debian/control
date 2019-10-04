@@ -1,0 +1,26 @@
+Source: mass1
+Section: science
+Priority: optional
+Maintainer: William A. Perkins <william.perkins@pnnl.gov>
+Build-Depends: cmake (>= 2.8.12),
+ make (>= 4.0), dpkg-dev (>= 1.17.11), gfortran (>=4.8)
+Homepage: https://store.pnnl.gov/content/modular-aquatic-simulation-system-1d-mass1
+Standards-Version: 3.9.7
+
+Package: mass1
+Architecture: any
+Depends: gfortran, ${misc:Depends}, ${shlibs:Depends}
+Suggests: gnuplot (>= 4.6), perl, python
+Description: Modular Aquatic Simulation System in One Dimension
+ MASS1 is a one-dimensional unsteady hydrodynamic and water quality
+ model capable of simulating open channel flows, water surface
+ elevations, dissolved gas, and water temperature. The model is
+ applicable to any branched channel system. Because MASS1 uses
+ cross-section averaging, only single values of water surface
+ elevation, velocity, discharge, and temperature are produced at each
+ cross-section location along the river course. Lateral (i.e., across
+ the river channel) and vertical variations of these quantities are
+ not simulated.  MASS1 was developed by Pacific Northwest National
+ Laboratory (PNNL). It is a research code, written for applications
+ and computer platforms specific to the developers. Others may, or
+ may not, find it useful.

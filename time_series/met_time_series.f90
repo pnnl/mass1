@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  1, 2013 by William A. Perkins
-! Last Change: 2019-05-30 13:01:57 d3g096
+! Last Change: 2019-10-04 13:34:11 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -23,7 +23,7 @@ MODULE met_time_series
 
   CHARACTER (LEN=80), PRIVATE, SAVE :: rcsid = "$Id$"
 
-  ! The number of met data values
+  ! The number of met data values (usually)
   INTEGER, PARAMETER, PUBLIC :: met_fields = 5
 
   TYPE met_time_series_rec
@@ -37,21 +37,32 @@ MODULE met_time_series
        &MET_DEWT = 2, &
        &MET_WIND = 3, &
        &MET_BARO = 4, &
-       &MET_SWRAD = 5
+       &MET_SWRAD = 5, &
+       &MET_LWRAD = 6
 
 CONTAINS
 
   ! ----------------------------------------------------------------
   ! TYPE(MET_TIME_SERIES_REC) FUNCTION met_time_series_alloc
   ! ----------------------------------------------------------------
-  TYPE(MET_TIME_SERIES_REC) FUNCTION met_time_series_alloc(id, len) RESULT (metts)
+  TYPE(MET_TIME_SERIES_REC) FUNCTION met_time_series_alloc(id, len, dolw) RESULT (metts)
 
     IMPLICIT NONE
     INTEGER, INTENT(IN) :: id, len
+    LOGICAL, INTENT(IN), OPTIONAL :: dolw
     POINTER metts
 
+    INTEGER :: nfld
+
+    nfld = met_fields
+    IF (PRESENT(dolw)) THEN
+       IF (dolw) THEN
+          nfld = nfld + 1
+       END IF
+    END IF
+
     ALLOCATE(metts)
-    metts%ts => time_series_alloc(id, met_fields, len)
+    metts%ts => time_series_alloc(id, nfld, len)
     metts%current => metts%ts%current
     
   END FUNCTION met_time_series_alloc
@@ -60,15 +71,24 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! TYPE(MET_TIME_SERIES_REC) FUNCTION met_time_series_read
   ! ----------------------------------------------------------------
-  TYPE(MET_TIME_SERIES_REC) FUNCTION met_time_series_read(filename) RESULT (metts)
+  TYPE(MET_TIME_SERIES_REC) FUNCTION met_time_series_read(filename, dolw) RESULT (metts)
 
     IMPLICIT NONE
 
     POINTER metts
     CHARACTER (LEN=*), INTENT(IN) :: filename
+    LOGICAL, INTENT(IN), OPTIONAL :: dolw
+    INTEGER :: nfld
+
+    nfld = met_fields
+    IF (PRESENT(dolw)) THEN
+       IF (dolw) THEN
+          nfld = nfld + 1
+       END IF
+    END IF
 
     ALLOCATE(metts)
-    metts%ts => time_series_read(filename, met_fields, 50)
+    metts%ts => time_series_read(filename, nfld, 50)
     metts%current => metts%ts%current
 
   END FUNCTION met_time_series_read

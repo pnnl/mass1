@@ -1,0 +1,43 @@
+#!/usr/bin/make -f
+
+BUILDDIR = build_dir
+
+# secondly called by launchpad
+build-arch:
+	mkdir $(BUILDDIR);
+	cd $(BUILDDIR); \
+        export FC=gfortran; \
+	cmake \
+	-D CMAKE_BUILD_TYPE:STRING="Release" \
+	-D CMAKE_INSTALL_PREFIX:PATH="/usr" \
+	..
+	make -C $(BUILDDIR)
+
+build: build-indep build-arch
+
+.PHONY: build build-arch build-indep clean
+
+build-indep:
+	# nothing to be done
+
+# thirdly called by launchpad
+binary: binary-indep binary-arch
+
+binary-indep:
+	# nothing to be done
+
+binary-arch:
+	make -C $(BUILDDIR) install/strip  DESTDIR="../debian/tmp/"
+	dpkg-shlibdeps debian/tmp/usr/bin/mass1 debian/tmp/usr/bin/mass1_new
+	dh_installchangelogs debian/changelog
+	mkdir debian/tmp/DEBIAN
+	dpkg-gencontrol -pmass1
+	dpkg --build debian/tmp ..
+
+# firstly called by launchpad
+clean:
+	rm -f build
+	rm -rf debian/tmp
+	rm -rf $(BUILDDIR)
+
+.PHONY: binary binary-arch binary-indep clean
