@@ -8,15 +8,16 @@
 ! distribution.
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
-! Last Change: 2019-05-30 13:59:27 d3g096
+! Last Change: 2019-10-04 08:37:49 d3g096
 ! ----------------------------------------------------------------
 
 MODULE energy_flux
 
   IMPLICIT NONE
 
-  PRIVATE :: net_solar_rad, net_longwave, back_radiation
+  PRIVATE :: net_solar_rad, back_radiation
   PRIVATE :: evaporation, conduction, windspeed, rel_humid, sat_vapor_press
+  PUBLIC :: net_longwave
 
   DOUBLE PRECISION :: stephan_boltz = 5.67e-8 !stephan-boltzmann constant in W/m2-K4
 
