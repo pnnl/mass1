@@ -8,7 +8,7 @@
 ! distribution.
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
-! Last Change: 2019-10-04 08:37:49 d3g096
+! Last Change: 2019-10-04 09:33:25 d3g096
 ! ----------------------------------------------------------------
 
 MODULE energy_flux
@@ -24,7 +24,8 @@ MODULE energy_flux
 
 CONTAINS
   !######################################################################
-  DOUBLE PRECISION FUNCTION net_heat_flux(coeff, net_solar, t_water, t_air, t_dew, wind_speed)
+  DOUBLE PRECISION FUNCTION net_heat_flux(coeff, &
+       &net_solar, t_water, t_air, t_dew, wind_speed, lwrad)
     !
     ! Hnet - (watts/m^2)
     !
@@ -32,12 +33,19 @@ CONTAINS
     ! equations in the report
     !
     IMPLICIT NONE
-    DOUBLE PRECISION :: coeff(*)
-    DOUBLE PRECISION :: net_solar,t_water, t_air, t_dew, wind_speed
+    DOUBLE PRECISION, INTENT(IN) :: coeff(*)
+    DOUBLE PRECISION, INTENT(IN) :: net_solar,t_water, t_air, t_dew, wind_speed
+    DOUBLE PRECISION, INTENT(IN), OPTIONAL :: lwrad
 
+    DOUBLE PRECISION :: tmplw
 
+    IF (PRESENT(lwrad)) THEN
+       tmplw = lwrad
+    ELSE
+       tmplw = net_longwave(coeff, t_air, t_dew)
+    END IF
     net_heat_flux = net_solar + &
-         &net_longwave(coeff, t_air, t_dew) + &
+         &tmplw + &
          &back_radiation(t_water) + &
          &evaporation(coeff, t_water, t_dew, wind_speed) + &
          &conduction(coeff, t_water, t_air, wind_speed) 

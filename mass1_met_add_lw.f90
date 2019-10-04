@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October  4, 2019 by William A. Perkins
-! Last Change: 2019-10-04 08:48:12 d3g096
+! Last Change: 2019-10-04 12:37:37 d3g096
 ! ----------------------------------------------------------------
 PROGRAM met_add_lw
   USE utility
@@ -21,7 +21,7 @@ PROGRAM met_add_lw
 
   INTEGER, PARAMETER :: iunit = 5, ounit = 6
   DOUBLE PRECISION :: coeff(met_ncoeff) = &
-       &(/0.46, 9.2, 0.47, 0.65/)
+       &(/0.46, 9.2, 0.47, 0.80/)
   CHARACTER (LEN=1024) :: buf
   CHARACTER (LEN=20) :: datestr, timestr
   TYPE (met_data) :: met
