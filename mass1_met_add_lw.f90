@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October  4, 2019 by William A. Perkins
-! Last Change: 2019-10-04 08:43:33 d3g096
+! Last Change: 2019-10-04 08:48:12 d3g096
 ! ----------------------------------------------------------------
 PROGRAM met_add_lw
   USE utility
@@ -31,8 +31,8 @@ PROGRAM met_add_lw
   utility_status_iounit = ounit
 
   ! read and print first line
-  READ(iunit, *) buf
-  WRITE(ounit, *) TRIM(buf)
+  READ(iunit, '(A)') buf
+  WRITE(ounit, '(A)') TRIM(buf)
   DO
      READ(iunit, *, END=100) datestr, timestr, &
           &met%temp, met%dew, met%wind, met%bp, met%rad
