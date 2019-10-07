@@ -1,3 +1,9 @@
+mass1 (2.0-beta0ubuntu2) xenial; urgency=medium
+
+  * Add debhelper build dependency
+
+ -- GridPACK <gridpack@gridpackvm>  Mon, 07 Oct 2019 06:57:02 -0700
+
 mass1 (2.0-beta0ubuntu1) xenial; urgency=low
 
   * Initial 
