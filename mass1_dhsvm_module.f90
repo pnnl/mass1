@@ -224,6 +224,7 @@ CONTAINS
           zone%id = link%id
           zone%coeff = coeff
           zone%dolw = .TRUE.
+          zone%dolw = .FALSE. ! FIXME
           
           zone%met => met_time_series_alloc(link%id, 1, zone%dolw)
           zone%met%ts%limit_mode = TS_LIMIT_FLAT
