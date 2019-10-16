@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2019-10-04 08:34:21 d3g096
+# Last Change: 2019-10-16 08:27:36 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -51,7 +51,7 @@ if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
 elseif (CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
   # w/ Intel, build static binaries that trap floating point exceptions
   # and turn on the preprocessor for all files
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpe0 -fpp")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpe0 -fpp -traceback")
 endif()
 
 # -------------------------------------------------------------
