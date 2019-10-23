@@ -277,8 +277,6 @@ add_subdirectory(test)
 # -------------------------------------------------------------
 install(FILES
   README.md
-  debian/changelog
-  debian/copyright
   DESTINATION share/doc/mass1
   )
   
