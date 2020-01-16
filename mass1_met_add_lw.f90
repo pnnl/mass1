@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October  4, 2019 by William A. Perkins
-! Last Change: 2019-10-04 12:37:37 d3g096
+! Last Change: 2020-01-15 14:30:28 d3g096
 ! ----------------------------------------------------------------
 PROGRAM met_add_lw
   USE utility
@@ -36,7 +36,7 @@ PROGRAM met_add_lw
   DO
      READ(iunit, *, END=100) datestr, timestr, &
           &met%temp, met%dew, met%wind, met%bp, met%rad
-     lwrad = net_longwave(coeff, met%temp, met%dew)
+     lwrad = atm_longwave(coeff, met%temp, met%dew)
      WRITE(ounit, 10) datestr, timestr, met%temp, met%dew, met%wind,&
           &met%bp, met%rad, lwrad
 10   FORMAT(A10, 1X, A8, 6(1X, F6.1), 1X, '/')

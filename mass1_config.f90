@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2019-06-28 12:00:14 d3g096
+! Last Change: 2020-01-15 14:49:11 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE mass1_config
@@ -128,6 +128,8 @@ MODULE mass1_config
      LOGICAL :: quiet
 
      LOGICAL :: do_transport
+
+     LOGICAL :: do_met_lwrad
 
    CONTAINS
      PROCEDURE :: read => configuration_read
@@ -531,6 +533,9 @@ CONTAINS
     this%time%step = this%time%delta_t/24.0
     this%time%delta_t = this%time%delta_t*3600.0
     this%time%current_step = 0
+
+    ! default, it can be true for individual met zones    
+    this%do_met_lwrad = .FALSE. 
 
     this%do_transport = (this%do_temp .OR. this%do_gas)
     IF (this%do_transport) THEN
