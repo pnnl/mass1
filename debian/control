@@ -2,7 +2,7 @@ Source: mass1
 Section: science
 Priority: optional
 Maintainer: William A. Perkins <william.perkins@pnnl.gov>
-Build-Depends: cmake (>= 2.8.12),
+Build-Depends: cmake (>= 2.8.12), debhelper, 
  make (>= 4.0), dpkg-dev (>= 1.17.11), gfortran (>=4.8)
 Homepage: https://store.pnnl.gov/content/modular-aquatic-simulation-system-1d-mass1
 Standards-Version: 3.9.7

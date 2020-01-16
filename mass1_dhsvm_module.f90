@@ -98,13 +98,13 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE mass1_initialize
   ! ----------------------------------------------------------------
-  SUBROUTINE mass1_initialize(dnet, cfgdir, outdir, start, end, quiet, dotemp)
+  SUBROUTINE mass1_initialize(dnet, cfgdir, outdir, start, end, quiet, dotemp, dolwrad)
 
     IMPLICIT NONE
     TYPE (DHSVM_network), INTENT(INOUT) :: dnet
     CHARACTER (LEN=*), INTENT(IN) :: cfgdir, outdir
     TYPE (DHSVM_date), INTENT(INOUT) :: start, end
-    LOGICAL, INTENT(IN) :: quiet, dotemp
+    LOGICAL, INTENT(IN) :: quiet, dotemp, dolwrad
 
     CHARACTER (LEN=1024) :: msg
     INTEGER :: id, n
@@ -138,6 +138,8 @@ CONTAINS
           CALL error_message("Temperature requested by DHSVM, but not enabled in MASS1",&
                &fatal=.TRUE.)
        END IF
+       ! if true DHSVM lw rad is used
+       dnet%net%config%do_met_lwrad = dolwrad
     END IF
 
     ! assume link id's are generally contiguous, or at least not too
@@ -181,6 +183,7 @@ CONTAINS
     TYPE (met_zone_t), POINTER :: zone
     DOUBLE PRECISION :: coeff(4)
     INTEGER :: tidx
+    LOGICAL :: lwflag
 
     DOUBLE PRECISION, PARAMETER :: zero(5) = 0.0, tempin(5) = 12.0
 
@@ -223,8 +226,7 @@ CONTAINS
           ALLOCATE(zone)
           zone%id = link%id
           zone%coeff = coeff
-          zone%dolw = .TRUE.
-          zone%dolw = .FALSE. ! FIXME
+          zone%dolw = dnet%net%config%do_met_lwrad
           
           zone%met => met_time_series_alloc(link%id, 1, zone%dolw)
           zone%met%ts%limit_mode = TS_LIMIT_FLAT

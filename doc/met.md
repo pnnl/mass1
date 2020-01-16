@@ -23,9 +23,13 @@ Field | Type | Description | Default
 4 | real | Wind coefficient offset | 9.2
 5 | real | Conduction coefficient | 0.47
 6 | real | Brunt coefficient | 0.65
+7 | flag | Incoming Longwave Radiation included | 0
 
 The coefficients are only optional for backward compatibility. It's
 best to include the coefficients for documentation. 
+
+If the longwave radiation flag is not set, MASS1 computes it
+internally, as it did historically.
 
 ### Example ###
 
@@ -59,16 +63,32 @@ Field | Type | Description | Units
 4 | real | Wind speed | m/s
 5 | real | Atmospheric pressure | mbar
 6 | real | Net incoming shortwave radiation | W/m<sup>2</sup>
+7 | real | Net incoming longwave radiation | W/m<sup>2</sup>
 
+Atmospheric pressure is used only when total dissolved gas is
+simulated.  Longwave radiation is allowed if specified in the
+meteorological zone table. It's inclusion is an error otherwise.  
 
 ### Example ###
 
+An example of a meteorology time series *without* longwave radiation:
+
 ```
-01-01-1998 00:00:00        0.28     0.28      0.55    760.0      2.79 /
-01-01-1998 01:00:00        0.21     0.21      0.82    760.0      5.58 /
-01-01-1998 02:00:00        0.23     0.23      0.82    760.0      2.79 /
-01-01-1998 03:00:00       -0.23    -0.23      0.55    760.0      5.58 /
-01-01-1998 04:00:00        0.08     0.08      0.55    760.0      4.18 /
-01-01-1998 05:00:00        0.56     0.56      0.82    760.0      2.79 /
+06-01-1990 06:00:00    8.9    2.8    4.0  739.1   20.9 /
+06-01-1990 07:00:00   11.1    2.2    5.4  739.1  104.6 /
+06-01-1990 08:00:00   12.2    2.2    7.2  739.1  209.2 /
+06-01-1990 09:00:00   15.0    2.2    8.9  739.1  509.1 /
+06-01-1990 10:00:00   16.7    2.2    9.8  738.8  676.4 /
+06-01-1990 11:00:00   18.3    2.8    8.0  738.8  788.0 /
+```
+An example of the same meteorology time series, but *with* longwave radiation:
+
+```
+06-01-1990 06:00:00    8.9    2.8    4.0  739.1   20.9  243.2 /
+06-01-1990 07:00:00   11.1    2.2    5.4  739.1  104.6  250.5 /
+06-01-1990 08:00:00   12.2    2.2    7.2  739.1  209.2  254.4 /
+06-01-1990 09:00:00   15.0    2.2    8.9  739.1  509.1  264.5 /
+06-01-1990 10:00:00   16.7    2.2    9.8  738.8  676.4  270.8 /
+06-01-1990 11:00:00   18.3    2.8    8.0  738.8  788.0  277.3 /
 
 ```

@@ -8,7 +8,7 @@
 ! distribution.
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
-! Last Change: 2019-10-04 09:33:25 d3g096
+! Last Change: 2020-01-15 13:32:49 d3g096
 ! ----------------------------------------------------------------
 
 MODULE energy_flux
@@ -40,7 +40,7 @@ CONTAINS
     DOUBLE PRECISION :: tmplw
 
     IF (PRESENT(lwrad)) THEN
-       tmplw = lwrad
+       tmplw = net_longwave(coeff, t_air, t_dew, lwrad)
     ELSE
        tmplw = net_longwave(coeff, t_air, t_dew)
     END IF
@@ -64,22 +64,52 @@ CONTAINS
 
   END FUNCTION net_solar_rad
 
+  ! ----------------------------------------------------------------
+  !  FUNCTION atm_longwave
+  ! ----------------------------------------------------------------
+  DOUBLE PRECISION FUNCTION atm_longwave(coeff, t_air, t_dew)
+
+    IMPLICIT NONE
+    
+    DOUBLE PRECISION, INTENT(IN) :: coeff(*)
+    DOUBLE PRECISION, INTENT(IN) :: t_air, t_dew
+    DOUBLE PRECISION :: brunt_coeff
+
+    ! Formula 2.1.1 in Edinger, Brady, Geyer (1974)
+
+    ! Black body radiation
+    ! FIXME: Why is this not the Stefan-Boltzmann constant (5.67E-08)
+    atm_longwave = 4.4e-8*(t_air + 273.15)**4
+
+    ! Atmospheric emissivity using the Brunt formula
+    brunt_coeff  = coeff(4)
+    atm_longwave = atm_longwave * &
+         ( brunt_coeff + 0.031*SQRT(sat_vapor_press(t_dew)) )
+
+  END FUNCTION atm_longwave
+
+
   !######################################################################
-  DOUBLE PRECISION FUNCTION net_longwave(coeff, t_air, t_dew)
+  DOUBLE PRECISION FUNCTION net_longwave(coeff, t_air, t_dew, lwrad)
     !
     ! Han - (Watts/meter^2)
     !
     ! net longwave atmospheric radiation ( W/m2 )
-    ! Formula 2.1.1 in Edinger, Brady, Geyer (1974)
     IMPLICIT NONE
-    DOUBLE PRECISION :: coeff(*)
-    DOUBLE PRECISION :: t_air, t_dew
-    DOUBLE PRECISION :: reflect = 0.03                  ! relflectance assumed to be 0.03 
+    DOUBLE PRECISION, INTENT(IN) :: coeff(*)
+    DOUBLE PRECISION, INTENT(IN) :: t_air, t_dew
+    DOUBLE PRECISION, INTENT(IN), OPTIONAL :: lwrad
+    DOUBLE PRECISION, PARAMETER :: reflect = 0.03 ! relflectance assumed to be 0.03 
     DOUBLE PRECISION :: brunt_coeff ! = 0.65    ! ave. value
 
-    brunt_coeff  = coeff(4)
-    net_longwave = 4.4e-8*(t_air + 273.15)**4 * &
-         ( brunt_coeff + 0.031*SQRT(sat_vapor_press(t_dew)) )*(1.0 - reflect)
+    IF (.NOT. PRESENT(lwrad)) THEN
+       net_longwave = atm_longwave(coeff, t_air, t_dew)
+    ELSE
+       ! Externally computed LW is assumed to have been adjusted with emissivity
+       net_longwave = lwrad
+    END IF
+
+    net_longwave = net_longwave*(1.0 - reflect)
 
   END FUNCTION net_longwave
 
