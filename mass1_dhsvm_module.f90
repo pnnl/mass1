@@ -140,6 +140,11 @@ CONTAINS
        END IF
        ! if true DHSVM lw rad is used
        dnet%net%config%do_met_lwrad = dolwrad
+       IF (dnet%net%config%do_met_lwrad) THEN
+          CALL status_message("MASS1 will use longwave radiation from DHSVM")
+       ELSE
+          CALL status_message("MASS1 will compute longwave radiation internally")
+       END IF
     END IF
 
     ! assume link id's are generally contiguous, or at least not too
