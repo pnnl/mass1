@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2019-06-06 09:53:46 d3g096
+! Last Change: 2020-01-30 07:56:27 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -176,6 +176,16 @@ MODULE cross_section
    CONTAINS
      PROCEDURE :: read => rectangular_flood_read
   END type rectangular_flood_section
+
+  ! ----------------------------------------------------------------
+  ! TYPE triangular_bottom_section
+  ! For DHSVM: triangular section below "bank full", fixed width above
+  ! ----------------------------------------------------------------
+  TYPE, PUBLIC, EXTENDS(compound_section_t) :: triangular_bottom_section
+     CONTAINS
+       PROCEDURE :: read => triangular_bottom_read
+    END type triangular_bottom_section
+  
 
   ! ----------------------------------------------------------------
   ! TYPE general_section
@@ -433,6 +443,55 @@ CONTAINS
     this%sect(2)%p => s2
     
   END SUBROUTINE rectangular_flood_read
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE triangular_bottom_read
+  ! ----------------------------------------------------------------
+  SUBROUTINE triangular_bottom_read(this, iounit, ioerr)
+
+    IMPLICIT NONE
+    CLASS (triangular_bottom_section), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: iounit
+    INTEGER, INTENT(OUT) :: ioerr
+    CHARACTER (LEN=256) :: msg
+    DOUBLE PRECISION :: sidez, width
+    CLASS (triangular_section), POINTER :: xtri
+    CLASS (rectangular_section), POINTER :: xrect
+
+    READ(iounit,*,IOSTAT=ioerr) sidez, width
+
+    IF (sidez .LE. 0.0) THEN
+       WRITE(msg, *) 'triangular bottom section ', this%id,&
+            &": error: invalid side slope"
+       CALL error_message(msg, fatal=.TRUE.)
+    END IF
+    IF (width .LE. 0.0) THEN
+       WRITE(msg, *) 'triangular bottom section ', this%id,&
+            &": error: invalid width"
+       CALL error_message(msg, fatal=.TRUE.)
+    END IF
+
+    this%nsect = 2
+    ALLOCATE(this%sect(this%nsect), this%selev(this%nsect))
+
+    ALLOCATE(triangular_section :: xtri)
+    xtri%sidez = sidez
+    
+    ALLOCATE(rectangular_section :: xrect)
+    xrect%bottom_width = width
+
+    ! The triangular section is on the bottom (duh).
+
+    this%selev(1) = 0.0
+    this%sect(1)%p => xtri
+
+    ! The rectangular section starts at the elevation where the
+    ! triangular section is that wide
+
+    this%selev(2) = width/sidez/2.0
+    this%sect(2)%p => xrect
+
+  END SUBROUTINE triangular_bottom_read
 
 
   ! ----------------------------------------------------------------
@@ -996,6 +1055,8 @@ CONTAINS
        ALLOCATE(parabolic_section :: xsect)
     CASE (14)
        ALLOCATE(triangular_rounded_section :: xsect)
+    CASE (24)
+       ALLOCATE(triangular_bottom_section :: xsect)
     CASE (50)
        ALLOCATE(general_section :: xsect)
     CASE DEFAULT
