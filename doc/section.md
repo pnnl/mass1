@@ -71,6 +71,18 @@ example, but with a circular bottom with radius of 4.
   2.0   4.0       / 
 ```
 
+### Triangular Bottom
+
+This section is a triangular section with vertical walls at maximum
+width. The first contains the section identifier and type (24).  The
+second contains the side slope run, as in the triangular section, and
+the maximum width.  The example below is the same as the triangular
+section example, but with a maximum width of 10.0.
+```
+240     4         / Triangular Bottom Section
+  2.0  10.0       /
+```
+
 ### Parabolic
 
 The bottom elevation of a parabolic cross section is defined as *y =
