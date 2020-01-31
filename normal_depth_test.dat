@@ -11,6 +11,8 @@
   0.0625          /
 220    14         / Rounded Triangular Section
   2.0   4.0       / 
+240    24         / Triangular Bottom Section
+  2.0  50.0       /
 300     2         / Rectangular w/ flood plain
 10.0 300.0 3000.0 /
 320     50      1 / Section 300 as general section
