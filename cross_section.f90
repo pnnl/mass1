@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2020-01-30 07:56:27 d3g096
+! Last Change: 2020-01-31 06:31:30 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -166,6 +166,7 @@ MODULE cross_section
      DOUBLE PRECISION, ALLOCATABLE :: selev(:)
   CONTAINS  
      PROCEDURE :: props => compound_props
+     PROCEDURE :: normal_depth_iter => compound_normal_iterate
      PROCEDURE :: destroy => compound_destroy
   END type compound_section_t
 
@@ -213,6 +214,8 @@ MODULE cross_section
      PROCEDURE :: destroy => general_destroy
   END type general_section
 
+  DOUBLE PRECISION, PRIVATE, PARAMETER :: alpha = 5.0/3.0, beta = 2.0/3.0
+  
 CONTAINS
 
   ! ----------------------------------------------------------------
@@ -1137,7 +1140,6 @@ CONTAINS
     DOUBLE PRECISION :: f
     CLASS(xsection_t), INTENT(IN) :: this
     DOUBLE PRECISION, INTENT(IN) :: discharge, slope, kstrick, dguess
-    DOUBLE PRECISION, PARAMETER :: alpha = 5.0/3.0, beta = 2.0/3.0
 
     TYPE (xsection_prop) :: props
     DOUBLE PRECISION :: K
@@ -1306,5 +1308,46 @@ CONTAINS
     dnorm = w/(a1 + sqrt(a2 + w))
 
   END FUNCTION trapezoidal_normal_iterate
+
+  ! ----------------------------------------------------------------
+  ! FUNCTION compound_normal_iterate
+  !
+  ! If the specified depth falls in the lowest section, just go ahead
+  ! and use its iterate
+  ! ----------------------------------------------------------------
+  FUNCTION compound_normal_iterate(this, &
+       &discharge, slope, kstrick, dguess) RESULT (dnorm)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION :: dnorm
+    CLASS(compound_section_t), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: discharge, slope, kstrick, dguess
+
+    TYPE (xsection_prop) :: props
+    DOUBLE PRECISION :: K
+    
+    IF (dguess .LE. this%selev(2)) THEN
+       dnorm = this%sect(1)%p%normal_depth_iter(discharge, slope, kstrick, dguess)
+    ELSE
+       ! <rant> Because of Fortran's eternal stupidity, the logical
+       ! thing
+       
+       ! dnorm = this%xsection_t%normal_depth_iter(discharge, slope, kstrick, dguess)
+
+       ! cannot be done here, because it will try to call
+       ! xsection_t%props, not compound_section_t%probs. Ya gotta love
+       ! Fortran logic. </rant>
+       
+       ! So, we have to duplicate xsection_normal_iterate
+
+       K = SQRT(slope)*kstrick
+       K = (discharge/K)**(1.0/alpha)
+       CALL this%props(dguess, props)
+       dnorm = K*(props%wetperim**(beta/alpha))
+       dnorm = this%invarea(dnorm)
+       
+    END IF
+  END FUNCTION compound_normal_iterate
+
 
 END MODULE cross_section
