@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-06-20 06:39:41 d3g096
+! Last Change: 2020-02-05 08:02:06 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -455,14 +455,7 @@ CONTAINS
           
 
        DO s = 1, nspecies
-          SELECT CASE (this%species(s)%scalar%bctype)
-          CASE (TRANS_BC_TYPE)
-             this%pt(i)%trans%cnow(s) = c(1)
-          CASE (TEMP_BC_TYPE)
-             this%pt(i)%trans%cnow(s) = c(2)
-          CASE DEFAULT
-             this%pt(i)%trans%cnow(s) = c(1)
-          END SELECT
+          this%pt(i)%trans%cnow(s) = c(s)
        END DO
     END DO
 
