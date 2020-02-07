@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2019-07-01 14:19:58 d3g096
+! Last Change: 2020-02-06 14:12:37 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -83,6 +83,7 @@ MODULE link_module
     INTEGER :: bcid, dsbcid, gbcid, tbcid, mzone, lbcid, lgbcid, ltbcid
     DOUBLE PRECISION :: lpiexp
     DOUBLE PRECISION :: gravity
+    DOUBLE PRECISION :: bedcond, beddepth, bedtemp
   CONTAINS
     PROCEDURE :: defaults => link_input_defaults
     PROCEDURE link_input_assign
@@ -140,6 +141,8 @@ MODULE link_module
      PROCEDURE (trans_pre_proc), DEFERRED :: pre_transport
      PROCEDURE (trans_interp_proc), DEFERRED :: trans_interp
      PROCEDURE (transport_proc), DEFERRED :: transport
+     ! FIXME: there's got to be a cleaner way
+     PROCEDURE (bedtemp_proc), DEFERRED :: set_bed_temp
 
      ! get a point on a link (if any)
 
@@ -272,6 +275,14 @@ MODULE link_module
        DOUBLE PRECISION, INTENT(IN) :: tdeltat
      END SUBROUTINE transport_proc
 
+     SUBROUTINE bedtemp_proc(this, tbed)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(INOUT) :: this
+       DOUBLE PRECISION, INTENT(IN) :: tbed
+     END SUBROUTINE bedtemp_proc
+     
+
      SUBROUTINE destroy_proc(this)
        IMPORT :: link_t
        IMPLICIT NONE
@@ -303,6 +314,11 @@ CONTAINS
     this%lgbcid = 0
     this%ltbcid = 0
     this%lpiexp = 0.0
+
+    this%beddepth = 2.0  ! 2m
+    ! A default assuming 30% porosity (from Heat Source Manual)
+    this%bedcond = (0.7*16.0 + 0.3*0.6) ! W/m/C
+    this%bedtemp = 12.5 ! for pond test (needs to change)
 
     this%dsid = 0
 

@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  4, 2019 by William A. Perkins
-! Last Change: 2020-01-15 14:56:32 d3g096
+! Last Change: 2020-02-06 14:04:25 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -228,6 +228,9 @@ SUBROUTINE mass1_update_latt(cnet, linkid, latt, ddate) BIND(c)
           &': ', ' temperature index not set'
      CALL error_message(msg)
   END IF
+
+  ! Assume the bed temperature is the same as inflow temperature
+  CALL link%set_bed_temp(lt(1))
 
 
 END SUBROUTINE mass1_update_latt

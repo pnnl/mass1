@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2020-02-05 08:02:06 d3g096
+! Last Change: 2020-02-06 14:03:04 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -60,6 +60,8 @@ MODULE linear_link_module
      PROCEDURE :: pre_transport => linear_link_pre_transport
      PROCEDURE :: trans_interp => linear_link_trans_interp
      PROCEDURE :: transport => linear_link_transport
+     ! FIXME: there's got to be a cleaner way
+     PROCEDURE :: set_bed_temp => linear_link_bedtemp
      PROCEDURE :: volume => linear_link_volume
      PROCEDURE :: destroy => linear_link_destroy
   END type linear_link_t
@@ -125,6 +127,9 @@ CONTAINS
           ALLOCATE(this%pt(i)%trans%cold(sclrman%nspecies))
           this%pt(i)%trans%cnow = 0.0
           this%pt(i)%trans%cold = 0.0
+          this%pt(i)%trans%bedcond = ldata%bedcond
+          this%pt(i)%trans%beddepth = ldata%beddepth
+          this%pt(i)%trans%bedtemp = ldata%bedtemp
        END DO
 
        
@@ -1004,6 +1009,25 @@ CONTAINS
        v = v + 0.5*(a1+a0)*ABS(x1-x0)
     END DO
   END FUNCTION linear_link_volume
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE linear_link_bedtemp
+  ! ----------------------------------------------------------------
+  SUBROUTINE linear_link_bedtemp(this, tbed)
+
+    IMPLICIT NONE
+    CLASS (linear_link_t), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: tbed
+
+    INTEGER :: i
+    
+    DO i = 1, this%npoints
+       this%pt(i)%trans%bedtemp = tbed
+    END DO
+    
+
+  END SUBROUTINE linear_link_bedtemp
+
 
 
 

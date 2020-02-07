@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2019-06-20 06:41:25 d3g096
+! Last Change: 2020-02-06 13:19:04 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -42,6 +42,11 @@ MODULE point_module
      TYPE (point_hydro_state) :: hnow, hold
      TYPE (xsection_prop) :: xsprop, xspropold
      DOUBLE PRECISION :: twater
+     ! For temperature (constant over time):
+     !   bed conductivity, W/m/C,
+     !   bed depth, m,
+     !   gw temp below bed, C
+     DOUBLE PRECISION :: bedcond, beddepth, bedtemp
      DOUBLE PRECISION, POINTER, DIMENSION(:) :: cnow, cold
   END type point_transport_state
 

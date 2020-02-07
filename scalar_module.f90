@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  7, 2019 by William A. Perkins
-! Last Change: 2020-02-04 14:33:40 d3g096
+! Last Change: 2020-02-07 08:19:32 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -75,9 +75,12 @@ MODULE scalar_module
   ! TYPE temp_scalar
   ! ----------------------------------------------------------------
   TYPE, PUBLIC, EXTENDS(scalar_t) :: temperature
+     LOGICAL :: do_friction
+     LOGICAL :: do_bed
    CONTAINS
      PROCEDURE :: atmospheric_flux => temperature_atmospheric_flux
      PROCEDURE :: friction => temperature_friction
+     PROCEDURE :: bed_flux => temperature_bed_flux
      PROCEDURE :: source => temperature_source
   END type temperature
 
@@ -172,11 +175,11 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION new_temperature
   ! ----------------------------------------------------------------
-  FUNCTION new_temperature(dometric, dodiff, dolatq, dosrc) RESULT(t)
+  FUNCTION new_temperature(dometric, dodiff, dolatq, dosrc, dofrict, dobed) RESULT(t)
 
     IMPLICIT NONE
     TYPE (temperature) :: t
-    LOGICAL, INTENT(IN) :: dometric, dodiff, dolatq, dosrc
+    LOGICAL, INTENT(IN) :: dometric, dodiff, dolatq, dosrc, dofrict, dobed
 
     t%dometric = dometric
     t%dodiffusion = dodiff
@@ -184,6 +187,8 @@ CONTAINS
     t%dosource = dosrc
     t%bctype = TEMP_BC_TYPE
     t%needmet = t%dosource
+    t%do_friction = dofrict
+    t%do_bed = dobed
 
   END FUNCTION new_temperature
 
@@ -245,6 +250,21 @@ CONTAINS
   END FUNCTION temperature_friction
 
 
+  ! ----------------------------------------------------------------
+  !  FUNCTION temperature_bed_flux
+  ! ----------------------------------------------------------------
+  FUNCTION temperature_bed_flux(this, pt, twater) RESULT(flux)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION :: flux
+    CLASS(temperature), INTENT(IN) :: this
+    TYPE (point_transport_state), INTENT(IN) :: pt
+    DOUBLE PRECISION, INTENT(IN) :: twater
+
+    flux = pt%bedcond/pt%beddepth*(pt%bedtemp - twater)
+    
+  END FUNCTION temperature_bed_flux
+
 
 
   ! ----------------------------------------------------------------
@@ -280,6 +300,10 @@ CONTAINS
              t = tout
 
              flux = flux + this%atmospheric_flux(tout, met)
+
+             IF (this%do_bed) THEN
+                flux = flux + this%bed_flux(pt, tout)
+             END IF
 
              ! This tortured logic is to fix temperature range
              ! problems caused by atmospheric exchange (e.g. really
@@ -430,7 +454,8 @@ CONTAINS
           ALLOCATE(this%species(i)%p, &
                &SOURCE=temperature((cfg%units .EQ. METRIC_UNITS), &
                &                    cfg%temp_diffusion, &
-               &                    cfg%do_latflow, cfg%temp_exchange))
+               &                    cfg%do_latflow, cfg%temp_exchange, &
+               &                    cfg%do_temp_frict, cfg%do_temp_bed))
           this%temp_index = i
           i = i + 1
        END IF
