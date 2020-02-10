@@ -7,24 +7,25 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  4, 2019 by William A. Perkins
-! Last Change: 2020-02-10 11:40:47 d3g096
+! Last Change: 2020-02-10 14:01:23 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
 !  FUNCTION mass1_create
 ! ----------------------------------------------------------------
-FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, pid, dotemp, dolwrad) RESULT(net) BIND(c)
+FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, pid, dotemp, dolwrad, dobed) &
+     &RESULT(net) BIND(c)
   USE, INTRINSIC :: iso_c_binding
   USE mass1_dhsvm_module
   IMPLICIT NONE
   TYPE (c_ptr) :: net
   TYPE (c_ptr), VALUE :: c_cfgdir, c_outdir
   TYPE (DHSVM_date), INTENT(INOUT) :: start, end
-  INTEGER(KIND=C_INT), VALUE :: pid, dotemp, dolwrad
+  INTEGER(KIND=C_INT), VALUE :: pid, dotemp, dolwrad, dobed
 
   TYPE (DHSVM_network), POINTER :: f_net
   CHARACTER (LEN=1024) :: cfgdir, outdir, spath, epath, buf
-  LOGICAL :: f_dotemp, f_dolwrad
+  LOGICAL :: f_dotemp, f_dolwrad, f_dobed
 
   CALL c2fstring(c_cfgdir, cfgdir)
   CALL c2fstring(c_outdir, outdir)
@@ -34,6 +35,7 @@ FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, pid, dotemp, dolwrad) RESU
   f_net%net = network()
   f_dotemp = (dotemp .NE. 0)
   f_dolwrad = (dolwrad .NE. 0)
+  f_dobed = (dobed .NE. 0)
 
   utility_error_iounit = 11
   utility_status_iounit = 99
@@ -59,7 +61,8 @@ FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, pid, dotemp, dolwrad) RESU
      CALL banner()
   END IF
 
-  CALL mass1_initialize(f_net, cfgdir, outdir, start, end, .TRUE., f_dotemp, f_dolwrad)
+  CALL mass1_initialize(f_net, cfgdir, outdir, start, end, .TRUE., &
+       &f_dotemp, f_dolwrad, f_dobed)
 
   net = C_LOC(f_net)
 
