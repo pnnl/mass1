@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2020-01-15 14:49:11 d3g096
+! Last Change: 2020-02-10 11:10:16 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE mass1_config
@@ -128,6 +128,8 @@ MODULE mass1_config
      LOGICAL :: quiet
 
      LOGICAL :: do_transport
+     LOGICAL :: do_temp_bed
+     LOGICAL :: do_temp_frict
 
      LOGICAL :: do_met_lwrad
 
@@ -538,6 +540,8 @@ CONTAINS
     this%do_met_lwrad = .FALSE. 
 
     this%do_transport = (this%do_temp .OR. this%do_gas)
+    this%do_temp_frict = .FALSE.
+    this%do_temp_bed = .FALSE.
     IF (this%do_transport) THEN
 
        IF (this%do_gas .AND. this%gas_exchange) THEN

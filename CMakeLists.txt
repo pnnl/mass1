@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2019-10-16 08:27:36 d3g096
+# Last Change: 2020-02-10 11:40:36 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -194,6 +194,18 @@ add_executable(normal_depth_test
 )
 target_link_libraries(normal_depth_test ts)
 
+# -------------------------------------------------------------
+# normal_depth_series
+# -------------------------------------------------------------
+add_executable(normal_depth_series
+  normal_depth_series.f90
+  section_handler.f90
+  cross_section.f90
+  dlist_module.f90
+  linear_interp.f90
+  svgrp.f90
+)
+target_link_libraries(normal_depth_series ts)
 
 # -------------------------------------------------------------
 # trapezoid_test

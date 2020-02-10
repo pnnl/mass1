@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2019-06-20 06:39:41 d3g096
+! Last Change: 2020-02-10 10:47:45 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -60,6 +60,8 @@ MODULE linear_link_module
      PROCEDURE :: pre_transport => linear_link_pre_transport
      PROCEDURE :: trans_interp => linear_link_trans_interp
      PROCEDURE :: transport => linear_link_transport
+     ! FIXME: there's got to be a cleaner way
+     PROCEDURE :: set_bed_temp => linear_link_bedtemp
      PROCEDURE :: volume => linear_link_volume
      PROCEDURE :: destroy => linear_link_destroy
   END type linear_link_t
@@ -125,6 +127,13 @@ CONTAINS
           ALLOCATE(this%pt(i)%trans%cold(sclrman%nspecies))
           this%pt(i)%trans%cnow = 0.0
           this%pt(i)%trans%cold = 0.0
+          this%pt(i)%trans%bedcond = ldata%bedcond
+          this%pt(i)%trans%beddensity = ldata%beddensity
+          this%pt(i)%trans%bedspheat = ldata%bedspheat
+          this%pt(i)%trans%beddepth = ldata%beddepth
+          this%pt(i)%trans%bedtemp = ldata%bedgwtemp
+          this%pt(i)%trans%bedtempold = ldata%bedgwtemp
+          this%pt(i)%trans%bedgwtemp = ldata%bedgwtemp
        END DO
 
        
@@ -455,14 +464,7 @@ CONTAINS
           
 
        DO s = 1, nspecies
-          SELECT CASE (this%species(s)%scalar%bctype)
-          CASE (TRANS_BC_TYPE)
-             this%pt(i)%trans%cnow(s) = c(1)
-          CASE (TEMP_BC_TYPE)
-             this%pt(i)%trans%cnow(s) = c(2)
-          CASE DEFAULT
-             this%pt(i)%trans%cnow(s) = c(1)
-          END SELECT
+          this%pt(i)%trans%cnow(s) = c(s)
        END DO
     END DO
 
@@ -1011,6 +1013,25 @@ CONTAINS
        v = v + 0.5*(a1+a0)*ABS(x1-x0)
     END DO
   END FUNCTION linear_link_volume
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE linear_link_bedtemp
+  ! ----------------------------------------------------------------
+  SUBROUTINE linear_link_bedtemp(this, tbed)
+
+    IMPLICIT NONE
+    CLASS (linear_link_t), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: tbed
+
+    INTEGER :: i
+    
+    DO i = 1, this%npoints
+       this%pt(i)%trans%bedgwtemp = tbed
+    END DO
+    
+
+  END SUBROUTINE linear_link_bedtemp
+
 
 
 

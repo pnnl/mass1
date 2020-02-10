@@ -830,7 +830,8 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
               !      &net_solar, t_water, t_air, t_dew, windspeed) &
               !      /(1000.0*4186.0/3.2808) ! rho*specifc heat*depth in feet
 
-              energy_source = metzone(link)%p%energy_flux(t_water)
+              energy_source = metzone(link)%p%energy_flux(t_water)/&
+                   &(1000.0*4186.0/3.2808)
               c(link,point) = c(link,point) + &
                    &energy_source*delta_t*width(link,point)/area(link,point)
 

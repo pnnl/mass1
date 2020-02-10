@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 21, 2017 by William A. Perkins
-! Last Change: 2019-10-04 13:02:02 d3g096
+! Last Change: 2020-01-31 14:09:50 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE met_zone
@@ -166,7 +166,7 @@ CONTAINS
     END IF
     
     ! FIXME: Metric units
-    flux = flux/(1000.0*4186.0/3.2808) ! rho*specifc heat*depth in feet
+    ! flux = flux/(1000.0*4186.0/3.2808) ! rho*specifc heat*depth in feet
 
     ! WRITE(*,*) this%current%rad, this%current%temp, this%current%dew, &
     !      &this%current%wind

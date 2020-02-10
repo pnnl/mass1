@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2019-09-06 12:13:01 d3g096
+! Last Change: 2020-02-05 08:01:16 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -252,6 +252,13 @@ CONTAINS
 
        NULLIFY(link)
        link => this%links%find(linkid)
+
+       ! Backward compatibility: c(1) tdg conc, c(2) is temperature
+       ! If TDG is simulated the concentrations are correct.
+       ! If only temperature is simulated, put the initial temp in c(1)
+       IF ((.NOT. this%config%do_gas) .AND. this%config%do_temp) THEN
+          c(1) = c(2)
+       END IF
 
        IF (ASSOCIATED(link)) THEN
           WRITE(msg, *) TRIM(this%config%initial_file), &
