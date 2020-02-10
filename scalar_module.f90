@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  7, 2019 by William A. Perkins
-! Last Change: 2020-02-07 08:19:32 d3g096
+! Last Change: 2020-02-10 09:50:10 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -160,7 +160,7 @@ CONTAINS
     IMPLICIT NONE
     DOUBLE PRECISION :: cout
     CLASS(scalar_t), INTENT(IN) :: this
-    TYPE (point_transport_state), INTENT(IN) :: pt
+    TYPE (point_transport_state), INTENT(INOUT) :: pt
     DOUBLE PRECISION, INTENT(IN) :: cin, deltat
     CLASS (met_zone_t), INTENT(INOUT), POINTER :: met
 
@@ -253,15 +253,34 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION temperature_bed_flux
   ! ----------------------------------------------------------------
-  FUNCTION temperature_bed_flux(this, pt, twater) RESULT(flux)
+  FUNCTION temperature_bed_flux(this, pt, twater, deltat) RESULT(flux)
 
     IMPLICIT NONE
     DOUBLE PRECISION :: flux
     CLASS(temperature), INTENT(IN) :: this
-    TYPE (point_transport_state), INTENT(IN) :: pt
+    TYPE (point_transport_state), INTENT(INOUT) :: pt
     DOUBLE PRECISION, INTENT(IN) :: twater
+    DOUBLE PRECISION, INTENT(IN) :: deltat
 
-    flux = pt%bedcond/pt%beddepth*(pt%bedtemp - twater)
+    DOUBLE PRECISION :: gwflux, swflux
+
+    ! pt%beddepth is the total depth of the bed, pt%bedtemp is in the
+    ! middle of that depth, 
+
+    ! flux OUT to ground water
+    gwflux = pt%bedcond*0.5*pt%beddepth*(pt%bedtemp - pt%bedgwtemp)
+
+    ! flux IN from stream
+    swflux = pt%bedcond*0.5*pt%beddepth*(twater - pt%bedtemp)
+
+
+    pt%bedtempold = pt%bedtemp
+
+    pt%bedtemp = pt%bedtempold + &
+         &(swflux - gwflux)/pt%beddepth/pt%beddensity/pt%bedspheat
+
+
+    flux = - swflux
     
   END FUNCTION temperature_bed_flux
 
@@ -276,7 +295,7 @@ CONTAINS
 
     DOUBLE PRECISION :: tout
     CLASS(temperature), INTENT(IN) :: this
-    TYPE (point_transport_state), INTENT(IN) :: pt
+    TYPE (point_transport_state), INTENT(INOUT) :: pt
     DOUBLE PRECISION, INTENT(IN) :: cin, deltat
     CLASS (met_zone_t), INTENT(INOUT), POINTER :: met
 
@@ -302,7 +321,7 @@ CONTAINS
              flux = flux + this%atmospheric_flux(tout, met)
 
              IF (this%do_bed) THEN
-                flux = flux + this%bed_flux(pt, tout)
+                flux = flux + this%bed_flux(pt, tout, deltat)
              END IF
 
              ! This tortured logic is to fix temperature range
@@ -396,7 +415,7 @@ CONTAINS
     IMPLICIT NONE
     DOUBLE PRECISION :: cout
     CLASS(tdg), INTENT(IN) :: this
-    TYPE (point_transport_state), INTENT(IN) :: pt
+    TYPE (point_transport_state), INTENT(INOUT) :: pt
     DOUBLE PRECISION, INTENT(IN) :: cin, deltat
     CLASS (met_zone_t), INTENT(INOUT), POINTER :: met
 

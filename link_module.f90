@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2020-02-06 14:12:37 d3g096
+! Last Change: 2020-02-10 10:46:35 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -83,7 +83,7 @@ MODULE link_module
     INTEGER :: bcid, dsbcid, gbcid, tbcid, mzone, lbcid, lgbcid, ltbcid
     DOUBLE PRECISION :: lpiexp
     DOUBLE PRECISION :: gravity
-    DOUBLE PRECISION :: bedcond, beddepth, bedtemp
+    DOUBLE PRECISION :: bedcond, bedspheat, beddensity, beddepth, bedgwtemp
   CONTAINS
     PROCEDURE :: defaults => link_input_defaults
     PROCEDURE link_input_assign
@@ -315,10 +315,13 @@ CONTAINS
     this%ltbcid = 0
     this%lpiexp = 0.0
 
-    this%beddepth = 2.0  ! 2m
-    ! A default assuming 30% porosity (from Heat Source Manual)
+    ! Default bed properties are from the Oregon DEQ "Heatsource" manual
+
+    this%beddepth = 0.5  ! manual suggests 0.2 m
     this%bedcond = (0.7*16.0 + 0.3*0.6) ! W/m/C
-    this%bedtemp = 12.5 ! for pond test (needs to change)
+    this%beddensity = (0.7*1600.0 + 0.3*1000.0)
+    this%bedspheat = (0.7*2219.0 + 0.3*4187.0)
+    this%bedgwtemp = 12.5 ! for pond test (needs to change)
 
     this%dsid = 0
 

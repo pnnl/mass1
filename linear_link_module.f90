@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2020-02-06 14:03:04 d3g096
+! Last Change: 2020-02-10 10:47:45 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -128,8 +128,12 @@ CONTAINS
           this%pt(i)%trans%cnow = 0.0
           this%pt(i)%trans%cold = 0.0
           this%pt(i)%trans%bedcond = ldata%bedcond
+          this%pt(i)%trans%beddensity = ldata%beddensity
+          this%pt(i)%trans%bedspheat = ldata%bedspheat
           this%pt(i)%trans%beddepth = ldata%beddepth
-          this%pt(i)%trans%bedtemp = ldata%bedtemp
+          this%pt(i)%trans%bedtemp = ldata%bedgwtemp
+          this%pt(i)%trans%bedtempold = ldata%bedgwtemp
+          this%pt(i)%trans%bedgwtemp = ldata%bedgwtemp
        END DO
 
        
@@ -1022,7 +1026,7 @@ CONTAINS
     INTEGER :: i
     
     DO i = 1, this%npoints
-       this%pt(i)%trans%bedtemp = tbed
+       this%pt(i)%trans%bedgwtemp = tbed
     END DO
     
 

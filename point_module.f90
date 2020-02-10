@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2020-02-06 13:19:04 d3g096
+! Last Change: 2020-02-10 09:49:41 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -46,7 +46,8 @@ MODULE point_module
      !   bed conductivity, W/m/C,
      !   bed depth, m,
      !   gw temp below bed, C
-     DOUBLE PRECISION :: bedcond, beddepth, bedtemp
+     DOUBLE PRECISION :: bedtemp, bedtempold, bedgwtemp
+     DOUBLE PRECISION :: bedcond, bedspheat, beddensity, beddepth
      DOUBLE PRECISION, POINTER, DIMENSION(:) :: cnow, cold
   END type point_transport_state
 
