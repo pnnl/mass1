@@ -98,23 +98,19 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE mass1_initialize
   ! ----------------------------------------------------------------
-  SUBROUTINE mass1_initialize(dnet, cfgdir, outdir, start, end, quiet, dotemp, dolwrad)
+  SUBROUTINE mass1_initialize(dnet, cfgdir, outdir, start, end, quiet, &
+       &dotemp, dolwrad, dobed)
 
     IMPLICIT NONE
     TYPE (DHSVM_network), INTENT(INOUT) :: dnet
     CHARACTER (LEN=*), INTENT(IN) :: cfgdir, outdir
     TYPE (DHSVM_date), INTENT(INOUT) :: start, end
-    LOGICAL, INTENT(IN) :: quiet, dotemp, dolwrad
+    LOGICAL, INTENT(IN) :: quiet, dotemp, dolwrad, dobed
 
-    CHARACTER (LEN=1024) :: msg
     INTEGER :: id, n
 
     CLASS (link_t), POINTER :: link
-    CLASS (simple_bc_t), POINTER :: latbc
-    CLASS (bc_t), POINTER :: stupid
-    TYPE (met_zone_t), POINTER :: zone
     DOUBLE PRECISION, PARAMETER :: zero(5) = 0.0, tempin(5) = 12.0
-    DOUBLE PRECISION :: coeff(4)
     INTEGER :: tidx
 
     ! When using MASS1 from DHSVM, keep temperature between 0 and 100 C
@@ -140,6 +136,7 @@ CONTAINS
        END IF
        ! if true DHSVM lw rad is used
        dnet%net%config%do_met_lwrad = dolwrad
+       dnet%net%config%do_temp_bed = dobed
     END IF
 
     ! assume link id's are generally contiguous, or at least not too
@@ -183,7 +180,6 @@ CONTAINS
     TYPE (met_zone_t), POINTER :: zone
     DOUBLE PRECISION :: coeff(4)
     INTEGER :: tidx
-    LOGICAL :: lwflag
 
     DOUBLE PRECISION, PARAMETER :: zero(5) = 0.0, tempin(5) = 12.0
 
