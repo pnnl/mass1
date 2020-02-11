@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2020-02-11 07:16:17 d3g096
+! Last Change: 2020-02-11 12:41:38 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -315,9 +315,10 @@ CONTAINS
     this%ltbcid = 0
     this%lpiexp = 0.0
 
-    ! Default bed properties are from the Oregon DEQ "Heatsource" manual
+    ! Default bed properties are from the Oregon DEQ "Heatsource"
+    ! manual and Pike, et al.
 
-    this%beddepth = 0.5  ! manual suggests 0.2 m
+    this%beddepth = 2.0  ! manual suggests 0.2 m
     this%bedcond = (0.7*16.0 + 0.3*0.6) ! W/m/C
     this%beddensity = (0.7*1600.0 + 0.3*1000.0)
     this%bedspheat = (0.7*2219.0 + 0.3*4187.0)

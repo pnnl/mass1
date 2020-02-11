@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2020-02-10 10:47:45 d3g096
+! Last Change: 2020-02-11 11:43:14 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -532,14 +532,15 @@ CONTAINS
     INTEGER :: i, s, iostat, ierr = 0
     CHARACTER (LEN=1024) :: msg
     
-    DOUBLE PRECISION :: c(nspecies), cold(nspecies)
+    DOUBLE PRECISION :: c(nspecies), cold(nspecies), tbed
 
     ierr = 0
 
     DO i = 1, this%npoints
        READ(iunit, IOSTAT=iostat) &
             &(c(s), s = 1, nspecies), &
-            &(cold(s), s = 1, nspecies)
+            &(cold(s), s = 1, nspecies), &
+            & tbed
        
        IF (IS_IOSTAT_END(iostat)) THEN
           WRITE(msg, *) 'link ', this%id, &
@@ -558,6 +559,9 @@ CONTAINS
           this%pt(i)%trans%cnow(s) = c(s)
           this%pt(i)%trans%cold(s) = cold(s)
        END DO
+       this%pt(i)%trans%bedtemp = tbed
+       this%pt(i)%trans%bedtempold = tbed
+
     END DO
     
     IF (ierr .GT. 0) THEN
@@ -617,7 +621,9 @@ CONTAINS
     DO i = 1, this%npoints
        WRITE(iunit, IOSTAT=iostat) &
             &(this%pt(i)%trans%cnow(s), s = 1, nspecies), &
-            &(this%pt(i)%trans%cold(s), s = 1, nspecies)
+            &(this%pt(i)%trans%cold(s), s = 1, nspecies), &
+            & this%pt(i)%trans%bedtemp
+       
        IF (iostat .NE. 0) THEN
           WRITE(msg, *) 'link ', this%id, &
                &': error writing (hydrodynamis) restart for point ', i

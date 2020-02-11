@@ -137,6 +137,8 @@ CONTAINS
        ! if true DHSVM lw rad is used
        dnet%net%config%do_met_lwrad = dolwrad
 
+       dnet%net%config%do_temp_bed = dobed
+
        IF (dnet%net%config%do_met_lwrad) THEN
           CALL status_message("MASS1 will use longwave radiation from DHSVM")
        ELSE
@@ -146,7 +148,7 @@ CONTAINS
        IF (dnet%net%config%do_temp_bed) THEN
           CALL status_message("MASS1 will simulate stream bed temperature")
        END IF
-       
+
     END IF
 
     ! assume link id's are generally contiguous, or at least not too
