@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  7, 2019 by William A. Perkins
-! Last Change: 2020-02-11 08:28:24 d3g096
+! Last Change: 2020-02-11 09:41:58 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -276,7 +276,7 @@ CONTAINS
     pt%bedtempold = pt%bedtemp
 
     pt%bedtemp = pt%bedtempold - &
-         &(swflux + gwflux)/pt%beddepth/pt%beddensity/pt%bedspheat
+         &(swflux + gwflux)*deltat/pt%beddepth/pt%beddensity/pt%bedspheat
 
 
     flux = swflux

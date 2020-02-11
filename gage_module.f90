@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  8, 2018 by William A. Perkins
-! Last Change: 2019-04-17 08:38:06 d3g096
+! Last Change: 2020-02-11 10:07:52 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -121,7 +121,7 @@ CONTAINS
     CHARACTER (LEN=*), INTENT(IN) :: date_string, time_string
     CLASS (scalar_manager), INTENT(IN) :: sclrman
 
-    DOUBLE PRECISION :: tout, tdgout, tdgsat, tdgpress, cout(10)
+    DOUBLE PRECISION :: tout, tbed, tdgout, tdgsat, tdgpress, cout(10)
     INTEGER :: ncout, s
     DOUBLE PRECISION :: depth
 
@@ -139,6 +139,7 @@ CONTAINS
       ! more general
       cout = 0.0
       tout = 0.0
+      tbed = 0.0
       tdgout = 0.0
       tdgsat = 0.0
       tdgpress = 0.0
@@ -153,18 +154,20 @@ CONTAINS
             END IF
          CASE DEFAULT
             tout = cout(1)
+            tbed = pt%trans%bedtemp
          END SELECT
       END DO
 
       depth = h%y - pt%thalweg
       WRITE(this%gunit,1010) date_string, time_string, &
            &h%y, h%q, h%v , depth, &
-           &tdgout , tout, tdgsat, tdgpress, &
+           &tdgout , tout, tbed, tdgsat, tdgpress, &
            &pt%thalweg, pr%area, pr%topwidth, pr%hydrad,&
            &h%froude_num, h%friction_slope, h%bed_shear
     END ASSOCIATE
     
-1010 FORMAT(a10,2x,a8,2x,f8.2,2x,f12.2,2x,f6.2,2x,f7.2,2x,f10.2,2x,f6.2,2x,f6.2,2x,f6.1,2x, &
+1010 FORMAT(a10,2x,a8,2x,f8.2,2x,f12.2,2x,f6.2,2x,f7.2,2x,f10.2,2x,f6.2,2x,&
+          &f6.2,2x,f6.2,2x,f6.1,2x, &
           f8.2,2x,es10.2,2x, &
           f8.2,2x,f6.2,f6.2,es10.2,2x,es10.2)
   END SUBROUTINE gage_output

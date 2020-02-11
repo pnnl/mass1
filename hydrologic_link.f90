@@ -473,7 +473,7 @@ CONTAINS
     INTEGER :: i, s, iostat, ierr = 0
     CHARACTER (LEN=1024) :: msg
     
-    DOUBLE PRECISION :: c(nspecies), cold(nspecies)
+    DOUBLE PRECISION :: c(nspecies), cold(nspecies), btemp
 
     ierr = 0
     
@@ -481,7 +481,8 @@ CONTAINS
     
     READ(iunit, IOSTAT=iostat) &
          &(c(s), s = 1, nspecies), &
-         &(cold(s), s = 1, nspecies)
+         &(cold(s), s = 1, nspecies), &
+         &btemp
 
     IF (IS_IOSTAT_END(iostat)) THEN
        WRITE(msg, *) 'link ', this%id, &
@@ -500,6 +501,7 @@ CONTAINS
     END DO
     this%avgpt%trans%hnow = this%avgpt%hnow
     this%avgpt%trans%hold = this%avgpt%trans%hnow
+    this%avgpt%trans%bedtemp = btemp
 
 
     IF (ierr .GT. 0) THEN
@@ -546,9 +548,10 @@ CONTAINS
     
     WRITE(iunit, IOSTAT=iostat) &
          &(this%avgpt%trans%cnow(s), s = 1, nspecies), &
-         &(this%avgpt%trans%cold(s), s = 1, nspecies)
+         &(this%avgpt%trans%cold(s), s = 1, nspecies), &
+         &this%avgpt%trans%bedtemp
     IF (iostat .NE. 0) THEN
-       WRITE(msg, *) 'problem reading restart (transport) for link', this%id
+       WRITE(msg, *) 'problem writing restart (transport) for link', this%id
        CALL error_message(msg, fatal=.TRUE.)
     END IF
 
