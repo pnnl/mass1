@@ -118,7 +118,7 @@ CONTAINS
        temperature_limits = .TRUE.
     END IF
 
-    CALL dnet%net%read(cfgdir, dotemp)
+    CALL dnet%net%read(cfgdir, dotemp, dobed)
 
     ASSOCIATE (cfg => dnet%net%config)
       cfg%time%begin = dhsvm_to_decimal(start)
@@ -143,8 +143,10 @@ CONTAINS
           CALL status_message("MASS1 will compute longwave radiation internally")
        END IF
 
-       dnet%net%config%do_temp_bed = dobed
-
+       IF (dnet%net%config%do_temp_bed) THEN
+          CALL status_message("MASS1 will simulate stream bed temperature")
+       END IF
+       
     END IF
 
     ! assume link id's are generally contiguous, or at least not too

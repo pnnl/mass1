@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  7, 2019 by William A. Perkins
-! Last Change: 2020-02-10 09:50:10 d3g096
+! Last Change: 2020-02-11 08:08:32 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -268,19 +268,18 @@ CONTAINS
     ! middle of that depth, 
 
     ! flux OUT to ground water
-    gwflux = pt%bedcond*0.5*pt%beddepth*(pt%bedtemp - pt%bedgwtemp)
+    gwflux = pt%bedcond*(pt%bedtemp - pt%bedgwtemp)/(0.5*pt%beddepth)
 
-    ! flux IN from stream
-    swflux = pt%bedcond*0.5*pt%beddepth*(twater - pt%bedtemp)
-
+    ! flux OUT to stream
+    swflux = pt%bedcond*(pt%bedtemp - twater)/(0.5*pt%beddepth)
 
     pt%bedtempold = pt%bedtemp
 
-    pt%bedtemp = pt%bedtempold + &
-         &(swflux - gwflux)/pt%beddepth/pt%beddensity/pt%bedspheat
+    pt%bedtemp = pt%bedtempold - &
+         &(swflux + gwflux)/pt%beddepth/pt%beddensity/pt%bedspheat
 
 
-    flux = - swflux
+    flux = swflux
     
   END FUNCTION temperature_bed_flux
 

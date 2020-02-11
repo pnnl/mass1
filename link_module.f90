@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2020-02-10 10:46:35 d3g096
+! Last Change: 2020-02-11 07:16:17 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -353,6 +353,12 @@ CONTAINS
     other%ltbcid = self%ltbcid
     other%lpiexp = self%lpiexp
     other%gravity = self%gravity
+
+    other%bedcond = self%bedcond
+    other%bedspheat = self%bedspheat
+    other%beddensity = self%beddensity
+    other%beddepth = self%beddepth
+    other%bedgwtemp = self%bedgwtemp
 
   END SUBROUTINE link_input_assign
 

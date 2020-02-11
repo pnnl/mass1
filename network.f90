@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2020-02-05 08:01:16 d3g096
+! Last Change: 2020-02-10 14:38:58 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -144,12 +144,12 @@ CONTAINS
   ! SUBROUTINE network_read
   ! 
   ! ----------------------------------------------------------------
-  SUBROUTINE network_read(this, base, dotemp_override)
+  SUBROUTINE network_read(this, base, dotemp_override, dobed_override)
     USE general_vars
     IMPLICIT NONE
     CLASS (network), INTENT(INOUT) :: this
     CHARACTER (LEN=*), INTENT(IN) :: base
-    LOGICAL, INTENT(IN), OPTIONAL :: dotemp_override
+    LOGICAL, INTENT(IN), OPTIONAL :: dotemp_override, dobed_override
     INTEGER :: istatus
     CHARACTER(LEN=path_length) :: cwd, mybase
 
@@ -178,6 +178,10 @@ CONTAINS
        this%config%do_transport = this%config%do_temp
        this%config%met_required = &
             &(this%config%do_temp .AND. this%config%temp_exchange)
+       
+       IF (PRESENT(dobed_override) .AND. this%config%do_temp) THEN
+          this%config%do_temp_bed = dobed_override
+       END IF
     END IF
 
     ! things that should be in the configuration
