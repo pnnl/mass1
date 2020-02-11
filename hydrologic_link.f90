@@ -164,6 +164,13 @@ CONTAINS
        this%avgpt%kstrick = this%pt(1)%kstrick
        this%avgpt%k_diff = this%pt(1)%k_diff
        this%avgpt%thalweg = 0.5*(this%pt(1)%thalweg + this%pt(this%npoints)%thalweg)
+       this%avgpt%trans%bedcond = this%pt(1)%trans%bedcond
+       this%avgpt%trans%beddensity = this%pt(1)%trans%beddensity
+       this%avgpt%trans%bedspheat = this%pt(1)%trans%bedspheat
+       this%avgpt%trans%beddepth = this%pt(1)%trans%beddepth
+       this%avgpt%trans%bedtemp = this%pt(1)%trans%bedgwtemp
+       this%avgpt%trans%bedtempold = this%pt(1)%trans%bedgwtemp
+       this%avgpt%trans%bedgwtemp = this%pt(1)%trans%bedgwtemp
     END SELECT
 
     this%L = ABS(this%pt(1)%x - this%pt(this%npoints)%x)
