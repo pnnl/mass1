@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 17, 2017 by William A. Perkins
-! Last Change: 2020-02-11 08:31:23 d3g096
+! Last Change: 2020-02-11 12:39:57 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE mass1_config
@@ -541,7 +541,7 @@ CONTAINS
 
     this%do_transport = (this%do_temp .OR. this%do_gas)
     this%do_temp_frict = .FALSE.
-    this%do_temp_bed = .TRUE.
+    this%do_temp_bed = .FALSE.
     IF (this%do_transport) THEN
 
        IF (this%do_gas .AND. this%gas_exchange) THEN
