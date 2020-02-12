@@ -63,6 +63,8 @@ MODULE hydrologic_link_module
      PROCEDURE :: max_diffuse => hydrologic_link_max_diffuse
      PROCEDURE :: trans_interp => hydrologic_link_trans_interp
      PROCEDURE :: transport => hydrologic_link_transport
+     PROCEDURE :: set_bed_temp => hydrologic_link_bedtemp
+     PROCEDURE :: set_bed_depth => hydrologic_link_beddepth
   END type hydrologic_link
 
 CONTAINS
@@ -681,6 +683,37 @@ CONTAINS
     this%avgpt%trans%cnow(ispec) = co
     
   END SUBROUTINE hydrologic_link_transport
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE hydrologic_link_bedtemp
+  ! ----------------------------------------------------------------
+  SUBROUTINE hydrologic_link_bedtemp(this, tbed)
+
+    IMPLICIT NONE
+    CLASS (hydrologic_link), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: tbed
+
+    CALL this%linear_link_t%set_bed_temp(tbed)
+    
+    this%avgpt%trans%bedgwtemp = tbed
+    
+
+  END SUBROUTINE hydrologic_link_bedtemp
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE hydrologic_link_beddepth
+  ! ----------------------------------------------------------------
+  SUBROUTINE hydrologic_link_beddepth(this, dbed)
+
+    IMPLICIT NONE
+    CLASS (hydrologic_link), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: dbed
+    
+    CALL this%linear_link_t%set_bed_depth(dbed)
+    this%avgpt%trans%beddepth = dbed
+
+  END SUBROUTINE hydrologic_link_beddepth
+  
 
 
 END MODULE hydrologic_link_module
