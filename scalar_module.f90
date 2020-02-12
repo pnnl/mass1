@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  7, 2019 by William A. Perkins
-! Last Change: 2020-02-11 12:42:42 d3g096
+! Last Change: 2020-02-12 08:43:34 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -197,12 +197,12 @@ CONTAINS
   !
   ! The result is in W/m2
   ! ----------------------------------------------------------------
-  FUNCTION temperature_atmospheric_flux(this, twater, met) RESULT (flux)
+  FUNCTION temperature_atmospheric_flux(this, twater, attenuate, met) RESULT (flux)
 
     IMPLICIT NONE
     DOUBLE PRECISION  flux
     CLASS(temperature), INTENT(IN) :: this
-    DOUBLE PRECISION, INTENT(IN) :: twater
+    DOUBLE PRECISION, INTENT(IN) :: twater, attenuate
     CLASS (met_zone_t), INTENT(INOUT), POINTER :: met
 
     DOUBLE PRECISION :: t
@@ -216,7 +216,7 @@ CONTAINS
        t = MIN(temperature_max, t)
     END IF
 
-    flux = met%energy_flux(t)
+    flux = met%energy_flux(t, attenuate)
     
   END FUNCTION temperature_atmospheric_flux
 
@@ -253,13 +253,13 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION temperature_bed_flux
   ! ----------------------------------------------------------------
-  FUNCTION temperature_bed_flux(this, pt, twater, deltat) RESULT(flux)
+  FUNCTION temperature_bed_flux(this, pt, twater, brad, deltat) RESULT(flux)
 
     IMPLICIT NONE
     DOUBLE PRECISION :: flux
     CLASS(temperature), INTENT(IN) :: this
     TYPE (point_transport_state), INTENT(INOUT) :: pt
-    DOUBLE PRECISION, INTENT(IN) :: twater
+    DOUBLE PRECISION, INTENT(IN) :: twater, brad
     DOUBLE PRECISION, INTENT(IN) :: deltat
 
     DOUBLE PRECISION :: gwflux, swflux
@@ -275,14 +275,44 @@ CONTAINS
 
     pt%bedtempold = pt%bedtemp
 
-    pt%bedtemp = pt%bedtempold - &
-         &(swflux + gwflux)*deltat/pt%beddepth/pt%beddensity/pt%bedspheat
+    pt%bedtemp = pt%bedtempold + &
+         &(brad - swflux - gwflux)*deltat/pt%beddepth/pt%beddensity/pt%bedspheat
 
 
     flux = swflux
     
   END FUNCTION temperature_bed_flux
 
+  ! ----------------------------------------------------------------
+  !  FUNCTION swrad_attenuation
+  !
+  ! This computes the fraction of SW radiation asorbed by the water
+  ! column based on equation 2-53 of the Oregon DEQ "Heatsource"
+  ! manual
+  ! ----------------------------------------------------------------
+  FUNCTION swrad_attenuation(depth, ismetric) RESULT (att)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION :: att
+    DOUBLE PRECISION, INTENT(IN) :: depth
+    LOGICAL, INTENT(IN) :: ismetric
+    DOUBLE PRECISION :: d
+
+    IF (.NOT. ismetric) THEN
+       d = depth/0.3048
+    ELSE
+       d = depth
+    END IF
+
+    IF (d .GT. depth_minimum) THEN
+       att = 0.415 - 0.194*LOG10(d)
+    ELSE
+       att = 0.0
+    END IF
+
+    att = 1.0 - att
+
+  END FUNCTION swrad_attenuation
 
 
   ! ----------------------------------------------------------------
@@ -299,17 +329,21 @@ CONTAINS
     CLASS (met_zone_t), INTENT(INOUT), POINTER :: met
 
     DOUBLE PRECISION :: t, depth, area, width, factor, dt, flux
+    DOUBLE PRECISION :: attenuate, brad
 
     tout = this%scalar_t%source(cin, pt, deltat, met)
-    flux = 0.0
 
     IF (this%dosource) THEN
+
        IF (ASSOCIATED(met)) THEN
           depth = pt%xsprop%depth
           area = pt%xsprop%area
           width = pt%xsprop%topwidth
-          
+
           IF (depth .GT. depth_minimum .AND. area .GT. 0.0) THEN
+
+             flux = 0.0
+
              ! FIXME: metric units
              factor = 1.0/(1000.0*4186.0)*deltat*width/area
              IF (.NOT. this%dometric) THEN
@@ -317,11 +351,16 @@ CONTAINS
              END IF 
              t = tout
 
-             flux = flux + this%atmospheric_flux(tout, met)
-
+             attenuate = 1.0
+             
              IF (this%do_bed) THEN
-                flux = flux + this%bed_flux(pt, tout, deltat)
+                attenuate = swrad_attenuation(depth, this%dometric)
+                brad = met%current%rad*(1.0 - attenuate)
+                flux = flux + this%bed_flux(pt, tout, brad, deltat)
              END IF
+
+             flux = flux + this%atmospheric_flux(tout, attenuate, met)
+
 
              ! This tortured logic is to fix temperature range
              ! problems caused by atmospheric exchange (e.g. really
