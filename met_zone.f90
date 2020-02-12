@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 21, 2017 by William A. Perkins
-! Last Change: 2020-01-31 14:09:50 d3g096
+! Last Change: 2020-02-12 07:33:26 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE met_zone
@@ -46,7 +46,7 @@ MODULE met_zone
   ! ----------------------------------------------------------------
   TYPE, PUBLIC :: met_zone_t
      INTEGER :: id
-     LOGICAL :: dolw
+     LOGICAL :: havelw
      DOUBLE PRECISION :: coeff(met_ncoeff) 
      TYPE (met_data) :: current
      TYPE (met_time_series_rec), POINTER :: met
@@ -114,18 +114,18 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION new_met_zone
   ! ----------------------------------------------------------------
-  FUNCTION new_met_zone(id, fname, dolw)
+  FUNCTION new_met_zone(id, fname, havelw)
     IMPLICIT NONE
     TYPE (met_zone_t) :: new_met_zone
     INTEGER, INTENT(IN) :: id
     CHARACTER(LEN=*), INTENT(IN) :: fname
-    LOGICAL, INTENT(IN), OPTIONAL :: dolw
+    LOGICAL, INTENT(IN), OPTIONAL :: havelw
     new_met_zone%id = id
-    new_met_zone%dolw = .FALSE.
-    IF (PRESENT(dolw)) THEN
-       new_met_zone%dolw = dolw
+    new_met_zone%havelw = .FALSE.
+    IF (PRESENT(havelw)) THEN
+       new_met_zone%havelw = havelw
     END IF
-    new_met_zone%met => met_time_series_read(fname, dolw)
+    new_met_zone%met => met_time_series_read(fname, havelw)
   END FUNCTION new_met_zone
 
   ! ----------------------------------------------------------------
@@ -141,7 +141,7 @@ CONTAINS
     this%current%wind = this%met%current(MET_WIND)
     this%current%bp = this%met%current(MET_BARO)
     this%current%rad = this%met%current(MET_SWRAD)
-    IF (this%dolw) THEN
+    IF (this%havelw) THEN
        this%current%lwrad = this%met%current(MET_LWRAD)
     END IF
   END SUBROUTINE met_zone_update
@@ -149,18 +149,20 @@ CONTAINS
   ! ----------------------------------------------------------------
   !  FUNCTION met_zone_energy_flux
   ! ----------------------------------------------------------------
-  FUNCTION met_zone_energy_flux(this, twater) RESULT(flux)
+  FUNCTION met_zone_energy_flux(this, twater, attenuate) RESULT(flux)
     IMPLICIT NONE
     CLASS (met_zone_t), INTENT(IN) :: this
-    DOUBLE PRECISION, INTENT(IN) :: twater
-    DOUBLE PRECISION :: flux
+    DOUBLE PRECISION, INTENT(IN) :: twater, attenuate
+    DOUBLE PRECISION :: flux, swrad
 
-    IF (this%dolw) THEN
-       flux = net_heat_flux(this%coeff, this%current%rad, &
+    swrad = attenuate*this%current%rad
+
+    IF (this%havelw) THEN
+       flux = net_heat_flux(this%coeff, swrad, &
             &twater, this%current%temp, this%current%dew, &
             &this%current%wind, this%current%lwrad)
     ELSE
-       flux = net_heat_flux(this%coeff, this%current%rad, &
+       flux = net_heat_flux(this%coeff, swrad, &
             &twater, this%current%temp, this%current%dew, &
             &this%current%wind)
     END IF
@@ -363,7 +365,7 @@ CONTAINS
     CHARACTER(LEN=1024) :: msg
     INTEGER, PARAMETER :: iounit1 = 50, iounit2 = 51
     TYPE (met_zone_t), POINTER :: zone
-    INTEGER :: zoneid, dolw
+    INTEGER :: zoneid, havelw
     CHARACTER(LEN=1024) :: zonefile
     DOUBLE PRECISION :: coeff(4)
     INTEGER :: line
@@ -379,14 +381,14 @@ CONTAINS
        coeff(2) = 9.2  ! wind function offset
        coeff(3) = 0.47 ! conduction coefficient
        coeff(4) = 0.65 ! "brunt" coefficient for lw atm radiation
-       dolw = 0        ! if > 0, met data file contains net incoming long wave
+       havelw = 0        ! if > 0, met data file contains net incoming long wave
 
        READ(iounit1,*,END=200, ERR=300) zoneid, zonefile, &
-            &coeff(1), coeff(2), coeff(3), coeff(4), dolw
+            &coeff(1), coeff(2), coeff(3), coeff(4), havelw
        line = line + 1
 
        ALLOCATE(zone)
-       zone = met_zone_t(zoneid, zonefile, (dolw .GT. 0) )
+       zone = met_zone_t(zoneid, zonefile, (havelw .GT. 0) )
        zone%coeff = coeff
        CALL this%zonelist%push(zone)
        

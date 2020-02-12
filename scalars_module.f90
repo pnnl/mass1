@@ -277,7 +277,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
   USE mass1_config
   USE transport_vars , ONLY : dxx
   USE link_vars
-  USE point_vars, ONLY: x, k_diff, thalweg, lateral_inflow, lateral_inflow_old
+  USE point_vars, ONLY: x, k_diff, thalweg
   
   USE energy_flux
   USE tdg_equation_coeff
@@ -830,7 +830,7 @@ SUBROUTINE tvd_transport(species_num, c, c_old)
               !      &net_solar, t_water, t_air, t_dew, windspeed) &
               !      /(1000.0*4186.0/3.2808) ! rho*specifc heat*depth in feet
 
-              energy_source = metzone(link)%p%energy_flux(t_water)/&
+              energy_source = metzone(link)%p%energy_flux(t_water, 1.0d00)/&
                    &(1000.0*4186.0/3.2808)
               c(link,point) = c(link,point) + &
                    &energy_source*delta_t*width(link,point)/area(link,point)
