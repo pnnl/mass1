@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2020-02-11 11:43:14 d3g096
+! Last Change: 2020-02-12 09:38:18 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -62,6 +62,7 @@ MODULE linear_link_module
      PROCEDURE :: transport => linear_link_transport
      ! FIXME: there's got to be a cleaner way
      PROCEDURE :: set_bed_temp => linear_link_bedtemp
+     PROCEDURE :: set_bed_depth => linear_link_beddepth
      PROCEDURE :: volume => linear_link_volume
      PROCEDURE :: destroy => linear_link_destroy
   END type linear_link_t
@@ -1037,6 +1038,24 @@ CONTAINS
     
 
   END SUBROUTINE linear_link_bedtemp
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE linear_link_beddepth
+  ! ----------------------------------------------------------------
+  SUBROUTINE linear_link_beddepth(this, dbed)
+
+    IMPLICIT NONE
+    CLASS (linear_link_t), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: dbed
+
+    INTEGER :: i
+    
+    DO i = 1, this%npoints
+       this%pt(i)%trans%beddepth = dbed
+    END DO
+    
+
+  END SUBROUTINE linear_link_beddepth
 
 
 

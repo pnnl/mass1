@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2020-02-11 12:41:38 d3g096
+! Last Change: 2020-02-12 10:50:14 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -143,6 +143,7 @@ MODULE link_module
      PROCEDURE (transport_proc), DEFERRED :: transport
      ! FIXME: there's got to be a cleaner way
      PROCEDURE (bedtemp_proc), DEFERRED :: set_bed_temp
+     PROCEDURE (beddepth_proc), DEFERRED :: set_bed_depth
 
      ! get a point on a link (if any)
 
@@ -282,6 +283,13 @@ MODULE link_module
        DOUBLE PRECISION, INTENT(IN) :: tbed
      END SUBROUTINE bedtemp_proc
      
+     SUBROUTINE beddepth_proc(this, dbed)
+       IMPORT :: link_t
+       IMPLICIT NONE
+       CLASS (link_t), INTENT(INOUT) :: this
+       DOUBLE PRECISION, INTENT(IN) :: dbed
+     END SUBROUTINE beddepth_proc
+     
 
      SUBROUTINE destroy_proc(this)
        IMPORT :: link_t
@@ -320,7 +328,7 @@ CONTAINS
 
     this%beddepth = 2.0  ! manual suggests 0.2 m
     this%bedcond = (0.7*16.0 + 0.3*0.6) ! W/m/C
-    this%beddensity = (0.7*1600.0 + 0.3*1000.0)
+    this%beddensity = (0.7*2600.0 + 0.3*1000.0)
     this%bedspheat = (0.7*2219.0 + 0.3*4187.0)
     this%bedgwtemp = 12.5 ! for pond test (needs to change)
 

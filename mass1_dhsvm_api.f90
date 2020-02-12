@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  4, 2019 by William A. Perkins
-! Last Change: 2020-02-10 14:01:23 d3g096
+! Last Change: 2020-02-12 09:45:32 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -95,7 +95,7 @@ END SUBROUTINE mass1_prepare_segment
 ! ----------------------------------------------------------------
 ! SUBROUTINE mass1_update_met_coeff
 ! ----------------------------------------------------------------
-SUBROUTINE mass1_update_met_coeff(cnet, linkid, a, b, c, brunt) BIND(c)
+SUBROUTINE mass1_update_met_coeff(cnet, linkid, a, b, c, brunt, bdepth) BIND(c)
 
   USE, INTRINSIC :: iso_c_binding
   USE mass1_dhsvm_module
@@ -103,8 +103,8 @@ SUBROUTINE mass1_update_met_coeff(cnet, linkid, a, b, c, brunt) BIND(c)
   IMPLICIT NONE
   TYPE (C_PTR), VALUE :: cnet
   INTEGER(KIND=C_INT), VALUE :: linkid
-  REAL(KIND=C_FLOAT), VALUE :: a, b, c, brunt
-  DOUBLE PRECISION :: coeff(4)
+  REAL(KIND=C_FLOAT), VALUE :: a, b, c, brunt, bdepth
+  DOUBLE PRECISION :: coeff(4), fbdepth
   TYPE (DHSVM_network), POINTER :: dnet
   CLASS (link_t), POINTER :: link
   INTEGER :: tidx
@@ -130,6 +130,8 @@ SUBROUTINE mass1_update_met_coeff(cnet, linkid, a, b, c, brunt) BIND(c)
           &': ', ' met zone not set'
         CALL error_message(msg)
      END IF
+     fbdepth = bdepth
+     CALL link%set_bed_depth(fbdepth)
   ELSE 
      WRITE(msg, *) 'mass1_update_met_coeff: link ', link%id,&
           &': ', ' temperature index not set'
@@ -233,7 +235,6 @@ SUBROUTINE mass1_update_latt(cnet, linkid, latt, ddate) BIND(c)
 
   ! Assume the bed temperature is the same as inflow temperature
   CALL link%set_bed_temp(lt(1))
-
 
 END SUBROUTINE mass1_update_latt
 
