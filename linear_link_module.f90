@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2020-02-12 12:29:15 d3g096
+! Last Change: 2020-02-13 13:59:51 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -736,6 +736,7 @@ CONTAINS
     DOUBLE PRECISION :: bcval, dy, dq
     INTEGER :: point
     CLASS (point_t), POINTER :: pt
+    CHARACTER (LEN=1024) :: msg
     
 
     point = this%npoints
@@ -759,9 +760,9 @@ CONTAINS
           dq = bcval - pt%hnow%q
           dy = (dq - pt%sweep%f)/pt%sweep%e
        END SELECT
-    ELSE 
-       CALL error_message("This should not happen in linear_link_backward", &
-            &fatal=.TRUE.)
+    ELSE
+       WRITE(msg, *) "Link ", this%id, ": missing downstream boundary condition"
+       CALL error_message(msg, fatal=.TRUE.)
     END IF
 
     pt%hnow%y = pt%hnow%y + dy
