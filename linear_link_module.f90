@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2020-02-13 13:59:51 d3g096
+! Last Change: 2020-02-24 06:57:47 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -480,23 +480,15 @@ CONTAINS
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: iunit
-    INTEGER :: i, junk, iostat, ierr
+    INTEGER :: i, in_id, in_pt, iostat, ierr
     CHARACTER (LEN=1024) :: msg
 
     ierr = 0
 
     DO i = 1, this%npoints
-       READ(iunit, IOSTAT=iostat) junk, junk, &
+       READ(iunit, IOSTAT=iostat) in_id, in_pt, &
             &this%pt(i)%hnow%q, &
             &this%pt(i)%hnow%y
-       this%pt(i)%hnow%lateral_inflow = 0.0
-
-       ! FIXME: should the transport states be saved too?
-       this%pt(i)%trans%hnow%q = this%pt(i)%hnow%q
-       this%pt(i)%trans%hold%q = this%pt(i)%hnow%q
-       this%pt(i)%trans%hnow%y = this%pt(i)%hnow%y
-       this%pt(i)%trans%hold%y = this%pt(i)%hnow%y
-       
        IF (IS_IOSTAT_END(iostat)) THEN
           WRITE(msg, *) 'link ', this%id, &
                &': premature end of file reading (hydrodynamics) restart for point ', i
@@ -510,6 +502,31 @@ CONTAINS
           ierr = ierr + 1
           EXIT
        END IF
+
+       IF (this%id .NE. in_id) THEN
+          WRITE(msg, *) "link ", this%id, &
+               &': error: hotstart link id mismatch: ', in_id
+          CALL error_message(msg)
+          ierr = ierr + 1
+          EXIT
+       END IF
+
+       IF (i .NE. in_pt) THEN
+          WRITE(msg, *) "link ", this%id, ", point ", i, &
+               &': error: hotstart point index mismatch: ', in_pt
+          CALL error_message(msg)
+          ierr = ierr + 1
+          EXIT
+       END IF
+       
+       this%pt(i)%hnow%lateral_inflow = 0.0
+
+       ! FIXME: should the transport states be saved too?
+       this%pt(i)%trans%hnow%q = this%pt(i)%hnow%q
+       this%pt(i)%trans%hold%q = this%pt(i)%hnow%q
+       this%pt(i)%trans%hnow%y = this%pt(i)%hnow%y
+       this%pt(i)%trans%hold%y = this%pt(i)%hnow%y
+       
     END DO
 
     IF (ierr .GT. 0) THEN
