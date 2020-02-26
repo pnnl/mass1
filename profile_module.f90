@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created January 10, 2018 by William A. Perkins
-  ! Last Change: 2019-03-21 07:27:31 d3g096
+  ! Last Change: 2020-02-26 07:45:56 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE profile_module
@@ -577,7 +577,7 @@ CONTAINS
     TYPE (configuration_t), INTENT(INOUT) :: theconfig
     CLASS (link_manager_t), INTENT(IN) :: linkman
 
-    INTEGER, PARAMETER :: punit = 34, maxlink = 100
+    INTEGER, PARAMETER :: punit = 34, maxlink = 1000
     INTEGER :: line
     INTEGER :: pid, numlinks
     CHARACTER (LEN=8) :: xunits
