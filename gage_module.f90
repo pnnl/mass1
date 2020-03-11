@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  8, 2018 by William A. Perkins
-! Last Change: 2020-02-24 08:09:36 d3g096
+! Last Change: 2020-03-11 09:36:20 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -38,8 +38,7 @@ MODULE gage_module
      LOGICAL, PRIVATE :: firstwrite = .TRUE.
    CONTAINS
      PROCEDURE, PRIVATE :: name => gage_name
-     ! PROCEDURE, PRIVATE :: header 
-     ! PROCEDURE, PRIVATE 
+     PROCEDURE, PRIVATE :: header => gage_header
      PROCEDURE :: output => gage_output
      PROCEDURE :: destroy => gage_destroy
   END type gage_t
@@ -113,6 +112,27 @@ CONTAINS
   END FUNCTION gage_name
 
   ! ----------------------------------------------------------------
+  ! SUBROUTINE gage_header
+  ! ----------------------------------------------------------------
+  SUBROUTINE gage_header(this)
+    IMPLICIT NONE
+    CLASS (gage_t), INTENT(INOUT) :: this
+    WRITE(this%gunit, 100)&
+         &"#Date", "Time", &
+         &"WSE", "Q", "Vel", "LatQ", "Depth", &
+         &"TDG", "T", "Tbed", "TDGSat", "TDGPr", &
+         &"Thalweg", "Area", "TopW", "HydRad", &
+         &"Froude", "FSlope", "Shear"
+100 FORMAT(A10, 2X, A8, 2X, &
+         &A12, 2X, A12, 2X, A6, 2X, A11, 2X, A7, 2X, &
+         &A10, 2X, A6, 2X, A6, 2X, A6, 2X, A6, 2X, &
+         &A8, 2X, A14, 2X, A10, 2X, A6, 2X, A6, 2X, A10, 2X, A10)
+    
+
+  END SUBROUTINE gage_header
+
+
+  ! ----------------------------------------------------------------
   ! SUBROUTINE gage_output
   ! ----------------------------------------------------------------
   SUBROUTINE gage_output(this, date_string, time_string, sclrman)
@@ -129,7 +149,7 @@ CONTAINS
        this%gunit = gunit_current
        gunit_current = gunit_current + 1
        CALL open_new(this%name(), this%gunit)
-       ! need to write a header
+       CALL this%header()
     END IF
     this%firstwrite = .FALSE.
     
@@ -160,16 +180,17 @@ CONTAINS
 
       depth = h%y - pt%thalweg
       WRITE(this%gunit,1010) date_string, time_string, &
-           &h%y, h%q, h%v , depth, &
+           &h%y, h%q, h%v, h%lateral_inflow, depth, &
            &tdgout , tout, tbed, tdgsat, tdgpress, &
            &pt%thalweg, pr%area, pr%topwidth, pr%hydrad,&
            &h%froude_num, h%friction_slope, h%bed_shear
     END ASSOCIATE
     
-1010 FORMAT(a10,2x,a8,2x,f8.2,2x,f12.2,2x,f6.2,2x,f7.2,2x,f10.2,2x,f6.2,2x,&
-          &f6.2,2x,f6.2,2x,f6.1,2x, &
-          f8.2,2x,es14.2,2x, &
-          es10.4,2x,f6.2,f6.2,es10.4,2x,es10.4)
+1010 FORMAT(a10,2x,a8,2x,&
+          &f12.3,2x, f12.2,2x, f6.2,2x, es11.4,2x, f7.2,2x, &
+          &f10.2,2x, f6.2,2x, f6.2,2x, f6.2,2x, f6.1,2x, &
+          &f8.2,2x, es14.2,2x, es10.4,2x, f6.2,2x, &
+          &f6.2,2x, es10.4,2x, es10.4)
   END SUBROUTINE gage_output
 
 
