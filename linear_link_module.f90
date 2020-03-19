@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2020-02-26 09:45:55 d3g096
+! Last Change: 2020-03-19 08:07:31 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -480,15 +480,16 @@ CONTAINS
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: iunit
-    INTEGER :: i, in_id, in_pt, iostat, ierr
+    INTEGER :: i, in_id, in_pt,iostat, ierr
+    DOUBLE PRECISION ::  q, y
     CHARACTER (LEN=1024) :: msg
 
     ierr = 0
 
     DO i = 1, this%npoints
-       READ(iunit, IOSTAT=iostat) in_id, in_pt, &
-            &this%pt(i)%hnow%q, &
-            &this%pt(i)%hnow%y
+       READ(iunit, IOSTAT=iostat) in_id, in_pt, q, y
+       this%pt(i)%hnow%q = q
+       this%pt(i)%hnow%y = y
        IF (IS_IOSTAT_END(iostat)) THEN
           WRITE(msg, *) 'link ', this%id, &
                &': premature end of file reading (hydrodynamics) restart for point ', i
