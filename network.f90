@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2020-02-10 14:38:58 d3g096
+! Last Change: 2020-03-19 07:53:38 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -288,6 +288,10 @@ CONTAINS
 
     DEALLOCATE(c)
 
+    CALL this%links%hyupdate(this%config%grav, &
+         &this%config%unit_weight_h2o, &
+         &this%config%time%delta_t)
+
   END SUBROUTINE network_set_initial
 
 
@@ -344,6 +348,10 @@ CONTAINS
     WRITE (msg, *) 'done reading restart from ', TRIM(this%config%restart_load_file)
     CALL status_message(msg)
     CLOSE(runit)
+
+    CALL this%links%hyupdate(this%config%grav, &
+         &this%config%unit_weight_h2o, &
+         &this%config%time%delta_t)
 
   END SUBROUTINE network_read_restart
 
@@ -423,10 +431,6 @@ CONTAINS
             &TRIM(cwd), " from ", TRIM(this%basedir)
        CALL error_message(msg, fatal=.TRUE.)
     END IF
-
-    CALL this%links%hyupdate(this%config%grav, &
-         &this%config%unit_weight_h2o, &
-         &this%config%time%delta_t)
 
   END SUBROUTINE network_initialize
 
