@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2020-03-20 08:55:50 d3g096
+! Last Change: 2020-03-20 09:37:39 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -480,7 +480,7 @@ CONTAINS
     CLASS (network), INTENT(INOUT) :: this
     DOUBLE PRECISION :: htime0, htime1
     DOUBLE PRECISION :: tnow, tdeltat
-    INTEGER :: tsteps, i, ispec
+    INTEGER :: tsteps, tlink, i, ispec
 
     htime0 = this%config%time%time
     htime1 = htime0 + this%config%time%step
@@ -492,9 +492,9 @@ CONTAINS
     IF (this%config%scalar_steps .GT. 0) THEN
        tsteps = this%config%scalar_steps
     ELSE
-       tsteps = this%links%transport_steps(this%config%time%step)
+       CALL this%links%transport_steps(this%config%time%step, tsteps, tlink)
        IF (.NOT. this%config%quiet) THEN
-          WRITE(*, '(" Using ", I5, " transport steps")') tsteps
+          WRITE(*, '(" Using ", I5, " transport steps (", I5,")")') tsteps, tlink
        END IF
     END IF
     tdeltat = this%config%time%delta_t

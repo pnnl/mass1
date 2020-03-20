@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2019-07-08 06:33:53 d3g096
+! Last Change: 2020-03-20 11:09:09 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -1017,49 +1017,62 @@ CONTAINS
   END SUBROUTINE link_manager_pre_transport
 
   ! ----------------------------------------------------------------
-  ! INTEGER FUNCTION link_manager_transport_steps
+  ! SUBROUTINE link_manager_transport_steps
   ! ----------------------------------------------------------------
-  FUNCTION link_manager_transport_steps(this, dt) RESULT(nstep)
+  SUBROUTINE link_manager_transport_steps(this, dt, nstep, olink)
 
     IMPLICIT NONE
-    INTEGER :: nstep
     CLASS (link_manager_t), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: dt
-
-    DOUBLE PRECISION :: cmax, dmax, a_transdt, d_transdt
-    INTEGER :: o, l
+    INTEGER, INTENT(OUT) :: nstep, olink
+    
+    DOUBLE PRECISION :: cmax, dmax, a_transdt, d_transdt, c, d
+    INTEGER :: o, l, clink, dlink
     CLASS (link_t), POINTER :: link
 
     DOUBLE PRECISION, PARAMETER :: max_courant = 0.99, max_diffuse = 0.99
 
     cmax = 0.0
     dmax = 0.0
+    clink = 0
+    dlink = 0
 
-    !$omp parallel default(shared)
     DO o = 1, this%maxorder
-       !$omp do private(l, link) reduction(MAX: cmax, dmax)
        DO l = 1, this%norder(o)
           link => this%links_by_order(o, l)%p
-          cmax = MAX(cmax, link%max_courant(dt))
-          dmax = MAX(dmax, link%max_diffuse(dt))
+          c = link%max_courant(dt)
+          IF (c .GT. cmax) THEN
+             clink = link%id
+             cmax = c
+          END IF
+          d = link%max_diffuse(dt)
+          IF (d .GT. dmax) THEN
+             dlink = link%id
+             dmax = d
+          END IF
        END DO
-       !$omp end do
     END DO
-    !$omp end parallel
 
     IF (cmax .GT. max_courant) THEN 
        a_transdt = max_courant/cmax*dt
     ELSE 
        a_transdt = dt
+       clink = 0
     END IF
 
     IF (dmax .GT. max_diffuse) THEN 
        d_transdt = max_diffuse/dmax*dt
     ELSE 
        d_transdt = dt
+       dlink = 0
     END IF
 
-    a_transdt = MIN(a_transdt, d_transdt)
+    IF (d_transdt .LT. a_transdt) THEN
+       a_transdt = d_transdt
+       olink = dlink
+    ELSE
+       olink = clink
+    END IF
 
     nstep = FLOOR(dt/a_transdt)
 
@@ -1068,8 +1081,7 @@ CONTAINS
 
     nstep = MAX(nstep, 1)
 
-  END FUNCTION link_manager_transport_steps
-
+  END SUBROUTINE link_manager_transport_steps
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_transport_interp
