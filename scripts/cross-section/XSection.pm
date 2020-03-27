@@ -11,7 +11,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created November 19, 1996 by William A. Perkins
-# Last Change: 2017-07-14 12:55:26 d3g096
+# Last Change: 2020-03-27 10:37:29 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -326,6 +326,7 @@ sub _initialize {
   $self->{ID} = shift;
   $self->{comment} = shift;
   $self->{steps} = shift if (scalar(@_) > 0);
+  $self->{deltay} = 1.0;
   return;
 }
 
@@ -351,14 +352,27 @@ sub read_section {
   my $comment;
   my $npts;
   my ($x, $z);
+  my @fld;
+  my $junk;
 
                                 # first line has ID, etc.
 
   return 0 unless defined($rec = <$fd>);
   chop $rec;
-  $id = substr($rec, 0, 5) + 0;
-  $steps = substr($rec, 5, 5) + 0;
-  $comment = substr($rec, 20);
+
+  # In CHARIMA, this line is expected to be fixed format and read like this:
+  # $id = substr($rec, 0, 5) + 0;
+  # $steps = substr($rec, 5, 5) + 0;
+
+  # but, since MASS1 is a little more flexible,
+  @fld = split(" ", $rec);
+  $id = $fld[0];
+  $steps = $fld[1]; # this is what MASS1 uses as section type (50 = general)
+  $junk = $fld[2]; # should be 1.0 -- ignored by MASS1
+   
+  # $comment = substr($rec, 20);
+  @fld = splice(@fld, 3);
+  $comment = join(" ", @fld);
   if ($comment =~ /\d+\.?\d*/) {
     $rm = $& + 0.0;
   } else {
@@ -375,7 +389,13 @@ sub read_section {
 
   return 0 unless defined($rec = <$fd>);
   chop $rec;
-  $npts = substr($rec, 5, 5);
+  
+  # $self->{deltay} = substr($rec, 0, 5);
+  # $npts = substr($rec, 5, 5);
+
+  @fld = split(" ", $rec);
+  $self->{deltay} = $fld[0];
+  $npts = $fld[1];
 
                                 # the rest of the lines have the points
   while ($npts > 0) {
@@ -417,9 +437,9 @@ sub write_section {
     $steps = 50;
   }
 
-  printf($fd "%5d%5d%10.1f   RM=%6.3f, %s River\n", 
+  printf($fd "%8d%5d%10.1f   RM=%6.3f, %s River\n", 
          $id, $steps, 1, $rm, $river);
-  printf($fd "%5d%5d\n", 1, $count);
+  printf($fd "%5.2f%5d\n", $self->{deltay}, $count);
   
   $step = 0;
   foreach $stn (sort { $a <=> $b } keys(%{$self->{points}}) ) {

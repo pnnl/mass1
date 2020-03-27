@@ -2,7 +2,9 @@
 
 This directory contains several scripts for the manipulation of
 *general* cross section data in the format used by CHARIMA (with some
-internal comments). This format is very similar to that used by MASS1.  
+internal comments). This format is very similar to that used by MASS1.
+Contrary to the script names, the output format won't work with CHARIMA
+anymore, if CHARIMA is actually used anymore.  
 
 These utilities are quite old and provided as-is. There is little or no
 documentation (except the code itself).  Some are still used often by the

@@ -11,7 +11,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created March 25, 2005 by William A. Perkins
-# Last Change: 2019-09-13 11:44:31 d3g096
+# Last Change: 2020-03-27 10:19:55 d3g096
 # -------------------------------------------------------------
 
 use XSection;
@@ -68,5 +68,6 @@ while (($xsection = CHARIMASection::read_section(STDIN)) != 0) {
     # ft to m
     $osect->addpoint($stn*$ft2m, $xsection->{points}->{$stn}*$ft2m);
   }
+  $osect->{deltay} = $osect->{deltay}*$ft2m;
   $osect->write_section(STDOUT);
 }
