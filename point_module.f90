@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2020-02-10 09:49:41 d3g096
+! Last Change: 2020-03-25 13:43:53 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -193,7 +193,7 @@ CONTAINS
     CLASS (point_t), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: grav, unitwt, deltat, deltax
 
-    DOUBLE PRECISION :: depth
+    DOUBLE PRECISION :: depth, tmp
 
     ASSOCIATE (h => this%hnow, xs => this%xsprop)
 
@@ -207,8 +207,18 @@ CONTAINS
       IF (xs%area .GT. 0.0) THEN
          h%froude_num = &
               &SQRT((h%q*h%q*xs%topwidth)/(grav*xs%area*xs%area*xs%area))
-         h%friction_slope = &
-              &((h%q)/(this%kstrick*xs%area*(xs%hydrad*xs%hydrad)**0.3333333))**2
+         
+         ! This code seems to be a pinch point
+
+         ! h%friction_slope = &
+         !      &((h%q)/(this%kstrick*xs%area*(xs%hydrad*xs%hydrad)**0.3333333))**2
+
+         ! Instead, try this:
+         tmp = xs%hydrad*xs%hydrad**(1.0/3.0)
+         tmp = this%kstrick*xs%area*tmp
+         tmp = (h%q)/tmp
+         h%friction_slope = tmp*tmp
+         
          IF (deltax .GT. 0.0) THEN
             h%courant_num = &
                  &ABS(h%q)/xs%area*deltat/deltax
