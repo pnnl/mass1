@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2020-02-12 12:29:27 d3g096
+! Last Change: 2020-03-25 13:36:17 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -41,6 +41,7 @@ MODULE link_module
   ! ----------------------------------------------------------------
   TYPE, PUBLIC, EXTENDS(dlist) :: link_list
    CONTAINS
+     PROCEDURE, NOPASS :: extract => link_list_extract_ptr
      PROCEDURE :: push => link_list_push
      PROCEDURE :: pop => link_list_pop
      PROCEDURE :: clear => link_list_clear
@@ -472,6 +473,31 @@ CONTAINS
     NULLIFY(new_link_list%tail)
   END FUNCTION new_link_list
 
+  ! ----------------------------------------------------------------
+  !  FUNCTION link_list_extract_ptr
+  ! ----------------------------------------------------------------
+  FUNCTION link_list_extract_ptr(p, dealloc) RESULT(link)
+
+    IMPLICIT NONE
+    CLASS(*), POINTER, INTENT(IN) :: p
+    LOGICAL, INTENT(IN) :: dealloc
+    CLASS (link_t), POINTER :: link
+    TYPE (link_ptr), POINTER :: ptr
+
+    NULLIFY(link)
+    
+    IF (ASSOCIATED(p)) THEN
+       SELECT TYPE (p)
+       TYPE IS (link_ptr)
+          ptr => p
+          link => ptr%p
+          IF (dealloc) THEN
+             DEALLOCATE(ptr)
+          END IF
+       END SELECT
+    END IF
+
+  END FUNCTION link_list_extract_ptr
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_list_push
@@ -496,20 +522,11 @@ CONTAINS
     IMPLICIT NONE
     CLASS (link_list), INTENT(INOUT) :: this
     CLASS (link_t), POINTER :: link
-    TYPE (link_ptr), POINTER :: ptr
     CLASS(*), POINTER :: p
 
     NULLIFY(link)
     p => this%genpop()
-
-    IF (ASSOCIATED(p)) THEN
-       SELECT TYPE (p)
-       TYPE IS (link_ptr)
-          ptr => p
-          link => ptr%p
-          DEALLOCATE(ptr)
-       END SELECT
-    END IF
+    link => this%extract(p, .TRUE.)
     RETURN
   END FUNCTION link_list_pop
 
@@ -561,20 +578,13 @@ CONTAINS
     IMPLICIT NONE
     CLASS (link_t), POINTER :: link
     CLASS (link_list) :: this
-    TYPE (link_ptr), POINTER :: ptr
     CLASS(*), POINTER :: p
 
     NULLIFY(link)
 
     IF (ASSOCIATED(this%cursor)) THEN
        p => this%cursor%data
-       IF (ASSOCIATED(p)) THEN
-          SELECT TYPE (p)
-          TYPE IS (link_ptr)
-             ptr => p
-             link => ptr%p
-          END SELECT
-       END IF
+       link => this%extract(p, .FALSE.)
     END IF
   END FUNCTION link_list_current
 
@@ -689,6 +699,7 @@ CONTAINS
     qout = 0.0
     uconc = 0.0
     cavg = 0.0
+    n = 0
     
     CALL this%ulink%begin()
     link => this%ulink%current()
@@ -740,7 +751,7 @@ CONTAINS
     CLASS (confluence_t), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: order0
     CLASS (link_t), POINTER :: link
-    INTEGER :: o, omax
+    INTEGER :: o
 
     o = order0
 
