@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2020-01-31 06:31:30 d3g096
+! Last Change: 2020-03-30 07:09:28 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -217,6 +217,28 @@ MODULE cross_section
   DOUBLE PRECISION, PRIVATE, PARAMETER :: alpha = 5.0/3.0, beta = 2.0/3.0
   
 CONTAINS
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE xsection_prop_interp
+  ! ----------------------------------------------------------------
+  SUBROUTINE xsection_prop_interp(t, told, tnew, pold, pnew, p)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION, INTENT(IN) :: t, told, tnew
+    TYPE (xsection_prop), INTENT(IN) :: pold, pnew
+    TYPE (xsection_prop), INTENT(OUT) :: p
+    DOUBLE PRECISION :: dlinear_interp
+
+    p%depth = dlinear_interp(pold%depth, told, pnew%depth, tnew, t)
+    p%area = dlinear_interp(pold%area, told, pnew%area, tnew, t)
+    p%topwidth = dlinear_interp(pold%topwidth, told, pnew%topwidth, tnew, t)
+    p%hydrad = dlinear_interp(pold%hydrad, told, pnew%hydrad, tnew, t)
+    p%wetperim = dlinear_interp(pold%wetperim, told, pnew%wetperim, tnew, t)
+    p%conveyance = dlinear_interp(pold%conveyance, told, pnew%conveyance, tnew, t)
+    p%dkdy = dlinear_interp(pold%dkdy, told, pnew%dkdy, tnew, t)
+
+  END SUBROUTINE xsection_prop_interp
+
 
   ! ----------------------------------------------------------------
   ! DOUBLE PRECISION FUNCTION xsection_area
