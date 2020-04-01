@@ -4,7 +4,7 @@ set term post enh eps color solid "Helvetica" 18
 set xdata time
 set timefmt "%m-%d-%Y %H:%M:%S"
 set xlabel "Day"
-set xrange ["06-03-2001 00:00:00":"06-20-2001 00:00:00"]
+set xrange ["06-03-2001 00:00:00":"07-01-2001 00:00:00"]
 set format x "%d"
 
 set ylabel "Temperature, {/Symbol \260}C"
