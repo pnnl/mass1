@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2020-04-01 07:41:30 d3g096
+! Last Change: 2020-04-01 13:02:48 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -270,12 +270,12 @@ MODULE link_module
        DOUBLE PRECISION, INTENT(IN) :: tnow, htime0, htime1
      END SUBROUTINE trans_interp_proc
 
-     SUBROUTINE transport_proc(this, ispec, tdeltat)
+     SUBROUTINE transport_proc(this, ispec, tstep, tdeltat, hdeltat)
        IMPORT :: link_t
        IMPLICIT NONE
        CLASS (link_t), INTENT(INOUT) :: this
-       INTEGER, INTENT(IN) :: ispec
-       DOUBLE PRECISION, INTENT(IN) :: tdeltat
+       INTEGER, INTENT(IN) :: ispec, tstep
+       DOUBLE PRECISION, INTENT(IN) :: tdeltat, hdeltat
      END SUBROUTINE transport_proc
 
      SUBROUTINE bedtemp_proc(this, tbed)
@@ -822,6 +822,8 @@ CONTAINS
     INTEGER :: ierr
     CLASS (link_t), INTENT(INOUT) :: this
 
+    ! this should not be called, do this to avoid unused warnings
+    ierr = this%id
     ierr = 0
 
   END FUNCTION link_check

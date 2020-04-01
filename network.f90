@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2020-03-20 09:37:39 d3g096
+! Last Change: 2020-04-01 13:01:48 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -506,7 +506,7 @@ CONTAINS
        CALL this%links%transport_interp(&
             &tnow + this%config%time%step/DBLE(tsteps), htime0, htime1)
        DO ispec = 1, this%scalars%nspecies
-          CALL this%links%transport(ispec, tdeltat)
+          CALL this%links%transport(ispec, i, tdeltat, this%config%time%delta_t)
        END DO
        tnow = htime0 + i*this%config%time%step/DBLE(tsteps)
     END DO

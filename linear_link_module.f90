@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2020-04-01 07:46:59 d3g096
+! Last Change: 2020-04-01 12:36:35 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -960,12 +960,12 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE linear_link_transport
   ! ----------------------------------------------------------------
-  SUBROUTINE linear_link_transport(this, ispec, tdeltat)
+  SUBROUTINE linear_link_transport(this, ispec, tstep, tdeltat, hdeltat)
 
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(INOUT) :: this
-    INTEGER, INTENT(IN) :: ispec
-    DOUBLE PRECISION, INTENT(IN) :: tdeltat
+    INTEGER, INTENT(IN) :: ispec, tstep
+    DOUBLE PRECISION, INTENT(IN) :: tdeltat, hdeltat
 
     INTEGER :: i
     DOUBLE PRECISION :: c
