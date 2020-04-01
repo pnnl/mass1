@@ -9,6 +9,6 @@ set format x "%d"
 
 set ylabel "Temperature, {/Symbol \260}C"
 set yrange [0:*]
-plot "tsInlet.out" using 1:8 title "Inlet" with lines ls 1, \
-     "tsOutlet.out" using 1:8 title "Outlet" with lines ls 3, \
+plot "tsInlet.out" using 1:9 title "Inlet" with lines ls 1, \
+     "tsOutlet.out" using 1:9 title "Outlet" with lines ls 3, \
      "../channel/weather.dat" using 1:3 title "Air" with lines ls 7
