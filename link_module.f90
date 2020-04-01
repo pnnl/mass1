@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2020-03-25 13:36:17 d3g096
+! Last Change: 2020-04-01 07:41:30 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -98,6 +98,7 @@ MODULE link_module
      INTEGER :: id
      INTEGER :: order
      INTEGER :: dsid, usbcid, dsbcid
+     LOGICAL :: tsubstep
      CLASS (bc_t), POINTER :: usbc, dsbc, latbc
      CLASS (confluence_t), POINTER :: ucon, dcon
      TYPE (link_scalar), DIMENSION(:), POINTER :: species

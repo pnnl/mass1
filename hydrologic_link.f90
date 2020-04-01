@@ -117,6 +117,7 @@ CONTAINS
     END IF
 
     ierr = this%linear_link_t%initialize(my_ldata, bcman, sclrman, metman)
+    this%tsubstep = .FALSE.   ! transport sub-stepping is not required (but can be done)
 
     IF (my_ldata%lbcid .GT. 0) THEN
        this%latbc => bcman%find(LATFLOW_BC_TYPE, my_ldata%lbcid)

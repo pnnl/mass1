@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2020-03-20 11:09:09 d3g096
+! Last Change: 2020-04-01 12:06:03 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -655,6 +655,7 @@ CONTAINS
 
     INTEGER :: ierr
     INTEGER :: nds, order, idx, o
+    LOGICAL :: substep
     TYPE (confluence_t), POINTER :: con
     CHARACTER(LEN=1024) :: msg, lbl
 
@@ -701,7 +702,7 @@ CONTAINS
 
     CALL this%links%begin()
     link => this%links%current()
-    
+
     DO WHILE (ASSOCIATED(link))
        IF (link%dsid .GT. 0) THEN 
           CALL this%links%save()
@@ -749,14 +750,15 @@ CONTAINS
     dlink => this%links%current()
 
     DO WHILE (ASSOCIATED(dlink))
-       WRITE(msg, '("link ", I5, "(order = ", I5, ") upstream links:")') &
-            &dlink%id, dlink%order
+       substep = dlink%tsubstep
+       msg = ""
        IF (ASSOCIATED(dlink%ucon)) THEN
           CALL dlink%ucon%ulink%begin()
           link => dlink%ucon%ulink%current()
           DO WHILE (ASSOCIATED(link))
              WRITE(lbl, '(I5)') link%id
              msg = TRIM(msg) // " " // TRIM(lbl)
+             substep = substep .OR. link%tsubstep
              CALL dlink%ucon%ulink%next()
              link => dlink%ucon%ulink%current()
           END DO
@@ -764,6 +766,10 @@ CONTAINS
           msg = TRIM(msg) // " none"
        END IF
        this%norder(dlink%order) = this%norder(dlink%order) + 1
+       dlink%tsubstep = substep
+       WRITE(lbl, '("link ", I5, "(order = ", I5, ", substep = ", L1, ") upstream links: ")') &
+            &dlink%id, dlink%order, dlink%tsubstep
+       msg = TRIM(lbl) // TRIM(msg) 
        CALL status_message(msg)
        CALL this%links%next()
        dlink => this%links%current()

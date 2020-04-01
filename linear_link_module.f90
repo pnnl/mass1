@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2020-03-20 08:55:34 d3g096
+! Last Change: 2020-04-01 07:46:59 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -89,6 +89,7 @@ CONTAINS
     this%npoints = ldata%npt
     this%dsid = ldata%dsid
     this%input_option = ldata%inopt
+    this%tsubstep = .TRUE.
 
     ALLOCATE(this%pt(this%npoints))
 
@@ -204,10 +205,14 @@ CONTAINS
     ierr = 0
     cl_factor = theconfig%channel_len_factor()
 
-    WRITE(msg, *) "Reading/building points for link = ", this%id, &
-         &", input option = ", this%input_option, &
-         &", points = ", this%npoints, &
-         &", length factor = ", cl_factor
+    WRITE(msg, 100) this%id, &
+         &this%input_option, &
+         &this%npoints, &
+         &cl_factor
+100 FORMAT("Reading/building points for link = ", I6, &
+         &", input option = ", I2, &
+         &", points = ", I4, &
+         &", length factor = ", F7.1)
     CALL status_message(msg)
 
     SELECT CASE(this%input_option)
