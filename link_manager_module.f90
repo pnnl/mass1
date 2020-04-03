@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2020-04-01 12:46:37 d3g096
+! Last Change: 2020-04-03 12:07:47 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -51,8 +51,9 @@ MODULE link_manager_module
      TYPE (link_list) :: links
      CLASS (link_t), POINTER :: dslink
      INTEGER :: maxorder
-     INTEGER, DIMENSION(:), ALLOCATABLE :: norder
+     INTEGER, DIMENSION(:), ALLOCATABLE :: norder, stepped, nonstepped
      TYPE (link_ptr), DIMENSION(:,:), ALLOCATABLE :: links_by_order
+     TYPE (link_ptr), DIMENSION(:,:), ALLOCATABLE :: links_substep, links_non_substep
    CONTAINS
      PROCEDURE, NOPASS :: scan => link_manager_scan
      PROCEDURE :: read => link_manager_read
@@ -654,7 +655,7 @@ CONTAINS
     CLASS (link_t), POINTER :: link, dlink
 
     INTEGER :: ierr
-    INTEGER :: nds, order, idx, o
+    INTEGER :: nds, order, idx, o, nsub, nnsub
     LOGICAL :: substep
     TYPE (confluence_t), POINTER :: con
     CHARACTER(LEN=1024) :: msg, lbl
@@ -743,8 +744,12 @@ CONTAINS
 
     ! spit out connectivity and order information
 
-    ALLOCATE(this%norder(this%maxorder))
+    ALLOCATE(this%norder(this%maxorder), &
+         &this%stepped(this%maxorder), &
+         &this%nonstepped(this%maxorder))
     this%norder = 0
+    this%stepped = 0
+    this%nonstepped = 0
 
     CALL this%links%begin()
     dlink => this%links%current()
@@ -781,10 +786,14 @@ CONTAINS
 
     o = MAXVAL(this%norder) + 1
     ALLOCATE(this%links_by_order(this%maxorder, o))
+    ALLOCATE(this%links_substep(this%maxorder, o))
+    ALLOCATE(this%links_non_substep(this%maxorder, o))
     ! Just to make sure
     DO order = 1, this%maxorder
        DO idx = 1, o
           NULLIFY(this%links_by_order(order, idx)%p)
+          NULLIFY(this%links_substep(order, idx)%p)
+          NULLIFY(this%links_non_substep(order, idx)%p)
        END DO
     END DO
     this%norder = 0
@@ -793,13 +802,26 @@ CONTAINS
     CALL this%links%begin()
     link => this%links%current()
 
+
     DO WHILE (ASSOCIATED(link))
        order = link%order
        this%norder(order) = this%norder(order) + 1
        this%links_by_order(order, this%norder(order))%p => link
+       IF (link%tsubstep) THEN
+          this%stepped(order) = this%stepped(order) + 1
+          this%links_substep(order, this%stepped(order))%p => link
+       ELSE
+          this%nonstepped(order) = this%nonstepped(order) + 1
+          this%links_non_substep(order, this%nonstepped(order))%p => link
+       END IF
        CALL this%links%next()
        link => this%links%current()
     END DO
+
+    nsub = SUM(this%stepped)
+    nnsub = SUM(this%nonstepped)
+    WRITE(msg, '("Link substep totals: ", I5, " T, ", I5, " F")') nsub, nnsub
+    CALL status_message(msg)
 
   END SUBROUTINE link_manager_connect
 
