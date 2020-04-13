@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2020-04-01 12:36:35 d3g096
+! Last Change: 2020-04-13 10:44:40 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -361,48 +361,100 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! DOUBLE PRECISION FUNCTION linear_link_q_up
   ! ----------------------------------------------------------------
-  DOUBLE PRECISION FUNCTION linear_link_q_up(this)
+  DOUBLE PRECISION FUNCTION linear_link_q_up(this, interp)
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(IN) :: this
+    LOGICAL, INTENT(IN), OPTIONAL :: interp
     INTEGER :: n
+    LOGICAL :: useint
+
+    IF (PRESENT(interp)) THEN
+       useint = interp
+    ELSE
+       useint = .FALSE.
+    END IF
     n = 1
-    linear_link_q_up = this%pt(n)%hnow%q
+    IF (useint) THEN
+       linear_link_q_up = this%pt(n)%trans%hnow%q
+    ELSE
+       linear_link_q_up = this%pt(n)%hnow%q
+    END IF
   END FUNCTION linear_link_q_up
 
 
   ! ----------------------------------------------------------------
   ! DOUBLE PRECISION FUNCTION linear_link_q_down
   ! ----------------------------------------------------------------
-  DOUBLE PRECISION FUNCTION linear_link_q_down(this)
+  DOUBLE PRECISION FUNCTION linear_link_q_down(this, interp)
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(IN) :: this
+    LOGICAL, INTENT(IN), OPTIONAL :: interp
     INTEGER :: n
+    LOGICAL :: useint
+
+    IF (PRESENT(interp)) THEN
+       useint = interp
+    ELSE
+       useint = .FALSE.
+    END IF
     n = this%npoints
-    linear_link_q_down = this%pt(n)%hnow%q
+    IF (useint) THEN
+       linear_link_q_down = this%pt(n)%trans%hnow%q
+    ELSE
+       linear_link_q_down = this%pt(n)%hnow%q
+    END IF
   END FUNCTION linear_link_q_down
 
 
   ! ----------------------------------------------------------------
   ! DOUBLE PRECISION FUNCTION linear_link_y_up
   ! ----------------------------------------------------------------
-  DOUBLE PRECISION FUNCTION linear_link_y_up(this)
+  DOUBLE PRECISION FUNCTION linear_link_y_up(this, interp)
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(IN) :: this
+    LOGICAL, INTENT(IN), OPTIONAL :: interp
     INTEGER :: n
+    LOGICAL :: useint
+
+    IF (PRESENT(interp)) THEN
+       useint = interp
+    ELSE
+       useint = .FALSE.
+    END IF
+
     n = 1
-    linear_link_y_up = this%pt(n)%hnow%y
+
+    IF (useint) THEN
+       linear_link_y_up = this%pt(n)%trans%hnow%y
+    ELSE 
+       linear_link_y_up = this%pt(n)%hnow%y
+    END IF
   END FUNCTION linear_link_y_up
 
 
   ! ----------------------------------------------------------------
   ! DOUBLE PRECISION FUNCTION linear_link_y_down
   ! ----------------------------------------------------------------
-  DOUBLE PRECISION FUNCTION linear_link_y_down(this)
+  DOUBLE PRECISION FUNCTION linear_link_y_down(this, interp)
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(IN) :: this
     INTEGER :: n
+    LOGICAL, INTENT(IN), OPTIONAL :: interp
+    LOGICAL :: useint
+
+    IF (PRESENT(interp)) THEN
+       useint = interp
+    ELSE
+       useint = .FALSE.
+    END IF
+
     n = this%npoints
-    linear_link_y_down = this%pt(n)%hnow%y
+
+    IF (useint) THEN
+       linear_link_y_down = this%pt(n)%trans%hnow%y
+    ELSE 
+       linear_link_y_down = this%pt(n)%hnow%y
+    END IF
   END FUNCTION linear_link_y_down
 
 

@@ -1,9 +1,12 @@
+/*~
 /accumulator.mod
 /accumulator.o
 /array_alloc.o
 /array_dealloc.o
 /bctable.mod
 /bctable.o
+/build
+/build.tlaloc
 /coeff.o
 /config.log
 /config.status
@@ -51,4 +54,3 @@
 /trans_bc.o
 /transport_vars.mod
 /write_restart.o
-/*~
