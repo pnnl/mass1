@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 20, 2017 by William A. Perkins
-! Last Change: 2020-04-03 12:07:47 d3g096
+! Last Change: 2020-04-15 12:04:42 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -50,6 +50,7 @@ MODULE link_manager_module
   TYPE, PUBLIC :: link_manager_t
      TYPE (link_list) :: links
      CLASS (link_t), POINTER :: dslink
+     LOGICAL :: reduce_transport_substep
      INTEGER :: maxorder
      INTEGER, DIMENSION(:), ALLOCATABLE :: norder, stepped, nonstepped
      TYPE (link_ptr), DIMENSION(:,:), ALLOCATABLE :: links_by_order
@@ -91,6 +92,7 @@ CONTAINS
     IMPLICIT NONE
     TYPE (link_manager_t) :: man
     man%links = new_link_list()
+    man%reduce_transport_substep = .FALSE.
   END FUNCTION new_link_manager
 
   ! ----------------------------------------------------------------
@@ -818,6 +820,11 @@ CONTAINS
        link => this%links%current()
     END DO
 
+    IF (this%reduce_transport_substep) THEN
+       CALL status_message("Transport in some links will not be substepped")
+    ELSE
+       CALL status_message("Transport will be substepped in all links")
+    END IF
     nsub = SUM(this%stepped)
     nnsub = SUM(this%nonstepped)
     WRITE(msg, '("Link substep totals: ", I5, " T, ", I5, " F")') nsub, nnsub
@@ -1114,25 +1121,47 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE link_manager_transport_interp
   ! ----------------------------------------------------------------
-  SUBROUTINE link_manager_transport_interp(this, tnow, htime0, htime1)
+  SUBROUTINE link_manager_transport_interp(this, tstep, tnow, htime0, htime1)
 
     IMPLICIT NONE
     CLASS (link_manager_t), INTENT(INOUT) :: this
+    INTEGER, INTENT(IN) :: tstep
     DOUBLE PRECISION, INTENT(IN) :: tnow, htime0, htime1
     CLASS (link_t), POINTER :: link
     INTEGER :: l, o
 
     !$omp parallel default(shared)
     DO o = 1, this%maxorder
-       !$omp do private(l, link)
-       DO l = 1, this%norder(o)
-          link => this%links_by_order(o, l)%p
-          CALL link%trans_interp(tnow, htime0, htime1)
-       END DO
-       !$omp end do
+       IF (this%reduce_transport_substep) THEN
+          ! Those links that do not require sub-stepping are interpolated to
+          ! the end hydrodynamic time (htime1)
+          IF (tstep .EQ. 1) THEN
+             !$omp do private(l, link)
+             DO l = 1, this%nonstepped(o)
+                link => this%links_non_substep(o, l)%p
+                CALL link%trans_interp(htime1, htime0, htime1)
+             END DO
+             !$omp end do
+          END IF
+          
+          ! Interpolate substepped links as usual
+          !$omp do private(l, link)
+          DO l = 1, this%stepped(o)
+             link => this%links_substep(o, l)%p
+             CALL link%trans_interp(tnow, htime0, htime1)
+          END DO
+          !$omp end do
+       ELSE 
+          !$omp do private(l, link)
+          DO l = 1, this%norder(o)
+             link => this%links_by_order(o, l)%p
+             CALL link%trans_interp(tnow, htime0, htime1)
+          END DO
+          !$omp end do
+       END IF
     END DO
     !$omp end parallel
-
+       
   END SUBROUTINE link_manager_transport_interp
 
 
@@ -1149,15 +1178,35 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     INTEGER :: l, o
 
-    
     !$omp parallel default(shared)
     DO o = 1, this%maxorder, 1
-       !$omp do private(l, link)
-       DO l = 1, this%norder(o)
-          link => this%links_by_order(o, l)%p
-          CALL link%transport(ispec, tstep, tdeltat, hdeltat)
-       END DO
-       !$omp end do
+       IF (this%reduce_transport_substep) THEN
+          ! On the first transport step, links that are simulated for a full
+          ! hydrodynamic time step
+          IF (tstep .EQ. 1) THEN
+             !$omp do private(l, link)
+             DO l = 1, this%nonstepped(o)
+                link => this%links_non_substep(o, l)%p
+                CALL link%transport(ispec, tstep, hdeltat, hdeltat)
+             END DO
+             !$omp end do
+          END IF
+
+          ! Substepped links are always simulated at the transport time step
+          !$omp do private(l, link)
+          DO l = 1, this%stepped(o)
+             link => this%links_substep(o, l)%p
+             CALL link%transport(ispec, tstep, tdeltat, hdeltat)
+          END DO
+          !$omp end do
+       ELSE
+          !$omp do private(l, link)
+          DO l = 1, this%norder(o)
+             link => this%links_by_order(o, l)%p
+             CALL link%transport(ispec, tstep, tdeltat, hdeltat)
+          END DO
+          !$omp end do
+       END IF
     END DO
     !$omp end parallel
 

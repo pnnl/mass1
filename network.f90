@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2020-04-01 13:01:48 d3g096
+! Last Change: 2020-04-15 12:35:29 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -144,12 +144,12 @@ CONTAINS
   ! SUBROUTINE network_read
   ! 
   ! ----------------------------------------------------------------
-  SUBROUTINE network_read(this, base, dotemp_override, dobed_override)
+  SUBROUTINE network_read(this, base, dotemp_override, dobed_override, doreduce_override)
     USE general_vars
     IMPLICIT NONE
     CLASS (network), INTENT(INOUT) :: this
     CHARACTER (LEN=*), INTENT(IN) :: base
-    LOGICAL, INTENT(IN), OPTIONAL :: dotemp_override, dobed_override
+    LOGICAL, INTENT(IN), OPTIONAL :: dotemp_override, dobed_override, doreduce_override
     INTEGER :: istatus
     CHARACTER(LEN=path_length) :: cwd, mybase
 
@@ -182,6 +182,11 @@ CONTAINS
        IF (PRESENT(dobed_override) .AND. this%config%do_temp) THEN
           this%config%do_temp_bed = dobed_override
        END IF
+       
+       IF (PRESENT(doreduce_override)) THEN
+          this%config%do_reduce_substep = doreduce_override
+       END IF
+
     END IF
 
     ! things that should be in the configuration
@@ -196,6 +201,9 @@ CONTAINS
        depth_threshold = depth_threshold/0.3048
        
     END SELECT
+
+    ! set flag for transport substepping hydrologic links
+    this%links%reduce_transport_substep = this%config%do_reduce_substep
 
     CALL this%scalars%initialize(this%config)
     CALL this%links%scan(this%config)
@@ -503,7 +511,7 @@ CONTAINS
     DO i = 1, tsteps
        CALL this%bcs%update(tnow)
        CALL this%met%update(tnow)
-       CALL this%links%transport_interp(&
+       CALL this%links%transport_interp(i,&
             &tnow + this%config%time%step/DBLE(tsteps), htime0, htime1)
        DO ispec = 1, this%scalars%nspecies
           CALL this%links%transport(ispec, i, tdeltat, this%config%time%delta_t)

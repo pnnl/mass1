@@ -112,13 +112,15 @@ CONTAINS
     CLASS (link_t), POINTER :: link
     DOUBLE PRECISION, PARAMETER :: zero(5) = 0.0, tempin(5) = 12.0
     INTEGER :: tidx
+    LOGICAL :: reduce_subset
 
     ! When using MASS1 from DHSVM, keep temperature between 0 and 100 C
     IF (dotemp) THEN
-       temperature_limits = .TRUE.
+       temperature_limits = .TRUE. ! global in scalars_module
+       reduce_subset = .TRUE.
     END IF
 
-    CALL dnet%net%read(cfgdir, dotemp, dobed)
+    CALL dnet%net%read(cfgdir, dotemp, dobed, reduce_subset)
 
     ASSOCIATE (cfg => dnet%net%config)
       cfg%time%begin = dhsvm_to_decimal(start)
