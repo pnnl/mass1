@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2020-02-11 08:25:38 d3g096
+# Last Change: 2020-04-15 12:58:35 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -273,6 +273,10 @@ set(mass1newexe $<TARGET_FILE:mass1_new>)
 add_executable(mass1_met_add_lw  mass1_met_add_lw.f90)
 add_dependencies(mass1_met_add_lw mass1lib)
 target_link_libraries(mass1_met_add_lw mass1lib gastemp ts)
+
+add_executable(mass1_equilibrium_temp  mass1_equilibrium_temp.f90)
+add_dependencies(mass1_equilibrium_temp mass1lib)
+target_link_libraries(mass1_equilibrium_temp mass1lib gastemp ts)
 
 # -------------------------------------------------------------
 # custom test target

@@ -8,7 +8,7 @@
 ! distribution.
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
-! Last Change: 2020-01-15 13:32:49 d3g096
+! Last Change: 2020-04-15 12:54:20 d3g096
 ! ----------------------------------------------------------------
 
 MODULE energy_flux
@@ -17,12 +17,61 @@ MODULE energy_flux
 
   PRIVATE :: net_solar_rad, back_radiation
   PRIVATE :: evaporation, conduction, windspeed, rel_humid, sat_vapor_press
-  PUBLIC :: net_longwave
+  PUBLIC :: net_longwave, equilibrium_temperature
 
-  DOUBLE PRECISION :: stephan_boltz = 5.67e-8 !stephan-boltzmann constant in W/m2-K4
+  DOUBLE PRECISION, PUBLIC, PARAMETER :: &
+       & stephan_boltz = 5.67e-8  ! stephan-boltzmann constant in W/m2-K4
 
+  ! density of water, kg/m3
+  DOUBLE PRECISION, PARAMETER, PRIVATE :: rho = 1000.0 
 
 CONTAINS
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION equilibrium_temperature
+  !
+  ! Computes equilibrium temperature according to
+  !
+  ! Edinger, John E., David W. Duttweiler, and John C. Geyer.  The
+  ! Response of Water Temperatures to Meteorological Conditions.
+  ! Water Resources Research 4, no. 5 (1968): 1137
+  ! 43. https://doi.org/10.1029/WR004i005p01137.
+
+  ! ----------------------------------------------------------------
+  FUNCTION equilibrium_temperature(coeff, &
+       &net_solar, t_water, t_air, t_dew, wind_speed, lwrad) RESULT(te)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION :: te
+    DOUBLE PRECISION, INTENT(IN) :: coeff(*)
+    DOUBLE PRECISION, INTENT(IN) :: net_solar,t_water, t_air, t_dew, wind_speed, lwrad
+
+    DOUBLE PRECISION, PARAMETER :: Delta3 = 273.15*273.15*273.15
+    DOUBLE PRECISION, PARAMETER :: Delta4 = Delta3*273.15
+
+    DOUBLE PRECISION :: beta, ccond, K, rh, es, L, emiss
+
+    ccond = coeff(3)
+    emiss = 0.97
+    rh = rel_humid(t_air, t_dew)
+    es = sat_vapor_press(t_dew)
+
+    IF (t_air .EQ. t_dew) THEN
+       beta = 0.0
+    ELSE 
+       beta = ((1.0 - rh)*es)/(t_air - t_dew)
+    END IF
+
+    L = latent_heat(t_water)
+
+    K = 4.0*emiss*stephan_boltz*Delta3 + L*rho*(ccond + beta)*windspeed(coeff, wind_speed)
+
+    te = (net_solar + lwrad - emiss*stephan_boltz*Delta3)/K + &
+         & (K - 4*emiss*stephan_boltz*Delta4)/(K*(ccond + beta))*&
+         & (ccond*t_air + beta*t_dew)
+    
+  END FUNCTION equilibrium_temperature
+
   !######################################################################
   DOUBLE PRECISION FUNCTION net_heat_flux(coeff, &
        &net_solar, t_water, t_air, t_dew, wind_speed, lwrad)
@@ -100,7 +149,6 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: t_air, t_dew
     DOUBLE PRECISION, INTENT(IN), OPTIONAL :: lwrad
     DOUBLE PRECISION, PARAMETER :: reflect = 0.03 ! relflectance assumed to be 0.03 
-    DOUBLE PRECISION :: brunt_coeff ! = 0.65    ! ave. value
 
     IF (.NOT. PRESENT(lwrad)) THEN
        net_longwave = atm_longwave(coeff, t_air, t_dew)
@@ -251,6 +299,35 @@ CONTAINS
 
     dew_point  = t_air - T
   END FUNCTION dew_point
+
+  ! ----------------------------------------------------------------
+  ! DOUBLE PRECISION FUNCTION latent_heat
+  !
+  ! Computes the latent heat of vaporization for water (kJ/kg) given the
+  ! temperature (degree C).  
+  ! ----------------------------------------------------------------
+  DOUBLE PRECISION FUNCTION latent_heat(T)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION, INTENT(IN) :: T
+
+    ! Got this from Wikipedia (I know, I know), which referenced
+    !
+    !   Quartic fit to Table 2.1,p.16, Textbook: R.R.Rogers & M.K. Yau, A
+    !   Short Course in Cloud Physics, 2e,(1989), Pergamon press
+
+    ! latent_heat = - 0.0000614342*T**3 + 0.00158927*T**2 - 2.36418*T + 2500.79
+
+    ! This is a little more defendable and very close to the above, from
+    !
+    !   Sinokrot B and H Stefan. 1994. “Stream Water-Temperature
+    !   Sensitivity to Weather and Bed Pa- rameters.”  Journal of
+    !   Hydraulic Engineering 120(6):722–736.
+
+    latent_heat = (597.31 - 0.5631*T)*4.186
+
+  END FUNCTION latent_heat
+
 
 
 
