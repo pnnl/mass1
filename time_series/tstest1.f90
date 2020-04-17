@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 16, 2002 by William A. Perkins
-! Last Change: 2017-06-22 09:24:31 d3g096
+! Last Change: 2020-04-17 07:15:57 d3g096
 ! ----------------------------------------------------------------
 
 PROGRAM tstest
@@ -18,8 +18,6 @@ PROGRAM tstest
 
   IMPLICIT NONE
 
-  CHARACTER (LEN=80), SAVE :: rcsid = "$Id$"
-  
   TYPE (time_series_rec), POINTER :: ts
   CHARACTER (LEN=1024) :: dstr
   DOUBLE PRECISION :: t, deltat = 15.0d0*SECONDS

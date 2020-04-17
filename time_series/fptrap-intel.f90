@@ -15,7 +15,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created April 14, 2004 by William A. Perkins
-! Last Change: 2017-06-22 09:22:51 d3g096
+! Last Change: 2020-04-17 07:15:58 d3g096
 ! ----------------------------------------------------------------
 
 ! RCS ID: $Id$ Battelle PNL
@@ -29,8 +29,6 @@ MODULE fptrap
   USE utility, ONLY: status_message
 
   IMPLICIT NONE
-
-  CHARACTER (LEN=80), PRIVATE, SAVE :: rcsid = "$Id$"
 
 CONTAINS
 

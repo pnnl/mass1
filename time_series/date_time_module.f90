@@ -95,7 +95,7 @@ CONTAINS
     CHARACTER (LEN=*) :: date_string
     CHARACTER (LEN=*)  :: time_string
 
-    INTEGER :: i0, i1, mon,dd,yr,hh,mm
+    INTEGER :: i1, mon,dd,yr,hh,mm
     DOUBLE PRECISION :: ss
     CHARACTER (LEN=20) :: buf
 
@@ -159,7 +159,6 @@ CONTAINS
 
     DOUBLE PRECISION :: sec
     INTEGER :: mon, day, yr, hr, min
-    CHARACTER (LEN=1024) :: fmt
     INTEGER :: i
 
     CALL CALCDATE(decimal_date,mon,day,yr,hr,min,sec)
@@ -186,8 +185,6 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: time
     CHARACTER (LEN=*), INTENT(OUT) :: s
     
-    DOUBLE PRECISION :: sec
-    INTEGER :: mon, day, yr, hr, min
     CHARACTER (LEN=20) :: ds, ts
     
     CALL decimal_to_date(time, ds, ts)

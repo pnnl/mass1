@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  4, 2013 by William A. Perkins
-! Last Change: 2017-06-22 09:21:57 d3g096
+! Last Change: 2020-04-17 07:14:56 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE const_series
@@ -20,8 +20,6 @@ MODULE const_series
 
   IMPLICIT NONE
   
-  CHARACTER (LEN=80), PRIVATE, SAVE :: rcsid = "$Id$"
-
   TYPE const_series_rec
      DOUBLE PRECISION :: defvalue
      TYPE (time_series_rec), POINTER :: ts

@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created October 21, 2002 by William A. Perkins
-! Last Change: 2017-08-21 12:19:08 d3g096
+! Last Change: 2020-04-17 07:18:52 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -18,8 +18,6 @@
 MODULE utility
 
   IMPLICIT NONE
-
-  CHARACTER (LEN=80), PRIVATE, SAVE :: rcsid = "$Id$"
 
   INTEGER, PUBLIC :: utility_error_iounit=13, utility_status_iounit=14
 
@@ -80,7 +78,7 @@ CONTAINS
     CHARACTER (LEN=*), OPTIONAL :: form
     LOGICAL, INTENT(OUT), OPTIONAL :: result
 
-    LOGICAL :: file_exist, myfatal = .TRUE., myresult = .FALSE.
+    LOGICAL :: file_exist, myfatal = .TRUE.
     CHARACTER (LEN=1024) :: myform
     INTEGER :: status
 

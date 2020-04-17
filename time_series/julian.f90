@@ -9,15 +9,13 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June  3, 1998 by William A. Perkins
-! Last Change: 2017-06-22 09:23:33 d3g096
+! Last Change: 2020-04-17 07:15:57 d3g096
 ! ----------------------------------------------------------------
 ! RCS ID: $Id$ Battelle PNL
 
 MODULE julian
 
   IMPLICIT NONE
-
-  CHARACTER (LEN=80), PRIVATE, SAVE :: rcsid = "$Id$"
 
 CONTAINS
 
