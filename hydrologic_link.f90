@@ -543,7 +543,6 @@ CONTAINS
     INTEGER, INTENT(IN) :: nspecies
 
     INTEGER :: s, iostat
-    DOUBLE PRECISION :: c(nspecies), cold(nspecies)
     CHARACTER (LEN=1024) :: msg
 
     CALL this%linear_link_t%write_trans_restart(iunit, nspecies)
@@ -568,9 +567,6 @@ CONTAINS
     
     CLASS (hydrologic_link), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: tnow, htime0, htime1
-    INTEGER :: i
-    CLASS (point_t), POINTER :: pt
-    DOUBLE PRECISION :: depth
     DOUBLE PRECISION :: dlinear_interp
 
     CALL this%linear_link_t%trans_interp(tnow, htime0, htime1)

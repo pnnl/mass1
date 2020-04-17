@@ -8,7 +8,7 @@
 ! distribution.
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
-! Last Change: 2020-01-15 13:32:49 d3g096
+! Last Change: 2020-04-17 07:18:53 d3g096
 ! ----------------------------------------------------------------
 
 MODULE energy_flux
@@ -100,7 +100,6 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: t_air, t_dew
     DOUBLE PRECISION, INTENT(IN), OPTIONAL :: lwrad
     DOUBLE PRECISION, PARAMETER :: reflect = 0.03 ! relflectance assumed to be 0.03 
-    DOUBLE PRECISION :: brunt_coeff ! = 0.65    ! ave. value
 
     IF (.NOT. PRESENT(lwrad)) THEN
        net_longwave = atm_longwave(coeff, t_air, t_dew)

@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2019-05-22 07:59:19 d3g096
+! Last Change: 2020-04-17 07:23:26 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -101,8 +101,6 @@ CONTAINS
     IMPLICIT NONE
     CLASS (fluvial_link), INTENT(INOUT) :: this
     DOUBLE PRECISION, INTENT(IN) :: deltat
-
-    INTEGER :: i
 
     CALL this%transport_link_t%forward_sweep(deltat)
 

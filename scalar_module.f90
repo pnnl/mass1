@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  7, 2019 by William A. Perkins
-! Last Change: 2020-02-12 12:29:53 d3g096
+! Last Change: 2020-04-17 07:23:27 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -163,8 +163,6 @@ CONTAINS
     TYPE (point_transport_state), INTENT(INOUT) :: pt
     DOUBLE PRECISION, INTENT(IN) :: cin, deltat
     CLASS (met_zone_t), INTENT(INOUT), POINTER :: met
-
-    DOUBLE PRECISION :: avg_area, avg_latq, c
 
     cout = cin
 
