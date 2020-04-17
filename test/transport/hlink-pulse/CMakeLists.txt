@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2019-05-10 13:19:32 d3g096
+# Last Change: 2019-05-23 13:35:12 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -63,7 +63,7 @@ add_custom_command(
 add_custom_command(
   OUTPUT
   "${CMAKE_CURRENT_BINARY_DIR}/ts11.out"
-  "${CMAKE_CURRENT_BINARY_DIR}/ts1149.out"
+  "${CMAKE_CURRENT_BINARY_DIR}/ts12.out"
   COMMAND ${CMAKE_COMMAND} -E copy mass1-run.cfg mass1.cfg
   COMMAND ${mass1newexe} > mass1.log
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
@@ -88,7 +88,7 @@ if (GNUPLOT_EXECUTABLE)
     COMMENT "Plotting test transport/hlink-pulse (conc)"
     DEPENDS 
     "${CMAKE_CURRENT_BINARY_DIR}/ts11.out"
-    "${CMAKE_CURRENT_BINARY_DIR}/ts1149.out"
+    "${CMAKE_CURRENT_BINARY_DIR}/ts12.out"
     "${CMAKE_CURRENT_SOURCE_DIR}/plot.gp"
     "${CMAKE_CURRENT_BINARY_DIR}/plot.gp"
     )
@@ -109,7 +109,7 @@ if (GNUPLOT_EXECUTABLE)
     COMMENT "Plotting test transport/hlink-pulse (mass)"
     DEPENDS 
     "${CMAKE_CURRENT_BINARY_DIR}/ts11.out"
-    "${CMAKE_CURRENT_BINARY_DIR}/ts1149.out"
+    "${CMAKE_CURRENT_BINARY_DIR}/ts12.out"
     "${CMAKE_CURRENT_SOURCE_DIR}/mass-plot.gp"
     "${CMAKE_CURRENT_BINARY_DIR}/mass-plot.gp"
     )
@@ -131,7 +131,7 @@ set_property(DIRECTORY
   profile1.warmup.out
   status.out
   error-warning.out
-  ts11.out ts1149.out
+  ts11.out ts12.out
   mass1.cfg
   mass1.log
 )

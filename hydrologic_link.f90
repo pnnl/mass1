@@ -117,6 +117,7 @@ CONTAINS
     END IF
 
     ierr = this%linear_link_t%initialize(my_ldata, bcman, sclrman, metman)
+    this%tsubstep = .FALSE.   ! transport sub-stepping is not required (but can be done)
 
     IF (my_ldata%lbcid .GT. 0) THEN
        this%latbc => bcman%find(LATFLOW_BC_TYPE, my_ldata%lbcid)
@@ -582,12 +583,12 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE hydrologic_link_transport
   ! ----------------------------------------------------------------
-  SUBROUTINE hydrologic_link_transport(this, ispec, tdeltat)
+  SUBROUTINE hydrologic_link_transport(this, ispec, tstep, tdeltat, hdeltat)
 
     IMPLICIT NONE
     CLASS (hydrologic_link), INTENT(INOUT) :: this
-    INTEGER, INTENT(IN) :: ispec
-    DOUBLE PRECISION, INTENT(IN) :: tdeltat
+    INTEGER, INTENT(IN) :: ispec, tstep
+    DOUBLE PRECISION, INTENT(IN) :: tdeltat, hdeltat
 
     DOUBLE PRECISION :: inflow, outflow, latflow
     DOUBLE PRECISION :: ci, co, csnow, csold, clat
@@ -597,7 +598,7 @@ CONTAINS
 
     ! if there is no storage, just copy the upstream concencentration 
     IF (this%trans_storage .LT. hydrologic_min_storage) THEN
-       CALL this%linear_link_t%transport(ispec, tdeltat)
+       CALL this%linear_link_t%transport(ispec, tstep, tdeltat, hdeltat)
        this%avgpt%trans%cnow(ispec) = this%pt(1)%trans%cnow(ispec)
        RETURN
     END IF

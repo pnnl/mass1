@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2020-04-17 07:23:26 d3g096
+! Last Change: 2020-04-17 07:38:46 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -89,6 +89,7 @@ CONTAINS
     this%npoints = ldata%npt
     this%dsid = ldata%dsid
     this%input_option = ldata%inopt
+    this%tsubstep = .TRUE.
 
     ALLOCATE(this%pt(this%npoints))
 
@@ -204,10 +205,14 @@ CONTAINS
     ierr = 0
     cl_factor = theconfig%channel_len_factor()
 
-    WRITE(msg, *) "Reading/building points for link = ", this%id, &
-         &", input option = ", this%input_option, &
-         &", points = ", this%npoints, &
-         &", length factor = ", cl_factor
+    WRITE(msg, 100) this%id, &
+         &this%input_option, &
+         &this%npoints, &
+         &cl_factor
+100 FORMAT("Reading/building points for link = ", I6, &
+         &", input option = ", I2, &
+         &", points = ", I4, &
+         &", length factor = ", F7.1)
     CALL status_message(msg)
 
     SELECT CASE(this%input_option)
@@ -356,48 +361,100 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! DOUBLE PRECISION FUNCTION linear_link_q_up
   ! ----------------------------------------------------------------
-  DOUBLE PRECISION FUNCTION linear_link_q_up(this)
+  DOUBLE PRECISION FUNCTION linear_link_q_up(this, interp)
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(IN) :: this
+    LOGICAL, INTENT(IN), OPTIONAL :: interp
     INTEGER :: n
+    LOGICAL :: useint
+
+    IF (PRESENT(interp)) THEN
+       useint = interp
+    ELSE
+       useint = .FALSE.
+    END IF
     n = 1
-    linear_link_q_up = this%pt(n)%hnow%q
+    IF (useint) THEN
+       linear_link_q_up = this%pt(n)%trans%hnow%q
+    ELSE
+       linear_link_q_up = this%pt(n)%hnow%q
+    END IF
   END FUNCTION linear_link_q_up
 
 
   ! ----------------------------------------------------------------
   ! DOUBLE PRECISION FUNCTION linear_link_q_down
   ! ----------------------------------------------------------------
-  DOUBLE PRECISION FUNCTION linear_link_q_down(this)
+  DOUBLE PRECISION FUNCTION linear_link_q_down(this, interp)
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(IN) :: this
+    LOGICAL, INTENT(IN), OPTIONAL :: interp
     INTEGER :: n
+    LOGICAL :: useint
+
+    IF (PRESENT(interp)) THEN
+       useint = interp
+    ELSE
+       useint = .FALSE.
+    END IF
     n = this%npoints
-    linear_link_q_down = this%pt(n)%hnow%q
+    IF (useint) THEN
+       linear_link_q_down = this%pt(n)%trans%hnow%q
+    ELSE
+       linear_link_q_down = this%pt(n)%hnow%q
+    END IF
   END FUNCTION linear_link_q_down
 
 
   ! ----------------------------------------------------------------
   ! DOUBLE PRECISION FUNCTION linear_link_y_up
   ! ----------------------------------------------------------------
-  DOUBLE PRECISION FUNCTION linear_link_y_up(this)
+  DOUBLE PRECISION FUNCTION linear_link_y_up(this, interp)
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(IN) :: this
+    LOGICAL, INTENT(IN), OPTIONAL :: interp
     INTEGER :: n
+    LOGICAL :: useint
+
+    IF (PRESENT(interp)) THEN
+       useint = interp
+    ELSE
+       useint = .FALSE.
+    END IF
+
     n = 1
-    linear_link_y_up = this%pt(n)%hnow%y
+
+    IF (useint) THEN
+       linear_link_y_up = this%pt(n)%trans%hnow%y
+    ELSE 
+       linear_link_y_up = this%pt(n)%hnow%y
+    END IF
   END FUNCTION linear_link_y_up
 
 
   ! ----------------------------------------------------------------
   ! DOUBLE PRECISION FUNCTION linear_link_y_down
   ! ----------------------------------------------------------------
-  DOUBLE PRECISION FUNCTION linear_link_y_down(this)
+  DOUBLE PRECISION FUNCTION linear_link_y_down(this, interp)
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(IN) :: this
     INTEGER :: n
+    LOGICAL, INTENT(IN), OPTIONAL :: interp
+    LOGICAL :: useint
+
+    IF (PRESENT(interp)) THEN
+       useint = interp
+    ELSE
+       useint = .FALSE.
+    END IF
+
     n = this%npoints
-    linear_link_y_down = this%pt(n)%hnow%y
+
+    IF (useint) THEN
+       linear_link_y_down = this%pt(n)%trans%hnow%y
+    ELSE 
+       linear_link_y_down = this%pt(n)%hnow%y
+    END IF
   END FUNCTION linear_link_y_down
 
 
@@ -953,12 +1010,12 @@ CONTAINS
   ! ----------------------------------------------------------------
   ! SUBROUTINE linear_link_transport
   ! ----------------------------------------------------------------
-  SUBROUTINE linear_link_transport(this, ispec, tdeltat)
+  SUBROUTINE linear_link_transport(this, ispec, tstep, tdeltat, hdeltat)
 
     IMPLICIT NONE
     CLASS (linear_link_t), INTENT(INOUT) :: this
-    INTEGER, INTENT(IN) :: ispec
-    DOUBLE PRECISION, INTENT(IN) :: tdeltat
+    INTEGER, INTENT(IN) :: ispec, tstep
+    DOUBLE PRECISION, INTENT(IN) :: tdeltat, hdeltat
 
     INTEGER :: i
     DOUBLE PRECISION :: c

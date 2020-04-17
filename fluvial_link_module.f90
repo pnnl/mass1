@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2020-04-17 07:23:26 d3g096
+! Last Change: 2020-04-17 07:38:05 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -34,7 +34,7 @@ MODULE fluvial_link_module
      PROCEDURE :: initialize => fluvial_link_initialize
      ! PROCEDURE :: forward_sweep => fluvial_link_forward
      PROCEDURE :: coeff => fluvial_link_coeff
-     ! PROCEDURE :: hydro_update => fluvial_link_hupdate
+     PROCEDURE :: hydro_update => fluvial_link_hupdate
   END type fluvial_link
 
   TYPE, PUBLIC, EXTENDS(fluvial_link) :: fluvial_hydro_link

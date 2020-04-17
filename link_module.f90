@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2020-04-17 07:23:26 d3g096
+! Last Change: 2020-04-17 07:39:03 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -98,6 +98,7 @@ MODULE link_module
      INTEGER :: id
      INTEGER :: order
      INTEGER :: dsid, usbcid, dsbcid
+     LOGICAL :: tsubstep
      CLASS (bc_t), POINTER :: usbc, dsbc, latbc
      CLASS (confluence_t), POINTER :: ucon, dcon
      TYPE (link_scalar), DIMENSION(:), POINTER :: species
@@ -180,10 +181,11 @@ MODULE link_module
 
      END FUNCTION readpts_proc
 
-     DOUBLE PRECISION FUNCTION up_down_proc(this)
+     DOUBLE PRECISION FUNCTION up_down_proc(this, interp)
        IMPORT :: link_t
        IMPLICIT NONE
        CLASS (link_t), INTENT(IN) :: this
+       LOGICAL, INTENT(IN), OPTIONAL :: interp
      END FUNCTION up_down_proc
      
      DOUBLE PRECISION FUNCTION c_up_down_proc(this, ispecies)
@@ -269,12 +271,12 @@ MODULE link_module
        DOUBLE PRECISION, INTENT(IN) :: tnow, htime0, htime1
      END SUBROUTINE trans_interp_proc
 
-     SUBROUTINE transport_proc(this, ispec, tdeltat)
+     SUBROUTINE transport_proc(this, ispec, tstep, tdeltat, hdeltat)
        IMPORT :: link_t
        IMPLICIT NONE
        CLASS (link_t), INTENT(INOUT) :: this
-       INTEGER, INTENT(IN) :: ispec
-       DOUBLE PRECISION, INTENT(IN) :: tdeltat
+       INTEGER, INTENT(IN) :: ispec, tstep
+       DOUBLE PRECISION, INTENT(IN) :: tdeltat, hdeltat
      END SUBROUTINE transport_proc
 
      SUBROUTINE bedtemp_proc(this, tbed)
@@ -708,11 +710,11 @@ CONTAINS
        cavg = cavg + c
        n = n + 1
 
-       IF (link%q_down() .GE. 0.0) THEN
-          qin = qin + link%q_down()
-          uconc = uconc + link%q_down()*c
+       IF (link%q_down(.TRUE.) .GE. 0.0) THEN
+          qin = qin + link%q_down(.TRUE.)
+          uconc = uconc + link%q_down(.TRUE.)*c
        ELSE 
-          qout = qout - link%q_down()
+          qout = qout - link%q_down(.TRUE.)
        END IF
 
        CALL this%ulink%next()
@@ -726,11 +728,11 @@ CONTAINS
     cavg = cavg +  c
     n = n + 1
     
-    IF (link%q_up() .LT. 0.0) THEN
-       qin = qin - link%q_up()
-       uconc = uconc + link%q_up()*c
+    IF (link%q_up(.TRUE.) .LT. 0.0) THEN
+       qin = qin - link%q_up(.TRUE.)
+       uconc = uconc + link%q_up(.TRUE.)*c
     ELSE 
-       qout = qout + link%q_up()
+       qout = qout + link%q_up(.TRUE.)
     END IF
        
     IF (qout .GT. 0.0) THEN
@@ -820,6 +822,8 @@ CONTAINS
     INTEGER :: ierr
     CLASS (link_t), INTENT(INOUT) :: this
 
+    ! this should not be called, do this to avoid unused warnings
+    ierr = this%id
     ierr = 0
 
   END FUNCTION link_check
