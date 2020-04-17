@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created June 28, 2017 by William A. Perkins
-! Last Change: 2020-04-13 10:44:40 d3g096
+! Last Change: 2020-04-17 07:38:46 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE linear_link_module
@@ -690,7 +690,6 @@ CONTAINS
     INTEGER, INTENT(IN) :: nspecies
 
     INTEGER :: i, s, iostat, ierr = 0
-    DOUBLE PRECISION :: c(nspecies), cold(nspecies)
     CHARACTER (LEN=1024) :: msg
 
     ierr = 0
@@ -998,7 +997,6 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: tnow, htime0, htime1
     INTEGER :: i
     CLASS (point_t), POINTER :: pt
-    DOUBLE PRECISION :: depth
 
     DO i = 1, this%points()
        pt => this%point(i)

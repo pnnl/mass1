@@ -64,7 +64,7 @@ foreach(c ${CASES})
     COMMAND ${CMAKE_COMMAND} -E copy profile1.out profile1.${c}.out 
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     COMMENT "Running test transport/hlink-advection-diffusion-1-segment (${c})"
-    DEPENDS mass1_new "${CMAKE_CURRENT_BINARY_DIR}/mass1-${c}.cfg" ${testfiles} ${exdep}
+    DEPENDS mass1 "${CMAKE_CURRENT_BINARY_DIR}/mass1-${c}.cfg" ${testfiles} ${exdep}
     )
   if(NOT ${c} STREQUAL "warmup")
     if (GNUPLOT_EXECUTABLE)

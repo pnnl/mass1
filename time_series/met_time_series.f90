@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  1, 2013 by William A. Perkins
-! Last Change: 2019-10-04 13:34:11 d3g096
+! Last Change: 2020-04-17 07:15:57 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -20,8 +20,6 @@ MODULE met_time_series
   USE time_series
 
   IMPLICIT NONE
-
-  CHARACTER (LEN=80), PRIVATE, SAVE :: rcsid = "$Id$"
 
   ! The number of met data values (usually)
   INTEGER, PARAMETER, PUBLIC :: met_fields = 5

@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created May 14, 2003 by William A. Perkins
-! Last Change: 2017-06-22 09:24:44 d3g096
+! Last Change: 2020-04-17 07:15:57 d3g096
 ! ----------------------------------------------------------------
 
 ! RCS ID: $Id$ Battelle PNL
@@ -20,8 +20,6 @@ PROGRAM tstest3
 
   IMPLICIT NONE
 
-  CHARACTER (LEN=80), SAVE :: rcsid = "$Id$"
-  
   TYPE (time_series_rec), POINTER :: ts, ts2
   CHARACTER (LEN=1024) :: dstr
   DOUBLE PRECISION :: t, deltat = 0.5d0*HOURS, start

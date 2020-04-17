@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January 21, 2002 by William A. Perkins
-! Last Change: 2018-05-02 14:39:54 d3g096
+! Last Change: 2020-04-17 07:23:27 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -22,12 +22,10 @@ MODULE time_series
 
   IMPLICIT NONE
 
-  CHARACTER (LEN=80), PRIVATE, SAVE :: rcsid = "$Id$"
-
   INTEGER, PRIVATE, PARAMETER :: max_fields = 10
   DOUBLE PRECISION, PRIVATE, PARAMETER :: bogus = -9999.0
 
-  CHARACTER (LEN=1024), PRIVATE :: buf, buf1
+  CHARACTER (LEN=1024), PRIVATE :: buf
 
   ! ----------------------------------------------------------------
   ! TYPE time_series_point

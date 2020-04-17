@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  1, 2013 by William A. Perkins
-! Last Change: 2017-06-22 09:23:48 d3g096
+! Last Change: 2020-04-17 07:15:57 d3g096
 ! ----------------------------------------------------------------
 PROGRAM mettest1
   
@@ -17,8 +17,6 @@ PROGRAM mettest1
 
   IMPLICIT NONE
 
-  CHARACTER (LEN=80), SAVE :: rcsid = "$Id: tstest1.f90 18 2003-04-14 17:48:14Z perk $"
-  
   TYPE (met_time_series_rec), POINTER :: metts
   CHARACTER (LEN=1024) :: dstr
   DOUBLE PRECISION :: t, deltat = 0.25d0*HOURS

@@ -55,7 +55,7 @@ add_custom_command(
   COMMAND ${mass1newexe} > mass1.log
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Running test transport/pulse (warmup)"
-  DEPENDS mass1_new "${CMAKE_CURRENT_BINARY_DIR}/mass1-warmup.cfg" ${testfiles}
+  DEPENDS mass1 "${CMAKE_CURRENT_BINARY_DIR}/mass1-warmup.cfg" ${testfiles}
   )
 
 # Run phase
@@ -68,7 +68,7 @@ add_custom_command(
   COMMAND ${mass1newexe} > mass1.log
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Running test transport/pulse (run)"
-  DEPENDS mass1_new "${CMAKE_CURRENT_BINARY_DIR}/mass1-run.cfg" ${testfiles}
+  DEPENDS mass1 "${CMAKE_CURRENT_BINARY_DIR}/mass1-run.cfg" ${testfiles}
   "${CMAKE_CURRENT_BINARY_DIR}/hotstart-warmup.dat"
   )
 

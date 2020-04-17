@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 28, 2013 by William A. Perkins
-! Last Change: 2017-06-22 09:22:07 d3g096
+! Last Change: 2020-04-17 07:15:02 d3g096
 ! ----------------------------------------------------------------
 PROGRAM cumtstest
 
@@ -17,8 +17,6 @@ PROGRAM cumtstest
 
   IMPLICIT NONE
 
-  CHARACTER (LEN=80), SAVE :: rcsid = "$Id: tstest1.f90 18 2003-04-14 17:48:14Z perk $"
-  
   TYPE (cumulative_time_series_rec), POINTER :: ts
   CHARACTER (LEN=1024) :: dstr
   DOUBLE PRECISION :: t, deltat = 1.0d0*HOURS

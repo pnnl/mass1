@@ -60,7 +60,7 @@ add_custom_command(
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Running test flow/storage (warmup)"
   DEPENDS 
-  mass1_new ${testfiles}
+  mass1 ${testfiles}
   "${CMAKE_CURRENT_BINARY_DIR}/mass1-warmup.cfg"
   "${CMAKE_CURRENT_SOURCE_DIR}/inflow-bc.dat"
   "${CMAKE_CURRENT_BINARY_DIR}/link-flowbc-files.dat"
@@ -81,7 +81,7 @@ add_custom_command(
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Running test flow/storage (flowbc)"
   DEPENDS 
-  mass1_new ${testfiles}
+  mass1 ${testfiles}
   "${CMAKE_CURRENT_BINARY_DIR}/hotstart-warmup.dat"
   "${CMAKE_CURRENT_BINARY_DIR}/mass1-flowbc.cfg"
   "${CMAKE_CURRENT_SOURCE_DIR}/inflow-bc.dat"
@@ -102,7 +102,7 @@ add_custom_command(
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Running test flow/storage (lateral)"
   DEPENDS 
-  mass1_new ${testfiles}
+  mass1 ${testfiles}
   "${CMAKE_CURRENT_BINARY_DIR}/hotstart-warmup.dat"
   "${CMAKE_CURRENT_BINARY_DIR}/mass1-lateral.cfg"
   "${CMAKE_CURRENT_SOURCE_DIR}/inflow-bc.dat"

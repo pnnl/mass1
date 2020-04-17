@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  3, 2017 by William A. Perkins
-! Last Change: 2020-03-30 07:09:28 d3g096
+! Last Change: 2020-04-17 07:37:52 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE cross_section
@@ -850,7 +850,7 @@ CONTAINS
     this%ymin = min_elv
     this%ymax = max_elv
 
-    this%nlevel = AINT((max_elv - min_elv)/this%delta_y) + 1
+    this%nlevel = INT((max_elv - min_elv)/this%delta_y) + 1
     ALLOCATE(this%prop(this%nlevel))
 
     ! compute depth, width, area, hydraulic radius, geo-conveyance
@@ -923,7 +923,7 @@ CONTAINS
     INTEGER :: j
     DOUBLE PRECISION :: factor
 
-    j = AINT(depth/this%delta_y) + 1
+    j = INT(depth/this%delta_y) + 1
 
     IF(j < 1) j=1
     IF(j >= this%nlevel) j = this%nlevel - 1
@@ -1132,7 +1132,7 @@ CONTAINS
     WRITE(iounit, 12) 'y', 'Width', 'Area', 'W Perim', 'H Radius', 'Convey', 'dkdy'
     WRITE(iounit, 10)
 
-    steps = AINT(ymax/dy + 0.5) + 1
+    steps = INT(ymax/dy + 0.5) + 1
     y = 0
     DO i = 0, steps
        y = REAL(i)*dy

@@ -72,7 +72,7 @@ foreach(c ${CASES})
     COMMAND ${CMAKE_COMMAND} -E copy ts1149.out ts1149-${c}.out 
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     COMMENT "Running test transport/advection-1-segment (${c})"
-    DEPENDS mass1_new "${CMAKE_CURRENT_BINARY_DIR}/mass1-${c}.cfg" ${testfiles} ${exdep}
+    DEPENDS mass1 "${CMAKE_CURRENT_BINARY_DIR}/mass1-${c}.cfg" ${testfiles} ${exdep}
     )
 
   if(NOT ${c} STREQUAL "warmup")

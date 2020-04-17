@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2019-05-01 12:58:50 d3g096
+# Last Change: 2020-04-17 06:56:26 d3g096
 # -------------------------------------------------------------
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -73,7 +73,7 @@ foreach(c ${CASES})
   add_custom_command(
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${out}"
     COMMAND ${CMAKE_COMMAND} -E copy mass1-${c}.cfg mass1.cfg
-    COMMAND ${mass1exe} > mass1.log
+    COMMAND ${mass1newexe} > mass1.log
     COMMAND ${CMAKE_COMMAND} -E copy profile1.out profile1.${c}.out 
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     COMMENT "Running test transport/lateral-inflow (${c})"

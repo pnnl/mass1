@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created May 14, 2003 by William A. Perkins
-! Last Change: 2018-05-03 06:28:22 d3g096
+! Last Change: 2020-04-17 07:15:56 d3g096
 ! ----------------------------------------------------------------
 
 ! RCS ID: $Id$ Battelle PNL
@@ -22,8 +22,6 @@ MODULE bogus
   USE time_series
 
   IMPLICIT NONE
-
-  CHARACTER (LEN=80), PRIVATE, SAVE :: rcsid = "$Id$"
 
 CONTAINS
 
