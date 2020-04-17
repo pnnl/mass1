@@ -39,7 +39,7 @@ add_custom_command(
   COMMAND ${mass1newexe} > mass1.log
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Running test flow/hlink-trib"
-  DEPENDS mass1_new ${testfiles}
+  DEPENDS mass1 ${testfiles}
 )
 set(rundeps "${CMAKE_CURRENT_BINARY_DIR}/profile1.out")
 

@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2020-02-11 08:25:38 d3g096
+# Last Change: 2020-04-17 07:12:11 d3g096
 # -------------------------------------------------------------
 
 # -------------------------------------------------------------
@@ -28,6 +28,13 @@ list (APPEND CMAKE_MODULE_PATH "${MASS1_SOURCE_DIR}/cmake")
 # Compiler options
 # -------------------------------------------------------------
 
+# The old Fortran 90 MASS1 is kept around to compare with current
+# code.  The goal is to have Fortran 2008 code that is functionally
+# equivalent with the same input/output.  This is becoming
+# increasingly difficult to maintain, however, and will need to be
+# abandoned soon.
+option(MASS1_BUILD_OLD "Build \"mass1_old\", from old code (for testing)" OFF)
+
 option(MASS1_ENABLE_OPENMP "Enable the use of OpenMP" OFF)
 
 # It is assumed here that the compiler does all the correct things if
@@ -47,7 +54,7 @@ endif (MASS1_ENABLE_OPENMP)
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
   # trap floating point exceptions and use preprocessor
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wall -ffpe-trap=invalid,zero,overflow -cpp -fbacktrace")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wall -ffpe-trap=invalid,zero,overflow -cpp -fbacktrace -Wno-unused-dummy-argument")
 elseif (CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
   # w/ Intel, build static binaries that trap floating point exceptions
   # and turn on the preprocessor for all files
@@ -122,51 +129,55 @@ include_directories(BEFORE
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-# -------------------------------------------------------------
-# mass1
-# -------------------------------------------------------------
-set(mass1src
-  array_alloc.f90
-  array_dealloc.f90
-  "${CMAKE_CURRENT_BINARY_DIR}/banner.f90"
-  bc_module.f90
-  coeff.f90
-  cross_section.f90
-  confluence_module.f90
-  dlist_module.f90
-  flow_coeff.f90
-  flow_sim.f90
-  gage_output.f90
-  hydro_output.f90
-  initial_cond.f90
-  kick_off.f90
-  linear_interp.f90
-  link_data.f90
-  mass1.f90
-  mass1_config.f90
-  met_zone.f90
-  modules.f90
-  nonfluvial_coeff.f90
-  pidlink.f90
-  point_data.f90
-  print_output.f90
-  profile_output.f90
-  read_hotstart.f90
-  scalars_module.f90
-  section_handler.f90
-  svgrp.f90
-  tdg_equation_coeff.f90
-  write_restart.f90
-)
+if (MASS1_BUILD_OLD)
 
-add_executable(mass1 ${mass1src})
-target_link_libraries(mass1 gastemp ts)
-install(TARGETS mass1 DESTINATION bin)
+  # -------------------------------------------------------------
+  # mass1
+  # -------------------------------------------------------------
+  set(mass1src
+    array_alloc.f90
+    array_dealloc.f90
+    "${CMAKE_CURRENT_BINARY_DIR}/banner.f90"
+    bc_module.f90
+    coeff.f90
+    cross_section.f90
+    confluence_module.f90
+    dlist_module.f90
+    flow_coeff.f90
+    flow_sim.f90
+    gage_output.f90
+    hydro_output.f90
+    initial_cond.f90
+    kick_off.f90
+    linear_interp.f90
+    link_data.f90
+    mass1.f90
+    mass1_config.f90
+    met_zone.f90
+    modules.f90
+    nonfluvial_coeff.f90
+    pidlink.f90
+    point_data.f90
+    print_output.f90
+    profile_output.f90
+    read_hotstart.f90
+    scalars_module.f90
+    section_handler.f90
+    svgrp.f90
+    tdg_equation_coeff.f90
+    write_restart.f90
+    )
 
-# save for running tests
-set(mass1exe $<TARGET_FILE:mass1>)
-#this is deprecated
-#get_property(mass1exe TARGET mass1 PROPERTY LOCATION)
+  add_executable(mass1_old ${mass1src})
+  set_target_properties(mass1_old PROPERTIES OUTPUT_NAME mass1)
+  target_link_libraries(mass1_old gastemp ts)
+  install(TARGETS mass1_old DESTINATION bin)
+
+  # save for running tests
+  set(mass1exe $<TARGET_FILE:mass1_old>)
+  #this is deprecated
+  #get_property(mass1exe TARGET mass1 PROPERTY LOCATION)
+endif (MASS1_BUILD_OLD)
 
 # -------------------------------------------------------------
 # cross_section_test
@@ -260,15 +271,16 @@ add_library(mass1lib
   mass1_dhsvm_api.f90
   )
 add_dependencies(mass1lib gastemp ts)
-add_executable(mass1_new
-  mass1_new.f90
-  )
-add_dependencies(mass1_new mass1lib)
-target_link_libraries(mass1_new mass1lib gastemp ts)
-install(TARGETS mass1_new DESTINATION bin)
+
+add_executable(mass1 mass1_new.f90)
+set_target_properties(mass1 PROPERTIES OUTPUT_NAME mass1_new)
+
+add_dependencies(mass1 mass1lib)
+target_link_libraries(mass1 mass1lib gastemp ts)
+install(TARGETS mass1 DESTINATION bin)
 
 # save for running tests
-set(mass1newexe $<TARGET_FILE:mass1_new>)
+set(mass1newexe $<TARGET_FILE:mass1>)
 
 add_executable(mass1_met_add_lw  mass1_met_add_lw.f90)
 add_dependencies(mass1_met_add_lw mass1lib)

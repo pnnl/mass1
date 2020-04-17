@@ -56,7 +56,7 @@ add_custom_command(
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Running test flow/lateral (inflow)"
   DEPENDS 
-  mass1_new ${testfiles}
+  mass1 ${testfiles}
   "${CMAKE_CURRENT_BINARY_DIR}/mass1-inflow.cfg"
   "${CMAKE_CURRENT_BINARY_DIR}/lat-inflow-files.dat"
   "${CMAKE_CURRENT_SOURCE_DIR}/lateral-inflow.dat"
@@ -70,7 +70,7 @@ add_custom_command(
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Running test flow/lateral (outflow)"
   DEPENDS 
-  mass1_new ${testfiles}
+  mass1 ${testfiles}
   "${CMAKE_CURRENT_BINARY_DIR}/mass1-outflow.cfg"
   "${CMAKE_CURRENT_BINARY_DIR}/lat-outflow-files.dat"
   "${CMAKE_CURRENT_SOURCE_DIR}/lateral-outflow.dat"
