@@ -10,7 +10,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 12, 2017 by William A. Perkins
-! Last Change: 2020-03-25 13:43:53 d3g096
+! Last Change: 2020-06-10 13:18:34 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE point_module
@@ -232,7 +232,11 @@ CONTAINS
       END IF
 
       h%bed_shear = unitwt*xs%hydrad*h%friction_slope
-      h%diffuse_num = 2.0*this%k_diff*deltat/deltax/deltax
+      IF (deltax .GT. 0.0) THEN
+         h%diffuse_num = 2.0*this%k_diff*deltat/deltax/deltax
+      ELSE
+         h%diffuse_num = 0.5
+      ENDIF 
 
     END ASSOCIATE
 

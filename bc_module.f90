@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January 17, 2017 by William A. Perkins
-! Last Change: 2018-08-24 11:17:11 d3g096
+! Last Change: 2020-05-04 11:37:43 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE bc_module
@@ -34,7 +34,8 @@ MODULE bc_module
   END ENUM
   PUBLIC :: BC_ENUM, LINK_BC_TYPE, LATFLOW_BC_TYPE, HYDRO_BC_TYPE, &
        &TEMP_BC_TYPE, TRANS_BC_TYPE
-  
+
+  INTEGER, PUBLIC, PARAMETER :: DS_BC_ID = 0
 
   ! ----------------------------------------------------------------
   ! TYPE bc_t

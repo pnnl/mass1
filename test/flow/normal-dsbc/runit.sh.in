@@ -1,0 +1,41 @@
+#! /bin/sh
+# -------------------------------------------------------------
+# file: runit.sh
+# -------------------------------------------------------------
+# -------------------------------------------------------------
+# Battelle Memorial Institute
+# Pacific Northwest Laboratory
+# -------------------------------------------------------------
+# -------------------------------------------------------------
+# Created December 11, 1998 by William A. Perkins
+# Last Change: 2017-01-19 09:50:11 d3g096
+# -------------------------------------------------------------
+# $Id$
+
+set -x
+set -e
+
+                                # to trap floating point errors on SGI
+
+model="@mass1exe@"
+
+"$model"
+
+(echo \
+    set terminal postscript landscape color solid \"Helvetica\" 14\; \
+    load \"@SRC@/plot.gp\"\; ) | \
+        gnuplot > plot.ps
+(echo \
+    set terminal postscript eps color solid \"Helvetica\" 22 \; \
+    load \"@SRC@/plot.gp\"\; ) | \
+        gnuplot > plot.eps
+
+(echo \
+    set terminal postscript landscape color solid \"Helvetica\" 14\; \
+    load \"@SRC@/plot-elev.gp\"\; ) | \
+        gnuplot > plot-elev.ps
+(echo \
+    set terminal postscript eps color solid \"Helvetica\" 22 \; \
+    load \"@SRC@/plot-elev.gp\"\; ) | \
+        gnuplot > plot-elev.eps
+

@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created January 19, 2017 by William A. Perkins
-# Last Change: 2020-04-14 09:42:59 d3g096
+# Last Change: 2020-05-19 14:04:02 d3g096
 # -------------------------------------------------------------
 
 
@@ -34,6 +34,7 @@ add_subdirectory(flow/lateral)
 add_subdirectory(flow/normal-hydro)
 add_subdirectory(flow/normal-metric)
 add_subdirectory(flow/normal)
+add_subdirectory(flow/normal-dsbc)
 
 add_subdirectory(transport/advection-1-segment)
 add_subdirectory(transport/lateral-inflow)

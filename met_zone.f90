@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February 21, 2017 by William A. Perkins
-! Last Change: 2020-02-12 07:33:26 d3g096
+! Last Change: 2020-04-20 07:14:31 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE met_zone
@@ -53,6 +53,7 @@ MODULE met_zone
    CONTAINS
      PROCEDURE :: update => met_zone_update
      PROCEDURE :: energy_flux => met_zone_energy_flux
+     PROCEDURE :: equilib_temp => met_zone_equilib_temp
      PROCEDURE :: gas_exchange => met_zone_gas_exchange
      PROCEDURE :: destroy => met_zone_destroy
   END type met_zone_t
@@ -174,6 +175,31 @@ CONTAINS
     !      &this%current%wind
     
   END FUNCTION met_zone_energy_flux
+
+  ! ----------------------------------------------------------------
+  !  FUNCTION met_zone_equilib_temp
+  ! ----------------------------------------------------------------
+  FUNCTION met_zone_equilib_temp(this, twater, attenuate) RESULT(teq)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION :: teq
+    CLASS (met_zone_t), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: twater, attenuate
+
+    DOUBLE PRECISION :: swrad, lwrad
+
+    swrad = attenuate*this%current%rad
+    
+    IF (this%havelw) THEN
+       lwrad = this%current%lwrad
+    ELSE
+       lwrad = net_longwave(this%coeff, this%current%temp, this%current%dew)
+    END IF
+    teq = equilibrium_temperature(this%coeff, swrad, &
+         &twater, this%current%temp, this%current%dew, &
+         &this%current%wind, lwrad)
+  END FUNCTION met_zone_equilib_temp
+
 
   ! ----------------------------------------------------------------
   !  FUNCTION met_zone_gas_exchange

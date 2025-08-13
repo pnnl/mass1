@@ -7,7 +7,7 @@
   ! ----------------------------------------------------------------
   ! ----------------------------------------------------------------
   ! Created February 18, 2019 by William A. Perkins
-  ! Last Change: 2020-04-01 12:37:07 d3g096
+  ! Last Change: 2020-05-07 06:38:42 d3g096
   ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE transport_link_module
@@ -302,7 +302,7 @@ CONTAINS
 
     INTEGER :: n, i
     CHARACTER (LEN=1024) :: msg
-    DOUBLE PRECISION :: c
+    DOUBLE PRECISION :: c, qup, qdn
 
     DO i = 1, this%npoints
        c = this%pt(i)%trans%cnow(ispec)
@@ -310,7 +310,9 @@ CONTAINS
     END DO
 
     ! FIXME: boundary conditions
-    IF (this%q_up() .GE. 0.0) THEN
+    qup = this%q_up(.TRUE.)
+    qdn = this%q_down(.TRUE.)
+    IF (qup .GT. 0.0) THEN
        c = 0.0
        IF (ASSOCIATED(this%species(ispec)%usbc)) THEN
           c = this%species(ispec)%getusbc()
@@ -324,10 +326,12 @@ CONTAINS
        END IF
        this%pt(1)%trans%cnow(ispec) = c
     END IF
-    IF (this%q_down() .LT. 0.0) THEN
+    IF (qdn .LT. 0.0) THEN
        c = 0.0
        IF (ASSOCIATED(this%dcon)) THEN
           c = this%dcon%conc(ispec)
+       ELSE IF (ASSOCIATED(this%species(ispec)%dsbc)) THEN
+          c = this%species(ispec)%getdsbc()
        ELSE
           WRITE(msg, *) 'link ', this%id, &
                &': error: reverse flow at downstream boundary w/o conc BC for species ', &
@@ -368,10 +372,10 @@ CONTAINS
     ! gradient w/ outflow
 
     n = this%npoints
-    IF (this%q_up() .LT. 0.0) THEN
+    IF (qup .LE. 0.0) THEN
        this%pt(1)%trans%cnow(ispec) = this%pt(2)%trans%cnow(ispec)
     END IF
-    IF (this%q_down() .GT. 0.0) THEN
+    IF (qdn .GE. 0.0) THEN
        this%pt(n)%trans%cnow(ispec) = this%pt(n-1)%trans%cnow(ispec)
     END IF
     

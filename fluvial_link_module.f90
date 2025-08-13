@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July  3, 2017 by William A. Perkins
-! Last Change: 2020-04-17 07:38:05 d3g096
+! Last Change: 2020-07-22 13:01:01 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE fluvial_link_module
@@ -42,8 +42,6 @@ MODULE fluvial_link_module
        PROCEDURE :: initialize => fluvial_hydro_link_initialize
   END type fluvial_hydro_link
 
-  DOUBLE PRECISION, PARAMETER :: alpha = 1.0
-  DOUBLE PRECISION, PARAMETER :: theta = 1.0
 
 CONTAINS
 

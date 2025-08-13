@@ -13,7 +13,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created January  7, 2019 by William A. Perkins
-! Last Change: 2020-04-17 07:23:27 d3g096
+! Last Change: 2020-08-06 09:18:50 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
@@ -77,6 +77,8 @@ MODULE scalar_module
   TYPE, PUBLIC, EXTENDS(scalar_t) :: temperature
      LOGICAL :: do_friction
      LOGICAL :: do_bed
+     LOGICAL :: do_limit
+     LOGICAL :: do_eqlimit
    CONTAINS
      PROCEDURE :: atmospheric_flux => temperature_atmospheric_flux
      PROCEDURE :: friction => temperature_friction
@@ -187,6 +189,15 @@ CONTAINS
     t%needmet = t%dosource
     t%do_friction = dofrict
     t%do_bed = dobed
+    t%do_limit = .FALSE.
+
+    t%do_eqlimit = .FALSE.
+
+    ! If .TRUE., do not use bad values to compute source term
+    t%do_limit = temperature_limits
+
+    ! This doesn't work yet so don't use it
+    t%do_eqlimit = .FALSE.
 
   END FUNCTION new_temperature
 
@@ -209,10 +220,8 @@ CONTAINS
     t = twater
     
     ! Don't use a wacky temperature value
-    IF (temperature_limits) THEN
-       t = MAX(temperature_min, t)
-       t = MIN(temperature_max, t)
-    END IF
+    t = MAX(temperature_min, t)
+    t = MIN(temperature_max, t)
 
     flux = met%energy_flux(t, attenuate)
     
@@ -326,7 +335,8 @@ CONTAINS
     DOUBLE PRECISION, INTENT(IN) :: cin, deltat
     CLASS (met_zone_t), INTENT(INOUT), POINTER :: met
 
-    DOUBLE PRECISION :: t, depth, area, width, factor, dt, flux
+    DOUBLE PRECISION :: t, depth, area, width, factor, dt, flux, aflux
+    DOUBLE PRECISION :: teq, tsign, fsign
     DOUBLE PRECISION :: attenuate, brad
 
     tout = this%scalar_t%source(cin, pt, deltat, met)
@@ -341,7 +351,7 @@ CONTAINS
           IF (depth .GT. depth_minimum .AND. area .GT. 0.0) THEN
 
              flux = 0.0
-
+             
              ! FIXME: metric units
              factor = 1.0/(1000.0*4186.0)*deltat*width/area
              IF (.NOT. this%dometric) THEN
@@ -357,8 +367,45 @@ CONTAINS
                 flux = flux + this%bed_flux(pt, tout, brad, deltat)
              END IF
 
-             flux = flux + this%atmospheric_flux(tout, attenuate, met)
+             aflux = this%atmospheric_flux(tout, attenuate, met)
 
+             ! FIXME: This needs to account for lateral inflow before
+             ! it's useful
+             ! IF (this%do_eqlimit) THEN
+             !    ! The atmospheric flux should not make the temperature go
+             !    ! past the equilibrium temperature, so limit the flux to
+             !    ! get the temperature 99% of the way to equilibrium
+             !    ! temperature.
+                
+             !    teq = met%equilib_temp(tout, attenuate)
+
+             !    IF (this%do_limit) THEN
+             !       teq = MAX(temperature_min, teq)
+             !       teq = MIN(temperature_max, teq)
+             !    END IF
+                
+             !    dt = (teq - tout)
+
+             !    WRITE(*,*) tout, teq, dt, aflux, dt/factor
+
+             !    ! If the flux indicates the temperature will move towards
+             !    ! equilibrium, limit the flux as necessary.
+             !    tsign = SIGN(1.0d00, dt)
+             !    fsign = SIGN(1.0d00, aflux)
+             !    IF (tsign .EQ. fsign) THEN
+             !       IF (fsign .GT. 0.0) THEN
+             !          aflux = MIN(aflux, (dt) /factor)
+             !       ELSE 
+             !          aflux = MAX(aflux, (dt) /factor)
+             !       END IF
+             !    ELSE
+             !       ! It seems like this should not happen, but it does.
+             !       ! aflux = 0.0
+             !    END IF
+             !    WRITE(*,*) aflux
+             ! END IF
+             
+             flux = flux + aflux
 
              ! This tortured logic is to fix temperature range
              ! problems caused by atmospheric exchange (e.g. really
@@ -368,7 +415,7 @@ CONTAINS
              dt = factor*flux
              
              t = tout + dt
-             IF (temperature_limits) THEN
+             IF (this%do_limit) THEN
                 IF (t .GE. temperature_max) THEN
                    IF (tout .GE. temperature_max) THEN
                       t = tout
@@ -376,8 +423,8 @@ CONTAINS
                       t = temperature_max
                    END IF
                 END IF
-                IF (t .LE. temperature_min) THEN
-                   IF (tout .LE. temperature_min) THEN
+                IF (t .LT. temperature_min) THEN
+                   IF (tout .LT. temperature_min) THEN
                       t = tout
                    ELSE
                       t = temperature_min
@@ -385,9 +432,6 @@ CONTAINS
                 END IF
              END IF
              tout = t
-             ! WRITE(*,*) "temperature_source: ", t, tout, width, area
-
-             ! If called for, keep temperature in the liquid range
           END IF
        END IF
     END IF

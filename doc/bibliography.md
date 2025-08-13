@@ -1,6 +1,11 @@
 # Work Using MASS1
 
 
+Bao, Jie, Tian Zhou, Maoyi Huang, Zhangshuan Hou, William Perkins,
+Samuel Harding, Scott Titzler, et al. 2018. “Modulating Factors of
+Hydrologic Exchanges in a Large-Scale River Reach: Insights from
+Three-Dimensional Computational Fluid Dynamics Simulations.”
+*Hydrological Processes* 32 (23). https://doi.org/10.1002/hyp.13266.
 
 Bellgraph, B.J., W. A. Perkins, M. C. Richmond, J. A. Serkowski, and S.
 F. Harding. 2016. “Lake Roosevelt White Sturgeon Modeling Support.”
@@ -86,6 +91,13 @@ Hydrodynamic, Water Quality, and Fish Exposure Modeling of the Columbia
 and Snake Rivers. Part 1: Summary and Model Formulation.” Final Report.
 P. O. Box 999, Richland, Washington, 99352: Battelle Pacific Northwest
 Division.
+
+Shuai, Pin, Xingyuan Chen, Xuehang Song, Glenn E. Hammond, John
+Zachara, Patrick Royer, Huiying Ren, William A. Perkins, Marshall
+C. Richmond, and Maoyi Huang. 2019. “Dam Operations and Subsurface
+Hydrogeology Control Dynamics of Hydrologic Exchange Flows in a
+Regulated River Reach.” *Water Resources Research* 55 (4):
+2593–2612. https://doi.org/10.1029/2018WR024193.
 
 Waichler, S. R., W. A. Perkins, and M. C. Richmond. 2005. “Hydrodynamic
 Simulation of the Columbia River, Hanford Reach, 1940-2004.” PNNL-15226.

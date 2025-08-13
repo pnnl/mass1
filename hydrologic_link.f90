@@ -263,8 +263,9 @@ CONTAINS
     END DO
     this%avgpt%hold = this%avgpt%hnow
     IF (ASSOCIATED(this%species)) THEN
-       this%avgpt%trans%hold = this%avgpt%hold
-       this%avgpt%trans%xspropold = this%avgpt%xsprop
+       this%avgpt%trans%hnow = this%avgpt%hold
+       this%avgpt%trans%xsprop = this%avgpt%xsprop
+       this%trans_storage = this%storage
     END IF
 
     ! get upstream inflow (volume)
@@ -279,15 +280,17 @@ CONTAINS
           invol = this%usbc%current_value
        END IF
     END IF
-    
+   
+    this%latqold = this%latq
     IF (ASSOCIATED(this%latbc)) THEN
-       this%latqold = this%latq
        this%latq = this%latbc%current_value
-       DO i = 1, this%npoints
-          this%pt(i)%hnow%lateral_inflow = this%latq
-       END DO
-       this%avgpt%hnow%lateral_inflow = this%latq
+    ELSE 
+       this%latq = 0.0
     END IF
+    DO i = 1, this%npoints
+       this%pt(i)%hnow%lateral_inflow = this%latq
+    END DO
+    this%avgpt%hnow%lateral_inflow = this%latq
 
     this%inflow = invol
     latvol = this%latq*this%L
@@ -301,10 +304,6 @@ CONTAINS
     this%K = SQRT(this%So)*kstrick*this%y**(2.0/3.0)/this%L
     X = EXP(-this%K*deltat)
 
-    ! WRITE (*,*) "Hydrologic link ", this%id, ": ", &
-    !      &"y = ", this%y, ", "&
-    !      &"K = ", this%K, ", "&
-    !      &"X = ", X 
 
     IF (this%K .GT. 0.0) THEN
        this%storage = (invol + latvol)/this%K + &
@@ -315,6 +314,14 @@ CONTAINS
     
     outvol = invol + latvol - (this%storage - this%storage_old)/deltat
     this%outflow = outvol
+
+    ! IF (this%id .EQ. 15257) THEN
+    !    WRITE (*,*) "Hydrologic link ", this%id, ": ", &
+    !         &"y = ", this%y, ", "&
+    !         &"K = ", this%K, ", "&
+    !         &"X = ", X 
+    !    WRITE(*,*) invol, latvol, outvol, this%storage, this%storage_old
+    ! END IF
 
     ! compute some coefficients that can be used by confluences
 

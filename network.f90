@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March 10, 2017 by William A. Perkins
-! Last Change: 2020-04-15 12:35:29 d3g096
+! Last Change: 2020-08-06 09:34:36 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE network_module
@@ -144,16 +144,19 @@ CONTAINS
   ! SUBROUTINE network_read
   ! 
   ! ----------------------------------------------------------------
-  SUBROUTINE network_read(this, base, dotemp_override, dobed_override, doreduce_override)
+  SUBROUTINE network_read(this, base, dotemp_override, &
+       &dobed_override, doreduce_override, &
+       &dogage_override, doprof_override)
     USE general_vars
     IMPLICIT NONE
     CLASS (network), INTENT(INOUT) :: this
     CHARACTER (LEN=*), INTENT(IN) :: base
     LOGICAL, INTENT(IN), OPTIONAL :: dotemp_override, dobed_override, doreduce_override
+    LOGICAL, INTENT(IN), OPTIONAL :: dogage_override, doprof_override
     INTEGER :: istatus
     CHARACTER(LEN=path_length) :: cwd, mybase
-
-
+    
+    
     istatus = getcwd(cwd)       ! FIXME: GNU specfic
     IF (istatus .NE. 0) THEN 
        CALL error_message("network_read: cannot get current working directory")
@@ -168,11 +171,18 @@ CONTAINS
        CALL error_message("network_read: cannot get current working directory")
     END IF
     this%basedir = mybase
-
+    
     CALL this%config%read()
 
     ! Some things can be overridden (i.e. DHSVM) can override some
     ! things in the configuration
+    IF (PRESENT(dogage_override)) THEN
+       this%config%do_gageout = dogage_override
+    END IF
+    IF (PRESENT(doprof_override)) THEN
+       this%config%do_profileout = doprof_override
+    END IF
+
     IF (PRESENT(dotemp_override)) THEN
        this%config%do_temp = dotemp_override
        this%config%do_transport = this%config%do_temp
@@ -489,6 +499,7 @@ CONTAINS
     DOUBLE PRECISION :: htime0, htime1
     DOUBLE PRECISION :: tnow, tdeltat
     INTEGER :: tsteps, tlink, i, ispec
+    CHARACTER (LEN=1024) :: msg
 
     htime0 = this%config%time%time
     htime1 = htime0 + this%config%time%step
@@ -503,6 +514,13 @@ CONTAINS
        CALL this%links%transport_steps(this%config%time%step, tsteps, tlink)
        IF (.NOT. this%config%quiet) THEN
           WRITE(*, '(" Using ", I5, " transport steps (", I5,")")') tsteps, tlink
+       END IF
+       IF (this%config%max_scalar_steps .GT. 0) THEN
+          IF (tsteps .GT. this%config%max_scalar_steps) THEN
+             WRITE(msg, '("Maximum transport steps exceeded (", I5, " > ", I5, ") on link ", I5)') &
+                  &tsteps, this%config%max_scalar_steps, tlink
+             CALL error_message(msg, fatal=.TRUE.)
+          END IF
        END IF
     END IF
     tdeltat = this%config%time%delta_t

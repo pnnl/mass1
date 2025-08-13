@@ -7,7 +7,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created December 29, 2016 by William A. Perkins
-# Last Change: 2018-05-02 14:18:55 d3g096
+# Last Change: 2020-05-07 12:34:15 d3g096
 # -------------------------------------------------------------
 
 # NOTE: The contents of this directory are expected to be a
@@ -19,6 +19,7 @@
 # ts - time series library
 # -------------------------------------------------------------
 set(tsources
+  table_module.f90
   time_series.f90
   cumulative_time_series.f90
   met_time_series.f90
@@ -52,6 +53,7 @@ set(tstests
   tstest2
   tstest3
   tstest4
+  tbltest
   cumtstest1
   mettest1
   fptraptest
@@ -106,6 +108,7 @@ add_custom_target(tstest2_input
   ${CMAKE_CURRENT_SOURCE_DIR}/tstest2.dat
 )
 add_dependencies(tstest2 tstest2_input)
+add_dependencies(tbltest tstest2_input)
 
 add_custom_target(tstest3_input
   COMMAND ${CMAKE_COMMAND} -E copy 
@@ -120,3 +123,4 @@ add_custom_target(tstest3_input
   ${CMAKE_CURRENT_SOURCE_DIR}/tstest3b.dat
 )
 add_dependencies(tstest3 tstest3_input)
+

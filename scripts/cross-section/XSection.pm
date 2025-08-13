@@ -11,7 +11,7 @@
 # -------------------------------------------------------------
 # -------------------------------------------------------------
 # Created November 19, 1996 by William A. Perkins
-# Last Change: 2020-03-27 10:37:29 d3g096
+# Last Change: 2021-01-28 14:01:30 d3g096
 # -------------------------------------------------------------
 
 # RCS ID: $Id$
@@ -32,6 +32,7 @@ sub new {
   my $self = {};
   bless $self, $type;
   $self->_initialize(@_);
+  # printf("In XSection::new \"%s\" ...\n", @_);
   return $self;
 }
 
@@ -43,6 +44,7 @@ sub _initialize {
   $self->{river} = shift;
   $self->{rivermile} = shift;
   $self->{points} = {};
+  # printf("In XSection::_initialize \"%s\" ...\n", $self->{river});
   return;
 }
 
@@ -327,6 +329,7 @@ sub _initialize {
   $self->{comment} = shift;
   $self->{steps} = shift if (scalar(@_) > 0);
   $self->{deltay} = 1.0;
+  # printf("In CHARIMASection::_initialize \"%s\" ...\n", $self->{river});
   return;
 }
 

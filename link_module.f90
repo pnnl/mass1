@@ -9,7 +9,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created March  8, 2017 by William A. Perkins
-! Last Change: 2020-04-17 07:39:03 d3g096
+! Last Change: 2020-07-22 13:00:52 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE link_module
@@ -99,6 +99,7 @@ MODULE link_module
      INTEGER :: order
      INTEGER :: dsid, usbcid, dsbcid
      LOGICAL :: tsubstep
+     LOGICAL :: imds
      CLASS (bc_t), POINTER :: usbc, dsbc, latbc
      CLASS (confluence_t), POINTER :: ucon, dcon
      TYPE (link_scalar), DIMENSION(:), POINTER :: species
@@ -302,6 +303,9 @@ MODULE link_module
 
   END INTERFACE
 
+  DOUBLE PRECISION, PUBLIC, PARAMETER :: alpha = 1.0
+  DOUBLE PRECISION, PUBLIC, PARAMETER :: theta = 1.0
+
 CONTAINS
 
   ! ----------------------------------------------------------------
@@ -401,6 +405,8 @@ CONTAINS
     IMPLICIT NONE
     CLASS (link_t), INTENT(INOUT) :: this
 
+    this%tsubstep = .TRUE.
+    this%imds = .FALSE.
     NULLIFY(this%usbc)
     NULLIFY(this%dsbc)
     NULLIFY(this%latbc)
@@ -693,7 +699,7 @@ CONTAINS
     CLASS (confluence_t), INTENT(INOUT) :: this
     INTEGER, INTENT(IN) :: ispecies
     CLASS (link_t), POINTER :: link
-    DOUBLE PRECISION :: qin, qout, cavg, c
+    DOUBLE PRECISION :: q, qin, qout, cavg, c
     INTEGER :: n
     
     qin = 0.0
@@ -710,11 +716,12 @@ CONTAINS
        cavg = cavg + c
        n = n + 1
 
-       IF (link%q_down(.TRUE.) .GE. 0.0) THEN
-          qin = qin + link%q_down(.TRUE.)
-          uconc = uconc + link%q_down(.TRUE.)*c
+       q = link%q_down(.TRUE.)
+       IF (q .GE. 0.0) THEN
+          qin = qin + q
+          uconc = uconc + q*c
        ELSE 
-          qout = qout - link%q_down(.TRUE.)
+          qout = qout - q
        END IF
 
        CALL this%ulink%next()
@@ -727,12 +734,13 @@ CONTAINS
 
     cavg = cavg +  c
     n = n + 1
-    
-    IF (link%q_up(.TRUE.) .LT. 0.0) THEN
-       qin = qin - link%q_up(.TRUE.)
-       uconc = uconc + link%q_up(.TRUE.)*c
+
+    q = link%q_up(.TRUE.)
+    IF (q .LT. 0.0) THEN
+       qin = qin - q
+       uconc = uconc - q*c
     ELSE 
-       qout = qout + link%q_up(.TRUE.)
+       qout = qout + q
     END IF
        
     IF (qout .GT. 0.0) THEN
@@ -740,6 +748,8 @@ CONTAINS
     ELSE 
        uconc = cavg/REAL(n)
     END IF
+
+    ! WRITE(*, *) 'qin = ', qin, ", qout = ", qout, "uconc = ", uconc
   END FUNCTION confluence_conc
 
   ! ----------------------------------------------------------------

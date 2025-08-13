@@ -20,7 +20,7 @@ set -e
 TRAP_FPE='INVALID=ABORT(1);UNDERFL=ZERO;OVERFL=ABORT(1);INT_OVERFL=ABORT(1);DIVZERO=ABORT(1);DEBUG'
 export TRAP_FPE
 
-model=${MODEL-../../../build/mass1}
+model=${MODEL-../../../build/mass1_new}
 
 $model
 

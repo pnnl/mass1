@@ -7,13 +7,14 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created February  4, 2019 by William A. Perkins
-! Last Change: 2020-02-12 12:29:40 d3g096
+! Last Change: 2020-08-06 09:18:17 d3g096
 ! ----------------------------------------------------------------
 
 ! ----------------------------------------------------------------
 !  FUNCTION mass1_create
 ! ----------------------------------------------------------------
-FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, pid, dotemp, dolwrad, dobed) &
+FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, pid, &
+     &dotemp, dolwrad, dobed, doquiet, dogage, doprof) &
      &RESULT(net) BIND(c)
   USE, INTRINSIC :: iso_c_binding
   USE mass1_dhsvm_module
@@ -21,11 +22,12 @@ FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, pid, dotemp, dolwrad, dobe
   TYPE (c_ptr) :: net
   TYPE (c_ptr), VALUE :: c_cfgdir, c_outdir
   TYPE (DHSVM_date), INTENT(INOUT) :: start, end
-  INTEGER(KIND=C_INT), VALUE :: pid, dotemp, dolwrad, dobed
+  INTEGER(KIND=C_INT), VALUE :: pid, dotemp, dolwrad, dobed, doquiet
+  INTEGER(KIND=C_INT), VALUE :: dogage, doprof
 
   TYPE (DHSVM_network), POINTER :: f_net
   CHARACTER (LEN=1024) :: cfgdir, outdir, spath, epath, buf
-  LOGICAL :: f_dotemp, f_dolwrad, f_dobed
+  LOGICAL :: f_dotemp, f_dolwrad, f_dobed, f_doquiet, f_dogage, f_doprof
 
   CALL c2fstring(c_cfgdir, cfgdir)
   CALL c2fstring(c_outdir, outdir)
@@ -37,6 +39,9 @@ FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, pid, dotemp, dolwrad, dobe
   f_dotemp = (dotemp .NE. 0)
   f_dolwrad = (dolwrad .NE. 0)
   f_dobed = (dobed .NE. 0)
+  f_doquiet = (doquiet .NE. 0)
+  f_dogage = (dogage .NE. 0)
+  f_doprof = (doprof .NE. 0)
 
   utility_error_iounit = 11
   utility_status_iounit = 99
@@ -62,8 +67,8 @@ FUNCTION mass1_create(c_cfgdir, c_outdir, start, end, pid, dotemp, dolwrad, dobe
      CALL banner()
   END IF
 
-  CALL mass1_initialize(f_net, cfgdir, outdir, start, end, .TRUE., &
-       &f_dotemp, f_dolwrad, f_dobed)
+  CALL mass1_initialize(f_net, cfgdir, outdir, start, end, f_doquiet, &
+       &f_dotemp, f_dolwrad, f_dobed, f_dogage, f_doprof)
 
   net = C_LOC(f_net)
 

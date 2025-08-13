@@ -99,13 +99,13 @@ CONTAINS
   ! SUBROUTINE mass1_initialize
   ! ----------------------------------------------------------------
   SUBROUTINE mass1_initialize(dnet, cfgdir, outdir, start, end, quiet, &
-       &dotemp, dolwrad, dobed)
+       &dotemp, dolwrad, dobed, dogage, doprof)
 
     IMPLICIT NONE
     TYPE (DHSVM_network), INTENT(INOUT) :: dnet
     CHARACTER (LEN=*), INTENT(IN) :: cfgdir, outdir
     TYPE (DHSVM_date), INTENT(INOUT) :: start, end
-    LOGICAL, INTENT(IN) :: quiet, dotemp, dolwrad, dobed
+    LOGICAL, INTENT(IN) :: quiet, dotemp, dolwrad, dobed, dogage, doprof
 
     INTEGER :: id, n
 
@@ -120,7 +120,7 @@ CONTAINS
        reduce_subset = .TRUE.
     END IF
 
-    CALL dnet%net%read(cfgdir, dotemp, dobed, reduce_subset)
+    CALL dnet%net%read(cfgdir, dotemp, dobed, reduce_subset, dogage, doprof)
 
     ASSOCIATE (cfg => dnet%net%config)
       cfg%time%begin = dhsvm_to_decimal(start)

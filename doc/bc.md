@@ -24,9 +24,15 @@ the name of the BC table file is specified in the
 [configuration.md](configuration file). The BC table file has a simple
 format. Each line has two fields:
 
-* BC identifier
+* BC identifier (non-negative integer)
 
 * File name, usually in quotes
+
+## Downstream Transport BC
+
+If reverse flow happens at the most downstream link, due to tidal
+fluctuations for example, a BC should be set for any transported
+quantities.  This is done with a special id "0".  
 
 ### Example
 

@@ -7,7 +7,7 @@
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! Created July 17, 2017 by William A. Perkins
-! Last Change: 2019-03-12 07:17:51 d3g096
+! Last Change: 2020-07-23 14:50:40 d3g096
 ! ----------------------------------------------------------------
 ! ----------------------------------------------------------------
 ! MODULE nonfluvial_link_module
@@ -20,15 +20,26 @@ MODULE nonfluvial_link_module
   USE linear_link_module
   USE flow_coeff
   USE bc_module
+  USE storage_module
+  
   IMPLICIT NONE
 
-  PRIVATE 
+  PRIVATE
+
+  ! ----------------------------------------------------------------
+  ! TYPE internal_bc_link_t
+  ! ----------------------------------------------------------------
+  TYPE, PUBLIC, EXTENDS(linear_link_t) :: internal_bc_link_t
+   CONTAINS
+     PROCEDURE :: max_courant => internal_bc_max_courant
+     PROCEDURE :: max_diffuse => internal_bc_max_diffuse
+  END type internal_bc_link_t
 
   ! ----------------------------------------------------------------
   ! TYPE discharge_link
   ! Imposed discharge (type = 2)
   ! ----------------------------------------------------------------
-  TYPE, PUBLIC, EXTENDS(linear_link_t) :: discharge_link
+  TYPE, PUBLIC, EXTENDS(internal_bc_link_t) :: discharge_link
    CONTAINS
      PROCEDURE :: coeff => discharge_link_coeff
   END type discharge_link
@@ -48,7 +59,7 @@ MODULE nonfluvial_link_module
   ! TYPE ustage_link
   ! Imposed stage upstream (type = 3)
   ! ----------------------------------------------------------------
-  TYPE, PUBLIC, EXTENDS(linear_link_t) :: ustage_link
+  TYPE, PUBLIC, EXTENDS(internal_bc_link_t) :: ustage_link
    CONTAINS
      PROCEDURE :: coeff => ustage_link_coeff
   END type ustage_link
@@ -57,7 +68,7 @@ MODULE nonfluvial_link_module
   ! TYPE dstage_link
   ! Imposed stage downstream (type = 4)
   ! ----------------------------------------------------------------
-  TYPE, PUBLIC, EXTENDS(linear_link_t) :: dstage_link
+  TYPE, PUBLIC, EXTENDS(internal_bc_link_t) :: dstage_link
    CONTAINS
      PROCEDURE :: coeff => dstage_link_coeff
   END type dstage_link
@@ -66,15 +77,57 @@ MODULE nonfluvial_link_module
   ! TYPE trib_inflow_link
   ! Tributary inflow (type = 5)
   ! ----------------------------------------------------------------
-  TYPE, PUBLIC, EXTENDS(linear_link_t) :: trib_inflow_link
+  TYPE, PUBLIC, EXTENDS(internal_bc_link_t) :: trib_inflow_link
    CONTAINS
      PROCEDURE :: coeff => trib_inflow_link_coeff
   END type trib_inflow_link
+
+  ! ----------------------------------------------------------------
+  ! TYPE offline_storage_link
+  ! 
+  ! ----------------------------------------------------------------
+  TYPE, PUBLIC, EXTENDS(internal_bc_link_t) :: offline_storage_link
+     ! The actual storage bucket
+     TYPE (storage_ptr) :: storage
+
+     
+     DOUBLE PRECISION :: yconnect
+   CONTAINS
+     PROCEDURE :: coeff => offline_storage_link_coeff
+  END type offline_storage_link
 
 
   DOUBLE PRECISION, PARAMETER :: eps = 1.0D-09
 
 CONTAINS
+
+  ! ----------------------------------------------------------------
+  ! DOUBLE PRECISION FUNCTION internal_bc_max_courant
+  ! ----------------------------------------------------------------
+  FUNCTION internal_bc_max_courant(this, dt) RESULT(cnmax)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION :: cnmax
+    CLASS (internal_bc_link_t), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: dt
+
+    cnmax = 0.0
+    
+  END FUNCTION internal_bc_max_courant
+
+  ! ----------------------------------------------------------------
+  ! DOUBLE PRECISION FUNCTION internal_bc_max_diffuse
+  ! ----------------------------------------------------------------
+  FUNCTION internal_bc_max_diffuse(this, dt) RESULT(dmax)
+
+    IMPLICIT NONE
+    DOUBLE PRECISION :: dmax
+    CLASS (internal_bc_link_t), INTENT(IN) :: this
+    DOUBLE PRECISION, INTENT(IN) :: dt
+
+    dmax = 0.0
+    
+  END FUNCTION internal_bc_max_diffuse
 
   ! ----------------------------------------------------------------
   ! SUBROUTINE discharge_link_coeff
@@ -240,6 +293,35 @@ CONTAINS
 
   END SUBROUTINE trib_inflow_link_coeff
 
+
+  ! ----------------------------------------------------------------
+  ! SUBROUTINE offline_storage_link_coeff
+  ! ----------------------------------------------------------------
+  SUBROUTINE offline_storage_link_coeff(this, dt, pt1, pt2, cf)
+
+    IMPLICIT NONE
+
+    CLASS (offline_storage_link), INTENT(INOUT) :: this
+    DOUBLE PRECISION, INTENT(IN) :: dt
+    TYPE (point_t), INTENT(IN) :: pt1, pt2
+    TYPE (coeff), INTENT(OUT) :: cf
+    DOUBLE PRECISION :: dvdy
+
+    dvdy = this%storage%p%dvdy(pt2%hnow%y)
+
+    cf%a = 0.0
+    cf%b = theta
+    cf%c = dvdy
+    cf%d = -theta
+    cf%g = pt2%hnow%q - pt1%hnow%q
+    
+    cf%ap = 1.0
+    cf%bp = 0.0
+    cf%cp = 1.0
+    cf%dp = 0.0
+    cf%gp = pt1%hnow%y - pt2%hnow%y
+    
+  END SUBROUTINE offline_storage_link_coeff
 
 
 END MODULE nonfluvial_link_module
